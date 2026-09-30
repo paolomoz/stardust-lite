@@ -3,18 +3,18 @@
 // Per top-level section: box, padding, paint (bg, image, radius, border, shadow, transform); per text node: font family/size/
 // line-height/weight/letter-spacing/transform/align/colour/style/decoration + box + text + href; per image/video/svg/canvas: box, fit, src.
 // Also writes the captured DOM. Usage:
-//   node live-spec.mjs <url> <W> --out <dir> [--sections <css>] [--header <css>] [--footer <css>] [--consent <css>] [--vh 900]
+//   node live-spec.mjs <url> <W> --out <dir> [--sections <css>] [--header <css>] [--footer <css>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--vh 900]
 // Default sections: `main > .section` (EDS) — for a source page pass its section selector, e.g. --sections '.section-wrapper > section'.
 import { chromium } from 'playwright';
 import { writeFileSync, mkdirSync } from 'node:fs';
-import { arg, openPage, settle } from './common.mjs';
+import { arg, openPage, settle, overlayOpts } from './common.mjs';
 
 const [,, url, wArg] = process.argv;
 if (!url || !wArg) { console.error('usage: live-spec.mjs <url> <W> --out <dir> [--sections <css>] [--header <css>] [--footer <css>] [--consent <css>]'); process.exit(1); }
 const W = Number(wArg); const out = arg('--out', '.'); const vh = Number(arg('--vh', 900));
 const sections = arg('--sections', 'main > .section'); const header = arg('--header', 'header'); const footer = arg('--footer', 'footer'); const consent = arg('--consent', null);
 const browser = await chromium.launch();
-const page = await openPage(browser, url, { width: W, height: vh, consent });
+const page = await openPage(browser, url, { width: W, height: vh, consent, ...overlayOpts() });
 await settle(page);
 const spec = await page.evaluate(({ sections, header, footer }) => {
   const R = (e) => { const b = e.getBoundingClientRect(); return [Math.round(b.x), Math.round(b.y + scrollY), Math.round(b.width), Math.round(b.height)]; };

@@ -1,0 +1,97 @@
+# www.ibm.com/us-en home — triage, deviations, motion (blocks-first v2.1, 2026-09-30)
+
+Source: https://www.ibm.com/us-en (Akamai bot manager present — `_abck`/`bm_sz` cookies — but headless Chromium with the real-Chrome
+UA gets HTTP 200 and the full page; no `--headed` needed). Two overlays at load: TrustArc consent bar (`#truste-consent-button`
+"Accept All", fixed, 167 px) and a full-viewport geo-mismatch modal (`#geoMismatchModal`, Italian, because the capture runs from Italy
+against `/us-en`; `button.geo-modal-close-icon`) — both passed to every instrument (`--consent`, `--dismiss`); locale pinned `en-US`.
+Doc height 4420 at 1440, 4455 at 2560, 7813 at 360. Carbon for IBM.com web components: 161 shadow roots, no `main`/`header`/`footer`
+elements (content root `c4d-video-cta-container`). Cap-probe: **shell fluid, content cap 1584 (module cap, 5 sections)**, probe 2560.
+Type: IBM Plex Sans 300/400/600 (split woff2 from 1.www.s81c.com, Latin1 + Pi), body 16/24 rgb(22,22,22), secondary rgb(82,82,82),
+link rgb(15,98,254), hover rgb(0,67,206), button hover rgb(0,80,230), borders rgb(198,198,198) / rgb(224,224,224), layer rgb(244,244,244),
+footer rgb(22,22,22). Fluid type: expressive-heading-05 53.65/62.77 300 at 1440 → 60/70.2 at ≥1584 → 32.45/40.57 400 at 360 (Carbon
+breakpoints 320/672/1056/1312/1584, linear between). Noise floor (two 1440 captures): **0.11 %** — bands 0:0.2, 450:0.8, rest 0 (the
+leadspace band: video frame / fixed chat launcher); the Adobe Target mboxes (leadspace, tiles, newsfeed) served the same content in every
+run (16 newsfeed items = 8 × 2 duplicates, identical at 360 / 1440 / 2560).
+
+## Triage table (step 2, before any block existed)
+
+| # | section (live, 1440) | default content | block · shape · collection match · rows × cols | section style |
+|---|---|---|---|---|
+| 0 | masthead 1440×49 fixed (logo 126, L0: Software ▾, Infrastructure ▾, Consulting, Support ▾, Think; search, contact, language, profile icons); mega menus with tabs (6 / 4) and 7–14 product links per tab; Support dropdown (8 items + "What's new"); hides on scroll down, reveals on scroll up (`top = clamp(top − Δy, −49, 0)`) | nav doc, 3 sections in reading order: brand `:ibm-logo:` link; L0 `ul` (level 2 = tab heading link, level 3 = product link + description; a level-2 link without children = "Explore all products"; a level-2 link without description = the dropdown's optional link); tools (`:search:`, `:chat:`, `:earth:`, `:user:` links) | `header` · BC **header** (fragment `/drafts/nav`) — IBM look in header.css, header.js assigns brand/sections/tools by section order, builds mega menus, dropdown, side nav, search field, scroll-linked bar | — |
+| 1 | short promo banner 1440×64 rgb(57,57,57): gradient heading 20/28 600 + text 20/28 + icon-only arrow link (124 px, stacked at 360) | — | `banner (dark)` · simple · no BC shape · 1 × 2 (`p strong` heading + text · link) | — (same section as the hero: no gap between them) |
+| 2 | leadspace 1440×608: h1 gradient (37.5 % col) + lede 20/28 + primary/tertiary buttons 232×70 · Kaltura 4:3 video 672×504 with pause toggle (50 %) · "Latest News" link list, 2 of 8 shown, 4 pages (12.5 %, hidden < 1056) | — | `hero (leadspace)` · simple · BC **hero** · 3 × 1 (`h1`, `p`, bold link, italic link · mp4 link + poster picture · `h3` + `ul` of 8 links) — the block builds the `<video>`, the pause toggle and the pagination | — |
+| 3 | "Recommended for you" h5 16/24 600 · 4 tiles 340×178 (92 px square image, label 14/18 grey, text 14/18, arrow / launch icon; whole tile is the link), the row bleeds 16 px into the gutters | `h5` | `cards (tiles)` · container · BC **cards** · 4 × 2 (picture · `p` label + `p` link) | `bleed` |
+| 4 | "Top enterprise technology" h2 (left 50 %) · lede 21.9/30.6 with inline link + "Save big on top products" arrow link (right 50 %) · 8 pictogram cards 332×208 in 4 × 2 (heading 16/22.4, pictogram 48, copy hidden until hover, arrow / launch) · "Explore all IBM products" arrow link | `h2`, `p` (inline link), `p` link, closing `p` link | `cards (pictogram)` · container · BC **cards** · 8 × 2 (`:pictogram-…:` · `h3` link + `p`) | `split-intro` |
+| 5 | promotional banner 1408×130 rgb(229,246,255): image 25 % · heading 16/22 600 + text · tertiary button 352×48 (360: text + icon-only arrow, no image) | — | `banner (light)` · simple · 1 × 3 (picture · `p strong` + `p` · italic link) | — |
+| 6 | "Smarter impact powered by IBM" h2 · 4 case-study cards 332×402 (logo 96×48, heading 28/36, stat panel rgb(244,244,244): 20/28 600 + 16/22, launch icon; whole card is the link) | `h2` | `cards (case-study)` · container · BC **cards** · 4 × 2 (picture · `h3` link + `p strong` stat + `p`) | — |
+| 7 | "Training for what's next" h2 in a 25 % column · 3 items 352 wide (picture 320×240, h 16/24 600, copy, 1–2 text links with arrow / launch); 65vw horizontal scroller at 360 | `h2` | `cards (training)` · container · BC **cards** · 3 × 2 (picture · `h3` + `p` + `p` links) | `title-aside` |
+| 8 | "Stay connected" h2 32/40 + 16:9 picture (656) · "What's New at IBM newsletter subscription" h2 with a 1 px rule (656); the Marketo form under it renders empty (0 px) on the live page | — | `columns (newsletter)` · container · BC **columns** · 1 × 2 (`h2` + picture · `h2`) | — |
+| 9 | footer rgb(22,22,22) 633: logo 128×65 (25 % col) · 4 groups (h2 14/20 600 + 6 / 5 / 6 / 6 links 14/20 rgb(198,198,198)) column-major in 3 × 320 columns · legal rule + 5 items in 3 columns (Contact IBM, Privacy, Terms of use, Accessibility, Cookie Preferences); 360: 48 px accordion rows | footer doc, 3 sections: `:ibm-logo-footer:` link; 4 × (`h2`, `ul`); `ul` | `footer` · BC **footer** (fragment `/drafts/footer`); footer.js groups each `h2 + ul`, accordion below 672 | — |
+
+Hidden DOM not modelled: video modal overlay, Kaltura lightbox container, `#sec-overlay`, geo modal, TrustArc bar, `#consent_blackbar`,
+UCX Symphony webchat launcher (fixed, bottom-right), Bing/LiveRamp pixels, mobile duplicates of the newsfeed (items 9–16), skip link,
+mega-menu panels for tabs 2–6 (captured with `scripts/nav-dump.mjs` + the tab-click probe and authored; hidden at rest).
+Configuration: `template: home`, `nav`, `footer`, `title`, `description` in the metadata block; section styles authored: `bleed`,
+`split-intro`, `title-aside`; every other section is default (64 px rhythm ≥ 672 / 32 px below is foundation CSS).
+
+## David's Model lint at step 2
+See LINT.md.
+
+## Deviations register (step 3, completed through the rounds)
+
+| source feature | decision | pixel cost (est.) |
+|---|---|---|
+| Hero video: Kaltura entry `1_zspv13qw` (partner 1773841), 4 H.264 flavors behind access control. The direct `playManifest … format/url` mp4s download (3.9 MB, byte-identical on re-download) but are **not decodable** (ffmpeg: "non-existing PPS", "no frame"; Chrome: `PIPELINE_ERROR_DECODE`) — Kaltura's protected download; the live player streams HLS/TS and decodes (480×360 flavor in the gate browser). DA accepted the mp4 (201) but the pipeline serves it as `application/octet-stream` (`media_….bin`, then `.mp4` after a typed re-upload) and Chrome's `<video>` refuses it; the code bus serves `video/mp4` with ranges but the bytes cannot play anywhere | authored as the source's own player URL (`https://mediacenter.ibm.com/id/1_zspv13qw`) + a poster picture; hero.js renders `<video>` for an mp4/webm link, else poster + play control opening the Media Center. Poster = the live player's frame at t = 0 captured at 2× (1344×1008, `leadspace-ibm-bob-4x3-frame0.png`) — the Kaltura entry thumbnail (`thumbnail/…/width/672`, "Bob head") is a different frame from the one the live page shows at rest. Same still on both sides of the gate; in a real browser the live page plays a video where the prototype shows the still | 1440 bands 0 / 450: 11.8 / 8.0 % (the 480×360 rendition upscaled on live vs a PNG of it; anti-aliased edges) ≈ 1.6 % of the page; 2560: 7.4 / 5.9 % |
+| UCX Symphony webchat launcher: fixed 56×56 gradient button, bottom-right, in every capture chunk (5 at 1440, 9 at 360) | decided out (third-party widget, not content) | ≈ 0.25 % per width |
+| TrustArc consent bar + geo-mismatch modal ("La tua regione attuale è: Stati Uniti") | accepted / dismissed in every instrument; not modelled (third-party / geo) | 0 (not in the captures) |
+| Adobe Target mboxes (`#mbox-leadspace`, `#mbox-tg1-tile*`, `target-newsfeed-enabled`) | served the same content in every run (noise floor 0.11 %); authored as seen on 2026-09-30; session-variable *region* candidates, cost 0 this run | 0 |
+| Masthead hides on scroll down and reveals on scroll up, `top = clamp(top − Δy, −49, 0)` (ladder measured 0 → −49 by 10 px steps) | header.js on the fixed `.header.block` (aem.js puts the wrapper class on `<header>` itself); ladder on the prototype identical to live (0 / −10 … −49 / −39 … 0) | 0 (frozen in the capture: neither side shows the bar below chunk 1) |
+| Mega menus: tabs (6 / 4) × panels of 7–14 product links with descriptions, "Explore all products"; Support dropdown (8 items + "What's new") — content in the light DOM only after a click; tab panels 2–6 only after the tab is clicked | captured with `scripts/nav-dump.mjs` and the tab-click probe (`measure/megamenu-all.json`), authored as a 3-level list; header.js builds tabs, panels (3 CSS columns, column-major like the source), view-all; click state measured on the build: panel 0/48/1440/406 vs live 410, left column and tabs at the same x, view-all 336 wide | 0 (hidden at rest) |
+| Mobile masthead: hamburger, 73 px logo, search, language, profile; side nav with 49 px rows (Software ›, Infrastructure ›, Consulting, Support ›, Think) and second-level panels | header.js side nav (built from the same list), click-state probe on the build: rows at 49 / 97 / 145 … | 0 at rest |
+| Search: the source's typeahead field expands in the bar | a search field toggled by the icon, submitting to https://www.ibm.com/search (no typeahead) | 0 at rest |
+| Language icon opens a region list; contact icon opens a chat module; profile opens a menu with "Log in" | authored as links (planetwide, contact/global, the login URL) | 0 |
+| Fluid type (Carbon expressive-heading-05 / -03) | CSS variables interpolating per Carbon breakpoint (`calc(48px + 12 * (100vw − 1312px) / 272)` …); exact at 360 / 1440 / 2560, unverified between | 0 at the three widths |
+| Content cap 1584 (module cap), shell fluid; gutters 16 / 32 / 40 | `main > .section > div { max-width: 1584px; padding: 0 var(--gutter) }`; cap-probe compare PASS (0 of 5 rows failed) from round 0 | 0 |
+| Tile group bleeds 16 px into the gutters (row 1408 wide at 1440, heading too) | section style `bleed` (authored) | 0 |
+| Intro "Top enterprise technology": h2 left half, lede + link right half; closing link 64 below the grid (+12 px section padding and a 16 px indent at 360) | section style `split-intro` (authored), foundation CSS | 0 (≤ 5 px at 360) |
+| "Training for what's next": heading in a 25 % column, three items; 65vw horizontal scroller at 360 | section style `title-aside` (authored); the block's row overflows its 464 px section by 8 px on the source → card padding 24 | 0–2 px |
+| Pictogram cards: heading wraps in `calc(100% − 32px)`; on mobile the heading is 132 px wide and **clamped to 3 lines with an ellipsis** (live 360: "watsonx…", "access with IB…"); copy visible on mobile, hidden until hover on desktop | CSS `-webkit-line-clamp: 3` below 672 (heights 48/72×7 = live) | 0 |
+| Pictogram card height: 208 at 1440 and 360, **204.75 at 2560** (Carbon subgrid rows driven by the hidden copy's height) | not modelled (fixed 208) | 3 px shift below the grid at 2560 only: bands 2250–3600 at 2560 2.0–6.1 % |
+| Cards' arrow vs launch icon: the source marks `cta-type="external"` per instance (bob.ibm.com is "local" on tile 1 and "external" on card 1) | rule: link host outside ibm.com → launch, else arrow; an authored `:launch:` / `:arrow-right:` token in the cell overrides (card 1 carries `:launch:`) | 0 |
+| Case-study card grid: standalone h2 in its own source section (63 px) + 64 gap + 32 grid padding | one authored section (h2 + block); `.cards.case-study { padding-top: calc(var(--section-gap) − 0.5px) }` — the −0.5 absorbs the source's fractional rounding of the h2 height (62.77 at 1440 rounds down at that seam, 81.14 at 360 does not) | 0 (1 px at 1440 without it) |
+| Promotional banner at 360: no image, icon-only arrow at the top right, content 17 / 43-px heading line / 66 / 16 → 142 | banner.css mobile rules (padding-bottom 14 measured) | 0 |
+| Marketo newsletter form (`form.mktoForm`, 0 px on the live page) | decided out (third-party; renders nothing in the capture); the heading with its 1 px rule is authored | 0 |
+| "Cookie Preferences" (TrustArc placeholder link in the legal list) | authored as a link to https://www.ibm.com/us-en/privacy (the consent manager is third-party) | 0 |
+| Footer link groups column-major in 3 × 320 columns; legal list 3 × 2; 360: accordion (48 px rows, collapsed) | footer.js / footer.css (grid `grid-auto-flow: column`); accordion toggles measured closed | 0–1 px |
+| Text anti-aliasing: the same glyphs at the same boxes read as differing pixels (`text-rendering: optimizeLegibility` matched; `-webkit-font-smoothing: antialiased` matched) | residual; every text band carries it (0.1–1 % at 1440; 1–4 % at 360 where text fills the width) | see the three-width table |
+| Images: 13 PNG renditions from assets.ibm.com (1536 px wide, `fmt=png-alpha`), the bytes the browser fetched at 1440 | uploaded **unchanged** to DA `/drafts/media/*` (lowercase), previewed on the branch, referenced by the branch preview URL (BACKLOG #4 path); the pipeline serves optimised renditions | photo bands 0.1–2 % |
+| Icons: Carbon 20/32 px icons and 8 pictograms inline in shadow roots (`currentColor` / rgb(22,22,22) fills); `ibm_icons` font glyph for the launch icon | 24 files in `/icons` extracted from the live page (`scripts/svg-extract` in media-list/svgs), Carbon `menu`/`close`/`chevron`/`arrow--left`/`play` from @carbon/icons; pictograms and logos keep baked fills and render as `<img>`; UI icons are inlined by `scripts/icons.js` so hover colours reach the glyph | 0 |
+| `:icon:` tokens: the harness fold does not convert them, the pipeline does (BACKLOG #5) | scripts.js `decorateIconTokens()` converts leftover `:name:` text before `decorateIcons` | 0 |
+| The pipeline leaves the metadata block's section behind empty (METHOD step 7) | `main > .section:not(:has(> *)) { display: none }` from round 0 | 0 |
+| Fonts | IBM Plex Sans Light/Regular/SemiBold, split Latin1 + Pi woff2 from 1.www.s81c.com → `/fonts`, `fonts.css` with the source's unicode ranges | 0 |
+| Hidden newsfeed duplicates (items 9–16 = 1–8) | authored once (8 links, 4 pages of 2) | 0 |
+
+## Motion register (motion-observe live vs prototype via `gate --probes`; deep hover diff `scripts/shadow-hover.mjs` live and build;
+`scripts/masthead-scroll.mjs`; click-state probes)
+
+| interaction | live | build | status |
+|---|---|---|---|
+| masthead on scroll | `top` follows the scroll delta, clamped −49 … 0 (ladder: 0, −10, −20, −30, −40, −49; reveal −39, −29, −19, −9, 0) | header.js on `.header.block` | verified: identical ladder on the prototype (`masthead-scroll.mjs`); motion-compare reads "header scroll-morph: dead on live" (no `header` element on live — sampler blind to the custom element) |
+| L0 menu / item hover | color rgb(82,82,82) → rgb(22,22,22), bg → rgba(140,140,140,.12), chevron fill follows | header.css | verified: deep diff identical (motion-compare "dead on live": the frame sampler reads the host, not the shadow anchor) |
+| logo hover | bg → rgba(140,140,140,.12) only | header.css | verified (deep diff; underline suppressed) |
+| search / profile icon hover | bg → rgba(140,140,140,.12), glyph rgb(82,82,82) → rgb(22,22,22) | header.css | verified (deep diff; search on live also expands a field on click — a field toggle on the build) |
+| mega menu click | panel 1440×410 under the bar, 352 left column (tabs 32 px rows, selected rgba(140,140,140,.2)), blue "Explore all products" 336×48, 3-column category links, heading 28/36 | header.js / header.css | verified: click-state probe — build 1440×406 (after the panel-padding fix 410), tabs at x32, view-all 336×48 at x32; motion-compare "dead on live" (class-toggled panel, sampler blind) |
+| mobile menu | side nav under the bar, 49 px rows, chevrons, Back + heading + items | header.js | verified: click-state probe on the build at 360 (rows 49/97/145/193/241) |
+| tile hover (Recommended for you) | wrapper bg → rgba(141,141,141,.12) 0.24 s; link color rgb(15,98,254) → rgb(0,80,230) 0.07 s + underline; arrow `scale` 1.125 0.15 s; `wrap-border` 0.7 s: a 135deg blue gradient stop (`--percentage` 0 → 100 %) draws the 2 px border ring | cards.css (`@property --wrap`, `wrap-border` keyframes with `cubic-bezier(.4,0,.2,1)` fitted to the sampled 12.5 / 38 / 67 / 87.5 % at 117 / 217 / 317 / 433 ms) | verified: deep diff identical; motion-compare `wrap-border` **parity**; "scale MISSING / transform extra" = the same icon zoom expressed as `transform` instead of the `scale` property; timing row 70 vs 240 ms = the sampler pairing the color transition with the background one |
+| pictogram card hover | tile bg → rgb(232,232,232) 0.15 s; copy opacity 0 → 1 / translateY −16 → 0 0.24 s; pictogram fades; arrow 1.1; `wrap-border` | cards.css | verified: deep diff identical (bg, copy, pictogram, icon) |
+| case-study card hover | card bg → rgba(141,141,141,.12), stat panel rgb(244,244,244) → rgb(232,232,232) 0.24 s, launch icon scale 1.1, `wrap-border` | cards.css | verified: deep diff identical; motion-compare "extra on build — advisory" (sampler read no diff on live) |
+| primary button hover | bg rgb(15,98,254) → rgb(0,80,230), arrow scale 1.1 | styles.css | verified: deep diff identical (advisory in motion-compare, same reason) |
+| tertiary button hover (hero, promo) | bg → rgb(0,80,230), text and icon → white, arrow 1.1 | styles.css | verified: deep diff identical |
+| newsfeed link hover | color → rgb(0,67,206), underline, arrow follows | hero.css | verified |
+| pagination dot hover / click | inactive ::after bar → rgb(141,141,141); click swaps the 2 visible items (class `active`) | hero.js / hero.css | verified: deep diff; motion-compare class `active` **parity** |
+| link-with-icon hover (intro, "Explore all", training links, short-banner arrow) | color → rgb(0,67,206) (rgb(166,200,255) on the dark banner), underline, icon 1.1 | styles.css / banner.css / cards.css | verified: deep diff identical |
+| footer link hover | color rgb(198,198,198) → rgb(244,244,244) + underline (the host probe read "no change": the 57 px link is left of the host centre) | footer.css | verified (precise deep diff on `c4d-footer-nav-item a`) |
+| footer logo hover | no change | — | verified (no hover rule) |
+| video pause toggle hover | bg rgba(22,22,22,.5) → rgba(23,23,23,.9) | hero.css | verified (the build's control is a play link on the poster — the video is not liftable, see deviations) |
+| Kaltura player classes `playkit-hover`, `playkit-state-paused` | fire on live | — | decided out (third-party player internals; video not lifted) — motion-compare MISSING ×2 |
+| footer accordion (360) | 48 px rows toggle | footer.js | verified closed state (rows 48/48/48/49 live vs 48×4 build); open state not measured |

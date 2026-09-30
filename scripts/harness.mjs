@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 // harness.mjs — lint → fold → runtime → serialise (step 5). The served harness page IS the gated prototype; the serialised file is
 // the review artifact. Refuses to fold a document with a David's Model 🔴 (deploy skill lint) unless --no-lint.
-// Usage: node harness.mjs <authored.html> --serve <dir> --name <slug> [--port 8930] [--width 1440] [--no-lint]
+// Usage: node harness.mjs <authored.html> --serve <dir> --name <slug> [--port 8930] [--width 1440] [--no-lint] [--fragments <branch-host>]
 //   <dir> must serve the site code: symlinks scripts/ blocks/ styles/ fonts/ icons/ → the repo; plus any local media the document
 //   references (e.g. drafts/media/*) and fragment plain.html files (drafts/nav.plain.html). Start it with `python3 -m http.server`.
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+//   --fragments https://<branch>--<site>--<org>.aem.page fetches the PIPELINE's `<nav>.plain.html` / `<footer>.plain.html` (the paths
+//   in the metadata block, previewed first) into <dir>: a hand-made plain.html differs from the pipeline's (it wraps a list item's own
+//   text in <p> when the item holds a nested list — ibm-home's header decorated on the prototype and crashed on the served page).
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { chromium } from 'playwright';
@@ -35,6 +39,14 @@ const folded = await p0.evaluate(() => {
 });
 await b0.close();
 const { metas } = folded;
+if (arg('--fragments', null)) {
+  const host = String(arg('--fragments')).replace(/\/$/, '');
+  for (const [k, v] of metas.filter(([k]) => ['nav', 'footer'].includes(k))) {
+    const path = new URL(v, host).pathname; const r = await fetch(`${host}${path}.plain.html`).catch(() => null);
+    if (!r || !r.ok) { console.error(`harness: ${host}${path}.plain.html → ${r ? r.status : 'unreachable'} — preview the ${k} document first`); process.exit(4); }
+    const file = `${serveDir}${path}.plain.html`; mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, await r.text()); console.log(`harness: ${k} fragment ← pipeline ${path}.plain.html`);
+  }
+}
 const head = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${metas.map(([k, v]) => `<meta name="${k}" content="${v.replace(/"/g, '&quot;')}">`).join('')}<title>${(metas.find(([k]) => k === 'title') || [, ''])[1]}</title><script src="/scripts/aem.js" type="module"></script><script src="/scripts/scripts.js" type="module"></script><link rel="stylesheet" href="/styles/styles.css"></head>`;
 writeFileSync(`${serveDir}/${name}.harness.html`, `${head}<body><header></header>${folded.main}<footer></footer></body></html>`);
 

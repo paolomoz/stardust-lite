@@ -2,14 +2,14 @@
 // click-state.mjs — click-state probe for what the frame sampler cannot see (class-toggled panels: dropdowns, mobile menus, tabs):
 // click a selector, then dump the opened panel's structure with boxes, display, paint and fonts, and screenshot the viewport.
 // Run it on live and on the build with the pair of selectors from the probes file.
-// Usage: node click-state.mjs <url> <W> --click <css> --panel <css> [--shot <out.png>] [--consent <css>] [--depth 7]
+// Usage: node click-state.mjs <url> <W> --click <css> --panel <css> [--shot <out.png>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--depth 7]
 import { chromium } from 'playwright';
-import { arg, openPage } from './common.mjs';
+import { arg, openPage, overlayOpts } from './common.mjs';
 
 const [,, url, wArg] = process.argv; const click = arg('--click'); const panel = arg('--panel');
 if (!url || !wArg || !click || !panel) { console.error('usage: click-state.mjs <url> <W> --click <css> --panel <css> [--shot <out.png>] [--consent <css>] [--depth 7]'); process.exit(1); }
 const W = Number(wArg); const depth = Number(arg('--depth', 7));
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: 900, consent: arg('--consent', null) });
+const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: 900, consent: arg('--consent', null), ...overlayOpts() });
 await page.click(click); await page.waitForTimeout(1200);
 if (arg('--shot', null)) await page.screenshot({ path: arg('--shot') });
 console.log(await page.evaluate(([panel, depth]) => {

@@ -3,18 +3,18 @@
 // first heading/paragraph of each live section is located on the build and the build section containing it is the partner (several
 // live sections can share one build section — authored sections are usually coarser than the source's). Falls back to index order
 // for a live section without text.
-// Usage: node sections.mjs <spec.json> <build-url> [--sections <css>] [--header <css>] [--footer <css>]
+// Usage: node sections.mjs <spec.json> <build-url> [--sections <css>] [--header <css>] [--footer <css>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>]
 import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
-import { arg, openPage, settle } from './common.mjs';
+import { arg, openPage, settle, overlayOpts } from './common.mjs';
 
 const [,, specPath, url] = process.argv;
 if (!specPath || !url) { console.error('usage: sections.mjs <spec.json> <build-url> [--sections <css>] [--header <css>] [--footer <css>]'); process.exit(1); }
 const spec = JSON.parse(readFileSync(specPath, 'utf8'));
 const sections = arg('--sections', 'main > .section'); const header = arg('--header', 'header'); const footer = arg('--footer', 'footer');
-const anchorOf = (s) => s.items.find((it) => ['h1', 'h2', 'h3', 'h4', 'p', 'a', 'li'].includes(it.k) && it.t && it.t.length >= 3);
+const anchorOf = (s) => s.items.find((it) => ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'li'].includes(it.k) && it.t && it.t.length >= 3); // h5/h6: a small section head is an h5 on Carbon sites (ibm-home)
 const live = spec.secs.map((s) => { const a = anchorOf(s); return { box: s.box, id: s.id, anchor: a ? { t: a.t.slice(0, 28), box: a.box } : null }; });
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800 });
+const browser = await chromium.launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800, consent: arg('--consent', null), ...overlayOpts() });
 await settle(page, 800, 50, 400);
 const r = await page.evaluate(({ sections, header, footer, live }) => {
   const R = (e) => { if (!e) return null; const b = e.getBoundingClientRect(); return [Math.round(b.x), Math.round(b.y + scrollY), Math.round(b.width), Math.round(b.height)]; };
