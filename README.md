@@ -18,8 +18,8 @@ loss in the first two pilots.
 
 - `METHOD.md` — the procedure. Every rule traces to a case; `BACKLOG.md` holds what the cases found wrong or missing.
 - `scripts/` — the instruments (Node + Playwright): `probe-load`, `probe-structure`, `content-dump`, `media-list`, `live-spec`, `scroll-probe`,
-  `deep-probe`, `harness`, `sections`, `pair`, `leak`, `gate`, `hover-diff`, `click-state`, `crop`, `measure-view`, `measure-to-spec`,
-  `origin-pick`, `spec-view`.
+  `deep-probe`, `video-frame`, `da-put`, `sync-poll`, `serve`, `harness`, `sections`, `pair`, `leak`, `gate`, `hover-diff`, `click-state`,
+  `crop`, `measure-view`, `measure-to-spec`, `origin-pick`, `spec-view`.
 - `tools/` — vendored, unmodified, from Adobe's stardust plugin (Apache-2.0, see `NOTICE`): `replica/` capture and compare tools
   (`stitch-shot`, `pixel-compare`, `cap-probe`, `motion-observe`, `motion-compare`, `measure`, `anchor`), `diff/live-session.mjs`
   (their live-page session), `lint/davids-model-lint.mjs` + `davids-model.md`.
@@ -35,8 +35,9 @@ npm run check              # syntax of every script and tool
 ```
 
 Bot-managed origins need the tools' `--headed` tier (real Chrome installed). DA / aem.page calls need an IMS bearer token in `DA_TOKEN`.
-Every instrument takes `--consent <css>`, `--dismiss <css,…>` (any other overlay: geo modal, interstitial), `--locale <tag>` and
-`--require <css,…>` (composition gate: exit 4 when the session is not the one the origin was captured in).
+Every instrument takes `--consent <css>` (a consent control that reloads the page is waited out), `--dismiss <css,…>` (any other overlay:
+geo modal, interstitial), `--locale <tag>` and `--require <css,…>` (composition gate: exit 4 when the session is not the one the origin
+was captured in); every measurement waits for `document.fonts.ready`.
 
 ## Use from a site repo (the normal way)
 
@@ -61,12 +62,12 @@ method changes and new instruments are pull requests here, traced to a case.
 
 | step | command |
 |---|---|
-| 1 measure | `npx stardust-lite probe-load <url>` (first look) · `npx stardust-lite probe-structure <url> <W> --root main --depth 3` (the section selector) · `npx stardust-lite cap-probe <url> --out cap.json` · `npx stardust-lite stitch-shot <url> live-<W>.png --width <W> --settle` (×3 widths, 1440 twice for the noise floor; a band far above the rest is a composition: pick one, pass its markers as `--require` below) · `npx stardust-lite content-dump <url> <W> --roots header,main,footer --out content.json` · `npx stardust-lite media-list <url> <W> --out media.json` · `npx stardust-lite live-spec <url> <W> --out measure --sections <css>` or, when the origin blocks headless, `npx stardust-lite measure <url> --headed --selectors … --json --out m.json` then `npx stardust-lite measure-to-spec` · `npx stardust-lite motion-observe <url> motion-live.json --headed --hover … --click …` |
-| 2–3 triage, author, lint | write the triage table and the registers, generate the documents, `npx stardust-lite lint doc/` |
+| 1 measure | `npx stardust-lite probe-load <url>` (first look) · `npx stardust-lite probe-structure <url> <W> --root main --depth 3` (the section selector) · `npx stardust-lite cap-probe <url> --out cap.json` · `npx stardust-lite stitch-shot <url> live-<W>.png --width <W> --settle` (×3 widths, 1440 twice for the noise floor; a band far above the rest is a composition: pick one, pass its markers as `--require` below) · `npx stardust-lite content-dump <url> <W> --roots header,main,footer --out content.json` · `npx stardust-lite media-list <url> <W> --out media.json` · `npx stardust-lite live-spec <url> <W> --out measure --sections <css>` or, when the origin blocks headless, `npx stardust-lite measure <url> --headed --selectors … --json --out m.json` then `npx stardust-lite measure-to-spec` · `npx stardust-lite motion-observe <url> motion-live.json --headed --hover … --click …` · `npx stardust-lite scroll-probe <url> --layers <css> --up` when a layer changes with scroll · `npx stardust-lite video-frame <url> <W> poster.png --video <css>` for a hosted player |
+| 2–3 triage, author, lint | write the triage table and the registers, generate the documents, `npx stardust-lite lint doc/`; `npx stardust-lite da-put <org>/<site>/<branch> media/* --to drafts/media` and `… doc/*.html --to drafts` (bytes unchanged, preview only) |
 | 4 blocks | in the site repo, on a branch |
-| 5 prototype | `npx stardust-lite harness doc/home.html --serve proto --name home --port 89xx` (serve dir symlinks the site's `scripts blocks styles fonts icons`) |
+| 5 prototype | `npx stardust-lite serve proto --port 89xx --site .` (concurrent server, creates the `scripts blocks styles fonts icons` symlinks) then `npx stardust-lite harness doc/home.html --serve proto --name home --port 89xx --fragments <branch-host> --content measure/content-1440.json` |
 | 6 gate | `npx stardust-lite sections spec-<W>.json <build>` · `npx stardust-lite pair spec-<W>.json <build>` at all three widths before every CSS change · between rounds `npx stardust-lite gate --live <url> --build http://localhost:89xx/home.harness.html --out gate --widths <base>` · once clean: the three widths with `--probes probes.txt`, plus `hover-diff` / `click-state` on both sides |
-| 7 deploy + gate | same document to DA, preview on the branch, `gate` against the served URL, `npx stardust-lite leak <url> --sels sels.txt` on both and diff |
+| 7 deploy + gate | same document to DA (`da-put`), push the code, `npx stardust-lite sync-poll <branch-host> . blocks/x/x.css …` until the bus serves the repo's files, `gate` against the served URL, `npx stardust-lite leak <url> --sels sels.txt` on both and diff |
 
 Definition of done: three-width pixel table with the noise floor, cap-probe PASS at the probe width, motion-compare parity, lint clean at
 step 2, served page within the prototype's numbers, leak table identical.
@@ -80,8 +81,11 @@ step 2, served page within the prototype's numbers, leak table identical.
 | `travelers-home` | 2026-09-30 | 3.26 / 1.09 / 0.57 | 3.28 / 1.10 / 0.57 | 5 CSS rounds (1 void) + 1 served fix; 2 h wall, first prototype at 76 min |
 | `ibm-home` | 2026-09-30 | 4.04 / 2.39 / 3.28 | 4.09 / 2.37 / 3.27 | 7 CSS rounds (1 void half-round, 2 on the hero video) + 1 served fix; 108 min wall, first shareable URL at 58 min; shadow-DOM origin, consent + geo modal |
 | `walgreens-home` | 2026-09-30 | 8.48 / 2.84 / 1.62 | 8.53 / 2.85 / 1.63 | 4 CSS rounds (none void, 3 on inherited boilerplate rules) + 0 served fixes; 91 min wall, first shareable URL at 50 min; light-DOM AEM Sites origin with three session compositions, a GAM ad slot, personalisation slots |
+| `stryker-home` | 2026-09-30/10-01 | 10.27 / 1.98 / 2.21 | 10.36 / 1.94 / 2.19 | 7 harness rounds (none void, 1 regression) + 0 served fixes; 67 min wall, first shareable URL at 46 min; light-DOM AEM Sites (Bootstrap 3) origin, reload-on-consent OneTrust bar, Dynamic Media hosted hero video, per-instance card styling (≈ 8 of the 10.3 % at 360), noise floor 0.00 |
 
 Next: one static-CMS site, passing the lint at step 2 and holding its prototype number on the served page. ibm-home was the JS-heavy
 one (Carbon web components); the composed-tree tier it needed is in `common.mjs` (`DEEP_HELPERS`), `deep-probe` and `hover-diff`.
 walgreens-home was the session-variable one (three compositions per load); the composition gate it needed is `--require` on every
-instrument, and its step-1 probes (`probe-load`, `probe-structure`, `content-dump`, `media-list`) are now instruments.
+instrument. stryker-home was the deterministic one (noise floor 0.00): what cost rounds there was the tooling — a consent that reloads,
+lazily loaded fonts, a single-threaded server, a truncated content viewer — and those are now `openPage`, `serve`, `harness --content`,
+`video-frame`, `da-put` and `sync-poll`.

@@ -1,5 +1,5 @@
-// common.mjs — shared helpers: real-Chrome UA, consent + overlay dismissal, locale, lazyload settle, composed-tree (shadow DOM)
-// queries, stardust plugin script paths.
+// common.mjs — shared helpers: real-Chrome UA, consent (waits out a reload-on-consent) + overlay dismissal, locale, device scale,
+// lazyload settle (fonts included), composed-tree (shadow DOM) queries, stardust plugin script paths.
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,15 +19,28 @@ export function arg(name, def) {
  * composition the origin was captured in: `--require <css,…>` exits 4 when one of the markers is absent — walgreens-home). */
 export const overlayOpts = () => ({ dismiss: String(arg('--dismiss', '')).split(',').map((s) => s.trim()).filter(Boolean), locale: arg('--locale', null), require: String(arg('--require', '')).split(',').map((s) => s.trim()).filter(Boolean) });
 
-export async function openPage(browser, url, { width = 1440, height = 900, consent = null, dismiss = [], locale = null, require = [], wait = 2500, before = null } = {}) {
-  const page = await browser.newPage({ viewport: { width, height }, userAgent: UA, ...(locale ? { locale, extraHTTPHeaders: { 'Accept-Language': `${locale},${locale.split('-')[0]};q=0.9` } } : {}) });
+export async function openPage(browser, url, { width = 1440, height = 900, scale = 1, consent = null, dismiss = [], locale = null, require = [], wait = 2500, before = null } = {}) {
+  const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: scale, userAgent: UA, ...(locale ? { locale, extraHTTPHeaders: { 'Accept-Language': `${locale},${locale.split('-')[0]};q=0.9` } } : {}) });
   if (before) await before(page); // listeners that must exist before navigation (response log for font requests — media-list)
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
   await page.waitForTimeout(wait);
-  for (const sel of dismiss) { try { await page.click(sel, { timeout: 1500 }); } catch { /* absent */ } }
+  const dismissAll = async () => { for (const sel of dismiss) { try { await page.click(sel, { timeout: 1500 }); } catch { /* absent */ } } };
+  await dismissAll();
   const candidates = [consent, '#onetrust-accept-btn-handler', '.agree-button', 'button:has-text("Accept all")', 'button:has-text("Accept All")'].filter(Boolean);
-  for (const sel of candidates) { try { await page.click(sel, { timeout: 1200 }); break; } catch { /* next */ } }
+  for (const sel of candidates) {
+    try {
+      // a consent accept may RELOAD the page (OneTrust "reload on consent" — stryker-home): every instrument then ran `settle` in a destroyed
+      // context. Arm the navigation wait before the click; when it fires, wait the page in again and re-dismiss the other overlays
+      const nav = page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 3000 }).catch(() => null);
+      await page.click(sel, { timeout: 1200 });
+      if (await nav) { console.error(`openPage: consent control ${sel} reloaded the page — waited for it`); await page.waitForTimeout(wait); await dismissAll(); }
+      break;
+    } catch { /* next */ }
+  }
   await page.waitForFunction(() => [...document.querySelectorAll('.block')].every((el) => el.dataset.blockStatus === 'loaded'), null, { timeout: 15000 }).catch(() => {});
+  // fonts are a measurement precondition: the boilerplate loads fonts.css lazily and a table read before the swap measures fallback metrics
+  // (sections / pair / deep-probe disagreed by 40–100 px between runs on one page — stryker-home)
+  await page.evaluate(() => document.fonts.ready.then(() => document.fonts.status)).catch(() => {});
   if (require.length) { // composition gate: the session must be the one the cached origin shows (retry the run otherwise)
     const missing = await page.evaluate((sels) => sels.filter((s) => { try { return !document.querySelector(s); } catch { return true; } }), require);
     if (missing.length) { console.error(`composition mismatch — missing: ${missing.join(' | ')} (exit 4; run again until the session matches the origin)`); await browser.close(); process.exit(4); }
@@ -39,6 +52,7 @@ export async function settle(page, step = 600, pause = 120, rest = 1500) {
   await page.evaluate(async ({ step, pause, rest }) => {
     for (let y = 0; y < document.body.scrollHeight; y += step) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, pause)); }
     window.scrollTo(0, 0); await new Promise((r) => setTimeout(r, rest));
+    await document.fonts.ready; // the lazy fonts.css has been requested by now: measure after the swap, not before
   }, { step, pause, rest });
 }
 

@@ -2,8 +2,13 @@
 // harness.mjs — lint → fold → runtime → serialise (step 5). The served harness page IS the gated prototype; the serialised file is
 // the review artifact. Refuses to fold a document with a David's Model 🔴 (deploy skill lint) unless --no-lint.
 // Usage: node harness.mjs <authored.html> --serve <dir> --name <slug> [--port 8930] [--width 1440] [--no-lint] [--fragments <branch-host>]
+//        [--content <content.json>]
 //   <dir> must serve the site code: symlinks scripts/ blocks/ styles/ fonts/ icons/ → the repo; plus any local media the document
-//   references (e.g. drafts/media/*) and fragment plain.html files (drafts/nav.plain.html). Start it with `python3 -m http.server`.
+//   references (e.g. drafts/media/*) and fragment plain.html files (drafts/nav.plain.html). Start it with `scripts/serve.mjs <dir>
+//   --port <n> --site <repo>` (creates the symlinks, answers concurrent sessions — `python3 -m http.server` under parallel Playwright
+//   sessions timed out the blocks-loaded wait and measured half-styled pages — stryker-home).
+//   --content <content-dump.json> checks every authored text against the capture: a text the dump does not hold was typed from memory
+//   (three descriptions finished from a truncated viewer cost a round — stryker-home). Warns, does not refuse.
 //   --fragments https://<branch>--<site>--<org>.aem.page fetches the PIPELINE's `<nav>.plain.html` / `<footer>.plain.html` (the paths
 //   in the metadata block, previewed first) into <dir>: a hand-made plain.html differs from the pipeline's (it wraps a list item's own
 //   text in <p> when the item holds a nested list — ibm-home's header decorated on the prototype and crashed on the served page), and
@@ -39,10 +44,21 @@ const folded = await p0.evaluate(() => {
   // the pipeline's cell rule: a block cell holding ONE paragraph and nothing else loses its <p> (`<div><p><a>x</a></p></div>` → `<div><a>x</a></div>`,
   // verified on the served plain.html — walgreens-home); a decorate that read `:scope > p` worked on the prototype only
   document.querySelectorAll('main > div > div > div > div').forEach((cell) => { const k = cell.children; if (k.length === 1 && k[0].tagName === 'P' && ![...cell.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) k[0].replaceWith(...k[0].childNodes); });
-  return { metas, main: document.querySelector('main').outerHTML };
+  // every authored text (an element's own text and inline children, nested lists/blocks excluded) for the capture check
+  const texts = [...document.querySelectorAll('main h1,main h2,main h3,main h4,main h5,main h6,main p,main li')].map((e) => [...e.childNodes].filter((n) => n.nodeType === 3 || (n.nodeType === 1 && !/^(UL|OL|DIV|P|TABLE)$/.test(n.tagName))).map((n) => n.textContent).join('').replace(/:[a-z0-9-]+:/g, ' ').replace(/\s+/g, ' ').trim()).filter((t) => t.length >= 3 && !/^https?:/.test(t));
+  return { metas, main: document.querySelector('main').outerHTML, texts };
 });
 await b0.close();
 const { metas } = folded;
+if (arg('--content', null)) {
+  const dump = JSON.parse(readFileSync(arg('--content'), 'utf8')); const got = [];
+  const walk = (n) => { if (!n || typeof n !== 'object') return; if (Array.isArray(n)) return n.forEach(walk); if (typeof n.text === 'string') got.push(n.text); walk(n.children); };
+  Object.entries(dump).forEach(([k, v]) => { if (!k.startsWith('__')) walk(v); });
+  const hay = got.join(' ').replace(/\s+/g, ' ').toLowerCase();
+  const missing = [...new Set(folded.texts)].filter((t) => !hay.includes(t.toLowerCase()));
+  missing.forEach((t) => console.log(`harness: text not in the capture — "${t.slice(0, 100)}${t.length > 100 ? '…' : ''}"`));
+  console.log(`harness: content check ${folded.texts.length} texts, ${missing.length} not in ${arg('--content')}${missing.length ? ' (typed from memory? read the JSON, not a viewer)' : ''}`);
+}
 if (arg('--fragments', null)) {
   const host = String(arg('--fragments')).replace(/\/$/, '');
   for (const [k, v] of metas.filter(([k]) => ['nav', 'footer'].includes(k))) {
@@ -65,7 +81,7 @@ try {
   const served = await (await fetch(`http://localhost:${port}/${name}.harness.html`)).text();
   if (md5(served) !== md5(written)) { console.error(`harness: http://localhost:${port}/${name}.harness.html is NOT the file just written (served md5 ${md5(served).slice(0, 8)}, written ${md5(written).slice(0, 8)}) — another server on :${port}? refusing`); process.exit(3); }
   console.log(`harness: served file verified (md5 ${md5(written).slice(0, 8)})`);
-} catch (e) { console.error(`harness: nothing answers on http://localhost:${port}/ — start \`python3 -m http.server ${port} --directory ${serveDir}\` first (${String(e).slice(0, 80)})`); process.exit(3); }
+} catch (e) { console.error(`harness: nothing answers on http://localhost:${port}/ — start \`node scripts/serve.mjs ${serveDir} --port ${port} --site <repo>\` first (${String(e).slice(0, 80)})`); process.exit(3); }
 
 const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: W, height: 900 } });
 p.on('console', (m) => { if (m.type() === 'error') console.log('console:', m.text().slice(0, 200)); });
@@ -73,7 +89,7 @@ p.on('pageerror', (e) => console.log('pageerror:', String(e).slice(0, 200)));
 p.on('requestfailed', (r) => console.log('reqfailed:', r.url().slice(0, 120)));
 await p.goto(`http://localhost:${port}/${name}.harness.html`, { waitUntil: 'networkidle', timeout: 60000 });
 await p.waitForFunction(() => document.body.classList.contains('appear') && [...document.querySelectorAll('.block')].every((el) => el.dataset.blockStatus === 'loaded'), null, { timeout: 30000 }).catch((e) => console.log('wait:', String(e).slice(0, 120)));
-await p.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 800) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 60)); } window.scrollTo(0, 0); });
+await p.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 800) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 60)); } window.scrollTo(0, 0); await document.fonts.ready; });
 await p.waitForTimeout(500);
 const dom = await p.evaluate(() => {
   document.querySelectorAll('script').forEach((s) => s.remove());

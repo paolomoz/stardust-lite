@@ -11,9 +11,9 @@ to `migration/cases/<template>/` (REPORT.md, REGISTER.md, LINT.md, tables — ca
 
 Instruments run with `npx stardust-lite <name> [args]` (`npx stardust-lite list`; each prints usage without arguments):
 `cap-probe`, `stitch-shot`, `pixel-compare`, `measure`, `motion-observe`, `motion-compare` (capture and compare),
-`probe-load`, `probe-structure`, `content-dump`, `media-list`, `live-spec`, `scroll-probe`, `deep-probe`, `measure-to-spec`,
-`measure-view`, `origin-pick` (measurement), `lint` (David's Model),
-`harness`, `gate`, `sections`, `pair`, `leak` (prototype and gate).
+`probe-load`, `probe-structure`, `content-dump`, `media-list`, `live-spec`, `scroll-probe`, `deep-probe`, `video-frame`, `measure-to-spec`,
+`measure-view`, `origin-pick` (measurement), `lint` (David's Model), `da-put`, `sync-poll` (DA upload + preview, code sync),
+`serve`, `harness`, `gate`, `sections`, `pair`, `leak`, `hover-diff`, `click-state` (prototype and gate).
 
 Rules that do not bend: the source is measured, never cloned; triage and lint before any block exists; the gated prototype is the
 runtime harness page at 360 / 1440 / probe width against a cached origin with a noise floor; a CSS round changes only what the section
