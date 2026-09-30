@@ -8,9 +8,39 @@
     "check": "for f in scripts/*.mjs tools/*/*.mjs; do node --check $f || exit 1; done",
     "test": "node --test tools/replica/test/"
   },
-  "devDependencies": {
+  "bin": {
+    "stardust-lite": "bin/stardust-lite.mjs"
+  },
+  "dependencies": {
     "playwright": "^1.50.0",
     "pixelmatch": "^6.0.0",
     "pngjs": "^7.0.0"
+  },
+  "files": [
+    "bin",
+    "scripts",
+    "tools",
+    "templates",
+    "METHOD.md",
+    "BACKLOG.md",
+    "README.md",
+    "AGENTS.md",
+    "NOTICE",
+    "LICENSE",
+    "cases/*/README.md",
+    "cases/*/REPORT.md",
+    "cases/*/REGISTER.md",
+    "cases/*/LINT.md",
+    "cases/*/doc",
+    "cases/*/registers",
+    "cases/*/authored"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paolomoz/stardust-lite.git"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
   }
 }

@@ -25,7 +25,7 @@ loss in the first two pilots.
 - `cases/<site>-<template>/` — one folder per run: triage table, deviations and motion registers, lint result, measurement tables,
   gate tables and report. Captures and media are regenerated, not committed.
 
-## Setup
+## Setup (working on stardust-lite itself)
 
 ```sh
 npm i                      # playwright, pixelmatch, pngjs
@@ -35,16 +35,35 @@ npm run check              # syntax of every script and tool
 
 Bot-managed origins need the tools' `--headed` tier (real Chrome installed). DA / aem.page calls need an IMS bearer token in `DA_TOKEN`.
 
+## Use from a site repo (the normal way)
+
+stardust-lite is a tool the **site being migrated** installs; the site repo holds the blocks and the evidence, this repo holds the
+method and the instruments.
+
+```sh
+cd <site-repo>                                   # the EDS boilerplate clone
+npm i -D github:paolomoz/stardust-lite           # or a pinned ref: github:paolomoz/stardust-lite#<sha>
+npx playwright install chromium
+npx stardust-lite init                           # writes .github/skills/stardust-lite/SKILL.md, .claude/skills/…, an AGENTS.md section,
+                                                 # migration/cases/ and .gitignore lines
+npx stardust-lite list                           # instruments; each prints usage without arguments
+npx stardust-lite method                         # path of METHOD.md — the agent reads this first
+```
+
+A clean Copilot or Claude Code session opened in the site repo then finds the skill and `AGENTS.md`, reads `node_modules/stardust-lite/METHOD.md`
+and runs `npx stardust-lite <instrument>`. Evidence goes to `migration/cases/<template>/`. Nothing under `node_modules/stardust-lite` is edited;
+method changes and new instruments are pull requests here, traced to a case.
+
 ## Run (per template)
 
 | step | command |
 |---|---|
-| 1 measure | `node tools/replica/cap-probe.mjs <url> --out cap.json` · `node tools/replica/stitch-shot.mjs <url> live-<W>.png --width <W> --settle` (×3 widths, 1440 twice for the noise floor) · `node scripts/live-spec.mjs <url> <W> --out measure --sections <css>` or, when the origin blocks headless, `node tools/replica/measure.mjs <url> --headed --selectors … --json --out m.json` then `node scripts/measure-to-spec.mjs` · `node tools/replica/motion-observe.mjs <url> motion-live.json --headed --hover … --click …` |
-| 2–3 triage, author, lint | write the triage table and the registers, generate the documents, `node tools/lint/davids-model-lint.mjs doc/` |
+| 1 measure | `npx stardust-lite cap-probe <url> --out cap.json` · `npx stardust-lite stitch-shot <url> live-<W>.png --width <W> --settle` (×3 widths, 1440 twice for the noise floor) · `npx stardust-lite live-spec <url> <W> --out measure --sections <css>` or, when the origin blocks headless, `npx stardust-lite measure <url> --headed --selectors … --json --out m.json` then `npx stardust-lite measure-to-spec` · `npx stardust-lite motion-observe <url> motion-live.json --headed --hover … --click …` |
+| 2–3 triage, author, lint | write the triage table and the registers, generate the documents, `npx stardust-lite lint doc/` |
 | 4 blocks | in the site repo, on a branch |
-| 5 prototype | `node scripts/harness.mjs doc/home.html --serve proto --name home --port 89xx` (serve dir symlinks the site's `scripts blocks styles fonts icons`) |
-| 6 gate | `node scripts/gate.mjs --live <url> --build http://localhost:89xx/home.harness.html --out gate [--probes probes.txt]` · `node scripts/sections.mjs spec-<W>.json <build>` · `node scripts/pair.mjs spec-<W>.json <build>` before every CSS change |
-| 7 deploy + gate | same document to DA, preview on the branch, `gate.mjs` against the served URL, `node scripts/leak.mjs <url> --sels sels.txt` on both and diff |
+| 5 prototype | `npx stardust-lite harness doc/home.html --serve proto --name home --port 89xx` (serve dir symlinks the site's `scripts blocks styles fonts icons`) |
+| 6 gate | `npx stardust-lite gate --live <url> --build http://localhost:89xx/home.harness.html --out gate [--probes probes.txt]` · `npx stardust-lite sections spec-<W>.json <build>` · `npx stardust-lite pair spec-<W>.json <build>` before every CSS change |
+| 7 deploy + gate | same document to DA, preview on the branch, `gate` against the served URL, `npx stardust-lite leak <url> --sels sels.txt` on both and diff |
 
 Definition of done: three-width pixel table with the noise floor, cap-probe PASS at the probe width, motion-compare parity, lint clean at
 step 2, served page within the prototype's numbers, leak table identical.
