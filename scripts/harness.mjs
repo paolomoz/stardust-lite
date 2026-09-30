@@ -6,6 +6,7 @@
 //   references (e.g. drafts/media/*) and fragment plain.html files (drafts/nav.plain.html). Start it with `python3 -m http.server`.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { chromium } from 'playwright';
 import { arg, davidsLint } from './common.mjs';
 
@@ -36,6 +37,15 @@ await b0.close();
 const { metas } = folded;
 const head = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${metas.map(([k, v]) => `<meta name="${k}" content="${v.replace(/"/g, '&quot;')}">`).join('')}<title>${(metas.find(([k]) => k === 'title') || [, ''])[1]}</title><script src="/scripts/aem.js" type="module"></script><script src="/scripts/scripts.js" type="module"></script><link rel="stylesheet" href="/styles/styles.css"></head>`;
 writeFileSync(`${serveDir}/${name}.harness.html`, `${head}<body><header></header>${folded.main}<footer></footer></body></html>`);
+
+// the served file must be the one just written (a server on this port from another case gates the wrong site — recorded twice)
+const written = `${head}<body><header></header>${folded.main}<footer></footer></body></html>`;
+const md5 = (s) => createHash('md5').update(s).digest('hex');
+try {
+  const served = await (await fetch(`http://localhost:${port}/${name}.harness.html`)).text();
+  if (md5(served) !== md5(written)) { console.error(`harness: http://localhost:${port}/${name}.harness.html is NOT the file just written (served md5 ${md5(served).slice(0, 8)}, written ${md5(written).slice(0, 8)}) — another server on :${port}? refusing`); process.exit(3); }
+  console.log(`harness: served file verified (md5 ${md5(written).slice(0, 8)})`);
+} catch (e) { console.error(`harness: nothing answers on http://localhost:${port}/ — start \`python3 -m http.server ${port} --directory ${serveDir}\` first (${String(e).slice(0, 80)})`); process.exit(3); }
 
 const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: W, height: 900 } });
 p.on('console', (m) => { if (m.type() === 'error') console.log('console:', m.text().slice(0, 200)); });

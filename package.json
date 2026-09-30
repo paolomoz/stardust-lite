@@ -33,7 +33,8 @@
     "cases/*/LINT.md",
     "cases/*/doc/**",
     "cases/*/registers/**",
-    "cases/*/authored/**"
+    "cases/*/authored/**",
+    "cases/*/scripts/**"
   ],
   "repository": {
     "type": "git",
