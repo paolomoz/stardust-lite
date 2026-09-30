@@ -13,18 +13,25 @@ export function arg(name, def) {
   return v === undefined || v.startsWith('--') ? true : v;
 }
 
-/** `--dismiss` and `--locale` read from argv the way every instrument reads them (a geo-mismatch modal or a marketing interstitial is
- * not consent: every overlay control must reach every tool — BACKLOG #2; a geo-redirecting origin needs the locale pinned). */
-export const overlayOpts = () => ({ dismiss: String(arg('--dismiss', '')).split(',').map((s) => s.trim()).filter(Boolean), locale: arg('--locale', null) });
+/** `--dismiss`, `--locale` and `--require` read from argv the way every instrument reads them (a geo-mismatch modal or a marketing
+ * interstitial is not consent: every overlay control must reach every tool — BACKLOG #2; a geo-redirecting origin needs the locale
+ * pinned; a page with session-variable composition — an A/B alert, a personalised slot — needs every measurement run gated to the
+ * composition the origin was captured in: `--require <css,…>` exits 4 when one of the markers is absent — walgreens-home). */
+export const overlayOpts = () => ({ dismiss: String(arg('--dismiss', '')).split(',').map((s) => s.trim()).filter(Boolean), locale: arg('--locale', null), require: String(arg('--require', '')).split(',').map((s) => s.trim()).filter(Boolean) });
 
-export async function openPage(browser, url, { width = 1440, height = 900, consent = null, dismiss = [], locale = null, wait = 2500 } = {}) {
+export async function openPage(browser, url, { width = 1440, height = 900, consent = null, dismiss = [], locale = null, require = [], wait = 2500, before = null } = {}) {
   const page = await browser.newPage({ viewport: { width, height }, userAgent: UA, ...(locale ? { locale, extraHTTPHeaders: { 'Accept-Language': `${locale},${locale.split('-')[0]};q=0.9` } } : {}) });
+  if (before) await before(page); // listeners that must exist before navigation (response log for font requests — media-list)
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
   await page.waitForTimeout(wait);
   for (const sel of dismiss) { try { await page.click(sel, { timeout: 1500 }); } catch { /* absent */ } }
   const candidates = [consent, '#onetrust-accept-btn-handler', '.agree-button', 'button:has-text("Accept all")', 'button:has-text("Accept All")'].filter(Boolean);
   for (const sel of candidates) { try { await page.click(sel, { timeout: 1200 }); break; } catch { /* next */ } }
   await page.waitForFunction(() => [...document.querySelectorAll('.block')].every((el) => el.dataset.blockStatus === 'loaded'), null, { timeout: 15000 }).catch(() => {});
+  if (require.length) { // composition gate: the session must be the one the cached origin shows (retry the run otherwise)
+    const missing = await page.evaluate((sels) => sels.filter((s) => { try { return !document.querySelector(s); } catch { return true; } }), require);
+    if (missing.length) { console.error(`composition mismatch — missing: ${missing.join(' | ')} (exit 4; run again until the session matches the origin)`); await browser.close(); process.exit(4); }
+  }
   return page;
 }
 

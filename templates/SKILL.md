@@ -11,7 +11,8 @@ to `migration/cases/<template>/` (REPORT.md, REGISTER.md, LINT.md, tables — ca
 
 Instruments run with `npx stardust-lite <name> [args]` (`npx stardust-lite list`; each prints usage without arguments):
 `cap-probe`, `stitch-shot`, `pixel-compare`, `measure`, `motion-observe`, `motion-compare` (capture and compare),
-`live-spec`, `scroll-probe`, `measure-to-spec`, `measure-view`, `origin-pick` (measurement), `lint` (David's Model),
+`probe-load`, `probe-structure`, `content-dump`, `media-list`, `live-spec`, `scroll-probe`, `deep-probe`, `measure-to-spec`,
+`measure-view`, `origin-pick` (measurement), `lint` (David's Model),
 `harness`, `gate`, `sections`, `pair`, `leak` (prototype and gate).
 
 Rules that do not bend: the source is measured, never cloned; triage and lint before any block exists; the gated prototype is the
