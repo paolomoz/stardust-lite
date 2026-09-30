@@ -35,10 +35,13 @@ for (const W of widths) {
 }
 const probe = widths.includes(2560) ? 2560 : Math.max(...widths);
 console.log('cap-probe…'); const cap = run([join(S, 'cap-probe.mjs'), live, '--against', build, '--build-main', arg('--build-main', 'main'), ...(arg('--main', null) ? ['--main', arg('--main')] : []), ...liveOpts, '--out', join(out, 'cap.json')], true);
-const capLine = (cap.stdout.match(/cap-probe: .*/) || ['cap-probe: (no verdict line)'])[0];
+// the verdict AND the failing rows: "FAIL — 1 of 4 rows" without the row sent walgreens-home to run cap-probe --against by hand
+const capLine = [(cap.stdout.match(/cap-probe: .*/) || ['cap-probe: (no verdict line)'])[0], ...cap.stdout.split('\n').filter((l) => /^\s*✗/.test(l))].join('\n');
 let motionLine = '';
 if (arg('--probes', null)) {
   const lines = readFileSync(arg('--probes'), 'utf8').split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
+  // CSS only: motion-observe resolves selectors with querySelector; a Playwright pseudo-class (`:visible`, `:has-text()`) costs a whole run (walgreens-home)
+  const bad = lines.filter((l) => /:(visible|hidden|has-text|text|text-is|nth-match|is-visible)\b/.test(l)); if (bad.length) { console.error(`gate: probes are CSS selectors, not Playwright locators — use an id or :nth-of-type to reach the visible copy:\n  ${bad.join('\n  ')}`); process.exit(1); }
   const side = (i) => lines.flatMap((l) => { const m = l.match(/^(hover|click)\s+(.+?)\s*=>\s*(.+)$/); return m ? [`--${m[1]}`, m[i]] : []; });
   console.log('motion live…'); run([join(S, 'motion-observe.mjs'), live, join(out, 'motion-live.json'), '--width', '1440', ...liveOpts, ...side(2)], true);
   console.log('motion build…'); run([join(S, 'motion-observe.mjs'), build, join(out, 'motion-build.json'), '--width', '1440', ...side(3)], true);

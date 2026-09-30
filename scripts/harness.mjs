@@ -6,7 +6,8 @@
 //   references (e.g. drafts/media/*) and fragment plain.html files (drafts/nav.plain.html). Start it with `python3 -m http.server`.
 //   --fragments https://<branch>--<site>--<org>.aem.page fetches the PIPELINE's `<nav>.plain.html` / `<footer>.plain.html` (the paths
 //   in the metadata block, previewed first) into <dir>: a hand-made plain.html differs from the pipeline's (it wraps a list item's own
-//   text in <p> when the item holds a nested list — ibm-home's header decorated on the prototype and crashed on the served page).
+//   text in <p> when the item holds a nested list — ibm-home's header decorated on the prototype and crashed on the served page), and
+//   fetches the media the fragments reference. The fold applies the pipeline's single-paragraph cell rule (see below).
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -35,6 +36,9 @@ const folded = await p0.evaluate(() => {
   document.querySelectorAll('main .metadata').forEach((m) => { m.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (k && v) metas.push([k.textContent.trim().toLowerCase(), v.textContent.trim()]); }); m.closest('main > div').remove(); });
   document.querySelectorAll('main .section-metadata').forEach((sm) => { const section = sm.parentElement; sm.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (!k || !v) return; const key = k.textContent.trim().toLowerCase(); if (key === 'style') v.textContent.split(',').map((x) => x.trim()).filter(Boolean).forEach((c) => section.classList.add(c)); else if (key === 'id') section.id = v.textContent.trim(); else section.dataset[key.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = (v.querySelector('a, img') ? (v.querySelector('a')?.href || v.querySelector('img')?.src) : v.textContent.trim()); }); sm.remove(); });
   document.querySelectorAll('main > div').forEach((d) => { if (!d.textContent.trim() && !d.querySelector('img,picture')) d.remove(); });
+  // the pipeline's cell rule: a block cell holding ONE paragraph and nothing else loses its <p> (`<div><p><a>x</a></p></div>` → `<div><a>x</a></div>`,
+  // verified on the served plain.html — walgreens-home); a decorate that read `:scope > p` worked on the prototype only
+  document.querySelectorAll('main > div > div > div > div').forEach((cell) => { const k = cell.children; if (k.length === 1 && k[0].tagName === 'P' && ![...cell.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) k[0].replaceWith(...k[0].childNodes); });
   return { metas, main: document.querySelector('main').outerHTML };
 });
 await b0.close();
@@ -44,7 +48,11 @@ if (arg('--fragments', null)) {
   for (const [k, v] of metas.filter(([k]) => ['nav', 'footer'].includes(k))) {
     const path = new URL(v, host).pathname; const r = await fetch(`${host}${path}.plain.html`).catch(() => null);
     if (!r || !r.ok) { console.error(`harness: ${host}${path}.plain.html → ${r ? r.status : 'unreachable'} — preview the ${k} document first`); process.exit(4); }
-    const file = `${serveDir}${path}.plain.html`; mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, await r.text()); console.log(`harness: ${k} fragment ← pipeline ${path}.plain.html`);
+    const html = await r.text(); const file = `${serveDir}${path}.plain.html`; mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, html); console.log(`harness: ${k} fragment ← pipeline ${path}.plain.html`);
+    // the fragment's pictures are relative (`./media_<hash>.<ext>?width=…`): fetch each once next to the plain.html (the prototype 404'd them — walgreens-home)
+    const media = [...new Set([...html.matchAll(/(?:src|srcset)="([^"]*)"/g)].flatMap((m) => m[1].split(',')).map((u) => u.trim().split(/[\s?]/)[0]).filter((u) => /^\.\/media_/.test(u)))];
+    for (const rel of media) { const mf = `${dirname(file)}/${rel.slice(2)}`; if (existsSync(mf)) continue; const mr = await fetch(`${host}${dirname(path)}/${rel.slice(2)}`.replace(/\/\//g, '/').replace(':/', '://')).catch(() => null); if (mr && mr.ok) writeFileSync(mf, Buffer.from(await mr.arrayBuffer())); else console.log(`harness: ${k} media ${rel} → ${mr ? mr.status : 'unreachable'}`); }
+    if (media.length) console.log(`harness: ${k} media ×${media.length} ← pipeline`);
   }
 }
 const head = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${metas.map(([k, v]) => `<meta name="${k}" content="${v.replace(/"/g, '&quot;')}">`).join('')}<title>${(metas.find(([k]) => k === 'title') || [, ''])[1]}</title><script src="/scripts/aem.js" type="module"></script><script src="/scripts/scripts.js" type="module"></script><link rel="stylesheet" href="/styles/styles.css"></head>`;

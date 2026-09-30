@@ -3,7 +3,7 @@
 // first heading/paragraph of each live section is located on the build and the build section containing it is the partner (several
 // live sections can share one build section — authored sections are usually coarser than the source's). Falls back to index order
 // for a live section without text.
-// Usage: node sections.mjs <spec.json> <build-url> [--sections <css>] [--header <css>] [--footer <css>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>]
+// Usage: node sections.mjs <spec.json> <build-url> [--sections <css>] [--header <css>] [--footer <css>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>]
 import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
 import { arg, openPage, settle, overlayOpts } from './common.mjs';
@@ -20,7 +20,8 @@ const r = await page.evaluate(({ sections, header, footer, live }) => {
   const R = (e) => { if (!e) return null; const b = e.getBoundingClientRect(); return [Math.round(b.x), Math.round(b.y + scrollY), Math.round(b.width), Math.round(b.height)]; };
   const secs = [document.querySelector(header), ...document.querySelectorAll(sections), document.querySelector(footer)].filter(Boolean);
   const norm = (s) => s.replace(/\s+/g, ' ').trim().toLowerCase();
-  const texts = [...document.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,a,span,strong,em,button,div')].filter((e) => { const b = e.getBoundingClientRect(); return b.width > 0 && b.height > 0 && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); });
+  // visible text only: a `visibility: hidden` build anchor paired a live section with the wrong build section every round (walgreens-home)
+  const texts = [...document.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,a,span,strong,em,button,div')].filter((e) => { const b = e.getBoundingClientRect(); const s = getComputedStyle(e); return b.width > 0 && b.height > 0 && s.visibility !== 'hidden' && parseFloat(s.opacity) > 0.05 && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); });
   const rows = live.map((l, i) => {
     let sec = null; let abox = null;
     if (l.anchor) {

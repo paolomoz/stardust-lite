@@ -3,7 +3,9 @@
 // Per top-level section: box, padding, paint (bg, image, radius, border, shadow, transform); per text node: font family/size/
 // line-height/weight/letter-spacing/transform/align/colour/style/decoration + box + text + href; per image/video/svg/canvas: box, fit, src.
 // Also writes the captured DOM. Usage:
-//   node live-spec.mjs <url> <W> --out <dir> [--sections <css>] [--header <css>] [--footer <css>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--vh 900]
+//   node live-spec.mjs <url> <W> --out <dir> [--sections <css>] [--header <css>] [--footer <css>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>] [--vh 900]
+// Every run is ONE session: on a page with session-variable composition pass --require (markers of the composition the origin was
+// captured in) so the three width specs describe the same page; a mismatching session exits 4.
 // Default sections: `main > .section` (EDS) — for a source page pass its section selector, e.g. --sections '.section-wrapper > section'.
 import { chromium } from 'playwright';
 import { writeFileSync, mkdirSync } from 'node:fs';
@@ -32,6 +34,7 @@ const spec = await page.evaluate(({ sections, header, footer }) => {
       if (!own && !e.matches('input,button')) return;
       const it = { k: e.tagName.toLowerCase(), cls: (typeof e.className === 'string' ? e.className : '').slice(0, 60), box: R(e), t: (own || e.value || e.placeholder || '').replace(/\s+/g, ' ').slice(0, 200), ...F(e) };
       const a = e.closest('a'); if (a) it.href = a.getAttribute('href'); if (e.matches('span,em,i,b,strong,u')) it.inline = true;
+      const ctl = e.closest('a,button'); if (ctl && ctl !== e) it.cbox = R(ctl); // the control's box: a button label pairs control with control (walgreens-home)
       Object.assign(it, BG(e)); if (getComputedStyle(e).padding !== '0px') it.pad = getComputedStyle(e).padding;
       s.items.push(it);
     });
