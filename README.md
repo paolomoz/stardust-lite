@@ -34,6 +34,7 @@ npm run check              # syntax of every script and tool
 ```
 
 Bot-managed origins need the tools' `--headed` tier (real Chrome installed). DA / aem.page calls need an IMS bearer token in `DA_TOKEN`.
+Every instrument takes `--consent <css>`, `--dismiss <css,…>` (any other overlay: geo modal, interstitial) and `--locale <tag>`.
 
 ## Use from a site repo (the normal way)
 
@@ -75,5 +76,7 @@ step 2, served page within the prototype's numbers, leak table identical.
 | `baincapital-home` | 2026-09-29/30 | 34.6 / 27.2 / 23.3 | 34.4 / 23.8 / 23.6 | — (v1 → v2 of the method) |
 | `fidelity-home` | 2026-09-30 | 10.49 / 0.85 / 3.66 | 10.40 / 0.85 / 3.61 | 3 CSS rounds + 1 origin round |
 | `travelers-home` | 2026-09-30 | 3.26 / 1.09 / 0.57 | 3.28 / 1.10 / 0.57 | 5 CSS rounds (1 void) + 1 served fix; 2 h wall, first prototype at 76 min |
+| `ibm-home` | 2026-09-30 | 4.04 / 2.39 / 3.28 | 4.09 / 2.37 / 3.27 | 7 CSS rounds (1 void half-round, 2 on the hero video) + 1 served fix; 108 min wall, first shareable URL at 58 min; shadow-DOM origin, consent + geo modal |
 
-Next: one static-CMS site and one JS-heavy site, each passing the lint at step 2 and holding its prototype number on the served page.
+Next: one static-CMS site, passing the lint at step 2 and holding its prototype number on the served page. ibm-home was the JS-heavy
+one (Carbon web components); the composed-tree tier it needed is in `common.mjs` (`DEEP_HELPERS`), `deep-probe` and `hover-diff`.
