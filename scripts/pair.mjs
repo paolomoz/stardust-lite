@@ -4,6 +4,7 @@
 // link pairs with its block, not with the inline `strong`/`a`). A row is hot on Δx, Δy, Δh or a font/colour change (a row 20 px low
 // with the same size was hidden before — ibm-home read every offset chain from the section table instead). Runs of anchors sharing
 // one Δx or Δy — even under the 3 px tolerance — are reported as a group offset: that is how a whole header bar shifted by 3 px shows up.
+// An inline live anchor (a span in a heading) paired with a block-level build box is compared as its line box (≈), not its glyph box.
 // Usage: node pair.mjs <spec.json> <build-url> [--max 120] [--filter <regex>] [--all]   (--all also prints rows within tolerance) [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>]
 import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
@@ -17,7 +18,7 @@ for (const s of spec.secs) for (const it of s.items) {
   if (!['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'span', 'button', 'li', 'div'].includes(it.k)) continue;
   if (!it.t || it.t.length < 3 || it.box[0] >= spec.W) continue;
   const key = it.t.slice(0, 28); if (seen.has(key)) continue; if (filter && !filter.test(it.t)) continue;
-  seen.add(key); anchors.push({ t: key, box: it.box, cbox: it.cbox || null, fs: it.fs, lh: it.lh, fw: it.fw, ff: it.ff, c: it.c, inline: !!it.inline || it.k === 'a' || it.k === 'span' });
+  seen.add(key); anchors.push({ t: key, box: it.box, cbox: it.cbox || null, pad: it.pad || null, fs: it.fs, lh: it.lh, fw: it.fw, ff: it.ff, c: it.c, inline: !!it.inline || it.k === 'a' || it.k === 'span' });
 }
 const browser = await chromium.launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800, consent: arg('--consent', null), ...overlayOpts() });
 await settle(page, 800, 50, 400);
@@ -39,25 +40,32 @@ const out = await page.evaluate((anchors) => {
     // box (cbox) and the build's a/button is the box — the span-vs-a.button rows (Δy −12 / Δh 24 = padding) meant nothing (walgreens-home)
     const s0 = getComputedStyle(e); const font = { fs: s0.fontSize, lh: s0.lineHeight, fw: s0.fontWeight, ff: s0.fontFamily.split(',')[0].replace(/"/g, ''), c: s0.color };
     const ctl = a.cbox ? e.closest('a,button') : null; if (ctl) return { box: R(ctl), ctl: true, ...font };
-    return { box: R(e), ...font };
+    return { box: R(e), block: !isInline(e), ...font };
   });
 }, anchors);
+// glyph box vs line box: a live `span` inside a heading measures its glyph box (Futura 28 px → 44 px tall in a 37.8 px line), the build's
+// h2 is the line box — every heading row read Δy +3 and every lede row −4 for a round (stryker-home). When an inline live anchor pairs
+// with a block-level build box, compare the live LINE box: top − (lh − glyph)/2, height + (lh − glyph), glyph = the single-line height
+const lineBox = (a) => { const lh = parseFloat(a.lh); if (!a.inline || a.pad || !(lh > 0)) return null; const [x, y, w, h] = a.box; let g = h; for (let n = 1; n < 40; n += 1) { const c = h - (n - 1) * lh; if (c >= 0.7 * lh && c < 1.7 * lh) { g = c; break; } } const d = Math.round((lh - g) / 2); return d ? [x, y - d, w, h + 2 * d] : null; };
+// the live box a row compares against: the control box (⌗), else the line box when it explains the build height better than the glyph
+// box (a padded footer span is as tall as the build's p — its glyph box is the right one), else the glyph box
+const liveBox = (a, o) => { if (!o) return a.box; if (o.ctl) return a.cbox; const lb = o.block ? lineBox(a) : null; return lb && Math.abs(o.box[3] - lb[3]) < Math.abs(o.box[3] - a.box[3]) ? lb : a.box; };
 console.log('anchor'.padEnd(30), 'live box'.padEnd(22), 'build box'.padEnd(22), 'Δx  Δy  Δw  Δh | font live → build');
 let n = 0;
 anchors.forEach((a, i) => {
-  if (n >= MAX) return; const o = out[i]; const lb = o && o.ctl ? a.cbox : a.box; // control paired with control: compare the control boxes
+  if (n >= MAX) return; const o = out[i]; const lb = liveBox(a, o); // control paired with control (⌗); inline glyph box read as its line box (≈)
   const d = o ? [o.box[0] - lb[0], o.box[1] - lb[1], o.box[2] - lb[2], o.box[3] - lb[3]] : null;
   const hot = !o || Math.abs(d[0]) > 3 || Math.abs(d[1]) > 3 || Math.abs(d[3]) > 3 || a.fs !== o.fs || a.fw !== o.fw || a.c !== o.c;
   if (!all && !hot) return; n += 1;
   const f = o ? `${a.fs}/${a.lh} ${a.fw} ${a.ff.slice(0, 7)} → ${o.fs}/${o.lh} ${o.fw} ${o.ff.slice(0, 7)}${a.c !== o.c ? ` COLOR ${a.c}→${o.c}` : ''}` : '';
-  console.log((o && o.ctl ? `${a.t.slice(0, 26)} ⌗` : a.t).padEnd(30), JSON.stringify(lb).padEnd(22), (o ? JSON.stringify(o.box) : '-').padEnd(22), o ? d.map((v) => String(v).padStart(4)).join('') : ' MISSING', '|', f);
+  console.log((o && o.ctl ? `${a.t.slice(0, 26)} ⌗` : (lb !== a.box ? `${a.t.slice(0, 26)} ≈` : a.t)).padEnd(30), JSON.stringify(lb).padEnd(22), (o ? JSON.stringify(o.box) : '-').padEnd(22), o ? d.map((v) => String(v).padStart(4)).join('') : ' MISSING', '|', f);
 });
-console.log(`${anchors.length} anchors, ${out.filter(Boolean).length} located${out.some((o) => o && o.ctl) ? ', ⌗ = control paired with control' : ''}${all ? '' : ` (rows within 3 px and same font hidden; --all shows them)`}`);
+console.log(`${anchors.length} anchors, ${out.filter(Boolean).length} located${out.some((o) => o && o.ctl) ? ', ⌗ = control paired with control' : ''}${out.some((o, i) => o && liveBox(anchors[i], o) !== anchors[i].box && !o.ctl) ? ', ≈ = live inline glyph box read as its line box' : ''}${all ? '' : ` (rows within 3 px and same font hidden; --all shows them)`}`);
 // group offsets: ≥ 3 consecutive located anchors sharing the same non-zero Δx or Δy (any magnitude, tolerance or not)
 for (const [axis, name] of [[0, 'Δx'], [1, 'Δy']]) {
   let run = [];
   const flush = () => { if (run.length >= 3) console.log(`group offset ${name}=${run[0].d > 0 ? '+' : ''}${run[0].d}: ${run.length} anchors, "${run[0].t}" … "${run[run.length - 1].t}"`); run = []; };
-  anchors.forEach((a, i) => { const o = out[i]; if (!o) { flush(); return; } const d = o.box[axis] - (o.ctl ? a.cbox : a.box)[axis]; if (d !== 0 && run.length && run[run.length - 1].d === d) run.push({ t: a.t, d }); else { flush(); if (d !== 0) run.push({ t: a.t, d }); } });
+  anchors.forEach((a, i) => { const o = out[i]; if (!o) { flush(); return; } const d = o.box[axis] - liveBox(a, o)[axis]; if (d !== 0 && run.length && run[run.length - 1].d === d) run.push({ t: a.t, d }); else { flush(); if (d !== 0) run.push({ t: a.t, d }); } });
   flush();
 }
 await browser.close();
