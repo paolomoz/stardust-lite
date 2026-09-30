@@ -1,0 +1,71 @@
+body > header
+header .header
+header .header .header-top
+header .header .header-bottom
+header .header .header-brand img
+header .header .header-links a
+.bain-hero
+.bain-hero .bain-hero-inner
+.bain-hero .bain-hero-title
+.bain-hero .bain-hero-deck
+.bain-hero .bain-hero-slide.is-active
+.bain-hero .bain-hero-text
+.bain-hero .bain-hero-actions .bc-btn
+.bain-hero .bain-hero-tangram
+.bain-hero .bain-hero-nav
+.bain-hero .bain-hero-nav-item
+.section.title-xl .default-content-wrapper > h2
+.section.title-xl .default-content-wrapper > p
+.bain-advantages
+.bain-advantages .bain-advantages-item.is-odd
+.bain-advantages .bain-advantages-item.is-odd .bain-advantages-poster
+.bain-advantages .bain-advantages-item.is-odd .bain-advantages-body
+.bain-advantages .bain-advantages-item.is-even .bain-advantages-poster
+.bain-advantages .bain-advantages-title
+.bain-advantages .bain-advantages-play
+.bain-platform
+.bain-platform .bain-platform-inner
+.bain-platform .bain-platform-intro
+.bain-platform .bain-platform-wheel
+.bain-platform .bain-platform-tab-label
+.bain-spotlight
+.bain-spotlight .bain-spotlight-list
+.bain-spotlight .bain-spotlight-card
+.bain-spotlight .bain-spotlight-media
+.bain-spotlight .bain-spotlight-title
+.section.band-tail .default-content-wrapper > h3
+.bain-commitments
+.bain-commitments .bain-commitments-list
+.bain-commitments .bain-commitments-item a
+.bain-commitments .bain-commitments-stage
+.bain-commitments .bain-commitments-cards
+.bain-commitments .bain-commitments-card-body
+.bain-commitments .bc-btn.green
+.bain-people
+.bain-people .bain-people-inner
+.bain-people .bain-people-title
+.bain-people .bain-people-tags
+.bain-people .bain-people-tag
+.bain-news
+.bain-news .bain-news-featured
+.bain-news .bain-news-image
+.bain-news .bain-news-list
+.bain-news .bain-news-list .bain-news-item
+.bain-news .bain-news-title
+.bain-news .bain-news-actions .bc-btn
+.section:has(.bain-presence)
+.bain-presence
+.bain-presence .bain-presence-map
+.bain-presence .bain-presence-head
+.bain-presence .bain-presence-title
+.bain-presence .bain-presence-tabs
+.bain-presence .bain-presence-tab.is-active
+.bain-presence .bain-presence-filter
+body > footer
+footer .footer .footer-inner
+footer .footer .footer-legal
+footer .footer .footer-links
+footer .footer .footer-links a
+footer .footer .footer-social a
+.bc-backdrop
+.bc-backdrop-photo img

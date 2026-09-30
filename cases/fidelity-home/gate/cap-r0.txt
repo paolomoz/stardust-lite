@@ -1,0 +1,14 @@
+cap-probe: overlay dismissed via .accept-btn-box a
+cap-probe  base 1440 → probe 2560 (derived: max(2560, largest cap × 1.25))
+live   https://www.fidelity.com/
+  modules  2 sections: capped 1440 ×2 · full-bleed ×0
+  contentMaxWidth 1440px (module) · shellMaxWidth fluid · root body.fds-theme--fidelity-light > prelogin-root.dcs-pla--root > div.fds-global-layout > main.fds-global__main.fds-page-layout
+build  http://localhost:8931/home.harness.html
+  modules  8 sections: capped 1440 ×6, 1344 ×1 · full-bleed ×1
+  contentMaxWidth 1440px (module) · shellMaxWidth fluid · root body.home.appear > main
+rows
+  ✓ content cap: live 1440px = build 1440px (±20, shared module cap)
+  ⚠ sections: live 2 vs build 8 top-level sections — module rows compared by order up to the shorter side, advisory until the structure matches
+  ✓ module 1/2: 1440px = 1440px
+  ✓ module 2/2: 1440px = 1440px
+cap-probe: PASS at 2560 — 0 of 4 rows failed

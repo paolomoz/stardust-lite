@@ -1,0 +1,226 @@
+
+## .bottom-header .navbar-nav > .nav-item:nth-child(3) > .nav-link 185 changes; transitions: a color ease-in-out, background-color ease-in-out, border-color ease-in-out
+   0:li.nav-item.dropdown|color                                 rgb(28, 33, 86) → undefined
+   0:li.nav-item.dropdown|background-color                      rgba(0, 0, 0, 0) → undefined
+   0:li.nav-item.dropdown|background-image                      none → undefined
+   0:li.nav-item.dropdown|background-size                       auto → undefined
+   0:li.nav-item.dropdown|background-position                   0% 0% → undefined
+   0:li.nav-item.dropdown|border-color                          rgb(28, 33, 86) → undefined
+   0:li.nav-item.dropdown|border-bottom-color                   rgb(28, 33, 86) → undefined
+   0:li.nav-item.dropdown|border-width                          0px → undefined
+   0:li.nav-item.dropdown|opacity                               1 → undefined
+   0:li.nav-item.dropdown|transform                             none → undefined
+   0:li.nav-item.dropdown|box-shadow                            none → undefined
+   0:li.nav-item.dropdown|text-decoration-line                  none → undefined
+   0:li.nav-item.dropdown|text-decoration-color                 rgb(28, 33, 86) → undefined
+   0:li.nav-item.dropdown|width                                 132.656px → undefined
+   0:li.nav-item.dropdown|height                                58px → undefined
+   0:li.nav-item.dropdown|left                                  auto → undefined
+   0:li.nav-item.dropdown|top                                   auto → undefined
+   0:li.nav-item.dropdown|visibility                            visible → undefined
+   0:li.nav-item.dropdown|filter                                none → undefined
+   0:li.nav-item.dropdown|outline-color                         rgb(28, 33, 86) → undefined
+   0:li.nav-item.dropdown|clip-path                             none → undefined
+   0:li.nav-item.dropdown|content                               normal → undefined
+   0:li.nav-item.dropdown|font-weight                           400 → undefined
+   0:li.nav-item.dropdown|letter-spacing                        normal → undefined
+   1:a.nav-link.dropdown-toggle:before|width                    0px → 104.656px
+   1:a.nav-link.dropdown-toggle:before|height                   0px → 4px
+   1:a.nav-link.dropdown-toggle:before|left                     52.3281px → 0px
+   1:a.nav-link.dropdown-toggle:before|top                      60px → 56px
+   2:div.dropdown-menu|color                                    rgb(33, 37, 41) → undefined
+   2:div.dropdown-menu|background-color                         rgba(0, 0, 0, 0) → undefined
+   2:div.dropdown-menu|background-image                         none → undefined
+   2:div.dropdown-menu|background-size                          auto → undefined
+   2:div.dropdown-menu|background-position                      0% 0% → undefined
+   2:div.dropdown-menu|border-color                             rgb(33, 37, 41) → undefined
+   2:div.dropdown-menu|border-bottom-color                      rgb(33, 37, 41) → undefined
+   2:div.dropdown-menu|border-width                             0px → undefined
+   2:div.dropdown-menu|opacity                                  0 → undefined
+   2:div.dropdown-menu|transform                                none → undefined
+   2:div.dropdown-menu|box-shadow                               none → undefined
+   2:div.dropdown-menu|text-decoration-line                     none → undefined
+
+## .top-header .navbar-nav .nav-item:nth-child(2) a 11 changes; transitions: a color
+   1:a|color                                                    rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a|border-color                                             rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a|border-bottom-color                                      rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a|text-decoration-color                                    rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a|outline-color                                            rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a:before|color                                             rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a:before|border-color                                      rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a:before|border-bottom-color                               rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a:before|transform                                         matrix(1, 0, 0, 0, 0, 0) → matrix(1, 0, 0, 1, 0, 0)
+   1:a:before|text-decoration-color                             rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a:before|outline-color                                     rgb(49, 93, 144) → rgb(255, 255, 255)
+
+## .banner-slide.slick-current .btn 19 changes; transitions: a color ease-in-out, background-color ease-in-out, border-color ease-in-out, box-shadow ease-in-out | span all | svg all | path all
+   1:a.btn.btn-outline.btn-blue|color                           rgb(0, 26, 255) → rgb(255, 255, 255)
+   1:a.btn.btn-outline.btn-blue|background-color                rgba(0, 0, 0, 0) → rgb(0, 26, 255)
+   1:a.btn.btn-outline.btn-blue|text-decoration-color           rgb(0, 26, 255) → rgb(255, 255, 255)
+   1:a.btn.btn-outline.btn-blue|outline-color                   rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span.arrow-round-icon.left|color                           rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span.arrow-round-icon.left|border-color                    rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span.arrow-round-icon.left|border-bottom-color             rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span.arrow-round-icon.left|text-decoration-color           rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span.arrow-round-icon.left|outline-color                   rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|color                                                  rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|border-color                                           rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|border-bottom-color                                    rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|text-decoration-color                                  rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|outline-color                                          rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|color                                                 rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|border-color                                          rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|border-bottom-color                                   rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|text-decoration-color                                 rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|outline-color                                         rgb(0, 26, 255) → rgb(255, 255, 255)
+
+## .our-advantages-box:first-child .play-video-btn 0 changes; transitions: button all | span all | svg all | path all
+
+## .esg-section .nav-tabs .nav-link:nth-child(1) 0 changes; transitions: a color ease-in-out, background-color ease-in-out, border-color ease-in-out | span ease-in-out | svg all | path ease-in-out
+
+## .esg-section .btn-green 3 changes; transitions: a color ease-in-out, background-color ease-in-out, border-color ease-in-out, box-shadow ease-in-out | span all | svg all | path all
+   1:a.btn.download-btn.btn-green|background-color              rgb(220, 245, 78) → rgb(225, 244, 107)
+   1:a.btn.download-btn.btn-green|border-color                  rgb(220, 245, 78) → rgb(225, 244, 107)
+   1:a.btn.download-btn.btn-green|border-bottom-color           rgb(220, 245, 78) → rgb(225, 244, 107)
+
+## .our-people-section .btn 19 changes; transitions: a color ease-in-out, background-color ease-in-out, border-color ease-in-out, box-shadow ease-in-out | span all | svg all | path all
+   5:a.btn.btn-outline.btn-light-blue|color                     rgb(63, 182, 255) → rgb(255, 255, 255)
+   5:a.btn.btn-outline.btn-light-blue|background-color          rgba(0, 0, 0, 0) → rgb(63, 182, 255)
+   5:a.btn.btn-outline.btn-light-blue|text-decoration-color     rgb(63, 182, 255) → rgb(255, 255, 255)
+   5:a.btn.btn-outline.btn-light-blue|outline-color             rgb(63, 182, 255) → rgb(255, 255, 255)
+   6:span.arrow-icon|color                                      rgb(63, 182, 255) → rgb(255, 255, 255)
+   6:span.arrow-icon|border-color                               rgb(63, 182, 255) → rgb(255, 255, 255)
+   6:span.arrow-icon|border-bottom-color                        rgb(63, 182, 255) → rgb(255, 255, 255)
+   6:span.arrow-icon|text-decoration-color                      rgb(63, 182, 255) → rgb(255, 255, 255)
+   6:span.arrow-icon|outline-color                              rgb(63, 182, 255) → rgb(255, 255, 255)
+   7:svg|color                                                  rgb(63, 182, 255) → rgb(255, 255, 255)
+   7:svg|border-color                                           rgb(63, 182, 255) → rgb(255, 255, 255)
+   7:svg|border-bottom-color                                    rgb(63, 182, 255) → rgb(255, 255, 255)
+   7:svg|text-decoration-color                                  rgb(63, 182, 255) → rgb(255, 255, 255)
+   7:svg|outline-color                                          rgb(63, 182, 255) → rgb(255, 255, 255)
+   8:path|color                                                 rgb(63, 182, 255) → rgb(255, 255, 255)
+   8:path|border-color                                          rgb(63, 182, 255) → rgb(255, 255, 255)
+   8:path|border-bottom-color                                   rgb(63, 182, 255) → rgb(255, 255, 255)
+   8:path|text-decoration-color                                 rgb(63, 182, 255) → rgb(255, 255, 255)
+   8:path|outline-color                                         rgb(63, 182, 255) → rgb(255, 255, 255)
+
+## .news-listing-section .news-title a 5 changes; transitions: a all
+   1:a|color                                                    rgb(28, 33, 86) → rgb(0, 71, 187)
+   1:a|border-color                                             rgb(28, 33, 86) → rgb(0, 71, 187)
+   1:a|border-bottom-color                                      rgb(28, 33, 86) → rgb(0, 71, 187)
+   1:a|text-decoration-color                                    rgb(28, 33, 86) → rgb(0, 71, 187)
+   1:a|outline-color                                            rgb(28, 33, 86) → rgb(0, 71, 187)
+
+## .news-listing-section .btn 19 changes; transitions: a color ease-in-out, background-color ease-in-out, border-color ease-in-out, box-shadow ease-in-out | span all | svg all | path all
+   1:a.btn.btn-outline.btn-blue|color                           rgb(0, 26, 255) → rgb(255, 255, 255)
+   1:a.btn.btn-outline.btn-blue|background-color                rgba(0, 0, 0, 0) → rgb(0, 26, 255)
+   1:a.btn.btn-outline.btn-blue|text-decoration-color           rgb(0, 26, 255) → rgb(255, 255, 255)
+   1:a.btn.btn-outline.btn-blue|outline-color                   rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span.arrow-icon|color                                      rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span.arrow-icon|border-color                               rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span.arrow-icon|border-bottom-color                        rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span.arrow-icon|text-decoration-color                      rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span.arrow-icon|outline-color                              rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|color                                                  rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|border-color                                           rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|border-bottom-color                                    rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|text-decoration-color                                  rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|outline-color                                          rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|color                                                 rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|border-color                                          rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|border-bottom-color                                   rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|text-decoration-color                                 rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|outline-color                                         rgb(0, 26, 255) → rgb(255, 255, 255)
+
+## .footermenu li:nth-child(2) a 2 changes; transitions: a all
+   1:a|border-color                                             rgb(171, 202, 233) → rgb(171, 202, 233) rgb(171, 202, 233) rgba(0, 0, 0, 0)
+   1:a|border-bottom-color                                      rgb(171, 202, 233) → rgba(0, 0, 0, 0)
+
+## .social-icon a.linkIco 1 changes; transitions: a all | i all
+   1:a.linkIco|background-color                                 rgb(27, 33, 90) → rgb(0, 26, 255)
+
+## .spotlight-section .slick-slide:nth-child(2) a 16 changes; transitions: a all | div all | img ease-in-out | div all
+   1:a|color                                                    rgb(38, 105, 138) → rgb(189, 156, 105)
+   1:a|border-color                                             rgb(38, 105, 138) → rgb(189, 156, 105)
+   1:a|border-bottom-color                                      rgb(38, 105, 138) → rgb(189, 156, 105)
+   1:a|text-decoration-color                                    rgb(38, 105, 138) → rgb(189, 156, 105)
+   1:a|outline-color                                            rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:div.image-wrap|color                                       rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:div.image-wrap|border-color                                rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:div.image-wrap|border-bottom-color                         rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:div.image-wrap|text-decoration-color                       rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:div.image-wrap|outline-color                               rgb(38, 105, 138) → rgb(189, 156, 105)
+   3:img|color                                                  rgb(38, 105, 138) → rgb(189, 156, 105)
+   3:img|border-color                                           rgb(38, 105, 138) → rgb(189, 156, 105)
+   3:img|border-bottom-color                                    rgb(38, 105, 138) → rgb(189, 156, 105)
+   3:img|transform                                              matrix(1, 0, 0, 1, 0, 0) → matrix(1.1, 0, 0, 1.1, 0, 0)
+   3:img|text-decoration-color                                  rgb(38, 105, 138) → rgb(189, 156, 105)
+   3:img|outline-color                                          rgb(38, 105, 138) → rgb(189, 156, 105)
+
+## .platform-anim-circle #circleTab2 10 changes; transitions: button color ease-in-out, background-color ease-in-out, border-color ease-in-out | span all
+   1:button.nav-link|color                                      rgb(63, 182, 255) → rgb(171, 202, 233)
+   1:button.nav-link|border-color                               rgb(63, 182, 255) → rgb(171, 202, 233)
+   1:button.nav-link|border-bottom-color                        rgb(63, 182, 255) → rgb(171, 202, 233)
+   1:button.nav-link|text-decoration-color                      rgb(63, 182, 255) → rgb(171, 202, 233)
+   1:button.nav-link|outline-color                              rgb(63, 182, 255) → rgb(171, 202, 233)
+   2:span.btn-text|color                                        rgb(63, 182, 255) → rgb(171, 202, 233)
+   2:span.btn-text|border-color                                 rgb(63, 182, 255) → rgb(171, 202, 233)
+   2:span.btn-text|border-bottom-color                          rgb(63, 182, 255) → rgb(171, 202, 233)
+   2:span.btn-text|text-decoration-color                        rgb(63, 182, 255) → rgb(171, 202, 233)
+   2:span.btn-text|outline-color                                rgb(63, 182, 255) → rgb(171, 202, 233)
+
+## .contact-section .regionList .nav-item:nth-child(2) .nav-link 0 changes; transitions: a color ease-in-out, background-color ease-in-out, border-color ease-in-out
+
+## .banner-nav-slider .slide-single:nth-child(1) 1 changes; transitions: div all | div ease-in-out | span all | div ease-in-out
+   7:span.anim|width                                            50.6094px → 87.6875px
+
+## .news-listing-section .featured-news-img 10 changes; transitions: div all | a all | img all
+   2:a|color                                                    rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:a|border-color                                             rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:a|border-bottom-color                                      rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:a|text-decoration-color                                    rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:a|outline-color                                            rgb(38, 105, 138) → rgb(189, 156, 105)
+   3:img|color                                                  rgb(38, 105, 138) → rgb(189, 156, 105)
+   3:img|border-color                                           rgb(38, 105, 138) → rgb(189, 156, 105)
+   3:img|border-bottom-color                                    rgb(38, 105, 138) → rgb(189, 156, 105)
+   3:img|text-decoration-color                                  rgb(38, 105, 138) → rgb(189, 156, 105)
+   3:img|outline-color                                          rgb(38, 105, 138) → rgb(189, 156, 105)
+
+## .spotlight-section .image-wrap 16 changes; transitions: div all | img ease-in-out
+   0:a|color                                                    rgb(38, 105, 138) → rgb(189, 156, 105)
+   0:a|border-color                                             rgb(38, 105, 138) → rgb(189, 156, 105)
+   0:a|border-bottom-color                                      rgb(38, 105, 138) → rgb(189, 156, 105)
+   0:a|text-decoration-color                                    rgb(38, 105, 138) → rgb(189, 156, 105)
+   0:a|outline-color                                            rgb(38, 105, 138) → rgb(189, 156, 105)
+   1:div.image-wrap|color                                       rgb(38, 105, 138) → rgb(189, 156, 105)
+   1:div.image-wrap|border-color                                rgb(38, 105, 138) → rgb(189, 156, 105)
+   1:div.image-wrap|border-bottom-color                         rgb(38, 105, 138) → rgb(189, 156, 105)
+   1:div.image-wrap|text-decoration-color                       rgb(38, 105, 138) → rgb(189, 156, 105)
+   1:div.image-wrap|outline-color                               rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:img|color                                                  rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:img|border-color                                           rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:img|border-bottom-color                                    rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:img|transform                                              matrix(1, 0, 0, 1, 0, 0) → matrix(1.1, 0, 0, 1.1, 0, 0)
+   2:img|text-decoration-color                                  rgb(38, 105, 138) → rgb(189, 156, 105)
+   2:img|outline-color                                          rgb(38, 105, 138) → rgb(189, 156, 105)
+
+## .esg-section .carousel-btn.nexttab 15 changes; transitions: div ease-in-out | svg all | path all
+   4:div.carousel-btn.nexttab.tab_nav|color                     rgb(27, 33, 90) → rgb(255, 255, 255)
+   4:div.carousel-btn.nexttab.tab_nav|background-color          rgba(0, 0, 0, 0) → rgb(27, 33, 90)
+   4:div.carousel-btn.nexttab.tab_nav|opacity                   0.5 → 1
+   4:div.carousel-btn.nexttab.tab_nav|text-decoration-color     rgb(27, 33, 90) → rgb(255, 255, 255)
+   4:div.carousel-btn.nexttab.tab_nav|outline-color             rgb(27, 33, 90) → rgb(255, 255, 255)
+   5:svg|color                                                  rgb(27, 33, 90) → rgb(255, 255, 255)
+   5:svg|border-color                                           rgb(27, 33, 90) → rgb(255, 255, 255)
+   5:svg|border-bottom-color                                    rgb(27, 33, 90) → rgb(255, 255, 255)
+   5:svg|text-decoration-color                                  rgb(27, 33, 90) → rgb(255, 255, 255)
+   5:svg|outline-color                                          rgb(27, 33, 90) → rgb(255, 255, 255)
+   6:path|color                                                 rgb(27, 33, 90) → rgb(255, 255, 255)
+   6:path|border-color                                          rgb(27, 33, 90) → rgb(255, 255, 255)
+   6:path|border-bottom-color                                   rgb(27, 33, 90) → rgb(255, 255, 255)
+   6:path|text-decoration-color                                 rgb(27, 33, 90) → rgb(255, 255, 255)
+   6:path|outline-color                                         rgb(27, 33, 90) → rgb(255, 255, 255)
+
+## .esg-section .esg-content-box 0 changes; transitions: div all | div all | img all | div all
+exit 0

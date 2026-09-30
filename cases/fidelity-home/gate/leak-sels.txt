@@ -1,0 +1,60 @@
+body.home .cards-container > .default-content-wrapper
+body.home .cards-container > .default-content-wrapper h2
+body.home .cards.learn > ul
+body.home .cards.learn > ul > li
+body.home .cards.learn .cards-card-image
+body.home .cards.learn .cards-card-image picture
+body.home .cards.learn .cards-card-image img
+body.home .cards.learn h3
+body.home .cards.learn .cards-card-body > p
+body.home .cards.learn .cards-card-meta
+body.home .hero.card > div > div
+body.home .hero.card > div > div > p
+body.home .hero.card .hero-card
+body.home .hero.card picture
+body.home .tabs.scroll-reveal .tabs-features p
+body.home .tabs.scroll-reveal .tabs-panel
+body.home .tabs.scroll-reveal .tabs-list
+header nav .nav-sections .default-content-wrapper > ul > li
+header nav .nav-sections .nav-drop > button
+footer .footer
+footer
+main
+main > .section.hero-container
+body.home .hero.card
+body.home .hero.card h1
+body.home .hero.card .hero-actions a.button.primary
+main > .section.tabs-container
+body.home .tabs.scroll-reveal
+body.home .tabs.scroll-reveal .tabs-content
+body.home .tabs.scroll-reveal .tabs-slide h3
+body.home .tabs.scroll-reveal .tabs-ctas .tabs-more a
+body.home .tabs.scroll-reveal .tabs-frame .tabs-picture img
+main > .section.columns-container
+body.home .columns.feature > div
+body.home .columns.feature > div > .columns-img-col img
+body.home .columns.feature h2
+body.home .columns.feature p
+body.home .columns.feature ul
+main > .section.legal
+main > .section.legal p
+main > .section.cards-container
+body.home .cards.learn .cards-meta-item
+body.home .cards.learn .cards-meta-item .icon
+body.home .cards.learn .cards-meta-item .icon img
+main > .section.disclosures > .default-content-wrapper
+main > .section.disclosures p
+main > .section.disclosures p strong
+header nav
+header nav .nav-brand .icon-fidelity-logo
+header nav .nav-brand .icon-fidelity-logo img
+header nav .nav-tools .nav-help .icon
+header nav .nav-search a
+header nav .nav-search a .icon
+footer .footer > div
+footer .footer .footer-products
+footer .footer .footer-connect
+footer .footer .footer-zip
+footer .footer .footer-connect li img
+footer .footer .footer-internal img
+footer .footer .footer-reserved

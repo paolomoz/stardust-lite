@@ -1,0 +1,9 @@
+🔴 D1 cases/baincapital-home/authored/home.da.html: section (unnamed) → block "bain-advantages" row 1 cell 1: embed/video URL authored inside a block — author it as a plain link in default content and auto-block it in scripts.js buildAutoBlocks()
+🔴 D1 cases/baincapital-home/authored/home.da.html: section (unnamed) → block "bain-advantages" row 2 cell 1: embed/video URL authored inside a block — author it as a plain link in default content and auto-block it in scripts.js buildAutoBlocks()
+🔴 D1 cases/baincapital-home/authored/home.da.html: section (unnamed) → block "bain-advantages" row 3 cell 1: embed/video URL authored inside a block — author it as a plain link in default content and auto-block it in scripts.js buildAutoBlocks()
+🟡 D3 cases/baincapital-home/authored/home.da.html: section (unnamed) → block "bain-hero": rows have differing cell counts (1, 3) — span-shaped structure; align rows or split the block
+🟡 D3 cases/baincapital-home/authored/home.da.html: section (unnamed) → block "bain-people": rows have differing cell counts (1, 3) — span-shaped structure; align rows or split the block
+🟡 D3 cases/baincapital-home/authored/home.da.html: section (unnamed) → block "bain-news": rows have differing cell counts (2, 1) — span-shaped structure; align rows or split the block
+🟡 D10 cases/baincapital-home/authored/home.da.html: section (unnamed) → block "bain-presence": 13 columns — >4 usually means fragmented content (exception: a genuine data table)
+🟡 D3 cases/baincapital-home/authored/home.da.html: section (unnamed) → block "bain-presence": rows have differing cell counts (1, 7, 13) — span-shaped structure; align rows or split the block
+FAIL — 3 🔴, 5 🟡 (rules: ../davids-model.md)

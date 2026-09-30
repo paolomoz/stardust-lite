@@ -1,0 +1,82 @@
+{
+ "a": "cases/fidelity-home/gate/live-360.png",
+ "b": "cases/fidelity-home/gate/build-360.png",
+ "compared": {
+  "width": 360,
+  "height": 9965,
+  "mode": "overlap"
+ },
+ "heightDelta": 47,
+ "differingPixels": 910428,
+ "pct": 25.38,
+ "threshold": 10,
+ "pass": false,
+ "diff": "cases/fidelity-home/gate/diff-360.png",
+ "masks": [],
+ "maskedRows": 0,
+ "textPct": null,
+ "textBoxes": null,
+ "textPixels": null,
+ "bands": [
+  {
+   "y0": 0,
+   "y1": 900,
+   "pct": 42.2
+  },
+  {
+   "y0": 900,
+   "y1": 1800,
+   "pct": 19.6
+  },
+  {
+   "y0": 1800,
+   "y1": 2700,
+   "pct": 43
+  },
+  {
+   "y0": 2700,
+   "y1": 3600,
+   "pct": 31.8
+  },
+  {
+   "y0": 3600,
+   "y1": 4500,
+   "pct": 21.4
+  },
+  {
+   "y0": 4500,
+   "y1": 5400,
+   "pct": 24.6
+  },
+  {
+   "y0": 5400,
+   "y1": 6300,
+   "pct": 27.2
+  },
+  {
+   "y0": 6300,
+   "y1": 7200,
+   "pct": 23.3
+  },
+  {
+   "y0": 7200,
+   "y1": 8100,
+   "pct": 16.4
+  },
+  {
+   "y0": 8100,
+   "y1": 9000,
+   "pct": 17.7
+  },
+  {
+   "y0": 9000,
+   "y1": 9900,
+   "pct": 13.3
+  },
+  {
+   "y0": 9900,
+   "y1": 9965,
+   "pct": 7.6
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+y     0 ty= 101 imgTop= 1353 | ty= 101 imgTop= 1792 | ty= 101 imgTop= 2230 | spot 0
+y   100 ty= 101 imgTop= 1258 | ty= 101 imgTop= 1697 | ty= 101 imgTop= 2136 | spot 0
+y   200 ty= 101 imgTop= 1158 | ty= 101 imgTop= 1597 | ty= 101 imgTop= 2036 | spot 0
+y   300 ty= 101 imgTop= 1058 | ty= 101 imgTop= 1497 | ty= 101 imgTop= 1936 | spot 0
+y   400 ty= 101 imgTop=  958 | ty= 101 imgTop= 1397 | ty= 101 imgTop= 1836 | spot 0
+y   500 ty= 101 imgTop=  858 | ty= 101 imgTop= 1297 | ty= 101 imgTop= 1736 | spot 0
+y   600 ty=  93 imgTop=  758 | ty= 101 imgTop= 1197 | ty= 101 imgTop= 1636 | spot 0
+y   700 ty=  73 imgTop=  658 | ty= 101 imgTop= 1097 | ty= 101 imgTop= 1536 | spot 0
+y   800 ty=  53 imgTop=  558 | ty= 101 imgTop=  997 | ty= 101 imgTop= 1436 | spot 0
+y   900 ty=  33 imgTop=  458 | ty= 101 imgTop=  897 | ty= 101 imgTop= 1336 | spot 0
+y  1000 ty=  13 imgTop=  358 | ty= 100 imgTop=  797 | ty= 101 imgTop= 1236 | spot 0
+y  1100 ty=  -7 imgTop=  258 | ty=  80 imgTop=  697 | ty= 101 imgTop= 1136 | spot 0
+y  1200 ty= -27 imgTop=  158 | ty=  60 imgTop=  597 | ty= 101 imgTop= 1036 | spot 0
+y  1300 ty= -47 imgTop=   58 | ty=  40 imgTop=  497 | ty= 101 imgTop=  936 | spot 0
+y  1400 ty= -67 imgTop=  -42 | ty=  20 imgTop=  397 | ty= 101 imgTop=  836 | spot 0
+y  1500 ty= -87 imgTop= -142 | ty=   0 imgTop=  297 | ty=  88 imgTop=  736 | spot 0
+y  1600 ty=-101 imgTop= -242 | ty= -20 imgTop=  197 | ty=  68 imgTop=  636 | spot 0
+y  1700 ty=-101 imgTop= -342 | ty= -40 imgTop=   97 | ty=  48 imgTop=  536 | spot 0
+y  1800 ty=-101 imgTop= -442 | ty= -60 imgTop=   -3 | ty=  28 imgTop=  436 | spot 0
+y  1900 ty=-101 imgTop= -542 | ty= -80 imgTop= -103 | ty=   8 imgTop=  336 | spot 0
+y  2000 ty=-101 imgTop= -642 | ty=-100 imgTop= -203 | ty= -12 imgTop=  236 | spot 0
+y  2100 ty=-101 imgTop= -742 | ty=-101 imgTop= -303 | ty= -32 imgTop=  136 | spot 0
+y  2200 ty=-101 imgTop= -842 | ty=-101 imgTop= -403 | ty= -52 imgTop=   36 | spot 0
+y  2300 ty=-101 imgTop= -942 | ty=-101 imgTop= -503 | ty= -72 imgTop=  -64 | spot 0
+y  2400 ty=-101 imgTop=-1042 | ty=-101 imgTop= -603 | ty= -92 imgTop= -164 | spot 0
+y  2500 ty=-101 imgTop=-1142 | ty=-101 imgTop= -703 | ty=-101 imgTop= -264 | spot 0
+y  2600 ty=-101 imgTop=-1242 | ty=-101 imgTop= -803 | ty=-101 imgTop= -364 | spot 0
+y  2700 ty=-101 imgTop=-1342 | ty=-101 imgTop= -903 | ty=-101 imgTop= -464 | spot 0
+y  2800 ty=-101 imgTop=-1442 | ty=-101 imgTop=-1003 | ty=-101 imgTop= -564 | spot 0
+exit 0

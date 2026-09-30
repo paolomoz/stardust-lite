@@ -1,0 +1,462 @@
+{
+ "hero": [
+  {
+   "headline": "A little now could go a long way tomorrow",
+   "teaser": "Let the power of recurring investing and smart saving features help you stay on track.",
+   "description": "Let the power of recurring investing and smart saving features help you stay on track.",
+   "extraLargeImage": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/hero-images/HP-littleNowLongWay.jpg"
+   },
+   "bodySection": [
+    {
+     "sectionKey": "CTAButtonGreen",
+     "disclosures": [],
+     "embeddedContent": [
+      {
+       "relatedPresentation": "Button Primary CT",
+       "relatedContent": "$$$bf16e744-fa1e-44a7-a3f3-51a2b428060a$$$"
+      }
+     ]
+    },
+    {
+     "sectionKey": "CTAButtonWhite",
+     "disclosures": [],
+     "embeddedContent": [
+      {
+       "relatedPresentation": "Button Secondary CT",
+       "relatedContent": "$$$a265241d-3274-45ef-8742-8bc15a0db84a$$$"
+      }
+     ]
+    },
+    {
+     "sectionKey": "inBannerDisclosure",
+     "disclosures": [],
+     "embeddedContent": []
+    }
+   ],
+   "disclosures": []
+  },
+  {
+   "id": "ed4878a6-d552-4dfe-9c9c-02325b2f5fae",
+   "path": "/600 Fidelity.Com English/Building Blocks/Content/PI/Fidelity.com/Homepage/heroBanners/EVlittleNowLongWayCPHPH",
+   "name": "EVlittleNowLongWayCPHPH",
+   "type": "Generic Complex",
+   "contentDetail": {
+    "headline": "A little now could go a long way tomorrow",
+    "teaser": "Let the power of recurring investing and smart saving features help you stay on track.",
+    "description": "Let the power of recurring investing and smart saving features help you stay on track.",
+    "extraLargeImage": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/hero-images/HP-littleNowLongWay.jpg"
+    },
+    "bodySection": [
+     {
+      "sectionKey": "CTAButtonGreen",
+      "disclosures": [],
+      "embeddedContent": [
+       {
+        "relatedPresentation": "Button Primary CT",
+        "relatedContent": "$$$bf16e744-fa1e-44a7-a3f3-51a2b428060a$$$"
+       }
+      ]
+     },
+     {
+      "sectionKey": "CTAButtonWhite",
+      "disclosures": [],
+      "embeddedContent": [
+       {
+        "relatedPresentation": "Button Secondary CT",
+        "relatedContent": "$$$a265241d-3274-45ef-8742-8bc15a0db84a$$$"
+       }
+      ]
+     },
+     {
+      "sectionKey": "inBannerDisclosure",
+      "disclosures": [],
+      "embeddedContent": []
+     }
+    ],
+    "disclosures": []
+   },
+   "components": [
+    {
+     "id": "bf16e744-fa1e-44a7-a3f3-51a2b428060a",
+     "path": "/600 Fidelity.Com English/Building Blocks/Content/PI/Fidelity.com/Homepage/heroBanners/buttons/openAnAccount_shared",
+     "name": "openAnAccount_shared",
+     "type": "Button",
+     "contentDetail": {
+      "text": "Open an account",
+      "url": "https://www.fidelity.com/open-account/overview"
+     },
+     "metadata": {
+      "customMetadata": []
+     }
+    },
+    {
+     "id": "a265241d-3274-45ef-8742-8bc15a0db84a",
+     "path": "/600 Fidelity.Com English/Building Blocks/Content/PI/Fidelity.com/Homepage/heroBanners/buttons/iNeedGuidance",
+     "name": "iNeedGuidance",
+     "type": "Button",
+     "contentDetail": {
+      "text": "I need guidance",
+      "url": "https://digital.fidelity.com/prgw/digital/accountselector/index"
+     },
+     "metadata": {
+      "customMetadata": []
+     }
+    }
+   ],
+   "metadata": {
+    "customMetadata": [
+     {
+      "value": "floatingHero",
+      "key": "template"
+     },
+     {
+      "value": "70",
+      "key": "focalPointX"
+     },
+     {
+      "value": "30",
+      "key": "focalPointY"
+     },
+     {
+      "key": "brandMark"
+     },
+     {
+      "value": "full",
+      "key": "variation"
+     }
+    ]
+   }
+  }
+ ],
+ "cards": [
+  {
+   "headline": "3 ways to use your health savings account",
+   "teaser": "Know the type of HSA user you are, then see how to make your money work harder.",
+   "description": "Know the type of HSA user you are, then see how to make your money work harder.",
+   "image": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/clock-icon.svg",
+    "title": "Clock Icon"
+   },
+   "largeImage": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/memo-icon.svg",
+    "title": "Memo Icon"
+   },
+   "mediumImage": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/clock-icon.svg",
+    "title": "Clock Icon"
+   },
+   "extraSmallImage": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/learn-carousel-01-image-01.jpg"
+   },
+   "bodySection": [],
+   "disclosures": []
+  },
+  {
+   "headline": "3 ways to use your health savings account",
+   "teaser": "Know the type of HSA user you are, then see how to make your money work harder.",
+   "description": "Know the type of HSA user you are, then see how to make your money work harder.",
+   "image": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/clock-icon.svg",
+    "title": "Clock Icon"
+   },
+   "largeImage": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/memo-icon.svg",
+    "title": "Memo Icon"
+   },
+   "mediumImage": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/clock-icon.svg",
+    "title": "Clock Icon"
+   },
+   "extraSmallImage": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/learn-carousel-01-image-01.jpg"
+   },
+   "bodySection": [],
+   "disclosures": []
+  },
+  {
+   "headline": "3 ways to use your health savings account",
+   "teaser": "Know the type of HSA user you are, then see how to make your money work harder.",
+   "description": "Know the type of HSA user you are, then see how to make your money work harder.",
+   "image": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/clock-icon.svg",
+    "title": "Clock Icon"
+   },
+   "largeImage": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/memo-icon.svg",
+    "title": "Memo Icon"
+   },
+   "mediumImage": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/clock-icon.svg",
+    "title": "Clock Icon"
+   },
+   "extraSmallImage": {
+    "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/learn-carousel-01-image-01.jpg"
+   },
+   "bodySection": [],
+   "disclosures": []
+  },
+  {
+   "id": "662206c2-7e99-401a-9ea4-0ecf817a3a30",
+   "path": "/600 Fidelity.Com English/Building Blocks/Content/PI/Fidelity.com/Homepage/components/BAU/learnCarouselHSADefault",
+   "name": "learnCarouselHSADefault",
+   "type": "Generic Complex",
+   "contentDetail": {
+    "headline": "3 ways to use your health savings account",
+    "teaser": "Know the type of HSA user you are, then see how to make your money work harder.",
+    "description": "Know the type of HSA user you are, then see how to make your money work harder.",
+    "image": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/clock-icon.svg",
+     "title": "Clock Icon"
+    },
+    "largeImage": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/memo-icon.svg",
+     "title": "Memo Icon"
+    },
+    "mediumImage": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/clock-icon.svg",
+     "title": "Clock Icon"
+    },
+    "extraSmallImage": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/learn-carousel-01-image-01.jpg"
+    },
+    "bodySection": [],
+    "disclosures": []
+   },
+   "metadata": {
+    "customMetadata": [
+     {
+      "value": "learn",
+      "key": "cardType"
+     },
+     {
+      "key": "imageAltText"
+     },
+     {
+      "value": "Article",
+      "key": "category"
+     },
+     {
+      "value": "6 min",
+      "key": "duration"
+     },
+     {
+      "value": "https://www.fidelity.com/learning-center/personal-finance/hsa-investing",
+      "key": "linkUrl"
+     }
+    ]
+   }
+  },
+  {
+   "id": "662206c2-7e99-401a-9ea4-0ecf817a3a30",
+   "path": "/600 Fidelity.Com English/Building Blocks/Content/PI/Fidelity.com/Homepage/components/BAU/learnCarouselHSADefault",
+   "name": "learnCarouselHSADefault",
+   "type": "Generic Complex",
+   "contentDetail": {
+    "headline": "3 ways to use your health savings account",
+    "teaser": "Know the type of HSA user you are, then see how to make your money work harder.",
+    "description": "Know the type of HSA user you are, then see how to make your money work harder.",
+    "image": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/clock-icon.svg",
+     "title": "Clock Icon"
+    },
+    "largeImage": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/memo-icon.svg",
+     "title": "Memo Icon"
+    },
+    "mediumImage": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/clock-icon.svg",
+     "title": "Clock Icon"
+    },
+    "extraSmallImage": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/learn-carousel-01-image-01.jpg"
+    },
+    "bodySection": [],
+    "disclosures": []
+   },
+   "metadata": {
+    "customMetadata": [
+     {
+      "value": "learn",
+      "key": "cardType"
+     },
+     {
+      "key": "imageAltText"
+     },
+     {
+      "value": "Article",
+      "key": "category"
+     },
+     {
+      "value": "6 min",
+      "key": "duration"
+     },
+     {
+      "value": "https://www.fidelity.com/learning-center/personal-finance/hsa-investing",
+      "key": "linkUrl"
+     }
+    ]
+   }
+  },
+  {
+   "id": "662206c2-7e99-401a-9ea4-0ecf817a3a30",
+   "path": "/600 Fidelity.Com English/Building Blocks/Content/PI/Fidelity.com/Homepage/components/BAU/learnCarouselHSADefault",
+   "name": "learnCarouselHSADefault",
+   "type": "Generic Complex",
+   "contentDetail": {
+    "headline": "3 ways to use your health savings account",
+    "teaser": "Know the type of HSA user you are, then see how to make your money work harder.",
+    "description": "Know the type of HSA user you are, then see how to make your money work harder.",
+    "image": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/clock-icon.svg",
+     "title": "Clock Icon"
+    },
+    "largeImage": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/memo-icon.svg",
+     "title": "Memo Icon"
+    },
+    "mediumImage": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/clock-icon.svg",
+     "title": "Clock Icon"
+    },
+    "extraSmallImage": {
+     "path": "https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/learn-carousel-01-image-01.jpg"
+    },
+    "bodySection": [],
+    "disclosures": []
+   },
+   "metadata": {
+    "customMetadata": [
+     {
+      "value": "learn",
+      "key": "cardType"
+     },
+     {
+      "key": "imageAltText"
+     },
+     {
+      "value": "Article",
+      "key": "category"
+     },
+     {
+      "value": "6 min",
+      "key": "duration"
+     },
+     {
+      "value": "https://www.fidelity.com/learning-center/personal-finance/hsa-investing",
+      "key": "linkUrl"
+     }
+    ]
+   }
+  }
+ ],
+ "disc": [
+  {
+   "text": "<p><strong>1. Applies to online U.S. equity trades and exchange-traded funds (ETFs). $0 commission does not apply to customers designated by Fidelity as a Professional Equity Trader who are subject to an equity commission charge of $0.001 per share rounded up to the nearest $0.01 on a per order basis. For complete details on pricing please see: <a href=\"https://www.fidelity.com/trading/commissions-margin-rates\" id=\"Link_1709233841631\" name=\"Link_1709233841631\">Fidelity.com/commissions</a> . A limited number of ETFs are subject to a transaction-based service fee of $100. See full list of ETFs subject to this service fee <a href=\"https://www.fidelity.com/trading/commissions-margin-rates\" id=\"Link_1775483792916\" title=\"here\" name=\"Link_1775483792916\">here</a>. Other exclusions and conditions may apply. Employee equity compensation transactions and accounts managed by advisors or intermediaries through Fidelity Institutional are subject to different commission schedules.</strong></p>"
+  },
+  {
+   "text": "<p> <strong>1. Applies to online U.S. equity trades and exchange-traded funds (ETFs). $0 commission does not apply to customers designated by Fidelity as a Professional Equity Trader who are subject to an equity commission charge of $0.001 per share rounded up to the nearest $0.01 on a per order basis. For complete details on pricing please see: <a href=\"https://www.fidelity.com/trading/commissions-margin-rates\" id=\"Link_1709233841631\" name=\"Link_1709233841631\">Fidelity.com/commissions</a> . A limited number of ETFs are subject to a transaction-based service fee of $100. See full list of ETFs subject to this service fee <a href=\"https://www.fidelity.com/trading/commissions-margin-rates\" id=\"Link_1775483792916\" title=\"here\" name=\"Link_1775483792916\">here</a>. Other exclusions and conditions may apply. Employee equity compensation transactions and accounts managed by advisors or intermediaries through Fidelity Institutional are subject to different commission schedules.</strong> </p>"
+  },
+  {
+   "section": [
+    {
+     "sectionKey": "scrollRevealWhite",
+     "disclosures": [],
+     "embeddedContent": [
+      {
+       "relatedContent": "$$$dc29009c-4cb0-4503-9a6a-f21499420edd$$$"
+      },
+      {
+       "relatedContent": "$$$3934214e-9ab3-426c-bd0f-464abe8290e6$$$"
+      },
+      {
+       "relatedContent": "$$$39d75058-9e25-487b-8bff-b0456acb9ece$$$"
+      }
+     ]
+    },
+    {
+     "sectionKey": "legalWhite",
+     "disclosures": [],
+     "embeddedContent": [
+      {
+       "relatedContent": "$$$9b56d2e3-8a0d-4a41-a98c-13bf2699495b$$$"
+      }
+     ]
+    },
+    {
+     "sectionKey": "learnCardCarouselSand",
+     "headline": "Expertise you can act on",
+     "disclosures": [],
+     "embeddedContent": [
+      {
+       "relatedContent": "$$$662206c2-7e99-401a-9ea4-0ecf817a3a30$$$"
+      },
+      {
+       "relatedContent": "$$$e08d67dc-d371-4b55-aba8-4cc9767cf4a6$$$"
+      },
+      {
+       "relatedContent": "$$$d01d3d10-4740-46d3-917d-657562414d2c$$$"
+      }
+     ]
+    },
+    {
+     "sectionKey": "imageFeatureSectionWhite",
+     "disclosures": [],
+     "embeddedContent": [
+      {
+       "relatedContent": "$$$0a84ee1d-df43-4d68-bc2a-06d2af804073$$$"
+      }
+     ]
+    },
+    {
+     "sectionKey": "imageFeatureSectionSand",
+     "disclosures": [],
+     "embeddedContent": [
+      {
+       "relatedContent": "$$$0db6d5d7-f685-4208-acbf-7f018c2a2284$$$"
+      }
+     ]
+    }
+   ],
+   "disclosures": [
+    {
+     "text": "<em>Keep in mind that investing involves risk. The value of your investment will fluctuate over time, and you may gain or lose money.</em>"
+    },
+    {
+     "text": "<p>Fidelity Crypto<sup>®</sup> is offered by Fidelity Digital Assets<sup>®</sup>. <br /> <br /> Investing involves risk, including risk of total loss. <br /> <br /> Crypto as an asset class is highly volatile, can become illiquid at any time, and is for investors with a high risk tolerance. Crypto may also be more susceptible to market manipulation than securities. Crypto is not insured by the Federal Deposit Insurance Corporation, the Securities Investor Protection Corporation, or any other government agency, and is not an obligation of any bank. Investors in crypto do not benefit from the same regulatory protections applicable to registered securities. <br /> <br /> Fidelity Crypto<sup>®</sup> accounts and custody and trading of crypto in such accounts are provided by Fidelity Digital Assets, National Association, which is a national trust bank. <br /> <br /> Brokerage services in support of securities trading are provided by Fidelity Brokerage Services LLC (“FBS”), and related custody services are provided by National Financial Services LLC (“NFS”), each a registered broker-dealer and member NYSE and SIPC. <br /> <br /> Neither FBS nor NFS offer crypto as a direct investment nor provide trading or custody services for such assets. <br /> <br /> Fidelity Crypto and Fidelity Digital Assets are registered service marks of FMR LLC.</p>"
+    },
+    {
+     "text": "Fidelity was named NerdWallet's 2026 winner for Best Broker for Beginning Investors, Best App for Investing (based on evaluation of 21 brokers), and Best Robo-Advisor for Low-Cost Investing (based on evaluation of 14 brokers.) ©2017-2026 and TM, NerdWallet, Inc. All Rights Reserved."
+    },
+    {
+     "text": "<p><strong>1. Applies to online U.S. equity trades and exchange-traded funds (ETFs). $0 commission does not apply to customers designated by Fidelity as a Professional Equity Trader who are subject to an equity commission charge of $0.001 per share rounded up to the nearest $0.01 on a per order basis. For complete details on pricing please see: <a href=\"https://www.fidelity.com/trading/commissions-margin-rates\" id=\"Link_1709233841631\" name=\"Link_1709233841631\">Fidelity.com/commissions</a> . A limited number of ETFs are subject to a transaction-based service fee of $100. See full list of ETFs subject to this service fee <a href=\"https://www.fidelity.com/trading/commissions-margin-rates\" id=\"Link_1775483792916\" title=\"here\" name=\"Link_1775483792916\">here</a>. Other exclusions and conditions may apply. Employee equity compensation transactions and accounts managed by advisors or intermediaries through Fidelity Institutional are subject to different commission schedules.</strong></p>"
+    },
+    {
+     "text": "*There is no minimum amount required to open a Fidelity Go account. However, in order for us to invest your money according to the investment strategy you've chosen, your account balance must be at least $10."
+    },
+    {
+     "text": "<strong>**Fidelity Go<sup>®</sup>provides discretionary investment management and, in certain circumstances, non-discretionary financial planning for a fee.**</strong> Advisory services are offered by Strategic Advisers LLC (Strategic Advisers), a registered investment adviser. Brokerage services are provided by Fidelity Brokerage Services LLC (FBS), and custodial and related services are provided by National Financial Services LLC (NFS), each a member of NYSE and SIPC. Strategic Advisers, FBS, and NFS are Fidelity Investments companies."
+    },
+    {
+     "text": "Fidelity advisors are licensed with Strategic Advisers LLC (Strategic Advisers), a registered investment adviser, and registered with Fidelity Brokerage Services LLC (FBS), a registered broker-dealer. Whether a Fidelity advisor provides advisory services through Strategic Advisers for a fee or brokerage services through FBS will depend on the products and services you choose."
+    },
+    {
+     "text": "The Fidelity Investments logo is a registered service mark of FMR LLC."
+    },
+    {
+     "text": "Fidelity does not provide legal or tax advice. The information herein is general in nature and should not be considered legal or tax advice. Consult an attorney or tax professional regarding your specific situation."
+    },
+    {
+     "text": "The images, graphs, tools, and videos are for illustrative purposes only."
+    },
+    {
+     "text": "Fidelity Brokerage Services LLC, Member NYSE, <a href=\"https://www.sipc.org/\" id=\"Link_1709234004675\" name=\"Link_1709234004675\">SIPC</a>, 900 Salem Street, Smithfield, RI 02917"
+    },
+    {
+     "text": "782377.124.0"
+    }
+   ]
+  }
+ ]
+}

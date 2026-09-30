@@ -1,0 +1,20 @@
+cap-probe: overlay dismissed via .agree-button
+cap-probe  base 1440 → probe 2560 (derived: max(2560, largest cap × 1.25))
+live   https://www.baincapital.com/
+  modules  9 sections: capped 1000 ×1, 930 ×1, 648 ×1, 310 ×1 · full-bleed ×5
+  contentMaxWidth fluid · shellMaxWidth fluid · root #smooth-content
+build  http://localhost:8930/home.harness.html
+  modules  8 sections: capped 1015 ×1, 631 ×1, 310 ×1 · full-bleed ×5
+  contentMaxWidth fluid · shellMaxWidth fluid · root body.home.appear > main
+rows
+  ✓ content cap: fluid on both sides — no wrapper, no shared module cap
+  ⚠ sections: live 9 vs build 8 top-level sections — module rows compared by order up to the shorter side, advisory until the structure matches
+  ⚠ module 1/9: live 1000px → build 631px, Δ-369px (div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav)
+  ⚠ module 2/9: live 930px (div.approach-section-wrap > div.container > div.title-wrap.stagger-parent > p.half-width-caption.stagger-anim) → build full-bleed (body.home.appear > main > div.band-first.backdrop-lightblue)
+  ✓ module 3/9: 310px = 310px
+  ✓ module 4/9: full-bleed on both
+  ✓ module 5/9: full-bleed on both
+  ⚠ module 6/9: live 648px → build 1015px, Δ367px (div.bain-people.block > div.bain-people-inner > div.bain-people-copy > p.bain-people-text)
+  ✓ module 7/9: full-bleed on both
+  ✓ module 8/9: full-bleed on both
+cap-probe: PASS at 2560 — 0 of 10 rows failed

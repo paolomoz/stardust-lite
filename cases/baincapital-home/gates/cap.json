@@ -1,0 +1,317 @@
+{
+  "_provenance": {
+    "writtenBy": "skills/replica/scripts/cap-probe.mjs",
+    "writtenAt": "2026-09-29T17:13:55.515Z",
+    "baseWidth": 1440,
+    "urls": [
+      "https://www.baincapital.com/"
+    ],
+    "failed": [],
+    "pinned": null
+  },
+  "pages": {
+    "https://www.baincapital.com/": {
+      "baseWidth": 1440,
+      "probeWidth": 2560,
+      "root": {
+        "selector": "#smooth-content",
+        "isBody": false,
+        "leaves": 163,
+        "w2": 2560
+      },
+      "origins": [
+        {
+          "kind": "module",
+          "px": 1000,
+          "via": "other",
+          "selector": "div.section.banner-tanagram-section > div.container > div.row.banner-title-row > div.col-md-7.banner-title-wrap",
+          "tier": 8,
+          "share": 0.01,
+          "section": 0,
+          "w1": 900,
+          "maxWidth": "100%"
+        },
+        {
+          "kind": "module",
+          "px": 650,
+          "via": "max-width",
+          "selector": "div.section.banner-tanagram-section > div.container > div.banner-slider-wrap.stagger-parent > div.banner-nav-slider-wrap",
+          "tier": 8,
+          "share": 0.02,
+          "section": 0,
+          "w1": 650,
+          "maxWidth": "650px"
+        },
+        {
+          "kind": "module",
+          "px": 930,
+          "via": "max-width",
+          "selector": "div.approach-section-wrap > div.container > div.title-wrap.stagger-parent > p.half-width-caption.stagger-anim",
+          "tier": 8,
+          "share": 0.01,
+          "section": 1,
+          "w1": 860,
+          "maxWidth": "930px"
+        },
+        {
+          "kind": "module",
+          "px": 310,
+          "via": "max-width",
+          "selector": "section.section.integrated-platform-section > div.container.stagger-parent > div.platform-content-wrap.stagger-anim > div.content-text",
+          "tier": 7,
+          "share": 0.01,
+          "section": 2,
+          "w1": 310,
+          "maxWidth": "310px"
+        },
+        {
+          "kind": "module",
+          "px": 256,
+          "via": "fixed",
+          "selector": "#circleTab1",
+          "tier": 13,
+          "share": 0.01,
+          "section": 2,
+          "w1": 256,
+          "maxWidth": "none"
+        },
+        {
+          "kind": "module",
+          "px": 247,
+          "via": "fixed",
+          "selector": "#circleTab3",
+          "tier": 13,
+          "share": 0.01,
+          "section": 2,
+          "w1": 247,
+          "maxWidth": "none"
+        },
+        {
+          "kind": "module",
+          "px": 278,
+          "via": "fixed",
+          "selector": "#circleTab4",
+          "tier": 13,
+          "share": 0.01,
+          "section": 2,
+          "w1": 278,
+          "maxWidth": "none"
+        },
+        {
+          "kind": "module",
+          "px": 281,
+          "via": "fixed",
+          "selector": "#circleTab5",
+          "tier": 13,
+          "share": 0.01,
+          "section": 2,
+          "w1": 281,
+          "maxWidth": "none"
+        },
+        {
+          "kind": "module",
+          "px": 456,
+          "via": "fixed",
+          "selector": "div.our-people-box.stagger-anim > div.row > div.col-12.people-breadcrumb-col > div.people-breadcrumb-inner",
+          "tier": 9,
+          "share": 0.02,
+          "section": 5,
+          "w1": 456,
+          "maxWidth": "none"
+        }
+      ],
+      "modules": [
+        {
+          "index": 0,
+          "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section-parent.home-section-parent",
+          "px": 1000,
+          "capSelector": "div.section.banner-tanagram-section > div.container > div.row.banner-title-row > div.col-md-7.banner-title-wrap"
+        },
+        {
+          "index": 1,
+          "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section.our-advantages-section",
+          "px": 930,
+          "capSelector": "div.approach-section-wrap > div.container > div.title-wrap.stagger-parent > p.half-width-caption.stagger-anim"
+        },
+        {
+          "index": 2,
+          "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section.integrated-platform-section",
+          "px": 310,
+          "capSelector": "section.section.integrated-platform-section > div.container.stagger-parent > div.platform-content-wrap.stagger-anim > div.content-text"
+        },
+        {
+          "index": 3,
+          "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section.spotlight-section",
+          "px": null,
+          "capSelector": null
+        },
+        {
+          "index": 4,
+          "selector": "#section5",
+          "px": null,
+          "capSelector": null
+        },
+        {
+          "index": 5,
+          "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section.our-people-section",
+          "px": 456,
+          "capSelector": "div.our-people-box.stagger-anim > div.row > div.col-12.people-breadcrumb-col > div.people-breadcrumb-inner"
+        },
+        {
+          "index": 6,
+          "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section.news-listing-section",
+          "px": null,
+          "capSelector": null
+        },
+        {
+          "index": 7,
+          "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section.contact-section",
+          "px": null,
+          "capSelector": null
+        },
+        {
+          "index": 8,
+          "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > footer.site-footer.section",
+          "px": null,
+          "capSelector": null
+        }
+      ],
+      "shellMaxWidth": null,
+      "contentMaxWidth": null,
+      "contentFrom": null,
+      "maxCap": 1000,
+      "fluid": false,
+      "probeNote": "derived: max(2560, largest cap × 1.25)",
+      "candidates": 355
+    }
+  },
+  "aggregate": {
+    "containerMaxWidth": null,
+    "contentMaxWidth": null,
+    "shellMaxWidth": null,
+    "consistent": true,
+    "probeWidth": 2560,
+    "caps": [
+      {
+        "kind": "module",
+        "px": 1000,
+        "via": "other",
+        "selector": "div.section.banner-tanagram-section > div.container > div.row.banner-title-row > div.col-md-7.banner-title-wrap",
+        "pages": [
+          "https://www.baincapital.com/"
+        ]
+      },
+      {
+        "kind": "module",
+        "px": 930,
+        "via": "max-width",
+        "selector": "div.approach-section-wrap > div.container > div.title-wrap.stagger-parent > p.half-width-caption.stagger-anim",
+        "pages": [
+          "https://www.baincapital.com/"
+        ]
+      },
+      {
+        "kind": "module",
+        "px": 650,
+        "via": "max-width",
+        "selector": "div.section.banner-tanagram-section > div.container > div.banner-slider-wrap.stagger-parent > div.banner-nav-slider-wrap",
+        "pages": [
+          "https://www.baincapital.com/"
+        ]
+      },
+      {
+        "kind": "module",
+        "px": 456,
+        "via": "fixed",
+        "selector": "div.our-people-box.stagger-anim > div.row > div.col-12.people-breadcrumb-col > div.people-breadcrumb-inner",
+        "pages": [
+          "https://www.baincapital.com/"
+        ]
+      },
+      {
+        "kind": "module",
+        "px": 310,
+        "via": "max-width",
+        "selector": "section.section.integrated-platform-section > div.container.stagger-parent > div.platform-content-wrap.stagger-anim > div.content-text",
+        "pages": [
+          "https://www.baincapital.com/"
+        ]
+      },
+      {
+        "kind": "module",
+        "px": 278,
+        "via": "fixed",
+        "selector": "#circleTab4",
+        "pages": [
+          "https://www.baincapital.com/"
+        ]
+      },
+      {
+        "kind": "module",
+        "px": 256,
+        "via": "fixed",
+        "selector": "#circleTab1",
+        "pages": [
+          "https://www.baincapital.com/"
+        ]
+      }
+    ],
+    "modules": [
+      {
+        "url": "https://www.baincapital.com/",
+        "section": 0,
+        "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section-parent.home-section-parent",
+        "px": 1000
+      },
+      {
+        "url": "https://www.baincapital.com/",
+        "section": 1,
+        "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section.our-advantages-section",
+        "px": 930
+      },
+      {
+        "url": "https://www.baincapital.com/",
+        "section": 2,
+        "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section.integrated-platform-section",
+        "px": 310
+      },
+      {
+        "url": "https://www.baincapital.com/",
+        "section": 3,
+        "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section.spotlight-section",
+        "px": null
+      },
+      {
+        "url": "https://www.baincapital.com/",
+        "section": 4,
+        "selector": "#section5",
+        "px": null
+      },
+      {
+        "url": "https://www.baincapital.com/",
+        "section": 5,
+        "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section.our-people-section",
+        "px": 456
+      },
+      {
+        "url": "https://www.baincapital.com/",
+        "section": 6,
+        "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section.news-listing-section",
+        "px": null
+      },
+      {
+        "url": "https://www.baincapital.com/",
+        "section": 7,
+        "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > section.section.contact-section",
+        "px": null
+      },
+      {
+        "url": "https://www.baincapital.com/",
+        "section": 8,
+        "selector": "#pinMaster > div.site-content-cover > div.section-wrapper > footer.site-footer.section",
+        "px": null
+      }
+    ],
+    "register": []
+  }
+}

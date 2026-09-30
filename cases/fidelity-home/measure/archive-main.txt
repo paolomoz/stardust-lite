@@ -1,0 +1,280 @@
+      <section class="full-hero">
+        <div class="full-hero__content">
+          <div class="full-hero__card fds-card">
+            <div class="full-hero__card-body">
+              <h1 id="hero-heading" class="full-hero__heading">
+                "Invest today and plan for tomorrow"
+              <p class="full-hero__teaser">
+                "We can help you get started."
+              <div class="full-hero__actions" role="group">
+                <div >
+                    <a class="pvd-button--anchor pvd-button--medium pvd-button--primary pvd-button-root" href="https://www.fidelity.com/open-account/overview">
+                      <div class="pvd-button__contents">
+                        <span class="pvd-button__text">
+                          "Open an account"
+                <div >
+                    <a class="pvd-button--anchor pvd-button--medium pvd-button--secondary pvd-button-root" href="https://digital.fidelity.com/prgw/digital/accountselector/index">
+                      <div class="pvd-button__contents">
+                        <span class="pvd-button__text">
+                          "I need guidance"
+        <picture class="full-hero__background">
+          <img class="full-hero__image" style="--desktop-focal-x: 65%; --desktop-focal-y: 50%; --tablet-focal-x: 65%; --tablet-focal-y: 50%; --mobile-focal-x: 65%; --mobile-focal-y: 50%;" src="https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/hero-images/in-market-HP-banner-mountain-3.jpg" alt="">
+      <div class="sections">
+          <section class="scroll-reveal" style="--transition-duration: 0.48s; --transition-ease: cubic-bezier(0.65, 0, 0.35, 1); background-color: #FFF; --background-color: #FFF;">
+            <div class="section-column">
+              <div class="content">
+                <section class="slide">
+                  <div class="text-content-half">
+                    <button type="button" class="slide-button" id="scroll-reveal-tab-scrollRevealWhite-0">
+                      <div class="slide-label">
+                        <h2 >
+                          "Start investing"
+                      <div class="slide-body">
+                        <h3 class="slide-title">
+                          "Invest smart from the start with a brokerage account"
+                      <div class="slide-icon">
+                        <svg >
+                    <section class="slide-accordion" id="scroll-reveal-tabpanel-scrollRevealWhite-0">
+                      <div class="slide-media-frame">
+                        <img class="media-image has-focal-point" style="--focal-x: 59%; --focal-y: 50%;" src="https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/offering-images/STR-start-investing-767x320.png" alt="">
+                      <div class="slide-body">
+                        <div class="row-set">
+                          <div class="row-item">
+                            <div class="row-item-title">
+                              "$0 account fees"
+                                "2"
+                            <div class="row-item-description">
+                              "Keep your money working toward your goals."
+                          <div class="row-item">
+                            <div class="row-item-title">
+                              "$0 commissions"
+                            <div class="row-item-description">
+                              "Trade US stocks and ETFs commission free online."
+                                "1"
+                          <div class="row-item">
+                            <div class="row-item-title">
+                              "Trade any amount"
+                            <div class="row-item-description">
+                              "Buy US stocks and ETFs for as little as $1 with fractional shares."
+                                "3"
+                        <div class="cta-set">
+                            <a class="pvd-button--medium pvd-button--primary pvd-button-root" href="https://digital.fidelity.com/prgw/digital/aox/aohome/getstarted?accountType=brokerage">
+                                <div class="pvd-button__contents">
+                                  <span class="pvd-button__text">
+                                    "Open a brokerage account"
+                            <a class="pvd-button--medium pvd-button--tertiary pvd-button--with-icon pvd-button-root" href="https://www.fidelity.com/trading/overview">
+                                <div class="pvd-button__contents">
+                                  <span class="pvd-button__text">
+                                    "Explore ways to invest"
+                                  <span class="pvd-button__icon pvd-button__icon--right">
+                                    <svg >
+              <div class="slide-line">
+              <div class="content">
+                <section class="slide">
+                  <div class="text-content-half">
+                    <button type="button" class="slide-button" id="scroll-reveal-tab-scrollRevealWhite-1">
+                      <div class="slide-label">
+                        <h2 >
+                          "Save for retirement"
+                      <div class="slide-body">
+                        <h3 class="slide-title">
+                          "Plan for the possibilities ahead with a Roth IRA"
+                      <div class="slide-icon">
+                        <svg >
+                    <section class="slide-accordion" id="scroll-reveal-tabpanel-scrollRevealWhite-1">
+                      <div class="slide-media-frame">
+                        <img class="media-image has-focal-point" style="--focal-x: 70%; --focal-y: 60%;" src="https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/offering-images/STR-retirement-767x320.png" alt="">
+                      <div class="slide-body">
+                        <div class="row-set">
+                          <div class="row-item">
+                            <div class="row-item-title">
+                              "Tax savings"
+                            <div class="row-item-description">
+                              "Any investment growth in a Roth is tax-free, with tax-free withdrawals in retirement."
+                                "4"
+                          <div class="row-item">
+                            <div class="row-item-title">
+                              "Access to your contributions"
+                            <div class="row-item-description">
+                              "Any amount you add to your Roth can be withdrawn without taxes or penalties, anytime, for any reason."
+                          <div class="row-item">
+                            <div class="row-item-title">
+                              "Numerous ways to invest"
+                            <div class="row-item-description">
+                              "Whether you invest on your own or have us do it, you can choose from stocks to ETFs to crypto and more."
+                        <div class="cta-set">
+                            <a class="pvd-button--medium pvd-button--primary pvd-button-root" href="https://digital.fidelity.com/prgw/digital/aox/aohome/getstarted?accountType=rothIRA">
+                                <div class="pvd-button__contents">
+                                  <span class="pvd-button__text">
+                                    "Open a Roth IRA"
+                            <a class="pvd-button--medium pvd-button--tertiary pvd-button--with-icon pvd-button-root" href="https://www.fidelity.com/retirement-ira/overview">
+                                <div class="pvd-button__contents">
+                                  <span class="pvd-button__text">
+                                    "Explore retirement planning"
+                                  <span class="pvd-button__icon pvd-button__icon--right">
+                                    <svg >
+              <div class="slide-line">
+              <div class="content">
+                <section class="slide">
+                  <div class="text-content-half">
+                    <button type="button" class="slide-button" id="scroll-reveal-tab-scrollRevealWhite-2">
+                      <div class="slide-label">
+                        <h2 >
+                          "Save for health care"
+                      <div class="slide-body">
+                        <h3 class="slide-title">
+                          "Save, earn, and invest for health care with an HSA"
+                      <div class="slide-icon">
+                        <svg >
+                    <section class="slide-accordion" id="scroll-reveal-tabpanel-scrollRevealWhite-2">
+                      <div class="slide-media-frame">
+                        <img class="media-image has-focal-point" style="--focal-x: 40%; --focal-y: 40%;" src="https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/offering-images/STR-HSA-767x320.png" alt="">
+                      <div class="slide-body">
+                        <div class="row-set">
+                          <div class="row-item">
+                            <div class="row-item-title">
+                              "Triple-tax advantage"
+                            <div class="row-item-description">
+                              "Get tax-deductible contributions, no immediate tax on earnings, and tax-free withdrawals for qualified medical expenses."
+                                "5"
+                          <div class="row-item">
+                            <div class="row-item-title">
+                              "No account fees"
+                            <div class="row-item-description">
+                              "Fidelity’s HSA has no account fees or minimums, and $0 commissions for US stock & ETF trades."
+                                "6"
+                          <div class="row-item">
+                            <div class="row-item-title">
+                              "Not “use-it-or-lose-it”"
+                            <div class="row-item-description">
+                              "The money’s always yours. You can earn interest on cash, grow your account by investing, or do both."
+                        <div class="cta-set">
+                            <a class="pvd-button--medium pvd-button--primary pvd-button-root" href="https://digital.fidelity.com/prgw/digital/aox/aohome/getstarted?accountType=hsa">
+                                <div class="pvd-button__contents">
+                                  <span class="pvd-button__text">
+                                    "Open an HSA"
+                            <a class="pvd-button--medium pvd-button--tertiary pvd-button--with-icon pvd-button-root" href="https://www.fidelity.com/go/hsa/why-hsa">
+                                <div class="pvd-button__contents">
+                                  <span class="pvd-button__text">
+                                    "Explore health savings at Fidelity"
+                                  <span class="pvd-button__icon pvd-button__icon--right">
+                                    <svg >
+              <div class="slide-line">
+              <div class="content">
+                <section class="slide">
+                  <div class="text-content-half">
+                    <button type="button" class="slide-button" id="scroll-reveal-tab-scrollRevealWhite-3">
+                      <div class="slide-label">
+                        <h2 >
+                          "Invest for a child"
+                      <div class="slide-body">
+                        <h3 class="slide-title">
+                          "Save for the next generation’s education with a 529 account"
+                      <div class="slide-icon">
+                        <svg >
+                    <section class="slide-accordion" id="scroll-reveal-tabpanel-scrollRevealWhite-3">
+                      <div class="slide-media-frame">
+                        <img class="media-image has-focal-point" style="--focal-x: 65%; --focal-y: 30%;" src="https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/offering-images/STR-child-767x320.png" alt="">
+                      <div class="slide-body">
+                        <div class="row-set">
+                          <div class="row-item">
+                            <div class="row-item-title">
+                              "Tax-smart savings"
+                            <div class="row-item-description">
+                              "Any earnings grow federal income tax-deferred, and you can get tax-free withdrawals for qualified education expenses."
+                          <div class="row-item">
+                            <div class="row-item-title">
+                              "Flexible use of funds"
+                            <div class="row-item-description">
+                              "Pay for college, trade school, and K–12 nationwide, including tuition, fees, and books."
+                                "7"
+                          <div class="row-item">
+                            <div class="row-item-title">
+                              "Your money can work harder"
+                            <div class="row-item-description">
+                              "No minimums to open and no account fees."
+                                "2"
+                              "Plus, start early and your money could potentially grow more."
+                        <div class="cta-set">
+                            <a class="pvd-button--medium pvd-button--primary pvd-button-root" href="https://digital.fidelity.com/prgw/digital/aox/aohome/getstarted?accountType=collegeSavingsPlan">
+                                <div class="pvd-button__contents">
+                                  <span class="pvd-button__text">
+                                    "Open a 529 account"
+                            <a class="pvd-button--medium pvd-button--tertiary pvd-button--with-icon pvd-button-root" href="https://www.fidelity.com/building-savings/child-saving-and-investing">
+                                <div class="pvd-button__contents">
+                                  <span class="pvd-button__text">
+                                    "Explore saving for a child"
+                                  <span class="pvd-button__icon pvd-button__icon--right">
+                                    <svg >
+            <section name="pattern-container" class="pattern white">
+              <div class="pattern-container">
+                <section name="image-feature-block" class="alignment--image-left variation--full">
+                  <div class="grid">
+                    <div class="grid-item grid-item__1-4--md grid-item__1-5--sm grid-item__1-8--lg grid-item__1-9 grid-item__align--center grid-item__justify--start h-100 image-box leftAlignme">
+                      <img class="featured-image w-100 h-auto has-focal-point" style="--focal-x: 60%; --focal-y: 40%;" src="https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/image-feature-images/Wealth-plan-possibilities-new.jpg" alt="">
+                    <div class="grid-item grid-item__1-5--sm grid-item__4-7--md grid-item__8-12--lg grid-item__9-12 grid-item__align--center h-100 rightAlignmentClassesFullContent">
+                      <div class="content-wrapper">
+                        <h2 class="headline text__display--section">
+                          "A partner to help bring your plans to life"
+                        <p class="content text__paragraph--lede">
+                          "Collaborate with a dedicated Fidelity advisor to build a comprehensive wealth management strategy designed to help you meet your goals and evolving needs."
+                          <div class="alignment--flex-start button-group direction--column" style="--gap: var(--fds-space-75); --direction: column; --alignment: flex-start;">
+                              <a class="pvd-button--anchor pvd-button--medium pvd-button--primary pvd-button-root" href="https://digital.fidelity.com/prgw/digital/faa/0/landing-page?ccsource=phpdefault">
+                                <div class="pvd-button__contents">
+                                  <span class="pvd-button__text">
+                                    "Find an advisor"
+          <section class="legal" style="background-color: #FFF;">
+              <div >
+                <p >
+                  "Review Fidelity Brokerage Services with"
+                  <a href="https://brokercheck.finra.org/firm/summary/7784" class="popup">
+                    "FINRA's BrokerCheck"
+                <a href="https://www.fidelity.com/bin-public/060_www_fidelity_com/documents/FBS-SAI-CRS.pdf">
+                  "Regulatory summary of Fidelity services (PDF)"
+            <section name="pattern-container" class="creme pattern">
+              <div class="pattern-container">
+                <section name="card-carousel">
+                  <div class="content-wrapper justification--centered">
+                    <h2 id="carousel-heading" class="text__align--center text__display--section title">
+                      "Expertise you can act on"
+                  <div role="group">
+                    <div class="carousel-container" style="height: NaNpx;">
+                      <div class="carousel-track">
+            <section name="pattern-container" class="pattern white">
+              <div class="pattern-container">
+                <section name="image-feature-block" class="alignment--image-right variation--full">
+                  <div class="grid">
+                    <div class="grid-item grid-item__1-5--sm grid-item__4-7--md grid-item__5-13 grid-item__6-13--lg grid-item__align--center grid-item__justify--end h-100 image-box rightAlignm">
+                      <img class="featured-image w-100 h-auto has-focal-point" style="--focal-x: 55%; --focal-y: 65%;" src="https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/image-feature-images/HP-why-fidelity-small-6-24.jpg" alt="">
+                    <div class="grid-item grid-item__1-4--md grid-item__1-5--sm grid-item__2-5 grid-item__2-6--lg grid-item__align--center h-100 leftAlignmentClassesFullContent">
+                      <div class="content-wrapper">
+                        <h2 class="headline text__display--section">
+                          "Why choose Fidelity?"
+                        <p class="content text__paragraph--lede">
+                          "Our objective insights and disciplined approach have helped generations of customers through all kinds of markets."
+                          <ul >
+                            <li >
+                              "A clear, straightforward experience"
+                            <li >
+                              "Guidance as life changes"
+                            <li >
+                              "A wider range of integrated tools and products"
+                            <li >
+                              "Value and transparency at every step"
+            <section name="pattern-container" class="creme pattern">
+              <div class="pattern-container">
+                <section name="image-feature-block" class="alignment--image-left variation--minor">
+                  <div class="grid">
+                    <div class="grid-item grid-item__1-4--md grid-item__2-7--lg grid-item__3-7 grid-item__align--center grid-item__justify--start h-100 image-box">
+                      <img class="featured-image w-100 h-auto" src="https://www.fidelity.com/bin-public/600_Fidelity_Com_English/images/homepage/image-feature-images/image-feature-02-looking-for-something-else-01-screen.png" alt="">
+                    <div class="grid-item grid-item__4-7--md grid-item__7-11 grid-item__7-12--lg grid-item__align--center grid-item__justify--end h-100">
+                      <div class="content-wrapper">
+                        <h2 class="headline text__headline--section">
+                          "Looking for something else?"
+                        <p class="content text__paragraph--lede">
+                          "Answer a few questions about your goals and we'll show account options that could work for you."
+                          <div class="alignment--flex-start button-group direction--column" style="--gap: var(--fds-space-75); --direction: column; --alignment: flex-start;">
+                              <a class="pvd-button--anchor pvd-button--medium pvd-button--secondary pvd-button-root" href="https://digital.fidelity.com/prgw/digital/accountselector/index">
+                                <div class="pvd-button__contents">
+                                  <span class="pvd-button__text">
+                                    "Get started"

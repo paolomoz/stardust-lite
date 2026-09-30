@@ -1,0 +1,2460 @@
+{
+  "url": "https://proto--sdt-baincapital--aemcoder-adobe.aem.page/drafts/home",
+  "width": 1440,
+  "headerTimeline": [
+    {
+      "y": 0,
+      "cls": "header-wrapper show",
+      "position": "fixed",
+      "height": "127.938px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 0,
+      "cls": "header-wrapper show",
+      "position": "fixed",
+      "height": "127.938px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 1200,
+      "cls": "header-wrapper scrolled hide",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 2400,
+      "cls": "header-wrapper scrolled hide",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 3600,
+      "cls": "header-wrapper scrolled hide",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 4800,
+      "cls": "header-wrapper scrolled hide",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 6000,
+      "cls": "header-wrapper scrolled hide",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 7200,
+      "cls": "header-wrapper scrolled hide",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 6192,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 4692,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 2400,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 1200,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 800,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 500,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 300,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 200,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 150,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 120,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 90,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 60,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 30,
+      "cls": "header-wrapper scrolled show",
+      "position": "fixed",
+      "height": "96px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    },
+    {
+      "y": 0,
+      "cls": "header-wrapper show",
+      "position": "fixed",
+      "height": "120.297px",
+      "transform": "none",
+      "transition": "top 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, z-index 0.3s ease-in-out",
+      "mainPadTop": "0px",
+      "bodyPadTop": "0px",
+      "headerCount": 1
+    }
+  ],
+  "widgetSamples": [
+    {
+      "sel": ".bain-hero-nav-item:nth-child(1)",
+      "frames": [
+        {
+          "t": 16113.100000023842,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 16318.300000011921,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 16522.200000047684,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 16726.100000023842,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        }
+      ]
+    },
+    {
+      "sel": ".bain-platform-tabs .bain-platform-tab:nth-child(2)",
+      "frames": [
+        {
+          "t": 17740.200000047684,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 17944.700000047684,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 18150.30000001192,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 18356.700000047684,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        }
+      ]
+    },
+    {
+      "sel": ".bain-commitments-list .bain-commitments-item:nth-child(2) a",
+      "frames": [
+        {
+          "t": 19374.80000001192,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 19578.900000035763,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 19785,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 19991.30000001192,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        }
+      ]
+    },
+    {
+      "sel": ".bain-commitments-nav.next",
+      "frames": [
+        {
+          "t": 21004.900000035763,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 21208.900000035763,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 21412.400000035763,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 21620.200000047684,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        }
+      ]
+    },
+    {
+      "sel": ".bain-presence-tabs li:nth-child(2) .bain-presence-tab",
+      "frames": [
+        {
+          "t": 22640.80000001192,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 22845.700000047684,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 23052.400000035763,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 23260,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        }
+      ]
+    },
+    {
+      "sel": ".bain-presence-filter",
+      "frames": [
+        {
+          "t": 24276.200000047684,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 24480.900000035763,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 24687.5,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 24891.600000023842,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        }
+      ]
+    },
+    {
+      "sel": ".header-more",
+      "frames": [
+        {
+          "t": 25905.200000047684,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 26110.900000035763,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 26315.5,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 26519.700000047684,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        }
+      ]
+    },
+    {
+      "sel": ".header-search",
+      "frames": [
+        {
+          "t": 27534,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 27739.400000035763,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 27945.100000023842,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 28152.5,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        }
+      ]
+    },
+    {
+      "sel": ".bain-advantages-item:first-child .bain-advantages-play",
+      "frames": [
+        {
+          "t": 29170.30000001192,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 29375.80000001192,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 29581.200000047684,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        },
+        {
+          "t": 29785.200000047684,
+          "trackTransform": null,
+          "trackTransition": null,
+          "boxScrollLeft": null,
+          "boxTransform": null,
+          "dots": []
+        }
+      ]
+    },
+    {
+      "sel": ".bain-hero-slide.is-active a[data-video]",
+      "error": "not found"
+    }
+  ],
+  "hoverSamples": [
+    {
+      "sel": ".header-links > li:nth-child(3) > a",
+      "changed": [],
+      "before": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(28, 33, 86)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "all"
+        },
+        "subs": []
+      },
+      "after": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(28, 33, 86)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "all"
+        },
+        "subs": []
+      }
+    },
+    {
+      "sel": ".header-tools li:nth-child(2) a",
+      "changed": [
+        "self.color"
+      ],
+      "before": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(49, 93, 144)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.3s"
+        },
+        "subs": []
+      },
+      "after": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(255, 255, 255)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.3s"
+        },
+        "subs": []
+      }
+    },
+    {
+      "sel": ".bain-hero-slide.is-active .bc-btn",
+      "changed": [
+        "self.color",
+        "self.background",
+        "span.bc-arrow-round.color"
+      ],
+      "before": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(0, 26, 255)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out"
+        },
+        "subs": [
+          {
+            "el": "span.bc-arrow-round",
+            "transform": "none",
+            "color": "rgb(0, 26, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "boxShadow": "none",
+            "opacity": "1",
+            "transition": "all"
+          }
+        ]
+      },
+      "after": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(255, 255, 255)",
+          "background": "rgb(0, 26, 255)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out"
+        },
+        "subs": [
+          {
+            "el": "span.bc-arrow-round",
+            "transform": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "boxShadow": "none",
+            "opacity": "1",
+            "transition": "all"
+          }
+        ]
+      }
+    },
+    {
+      "sel": ".bain-advantages-item:first-child .bain-advantages-play",
+      "error": "not found"
+    },
+    {
+      "sel": ".bain-commitments .bc-btn.green",
+      "changed": [],
+      "before": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(27, 33, 90)",
+          "background": "rgb(220, 245, 78)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out"
+        },
+        "subs": []
+      },
+      "after": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(27, 33, 90)",
+          "background": "rgb(220, 245, 78)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out"
+        },
+        "subs": []
+      }
+    },
+    {
+      "sel": ".bain-people .bc-btn",
+      "changed": [
+        "self.color",
+        "self.background",
+        "svg.[object.SVGAnimatedString].color"
+      ],
+      "before": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(63, 182, 255)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out"
+        },
+        "subs": [
+          {
+            "el": "svg.[object.SVGAnimatedString]",
+            "transform": "none",
+            "color": "rgb(63, 182, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "boxShadow": "none",
+            "opacity": "1",
+            "transition": "all"
+          }
+        ]
+      },
+      "after": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(255, 255, 255)",
+          "background": "rgb(63, 182, 255)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out"
+        },
+        "subs": [
+          {
+            "el": "svg.[object.SVGAnimatedString]",
+            "transform": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "boxShadow": "none",
+            "opacity": "1",
+            "transition": "all"
+          }
+        ]
+      }
+    },
+    {
+      "sel": ".bain-news-list .bain-news-title a",
+      "changed": [
+        "self.color"
+      ],
+      "before": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(28, 33, 86)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.3s"
+        },
+        "subs": []
+      },
+      "after": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(0, 71, 187)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.3s"
+        },
+        "subs": []
+      }
+    },
+    {
+      "sel": ".bain-news .bain-news-actions .bc-btn",
+      "changed": [
+        "self.color",
+        "self.background",
+        "svg.[object.SVGAnimatedString].color"
+      ],
+      "before": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(0, 26, 255)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out"
+        },
+        "subs": [
+          {
+            "el": "svg.[object.SVGAnimatedString]",
+            "transform": "none",
+            "color": "rgb(0, 26, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "boxShadow": "none",
+            "opacity": "1",
+            "transition": "all"
+          }
+        ]
+      },
+      "after": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(255, 255, 255)",
+          "background": "rgb(0, 26, 255)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out"
+        },
+        "subs": [
+          {
+            "el": "svg.[object.SVGAnimatedString]",
+            "transform": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "boxShadow": "none",
+            "opacity": "1",
+            "transition": "all"
+          }
+        ]
+      }
+    },
+    {
+      "sel": ".footer-links li:nth-child(2) a",
+      "changed": [],
+      "before": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(171, 202, 233)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "border-color 0.3s"
+        },
+        "subs": []
+      },
+      "after": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(171, 202, 233)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "border-color 0.3s"
+        },
+        "subs": []
+      }
+    },
+    {
+      "sel": ".footer-social a",
+      "changed": [
+        "self.background"
+      ],
+      "before": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(255, 255, 255)",
+          "background": "rgb(27, 33, 90)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "background-color 0.3s"
+        },
+        "subs": []
+      },
+      "after": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(255, 255, 255)",
+          "background": "rgb(0, 26, 255)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "background-color 0.3s"
+        },
+        "subs": []
+      }
+    },
+    {
+      "sel": ".bain-spotlight-card:nth-child(2)",
+      "changed": [
+        "img..transform"
+      ],
+      "before": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(255, 255, 255)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "all"
+        },
+        "subs": [
+          {
+            "el": "img.",
+            "transform": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "boxShadow": "none",
+            "opacity": "1",
+            "transition": "transform 0.3s ease-in-out"
+          },
+          {
+            "el": "h3.bain-spotlight-title",
+            "transform": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "boxShadow": "none",
+            "opacity": "1",
+            "transition": "all"
+          }
+        ]
+      },
+      "after": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(255, 255, 255)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "all"
+        },
+        "subs": [
+          {
+            "el": "img.",
+            "transform": "matrix(1.0994, 0, 0, 1.0994, 0, 0)",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "boxShadow": "none",
+            "opacity": "1",
+            "transition": "transform 0.3s ease-in-out"
+          },
+          {
+            "el": "h3.bain-spotlight-title",
+            "transform": "none",
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(0, 0, 0, 0)",
+            "boxShadow": "none",
+            "opacity": "1",
+            "transition": "all"
+          }
+        ]
+      }
+    },
+    {
+      "sel": ".bain-platform-labels .bain-platform-tab-label:nth-child(2)",
+      "changed": [],
+      "before": {
+        "self": {
+          "transform": "matrix(1, 0, 0, 1, -100, -40.7969)",
+          "color": "rgb(255, 255, 255)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.15s ease-in-out, opacity 0.15s ease-in-out"
+        },
+        "subs": []
+      },
+      "after": {
+        "self": {
+          "transform": "matrix(1, 0, 0, 1, -100, -40.7969)",
+          "color": "rgb(255, 255, 255)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "color 0.15s ease-in-out, opacity 0.15s ease-in-out"
+        },
+        "subs": []
+      }
+    },
+    {
+      "sel": ".bain-presence-tabs li:nth-child(2) .bain-presence-tab",
+      "changed": [],
+      "before": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(255, 255, 255)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "border-color 0.15s ease-in-out"
+        },
+        "subs": []
+      },
+      "after": {
+        "self": {
+          "transform": "none",
+          "color": "rgb(255, 255, 255)",
+          "background": "rgba(0, 0, 0, 0)",
+          "boxShadow": "none",
+          "opacity": "1",
+          "transition": "border-color 0.15s ease-in-out"
+        },
+        "subs": []
+      }
+    }
+  ],
+  "events": {
+    "animations": [],
+    "transitions": [
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 400,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide > div.header.block.scrolled > div.header-bottom",
+        "y": 400,
+        "dur": "1s, 1s"
+      },
+      {
+        "prop": "border-bottom-width",
+        "el": "header.header-wrapper.scrolled.hide > div.header.block.scrolled > div.header-bottom > div.header-inner > nav.header-nav",
+        "y": 400,
+        "dur": "0.5s, 0.5s"
+      },
+      {
+        "prop": "max-width",
+        "el": "header.header-wrapper.scrolled.hide > div.header.block.scrolled > div.header-bottom > div.header-inner > a.header-brand",
+        "y": 400,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "padding-bottom",
+        "el": "header.header-wrapper.scrolled.hide > div.header.block.scrolled > div.header-bottom > div.header-inner > a.header-brand",
+        "y": 400,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "padding-top",
+        "el": "header.header-wrapper.scrolled.hide > div.header.block.scrolled > div.header-bottom > div.header-inner > a.header-brand",
+        "y": 400,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 400,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "top",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 400,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 400,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 2400,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 4000,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > div.bc-backdrop.is-photo > div.bc-backdrop-photo",
+        "y": 4800,
+        "dur": "0.2s, 0.2s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > div.bc-backdrop.is-photo > div.bc-backdrop-photo",
+        "y": 4800,
+        "dur": "0.2s, 0.2s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide.is-active",
+        "y": 5200,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-line",
+        "y": 5200,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-nav-title",
+        "y": 5200,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes",
+        "y": 5200,
+        "dur": "1s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item > span.bain-hero-nav-title",
+        "y": 5200,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item > span.bain-hero-line",
+        "y": 5200,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide",
+        "y": 5200,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "width",
+        "el": "div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-line > span.bain-hero-progress",
+        "y": 5200,
+        "dur": "5.5s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > div.bc-backdrop > div.bc-backdrop-photo",
+        "y": 5600,
+        "dur": "0.2s, 0.2s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > div.bc-backdrop > div.bc-backdrop-photo",
+        "y": 5600,
+        "dur": "0.2s, 0.2s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes.is-active",
+        "y": 6400,
+        "dur": "0.2s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 6800,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 6192,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 6192,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "top",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 6192,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 6192,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > div.bc-backdrop.is-photo > div.bc-backdrop-photo",
+        "y": 4692,
+        "dur": "0.2s, 0.2s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > div.bc-backdrop.is-photo > div.bc-backdrop-photo",
+        "y": 4692,
+        "dur": "0.2s, 0.2s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 2400,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > div.bc-backdrop > div.bc-backdrop-photo",
+        "y": 2400,
+        "dur": "0.2s, 0.2s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > div.bc-backdrop > div.bc-backdrop-photo",
+        "y": 2400,
+        "dur": "0.2s, 0.2s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 1200,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 200,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > header.header-wrapper.show > div.header.block.show > div.header-bottom",
+        "y": 0,
+        "dur": "1s, 1s"
+      },
+      {
+        "prop": "border-bottom-width",
+        "el": "header.header-wrapper.show > div.header.block.show > div.header-bottom > div.header-inner > nav.header-nav",
+        "y": 0,
+        "dur": "0.5s, 0.5s"
+      },
+      {
+        "prop": "max-width",
+        "el": "header.header-wrapper.show > div.header.block.show > div.header-bottom > div.header-inner > a.header-brand",
+        "y": 0,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "padding-bottom",
+        "el": "header.header-wrapper.show > div.header.block.show > div.header-bottom > div.header-inner > a.header-brand",
+        "y": 0,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "padding-top",
+        "el": "header.header-wrapper.show > div.header.block.show > div.header-bottom > div.header-inner > a.header-brand",
+        "y": 0,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 399,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide > div.header.block.scrolled > div.header-bottom",
+        "y": 399,
+        "dur": "1s, 1s"
+      },
+      {
+        "prop": "border-bottom-width",
+        "el": "header.header-wrapper.scrolled.hide > div.header.block.scrolled > div.header-bottom > div.header-inner > nav.header-nav",
+        "y": 399,
+        "dur": "0.5s, 0.5s"
+      },
+      {
+        "prop": "max-width",
+        "el": "header.header-wrapper.scrolled.hide > div.header.block.scrolled > div.header-bottom > div.header-inner > a.header-brand",
+        "y": 399,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "padding-bottom",
+        "el": "header.header-wrapper.scrolled.hide > div.header.block.scrolled > div.header-bottom > div.header-inner > a.header-brand",
+        "y": 399,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "padding-top",
+        "el": "header.header-wrapper.scrolled.hide > div.header.block.scrolled > div.header-bottom > div.header-inner > a.header-brand",
+        "y": 399,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 399,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "top",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 399,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 399,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-nav-title",
+        "y": 399,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes",
+        "y": 399,
+        "dur": "1s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide.is-active",
+        "y": 399,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-line",
+        "y": 399,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide",
+        "y": 399,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item > span.bain-hero-line",
+        "y": 399,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item > span.bain-hero-nav-title",
+        "y": 399,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "width",
+        "el": "div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-line > span.bain-hero-progress",
+        "y": 399,
+        "dur": "5.5s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes.is-active",
+        "y": 399,
+        "dur": "0.2s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 2721,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.band.backdrop-navy.dark > div.bain-platform-wrapper > div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-panels",
+        "y": 2721,
+        "dur": "0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "left",
+        "el": "div.band.backdrop-navy.dark > div.bain-platform-wrapper > div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-panels",
+        "y": 2721,
+        "dur": "0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "visibility",
+        "el": "div.band.backdrop-navy.dark > div.bain-platform-wrapper > div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-panels",
+        "y": 2721,
+        "dur": "0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.band.backdrop-navy.dark > div.bain-platform-wrapper > div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-wheel",
+        "y": 2721,
+        "dur": "0.3s, 0.3s"
+      },
+      {
+        "prop": "transform",
+        "el": "div.band.backdrop-navy.dark > div.bain-platform-wrapper > div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-wheel",
+        "y": 2721,
+        "dur": "0.3s, 0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-wheel > div.bain-platform-labels > span.bain-platform-tab-label.is-active",
+        "y": 2721,
+        "dur": "0.15s, 0.15s"
+      },
+      {
+        "prop": "color",
+        "el": "div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-wheel > div.bain-platform-labels > span.bain-platform-tab-label.is-active",
+        "y": 2721,
+        "dur": "0.15s, 0.15s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-platform-wrapper > div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-panels > div.bain-platform-panel.is-active",
+        "y": 2721,
+        "dur": "0.15s, 0.15s"
+      },
+      {
+        "prop": "visibility",
+        "el": "div.bain-platform-wrapper > div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-panels > div.bain-platform-panel.is-active",
+        "y": 2721,
+        "dur": "0.15s, 0.15s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 4407,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-commitments-wrapper > div.bain-commitments.block > div.bain-commitments-stage > div.bain-commitments-cards > div.bain-commitments-card.is-active",
+        "y": 4407,
+        "dur": "0.15s, 0.15s"
+      },
+      {
+        "prop": "visibility",
+        "el": "div.bain-commitments-wrapper > div.bain-commitments.block > div.bain-commitments-stage > div.bain-commitments-cards > div.bain-commitments-card.is-active",
+        "y": 4407,
+        "dur": "0.15s, 0.15s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-commitments-wrapper > div.bain-commitments.block > div.bain-commitments-stage > div.bain-commitments-cards > div.bain-commitments-card",
+        "y": 4407,
+        "dur": "0.15s, 0.15s"
+      },
+      {
+        "prop": "visibility",
+        "el": "div.bain-commitments-wrapper > div.bain-commitments.block > div.bain-commitments-stage > div.bain-commitments-cards > div.bain-commitments-card",
+        "y": 4407,
+        "dur": "0.15s, 0.15s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 4352,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "top",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 4352,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 4352,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-commitments-wrapper > div.bain-commitments.block > div.bain-commitments-stage > div.bain-commitments-cards > div.bain-commitments-card",
+        "y": 4352,
+        "dur": "0.15s, 0.15s"
+      },
+      {
+        "prop": "visibility",
+        "el": "div.bain-commitments-wrapper > div.bain-commitments.block > div.bain-commitments-stage > div.bain-commitments-cards > div.bain-commitments-card",
+        "y": 4352,
+        "dur": "0.15s, 0.15s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-commitments-wrapper > div.bain-commitments.block > div.bain-commitments-stage > div.bain-commitments-cards > div.bain-commitments-card.is-active",
+        "y": 4352,
+        "dur": "0.15s, 0.15s"
+      },
+      {
+        "prop": "visibility",
+        "el": "div.bain-commitments-wrapper > div.bain-commitments.block > div.bain-commitments-stage > div.bain-commitments-cards > div.bain-commitments-card.is-active",
+        "y": 4352,
+        "dur": "0.15s, 0.15s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item > span.bain-hero-nav-title",
+        "y": 4352,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide",
+        "y": 4352,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item > span.bain-hero-line",
+        "y": 4352,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes",
+        "y": 4352,
+        "dur": "1s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-nav-title",
+        "y": 4352,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-line",
+        "y": 4352,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide.is-active",
+        "y": 4352,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "width",
+        "el": "div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-line > span.bain-hero-progress",
+        "y": 4352,
+        "dur": "5.5s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 6917,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 6917,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "top",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 6917,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 6917,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes.is-active",
+        "y": 6917,
+        "dur": "0.2s"
+      },
+      {
+        "prop": "opacity",
+        "el": "main > div.band-open.backdrop-blue.dark > div.bain-presence-wrapper > div.bain-presence.block.is-listing > div.bain-presence-map",
+        "y": 6917,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "border-bottom-color",
+        "el": "div.bain-presence.block.is-listing > div.bain-presence-head > ul.bain-presence-tabs > li > button.bain-presence-tab",
+        "y": 6917,
+        "dur": "0.15s"
+      },
+      {
+        "prop": "border-bottom-color",
+        "el": "div.bain-presence.block.is-listing > div.bain-presence-head > ul.bain-presence-tabs > li > button.bain-presence-tab.is-active",
+        "y": 6917,
+        "dur": "0.15s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide.is-active",
+        "y": 6981,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-line",
+        "y": 6981,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-nav-title",
+        "y": 6981,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes",
+        "y": 6981,
+        "dur": "1s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item > span.bain-hero-nav-title",
+        "y": 6981,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item > span.bain-hero-line",
+        "y": 6981,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide",
+        "y": 6981,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "width",
+        "el": "div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-line > span.bain-hero-progress",
+        "y": 6981,
+        "dur": "5.5s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes.is-active",
+        "y": 6981,
+        "dur": "0.2s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 1131,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 1131,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "top",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 1131,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 1131,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "width",
+        "el": "div.header-inner > nav.header-nav > ul.header-links > li > a",
+        "y": 1131,
+        "dur": "0s"
+      },
+      {
+        "prop": "left",
+        "el": "div.header-inner > nav.header-nav > ul.header-links > li > a",
+        "y": 1131,
+        "dur": "0s"
+      },
+      {
+        "prop": "width",
+        "el": "div.header-inner > nav.header-nav > ul.header-links > li > a",
+        "y": 1131,
+        "dur": "0s"
+      },
+      {
+        "prop": "left",
+        "el": "div.header-inner > nav.header-nav > ul.header-links > li > a",
+        "y": 1131,
+        "dur": "0s"
+      },
+      {
+        "prop": "transform",
+        "el": "div.header-top > div.header-inner > ul.header-tools > li > a",
+        "y": 1131,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "color",
+        "el": "div.header-top > div.header-inner > ul.header-tools > li > a",
+        "y": 1131,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "transform",
+        "el": "div.header-top > div.header-inner > ul.header-tools > li > a",
+        "y": 1131,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "color",
+        "el": "div.header-top > div.header-inner > ul.header-tools > li > a",
+        "y": 1131,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 216,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "color",
+        "el": "div.bain-hero-deck > div.bain-hero-slide.is-active > div.bain-hero-copy > p.bain-hero-actions > a.bc-btn",
+        "y": 216,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero-deck > div.bain-hero-slide.is-active > div.bain-hero-copy > p.bain-hero-actions > a.bc-btn",
+        "y": 216,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "color",
+        "el": "div.bain-hero-deck > div.bain-hero-slide.is-active > div.bain-hero-copy > p.bain-hero-actions > a.bc-btn",
+        "y": 216,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero-deck > div.bain-hero-slide.is-active > div.bain-hero-copy > p.bain-hero-actions > a.bc-btn",
+        "y": 216,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 4553,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "top",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 4553,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 4553,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-nav-title",
+        "y": 4553,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide.is-active",
+        "y": 4553,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes",
+        "y": 4553,
+        "dur": "1s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-line",
+        "y": 4553,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide",
+        "y": 4553,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item > span.bain-hero-line",
+        "y": 4553,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item > span.bain-hero-nav-title",
+        "y": 4553,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "width",
+        "el": "div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-line > span.bain-hero-progress",
+        "y": 4553,
+        "dur": "5.5s"
+      },
+      {
+        "prop": "color",
+        "el": "div.bain-commitments-cards > div.bain-commitments-card.is-active > div.bain-commitments-card-body > p.bain-commitments-card-actions > a.bc-btn.white",
+        "y": 4553,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-commitments-cards > div.bain-commitments-card.is-active > div.bain-commitments-card-body > p.bain-commitments-card-actions > a.bc-btn.white",
+        "y": 4553,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "color",
+        "el": "div.bain-commitments-cards > div.bain-commitments-card.is-active > div.bain-commitments-card-body > p.bain-commitments-card-actions > a.bc-btn.white",
+        "y": 4553,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-commitments-cards > div.bain-commitments-card.is-active > div.bain-commitments-card-body > p.bain-commitments-card-actions > a.bc-btn.white",
+        "y": 4553,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > div.bc-backdrop.is-photo > div.bc-backdrop-photo",
+        "y": 5443,
+        "dur": "0.2s, 0.2s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > div.bc-backdrop.is-photo > div.bc-backdrop-photo",
+        "y": 5443,
+        "dur": "0.2s, 0.2s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes.is-active",
+        "y": 5443,
+        "dur": "0.2s"
+      },
+      {
+        "prop": "color",
+        "el": "div.bain-people.block > div.bain-people-inner > div.bain-people-copy > p.bain-people-actions > a.bc-btn.light-blue",
+        "y": 5443,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-people.block > div.bain-people-inner > div.bain-people-copy > p.bain-people-actions > a.bc-btn.light-blue",
+        "y": 5443,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "color",
+        "el": "div.bain-people.block > div.bain-people-inner > div.bain-people-copy > p.bain-people-actions > a.bc-btn.light-blue",
+        "y": 5443,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-people.block > div.bain-people-inner > div.bain-people-copy > p.bain-people-actions > a.bc-btn.light-blue",
+        "y": 5443,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > div.bc-backdrop > div.bc-backdrop-photo",
+        "y": 5941,
+        "dur": "0.2s, 0.2s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > div.bc-backdrop > div.bc-backdrop-photo",
+        "y": 5941,
+        "dur": "0.2s, 0.2s"
+      },
+      {
+        "prop": "color",
+        "el": "div.bain-news.block > div.bain-news-list > article.bain-news-item > h3.bain-news-title > a",
+        "y": 5941,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "color",
+        "el": "div.bain-news.block > div.bain-news-list > article.bain-news-item > h3.bain-news-title > a",
+        "y": 5941,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 6555,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "color",
+        "el": "div.bain-news-wrapper > div.bain-news.block > div.bain-news-list > p.bain-news-actions > a.bc-btn",
+        "y": 6555,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-news-wrapper > div.bain-news.block > div.bain-news-list > p.bain-news-actions > a.bc-btn",
+        "y": 6555,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "color",
+        "el": "div.bain-news-wrapper > div.bain-news.block > div.bain-news-list > p.bain-news-actions > a.bc-btn",
+        "y": 6555,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-news-wrapper > div.bain-news.block > div.bain-news-list > p.bain-news-actions > a.bc-btn",
+        "y": 6555,
+        "dur": "0.15s, 0.15s, 0.15s"
+      },
+      {
+        "prop": "border-bottom-color",
+        "el": "div.footer-inner > div.footer-legal > ul.footer-links > li > a",
+        "y": 7292,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "border-bottom-color",
+        "el": "div.footer-inner > div.footer-legal > ul.footer-links > li > a",
+        "y": 7292,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.footer.block > div.footer-inner > ul.footer-social > li > a",
+        "y": 7292,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.footer.block > div.footer-inner > ul.footer-social > li > a",
+        "y": 7292,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 3586,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 3586,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "top",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 3586,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 3586,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "transform",
+        "el": "div.bain-spotlight.block > div.bain-spotlight-list > a.bain-spotlight-card > div.bain-spotlight-media > img",
+        "y": 3586,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "transform",
+        "el": "div.bain-spotlight.block > div.bain-spotlight-list > a.bain-spotlight-card > div.bain-spotlight-media > img",
+        "y": 3586,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item > span.bain-hero-nav-title",
+        "y": 6917,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide",
+        "y": 6917,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item > span.bain-hero-line",
+        "y": 6917,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes",
+        "y": 6917,
+        "dur": "1s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-nav-title",
+        "y": 6917,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "background-color",
+        "el": "div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-line",
+        "y": 6917,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide.is-active",
+        "y": 6917,
+        "dur": "0.5s"
+      },
+      {
+        "prop": "background-color",
+        "el": "html > body.home.appear > div.bc-backdrop",
+        "y": 6917,
+        "dur": "0.3s"
+      },
+      {
+        "prop": "opacity",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 6917,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "top",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 6917,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "visibility",
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 6917,
+        "dur": "0.3s, 0.3s, 0.3s, 0.3s"
+      },
+      {
+        "prop": "width",
+        "el": "div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active > span.bain-hero-line > span.bain-hero-progress",
+        "y": 6917,
+        "dur": "5.5s"
+      },
+      {
+        "prop": "opacity",
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes.is-active",
+        "y": 6917,
+        "dur": "0.2s"
+      }
+    ],
+    "classMutations": [
+      {
+        "added": [
+          "scrolled",
+          "hide"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide > div.header.block.scrolled",
+        "y": 400
+      },
+      {
+        "added": [
+          "scrolled",
+          "hide"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 400
+      },
+      {
+        "added": [
+          "is-photo"
+        ],
+        "el": "html > body.home.appear > div.bc-backdrop.is-photo",
+        "y": 4800
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide.is-active",
+        "y": 5200
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes.is-active",
+        "y": 5200
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active",
+        "y": 5200
+      },
+      {
+        "added": [
+          "show"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show > div.header.block.scrolled",
+        "y": 6192
+      },
+      {
+        "added": [
+          "show"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 6192
+      },
+      {
+        "added": [
+          "is-photo"
+        ],
+        "el": "html > body.home.appear > div.bc-backdrop.is-photo",
+        "y": 4692
+      },
+      {
+        "added": [
+          "scrolled",
+          "hide"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide > div.header.block.scrolled",
+        "y": 399
+      },
+      {
+        "added": [
+          "scrolled",
+          "hide"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 399
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide.is-active",
+        "y": 399
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes.is-active",
+        "y": 399
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active",
+        "y": 399
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-wheel > div.bain-platform-tabs > button.bain-platform-tab.is-active",
+        "y": 2721
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-wheel > div.bain-platform-labels > span.bain-platform-tab-label.is-active",
+        "y": 2721
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-platform-wrapper > div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-panels > div.bain-platform-panel.is-active",
+        "y": 2721
+      },
+      {
+        "added": [
+          "is-open"
+        ],
+        "el": "body.home.appear > main > div.band.backdrop-navy.dark > div.bain-platform-wrapper > div.bain-platform.block.is-open",
+        "y": 2721
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.band-tail.backdrop-cream.section > div.bain-commitments-wrapper > div.bain-commitments.block > ul.bain-commitments-list > li.bain-commitments-item.is-active",
+        "y": 4407
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-commitments-wrapper > div.bain-commitments.block > div.bain-commitments-stage > div.bain-commitments-cards > div.bain-commitments-card.is-active",
+        "y": 4407
+      },
+      {
+        "added": [
+          "show"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show > div.header.block.scrolled",
+        "y": 4352
+      },
+      {
+        "added": [
+          "show"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 4352
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.band-tail.backdrop-cream.section > div.bain-commitments-wrapper > div.bain-commitments.block > ul.bain-commitments-list > li.bain-commitments-item.is-active",
+        "y": 4352
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-commitments-wrapper > div.bain-commitments.block > div.bain-commitments-stage > div.bain-commitments-cards > div.bain-commitments-card.is-active",
+        "y": 4352
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide.is-active",
+        "y": 4352
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes.is-active",
+        "y": 4352
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active",
+        "y": 4352
+      },
+      {
+        "added": [
+          "hide"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide > div.header.block.scrolled",
+        "y": 6917
+      },
+      {
+        "added": [
+          "hide"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 6917
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-presence.block.is-listing > div.bain-presence-head > ul.bain-presence-tabs > li > button.bain-presence-tab.is-active",
+        "y": 6917
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.band-open.backdrop-blue.dark > div.bain-presence-wrapper > div.bain-presence.block.is-listing > div.bain-presence-lists > div.bain-presence-list.is-active",
+        "y": 6917
+      },
+      {
+        "added": [
+          "is-listing"
+        ],
+        "el": "body.home.appear > main > div.band-open.backdrop-blue.dark > div.bain-presence-wrapper > div.bain-presence.block.is-listing",
+        "y": 6917
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide.is-active",
+        "y": 6981
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes.is-active",
+        "y": 6981
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active",
+        "y": 6981
+      },
+      {
+        "added": [
+          "show"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show > div.header.block.scrolled",
+        "y": 1131
+      },
+      {
+        "added": [
+          "show"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 1131
+      },
+      {
+        "added": [
+          "is-playing"
+        ],
+        "el": "div.bain-advantages-wrapper > div.bain-advantages.block > div.bain-advantages-item.is-odd > div.bain-advantages-media > div.bain-advantages-poster.is-playing",
+        "y": 1131
+      },
+      {
+        "added": [
+          "hide"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide > div.header.block.scrolled",
+        "y": 4553
+      },
+      {
+        "added": [
+          "hide"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 4553
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide.is-active",
+        "y": 4553
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes.is-active",
+        "y": 4553
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active",
+        "y": 4553
+      },
+      {
+        "added": [
+          "is-photo"
+        ],
+        "el": "html > body.home.appear > div.bc-backdrop.is-photo",
+        "y": 5443
+      },
+      {
+        "added": [
+          "show"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show > div.header.block.scrolled",
+        "y": 3586
+      },
+      {
+        "added": [
+          "show"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.show",
+        "y": 3586
+      },
+      {
+        "added": [
+          "is-hover"
+        ],
+        "el": "div.bain-platform.block.is-open > div.bain-platform-inner > div.bain-platform-wheel > div.bain-platform-labels > span.bain-platform-tab-label.is-active.is-hover",
+        "y": 2556
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-deck > div.bain-hero-slide.is-active",
+        "y": 6917
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-tangram > div.bain-hero-shapes.is-active",
+        "y": 6917
+      },
+      {
+        "added": [
+          "is-active"
+        ],
+        "el": "div.bain-hero-wrapper > div.bain-hero.block > div.bain-hero-inner > div.bain-hero-nav > button.bain-hero-nav-item.is-active",
+        "y": 6917
+      },
+      {
+        "added": [
+          "hide"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide > div.header.block.scrolled",
+        "y": 6917
+      },
+      {
+        "added": [
+          "hide"
+        ],
+        "el": "html > body.home.appear > header.header-wrapper.scrolled.hide",
+        "y": 6917
+      }
+    ]
+  }
+}

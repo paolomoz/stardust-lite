@@ -1,0 +1,72 @@
+{
+  "a": ".work/gates/live-360.png",
+  "b": ".work/gates/proto-360.png",
+  "compared": {
+    "width": 360,
+    "height": 8686,
+    "mode": "overlap"
+  },
+  "heightDelta": 7,
+  "differingPixels": 1080752,
+  "pct": 34.56,
+  "threshold": 10,
+  "pass": false,
+  "diff": ".work/gates/diff-360.png",
+  "masks": [],
+  "maskedRows": 0,
+  "textPct": null,
+  "textBoxes": null,
+  "textPixels": null,
+  "bands": [
+    {
+      "y0": 0,
+      "y1": 900,
+      "pct": 24.7
+    },
+    {
+      "y0": 900,
+      "y1": 1800,
+      "pct": 52
+    },
+    {
+      "y0": 1800,
+      "y1": 2700,
+      "pct": 87.4
+    },
+    {
+      "y0": 2700,
+      "y1": 3600,
+      "pct": 12.4
+    },
+    {
+      "y0": 3600,
+      "y1": 4500,
+      "pct": 21.2
+    },
+    {
+      "y0": 4500,
+      "y1": 5400,
+      "pct": 21.1
+    },
+    {
+      "y0": 5400,
+      "y1": 6300,
+      "pct": 85.8
+    },
+    {
+      "y0": 6300,
+      "y1": 7200,
+      "pct": 10.3
+    },
+    {
+      "y0": 7200,
+      "y1": 8100,
+      "pct": 9.5
+    },
+    {
+      "y0": 8100,
+      "y1": 8686,
+      "pct": 14.2
+    }
+  ]
+}

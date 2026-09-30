@@ -1,0 +1,5 @@
+cap-probe: overlay dismissed via .accept-btn-box a
+https://www.fidelity.com/  base 1440 → probe 2560 (derived: max(2560, largest cap × 1.25))
+  modules  2 sections: capped 1440 ×2 · full-bleed ×0
+  contentMaxWidth 1440px (module) · shellMaxWidth fluid · root body.fds-theme--fidelity-light > prelogin-root.dcs-pla--root > div.fds-global-layout > main.fds-global__main.fds-page-layout
+contentMaxWidth: 1440px  shellMaxWidth: fluid  probeWidth: 2560  consistent: yes

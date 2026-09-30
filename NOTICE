@@ -1,0 +1,6 @@
+stardust-lite
+
+tools/replica/*, tools/diff/live-session.mjs and tools/lint/* are vendored unmodified from the Adobe "stardust" plugin in
+https://github.com/adobe/skills (plugins/stardust/skills/{replica,diff,deploy}), Apache License 2.0, Copyright Adobe.
+Snapshot taken 2026-09-30 from the installed marketplace copy. Everything else in this repository is original work under the
+same license (see LICENSE).

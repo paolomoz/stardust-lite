@@ -1,0 +1,306 @@
+{
+ "4": [
+  {
+   "city": "Boston",
+   "title": "",
+   "lines": [
+    "200 Clarendon Street",
+    "Boston",
+    "MA 02116",
+    "United States",
+    "Main: +1 (617) 516-2000",
+    "Fax: +1 (617) 516-2010"
+   ],
+   "map": "https://www.google.com/maps/place/John+Hancock+Tower,+200+Clarendon+St,+Boston,+MA+02116,+USA/@42.3492166,-71.0773136,17z/data=!3m1!4b1!4m2!3m1!1s0x89e37a0ceab1c1ed:0xab39ce53f62cb1c3?hl=en"
+  },
+  {
+   "city": "Chicago",
+   "title": "",
+   "lines": [
+    "222 West Adams Street",
+    "Suite 2200",
+    "Chicago",
+    "IL 60606",
+    "United States",
+    "Main: +1 (312) 253-6940"
+   ],
+   "map": "https://www.google.com/maps/place/222+W+Adams+St,+Chicago,+IL+60606/@41.8795771,-87.637293,17z/data=!3m1!4b1!4m6!3m5!1s0x880e2cbec103f27b:0x13df44a5e61123bd!8m2!3d41.8795771!4d-87.6347181!16s%2Fg%2F11c1yx5qb7?entry=ttu"
+  },
+  {
+   "city": "New York",
+   "title": "",
+   "lines": [
+    "535 Madison Avenue, 29th Floor",
+    "New York",
+    "NY 10022",
+    "United States",
+    "Main: +1 (212) 326-9420",
+    "Fax: +1 (212) 421-2225"
+   ],
+   "map": "https://www.google.com/maps/place/535+Madison+Ave,+New+York,+NY+10022/@40.7604994,-73.9753822,17z/data=!4m13!1m7!3m6!1s0x89c258fb7407c505:0x3d689ad5784fa9aa!2s535+Madison+Ave,+New+York,+NY+10022!3b1!8m2!3d40.7604954!4d-73.9731882!3m4!1s0x89c258fb7407c505:0x3d689ad5784fa9aa!8m2!3d40.7604954!4d-73.973"
+  },
+  {
+   "city": "New York Broadway",
+   "title": "Venture and Crypto",
+   "lines": [
+    "799 Broadway, 10th Floor",
+    "New York",
+    "NY 10003",
+    "United States",
+    "Main: +1 (212) 822-2900"
+   ],
+   "map": "https://www.google.com/maps/place/799+Broadway,+New+York,+NY+10003/@40.7323871,-73.9936775,17z/data=!3m1!4b1!4m5!3m4!1s0x89c2599976c59d7f:0xe26cbabe980dfcf1!8m2!3d40.7323831!4d-73.9914888"
+  },
+  {
+   "city": "Palo Alto",
+   "title": "",
+   "lines": [
+    "524 Hamilton Avenue",
+    "Palo Alto",
+    "CA 94301",
+    "United States",
+    "Main: +1 (650) 798-2500"
+   ],
+   "map": "https://www.google.com/maps/place/524+Hamilton+Ave,+Palo+Alto,+CA+94301/@37.447807,-122.1593862,17z/data=!3m1!4b1!4m5!3m4!1s0x808fbb3ece499363:0xb406739a5ba4c127!8m2!3d37.4478028!4d-122.1571975"
+  },
+  {
+   "city": "San Francisco",
+   "title": "",
+   "lines": [
+    "450 Pacific Avenue",
+    "San Francisco",
+    "CA 94133",
+    "United States",
+    "Main: +1 (628) 201-3600"
+   ],
+   "map": "https://www.google.com/maps/place/450+Pacific+Ave,+San+Francisco,+CA+94133/@37.7976402,-122.4056315,17z/data=!3m1!4b1!4m6!3m5!1s0x808580f514749d57:0x14f82452d870d191!8m2!3d37.7976402!4d-122.4030566!16s%2Fg%2F11bw3wsn8p?entry=ttu"
+  }
+ ],
+ "3": [
+  {
+   "city": "Abu Dhabi",
+   "title": "",
+   "lines": [
+    "Al Maryah Tower, Level 7, ADGM",
+    "Abu Dhabi",
+    "United Arab Emirates",
+    "Main: +230 468 1321"
+   ],
+   "map": ""
+  },
+  {
+   "city": "Hong Kong",
+   "title": "",
+   "lines": [
+    "Suite 2501, Level 25",
+    "One Pacific Place",
+    "88 Queensway",
+    "Admiralty",
+    "Hong Kong",
+    "Main: +852-36566800",
+    "Fax: +852-30140844"
+   ],
+   "map": "https://www.google.com/maps/place/Suite+2501,+Level+25,+One+Pacific+Place,+88+Queensway,+Admiralty,+Hong+Kong/@22.2776496,114.1632049,17z/data=!3m1!4b1!4m5!3m4!1s0x34040067b61b109b:0x49c187fb4e65b9a6!8m2!3d22.2776447!4d114.1653936"
+  },
+  {
+   "city": "Mauritius",
+   "title": "",
+   "lines": [
+    "Office 1, Block 3, Ground Floor",
+    "The Strand, Lakeside District",
+    "Beau Plan 21001",
+    "Mauritius",
+    "Main: +230 290 2000",
+    "Fax: +230 489 6185"
+   ],
+   "map": "https://www.google.com/maps/place/The+Strand+Office+Park/@-20.0987128,57.5735343,17z/data=!3m1!4b1!4m6!3m5!1s0x217c55006cdeecd3:0x496d52c169ebae04!8m2!3d-20.0987128!4d57.5761146!16s%2Fg%2F11xn5h78kk?entry=ttu&amp;g_ep=EgoyMDI2MDIxOC4wIKXMDSoASAFQAw%3D%3D"
+  },
+  {
+   "city": "Melbourne",
+   "title": "",
+   "lines": [
+    "Level 20, 101 Collins Street",
+    "Melbourne VIC 3000",
+    "Australia",
+    "Main: +61-3-8102-8600"
+   ],
+   "map": "https://www.google.com/maps/place/20%2F101+Collins+St,+Melbourne+VIC+3000,+Australia/@-37.8145656,144.9684958,17z/data=!3m1!4b1!4m2!3m1!1s0x6ad642c821f25843:0xe2cf50fabbc69245"
+  },
+  {
+   "city": "Mumbai",
+   "title": "",
+   "lines": [
+    "Express Towers",
+    "Private Equity: Unit 2201, 22nd Floor",
+    "Special Situations: Unit 1104, 11th Floor",
+    "Nariman Point",
+    "Mumbai",
+    "Maharashtra 400 021",
+    "India",
+    "Main: +91-2267528000"
+   ],
+   "map": "https://www.google.com/maps/place/Express+Towers,+Ramnath+Goenka+Marg,+Nariman+Point,+Mumbai,+Maharashtra+400021,+India/@18.9281764,72.8200946,17z/data=!3m1!4b1!4m5!3m4!1s0x3be7d1e8d34ef5d7:0xd03369a7fcfee789!8m2!3d18.9281713!4d72.8222833"
+  },
+  {
+   "city": "Osaka",
+   "title": "",
+   "lines": [
+    "Grand Front Osaka Tower A 24F",
+    "4-20 Ofukacho",
+    "Kita-ku",
+    "Osaka 530-0011",
+    "Japan",
+    "Main: +81 6-7712-2777"
+   ],
+   "map": "https://www.google.com/maps/place/Grand+Front+Osaka/@34.7038394,135.4949209,15z/data=!4m6!3m5!1s0x6000e68f07000001:0xa684e6b145ca9d5!8m2!3d34.7038394!4d135.4949209!16s%2Fg%2F12b02n906"
+  },
+  {
+   "city": "Seoul",
+   "title": "",
+   "lines": [
+    "28F, Parnas Tower",
+    "521, Teheran-ro, Gangnam-gu",
+    "Seoul 06164",
+    "Korea, Republic of",
+    "Main: +82 2 6940 2300",
+    "Fax: +82 2 6322 9822"
+   ],
+   "map": "https://www.google.com/maps/place/Parnas+Tower/@37.5095101,127.0590419,17z/data=!3m1!4b1!4m5!3m4!1s0x357ca46aa1beb59b:0x621bf4490b492a95!8m2!3d37.5095059!4d127.0612306"
+  },
+  {
+   "city": "Shanghai",
+   "title": "",
+   "lines": [
+    "Room 4705, 47/f, Office Tower 2, Plaza 66,",
+    "1266 Nanjing Road West,",
+    "Jing An District",
+    "Shanghai",
+    "China",
+    "Main: +86 21 8012 1700"
+   ],
+   "map": "https://www.google.com/maps/place/1266+Nanjing+W+Rd,+Jingan+Qu,+Shanghai+Shi,+China,+200010/@31.227654,121.450442,17z/data=!3m1!4b1!4m5!3m4!1s0x35b2701b4ac28641:0x46449d670dfa742b!8m2!3d31.227654!4d121.452636"
+  },
+  {
+   "city": "Shanghai",
+   "title": "",
+   "lines": [
+    "Room 3669, 36/F Two IFC",
+    "8 Century Boulevard",
+    "Shanghai, 200120",
+    "China",
+    "Main: +86-2160626120"
+   ],
+   "map": "https://www.google.com/maps/place/8+Shi+Ji+Da+Dao,+LuJiaZui,+Pudong+Xinqu,+Shanghai+Shi,+China,+200120/@31.240545,121.491365,15z/data=!4m2!3m1!1s0x35b270fade9b1a17:0x1fcdc6918caca9d8?hl=en"
+  },
+  {
+   "city": "Singapore",
+   "title": "",
+   "lines": [
+    "88 Market Street, #40-01",
+    "CapitaSpring",
+    "Singapore 048948",
+    "Singapore",
+    "Main: +65 6016 1030"
+   ],
+   "map": "https://www.google.com/maps/place/CapitaSpring/@1.2842308,103.8480383,17z/data=!3m2!4b1!5s0x31da190c074a4c25:0x7234a693b59634af!4m5!3m4!1s0x31da193f0e2b8b4f:0xd1225a27807c05e9!8m2!3d1.2842254!4d103.850227"
+  },
+  {
+   "city": "Sydney",
+   "title": "",
+   "lines": [
+    "Level 28",
+    "88 Phillip Street",
+    "Sydney",
+    "NSW 2000",
+    "Australia",
+    "Main: +61-2-9093-5500"
+   ],
+   "map": "https://www.google.com/maps/place/88+Phillip+St,+Sydney+NSW+2000,+Australia/@-33.8647088,151.2098302,17z/data=!3m1!4b1!4m5!3m4!1s0x6b12ae6a23b6d9b5:0xc87be738fbbc27ba!8m2!3d-33.8647133!4d151.2120189"
+  },
+  {
+   "city": "Tokyo",
+   "title": "",
+   "lines": [
+    "5F, Palace Building 1-1-1 Marunouchi",
+    "Chiyoda-ku",
+    "Tokyo 100-0005",
+    "Japan",
+    "Main: +81-362127070",
+    "Fax: +81-362127071"
+   ],
+   "map": "https://www.google.com/maps/place/35%C2%B041'06.7%22N+139%C2%B045'41.5%22E/@35.685189,139.7593273,17z/data=!3m1!4b1!4m2!3m1!1s0x0:0x0?hl=en"
+  }
+ ],
+ "2": [
+  {
+   "city": "Dublin",
+   "title": "",
+   "lines": [
+    "45 Mespil Road",
+    "Dublin 4",
+    "Ireland",
+    "Main: +353-19019800",
+    "Fax: +353-16335380"
+   ],
+   "map": "https://www.google.com/maps/place/45+Mespil+Rd,+Dublin,+Ireland/@53.3330969,-6.2499251,17z/data=!3m1!4b1!4m5!3m4!1s0x48670ebda53a96fd:0x277378734d59299!8m2!3d53.3330937!4d-6.2477364"
+  },
+  {
+   "city": "Lisbon",
+   "title": "",
+   "lines": [
+    "Av. da Liberdade 245 4C",
+    "Office 414",
+    "Lisbon 1250-143",
+    "Portugal"
+   ],
+   "map": "https://www.google.com/maps/place/Av.+da+Liberdade+245,+1250-096+Lisboa,+Portugal/@38.7235209,-9.1513917,17z/data=!3m1!4b1!4m5!3m4!1s0xd1933776521f637:0x855a2666ba2fbc07!8m2!3d38.7235209!4d-9.149203"
+  },
+  {
+   "city": "London",
+   "title": "",
+   "lines": [
+    "Devonshire House",
+    "Mayfair Place",
+    "London W1J 8AJ",
+    "United Kingdom",
+    "Main: +44 20 7514 5252",
+    "Fax: +44 20 7514 5250"
+   ],
+   "map": "https://www.google.com/maps/place/Devonshire+House,+London,+UK/@51.5072829,-0.14523,17z/data=!4m13!1m7!3m6!1s0x48760529b3a8a2c1:0x95958a457128ba12!2sDevonshire+House,+London,+UK!3b1!8m2!3d51.5072829!4d-0.1430413!3m4!1s0x48760529b3a8a2c1:0x95958a457128ba12!8m2!3d51.5072829!4d-0.1430413"
+  },
+  {
+   "city": "Luxembourg",
+   "title": "",
+   "lines": [
+    "13 rue Edward Steichen",
+    "L-2540",
+    "Luxembourg",
+    "Main: +352 27 94 2930"
+   ],
+   "map": "https://www.google.com/maps/place/Regus+-+Luxembourg,+Kirchberg+Oksigen/@49.6335034,6.1740651,17z/data=!3m1!4b1!4m6!3m5!1s0x47954f1faabe5443:0x64e9d12aa78aa918!8m2!3d49.6335!4d6.17664!16s%2Fg%2F11h03g3sk_?entry=ttu"
+  },
+  {
+   "city": "Madrid",
+   "title": "",
+   "lines": [
+    "Calle de Serrano n°38",
+    "1st Floor",
+    "Madrid 28001",
+    "Spain"
+   ],
+   "map": "https://www.google.com/maps/place/Calle+de+Serrano,+38,+28001+Madrid,+Spain/@40.4259025,-3.7049145,14z/data=!4m5!3m4!1s0xd4228972b76fb59:0xa8bffc319deb286b!8m2!3d40.4259025!4d-3.6873997"
+  },
+  {
+   "city": "Munich",
+   "title": "",
+   "lines": [
+    "Maximilianstraße 11",
+    "80539 München",
+    "Germany",
+    "Main: +49-89244410700",
+    "Fax: +49-89244410731"
+   ],
+   "map": "https://www.google.com/maps/place/Maximilianstra%C3%9Fe+11,+80539+M%C3%BCnchen,+Germany/@48.1392105,11.578381,17z/data=!3m1!4b1!4m2!3m1!1s0x479e758b8ba3e13b:0xbc71dd572389d887?hl=en"
+  }
+ ]
+}

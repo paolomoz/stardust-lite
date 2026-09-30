@@ -1,0 +1,13 @@
+{
+  "url": "https://www.fidelity.com/",
+  "width": 1440,
+  "main": "main",
+  "doc": 8448,
+  "rootMissing": false,
+  "rootWrapsChrome": false,
+  "sections": [],
+  "footer": [
+    8055,
+    393
+  ]
+}

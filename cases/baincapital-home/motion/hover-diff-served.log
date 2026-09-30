@@ -1,0 +1,147 @@
+
+## .header-links > li:nth-child(3) > a 2 changes; transitions: a all
+   1:a:before|width                                             0px → 234.031px
+   1:a:before|left                                              117.016px → 0px
+
+## .header-tools li:nth-child(2) a 11 changes; transitions: a color
+   1:a|color                                                    rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a|border-color                                             rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a|border-bottom-color                                      rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a|text-decoration-color                                    rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a|outline-color                                            rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a:before|color                                             rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a:before|border-color                                      rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a:before|border-bottom-color                               rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a:before|transform                                         matrix(1, 0, 0, 0, 0, 0) → matrix(1, 0, 0, 1, 0, 0)
+   1:a:before|text-decoration-color                             rgb(49, 93, 144) → rgb(255, 255, 255)
+   1:a:before|outline-color                                     rgb(49, 93, 144) → rgb(255, 255, 255)
+
+## .bain-hero-slide.is-active .bc-btn 24 changes; transitions: a color ease-in-out, background-color ease-in-out, border-color ease-in-out | span all | span all | svg all
+   1:a.bc-btn|color                                             rgb(0, 26, 255) → rgb(255, 255, 255)
+   1:a.bc-btn|background-color                                  rgba(0, 0, 0, 0) → rgb(0, 26, 255)
+   1:a.bc-btn|text-decoration-color                             rgb(0, 26, 255) → rgb(255, 255, 255)
+   1:a.bc-btn|outline-color                                     rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span|color                                                 rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span|border-color                                          rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span|border-bottom-color                                   rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span|text-decoration-color                                 rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span|outline-color                                         rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:span.bc-arrow-round|color                                  rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:span.bc-arrow-round|border-color                           rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:span.bc-arrow-round|border-bottom-color                    rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:span.bc-arrow-round|text-decoration-color                  rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:span.bc-arrow-round|outline-color                          rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:svg|color                                                  rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:svg|border-color                                           rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:svg|border-bottom-color                                    rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:svg|text-decoration-color                                  rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:svg|outline-color                                          rgb(0, 26, 255) → rgb(255, 255, 255)
+   5:path|color                                                 rgb(0, 26, 255) → rgb(255, 255, 255)
+   5:path|border-color                                          rgb(0, 26, 255) → rgb(255, 255, 255)
+   5:path|border-bottom-color                                   rgb(0, 26, 255) → rgb(255, 255, 255)
+   5:path|text-decoration-color                                 rgb(0, 26, 255) → rgb(255, 255, 255)
+   5:path|outline-color                                         rgb(0, 26, 255) → rgb(255, 255, 255)
+
+## .bain-advantages-item:first-child .bain-advantages-play 0 changes; transitions: button all | span all | svg all | circle all
+
+## .bain-commitments-list .bain-commitments-item:nth-child(2) a 0 changes; transitions: a all | span all | span all | svg all
+
+## .bain-commitments .bc-btn.green 3 changes; transitions: a color ease-in-out, background-color ease-in-out, border-color ease-in-out | span all | span all | svg all
+   1:a.bc-btn.green|background-color                            rgb(220, 245, 78) → rgb(225, 244, 107)
+   1:a.bc-btn.green|border-color                                rgb(220, 245, 78) → rgb(225, 244, 107)
+   1:a.bc-btn.green|border-bottom-color                         rgb(220, 245, 78) → rgb(225, 244, 107)
+
+## .bain-people .bc-btn 19 changes; transitions: a color ease-in-out, background-color ease-in-out, border-color ease-in-out | span all | svg all | path all
+   1:a.bc-btn.light-blue|color                                  rgb(63, 182, 255) → rgb(255, 255, 255)
+   1:a.bc-btn.light-blue|background-color                       rgba(0, 0, 0, 0) → rgb(63, 182, 255)
+   1:a.bc-btn.light-blue|text-decoration-color                  rgb(63, 182, 255) → rgb(255, 255, 255)
+   1:a.bc-btn.light-blue|outline-color                          rgb(63, 182, 255) → rgb(255, 255, 255)
+   2:span|color                                                 rgb(63, 182, 255) → rgb(255, 255, 255)
+   2:span|border-color                                          rgb(63, 182, 255) → rgb(255, 255, 255)
+   2:span|border-bottom-color                                   rgb(63, 182, 255) → rgb(255, 255, 255)
+   2:span|text-decoration-color                                 rgb(63, 182, 255) → rgb(255, 255, 255)
+   2:span|outline-color                                         rgb(63, 182, 255) → rgb(255, 255, 255)
+   3:svg|color                                                  rgb(63, 182, 255) → rgb(255, 255, 255)
+   3:svg|border-color                                           rgb(63, 182, 255) → rgb(255, 255, 255)
+   3:svg|border-bottom-color                                    rgb(63, 182, 255) → rgb(255, 255, 255)
+   3:svg|text-decoration-color                                  rgb(63, 182, 255) → rgb(255, 255, 255)
+   3:svg|outline-color                                          rgb(63, 182, 255) → rgb(255, 255, 255)
+   4:path|color                                                 rgb(63, 182, 255) → rgb(255, 255, 255)
+   4:path|border-color                                          rgb(63, 182, 255) → rgb(255, 255, 255)
+   4:path|border-bottom-color                                   rgb(63, 182, 255) → rgb(255, 255, 255)
+   4:path|text-decoration-color                                 rgb(63, 182, 255) → rgb(255, 255, 255)
+   4:path|outline-color                                         rgb(63, 182, 255) → rgb(255, 255, 255)
+
+## .bain-news-list .bain-news-title a 5 changes; transitions: a color
+   1:a|color                                                    rgb(28, 33, 86) → rgb(0, 71, 187)
+   1:a|border-color                                             rgb(28, 33, 86) → rgb(0, 71, 187)
+   1:a|border-bottom-color                                      rgb(28, 33, 86) → rgb(0, 71, 187)
+   1:a|text-decoration-color                                    rgb(28, 33, 86) → rgb(0, 71, 187)
+   1:a|outline-color                                            rgb(28, 33, 86) → rgb(0, 71, 187)
+
+## .bain-news .bain-news-actions .bc-btn 19 changes; transitions: a color ease-in-out, background-color ease-in-out, border-color ease-in-out | span all | svg all | path all
+   1:a.bc-btn|color                                             rgb(0, 26, 255) → rgb(255, 255, 255)
+   1:a.bc-btn|background-color                                  rgba(0, 0, 0, 0) → rgb(0, 26, 255)
+   1:a.bc-btn|text-decoration-color                             rgb(0, 26, 255) → rgb(255, 255, 255)
+   1:a.bc-btn|outline-color                                     rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span|color                                                 rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span|border-color                                          rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span|border-bottom-color                                   rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span|text-decoration-color                                 rgb(0, 26, 255) → rgb(255, 255, 255)
+   2:span|outline-color                                         rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|color                                                  rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|border-color                                           rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|border-bottom-color                                    rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|text-decoration-color                                  rgb(0, 26, 255) → rgb(255, 255, 255)
+   3:svg|outline-color                                          rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|color                                                 rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|border-color                                          rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|border-bottom-color                                   rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|text-decoration-color                                 rgb(0, 26, 255) → rgb(255, 255, 255)
+   4:path|outline-color                                         rgb(0, 26, 255) → rgb(255, 255, 255)
+
+## .footer-links li:nth-child(2) a 2 changes; transitions: a border-color
+   1:a|border-color                                             rgb(171, 202, 233) → rgb(171, 202, 233) rgb(171, 202, 233) rgba(0, 0, 0, 0)
+   1:a|border-bottom-color                                      rgb(171, 202, 233) → rgba(0, 0, 0, 0)
+
+## .footer-social a 1 changes; transitions: a background-color | svg all | path all
+   1:a|background-color                                         rgb(27, 33, 90) → rgb(0, 26, 255)
+
+## .bain-spotlight-card:nth-child(2) 1 changes; transitions: a all | div all | img transform ease-in-out | div all
+   9:img|transform                                              none → matrix(1.1, 0, 0, 1.1, 0, 0)
+
+## .bain-platform-labels .bain-platform-tab-label:nth-child(2) 5 changes; transitions: span color ease-in-out, opacity ease-in-out
+   2:span.bain-platform-tab-label|color                         rgb(63, 182, 255) → rgb(171, 202, 233)
+   2:span.bain-platform-tab-label|border-color                  rgb(63, 182, 255) → rgb(171, 202, 233)
+   2:span.bain-platform-tab-label|border-bottom-color           rgb(63, 182, 255) → rgb(171, 202, 233)
+   2:span.bain-platform-tab-label|text-decoration-color         rgb(63, 182, 255) → rgb(171, 202, 233)
+   2:span.bain-platform-tab-label|outline-color                 rgb(63, 182, 255) → rgb(171, 202, 233)
+
+## .bain-presence-tabs li:nth-child(2) .bain-presence-tab 0 changes; transitions: button border-color ease-in-out
+
+## .bain-hero-nav-item:nth-child(1) 0 changes; transitions: button all | span background-color ease-in-out | span opacity ease-in-out
+
+## .bain-news-image 0 changes; transitions: div all | img all
+
+## .bain-spotlight-media 1 changes; transitions: div all | img transform ease-in-out
+   2:img|transform                                              none → matrix(1.1, 0, 0, 1.1, 0, 0)
+
+## .bain-commitments-nav.next 15 changes; transitions: button ease-in-out | svg all | path all
+   71:button.bain-commitments-nav.next|color                    rgb(27, 33, 90) → rgb(255, 255, 255)
+   71:button.bain-commitments-nav.next|background-color         rgba(0, 0, 0, 0) → rgb(27, 33, 90)
+   71:button.bain-commitments-nav.next|opacity                  0.5 → 1
+   71:button.bain-commitments-nav.next|text-decoration-color    rgb(27, 33, 90) → rgb(255, 255, 255)
+   71:button.bain-commitments-nav.next|outline-color            rgb(27, 33, 90) → rgb(255, 255, 255)
+   72:svg|color                                                 rgb(27, 33, 90) → rgb(255, 255, 255)
+   72:svg|border-color                                          rgb(27, 33, 90) → rgb(255, 255, 255)
+   72:svg|border-bottom-color                                   rgb(27, 33, 90) → rgb(255, 255, 255)
+   72:svg|text-decoration-color                                 rgb(27, 33, 90) → rgb(255, 255, 255)
+   72:svg|outline-color                                         rgb(27, 33, 90) → rgb(255, 255, 255)
+   73:path|color                                                rgb(27, 33, 90) → rgb(255, 255, 255)
+   73:path|border-color                                         rgb(27, 33, 90) → rgb(255, 255, 255)
+   73:path|border-bottom-color                                  rgb(27, 33, 90) → rgb(255, 255, 255)
+   73:path|text-decoration-color                                rgb(27, 33, 90) → rgb(255, 255, 255)
+   73:path|outline-color                                        rgb(27, 33, 90) → rgb(255, 255, 255)
+
+## .bain-commitments-cards 0 changes; transitions: div all | div opacity linear, visibility | img all | div all
+exit 0

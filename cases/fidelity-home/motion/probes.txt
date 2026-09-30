@@ -1,0 +1,10 @@
+# hover <live-sel> => <build-sel> / click <live-sel> => <build-sel> — same order both sides
+hover .pvd-button--primary => .button.primary
+hover .pvd-button--secondary => .button.secondary
+hover .pvd-button--tertiary => .tabs-more a
+hover .web-only .nav-primary-level1-li > a => header nav .nav-drop > button
+hover .web-only .nav-utility-links > li > a => header nav .nav-tools p a
+hover .carousel-track [role=link] => .cards.learn > ul > li
+hover .glpg-seo-footer--products-list a => footer .footer-products a
+hover section.legal a => .section.legal a
+click .scroll-reveal [role=tab] => .tabs-tab

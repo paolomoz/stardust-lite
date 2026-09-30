@@ -1,0 +1,127 @@
+{
+  "live": "motion-live.json",
+  "build": "motion-served.json",
+  "toleranceMs": 150,
+  "tolerancePx": 8,
+  "advisory": true,
+  "findings": 2,
+  "counts": {
+    "behaviors": 15,
+    "parity": 8,
+    "missing": 1,
+    "extra": 0,
+    "tolerance": 1,
+    "dead": 5,
+    "advisory": 0
+  },
+  "verdicts": [
+    {
+      "cls": "header",
+      "name": "scroll-morph",
+      "state": "dead",
+      "note": "header static across the scroll traversal on both sides",
+      "line": "motion header scroll-morph: dead on live — not required (header static across the scroll traversal on both sides)"
+    },
+    {
+      "cls": "widget",
+      "name": ".scroll-reveal [role=tab] → .tabs-tab",
+      "state": "dead",
+      "note": "no sampled change across the frames (track/scroll/box/indicator)",
+      "line": "motion widget .scroll-reveal [role=tab] → .tabs-tab: dead on live — not required (no sampled change across the frames (track/scroll/box/indicator))"
+    },
+    {
+      "cls": "hover",
+      "name": ".pvd-button--primary → .button.primary",
+      "state": "parity",
+      "note": "self.background; n/a; paired by order",
+      "line": "motion hover .pvd-button--primary → .button.primary: parity (self.background; n/a; paired by order)"
+    },
+    {
+      "cls": "hover",
+      "name": ".pvd-button--secondary → .button.secondary",
+      "state": "parity",
+      "note": "self.background; n/a; paired by order",
+      "line": "motion hover .pvd-button--secondary → .button.secondary: parity (self.background; n/a; paired by order)"
+    },
+    {
+      "cls": "hover",
+      "name": ".pvd-button--tertiary → .tabs-more a",
+      "state": "parity",
+      "note": "self.background; n/a; paired by order",
+      "line": "motion hover .pvd-button--tertiary → .tabs-more a: parity (self.background; n/a; paired by order)"
+    },
+    {
+      "cls": "hover",
+      "name": ".web-only .nav-primary-level1-li > a → header nav .nav-drop > button",
+      "state": "parity",
+      "note": "self.background; n/a; paired by order",
+      "line": "motion hover .web-only .nav-primary-level1-li > a → header nav .nav-drop > button: parity (self.background; n/a; paired by order)"
+    },
+    {
+      "cls": "hover",
+      "name": ".web-only .nav-utility-links > li > a → header nav .nav-tools p a",
+      "state": "dead",
+      "note": "no measured hover diff",
+      "line": "motion hover .web-only .nav-utility-links > li > a → header nav .nav-tools p a: dead on live — not required (no measured hover diff)"
+    },
+    {
+      "cls": "hover",
+      "name": ".carousel-track [role=link] → .cards.learn > ul > li",
+      "state": "tolerance",
+      "deltas": [
+        "build adds a.color"
+      ],
+      "note": "live changes h3.color, self.boxShadow; 100ms; paired by order",
+      "line": "motion hover .carousel-track [role=link] → .cards.learn > ul > li: build adds a.color (live changes h3.color, self.boxShadow; 100ms; paired by order)"
+    },
+    {
+      "cls": "hover",
+      "name": ".glpg-seo-footer--products-list a → footer .footer-products a",
+      "state": "dead",
+      "note": "no measured hover diff",
+      "line": "motion hover .glpg-seo-footer--products-list a → footer .footer-products a: dead on live — not required (no measured hover diff)"
+    },
+    {
+      "cls": "hover",
+      "name": "section.legal a → .section.legal a",
+      "state": "dead",
+      "note": "no measured hover diff",
+      "line": "motion hover section.legal a → .section.legal a: dead on live — not required (no measured hover diff)"
+    },
+    {
+      "cls": "transition",
+      "name": "box-shadow",
+      "state": "parity",
+      "note": "2 event(s) on live, 2 on build, 100ms",
+      "line": "motion transition box-shadow: parity (2 event(s) on live, 2 on build, 100ms)"
+    },
+    {
+      "cls": "transition",
+      "name": "opacity",
+      "state": "parity",
+      "note": "6 event(s) on live, 2 on build, 750ms",
+      "line": "motion transition opacity: parity (6 event(s) on live, 2 on build, 750ms)"
+    },
+    {
+      "cls": "transition",
+      "name": "transform",
+      "state": "parity",
+      "note": "2 event(s) on live, 2 on build, 300ms",
+      "line": "motion transition transform: parity (2 event(s) on live, 2 on build, 300ms)"
+    },
+    {
+      "cls": "class",
+      "name": "level2-popup",
+      "state": "missing",
+      "note": "trigger class added 1× on live, never on build",
+      "line": "motion class level2-popup: MISSING on build (trigger class added 1× on live, never on build)"
+    },
+    {
+      "cls": "class",
+      "name": "visible",
+      "state": "parity",
+      "note": "added 4× on live, 1× on build",
+      "line": "motion class visible: parity (added 4× on live, 1× on build)"
+    }
+  ]
+}

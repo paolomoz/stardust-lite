@@ -1,0 +1,15 @@
+node_modules/
+.DS_Store
+# captures and media are evidence you regenerate; the tables next to them are committed
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.woff2
+cases/*/proto/
+cases/*/media/
+cases/*/media-eds/
+cases/*/fonts/
+cases/*/measure/archive*.html
+cases/*/measure/dom-*.html
+*.harness.html

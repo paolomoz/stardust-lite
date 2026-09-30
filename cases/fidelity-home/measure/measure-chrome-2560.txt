@@ -1,0 +1,447 @@
+
+# https://www.fidelity.com/ @ 2560  root {"viewport":2560,"clientWidth":2560,"scrollWidth":2560,"scrollHeight":8448,"overflowX":0}
+body                                                 [0,0,2560,8448]          block        16px/normal 400 Fidelity Sans      (20,20,20)     bg=(249,247,245)              | Skip to main content Fidelity.com Home …
+.fds-global-layout                                   [0,0,2560,8448]          block        16px/normal 400 Fidelity Sans      (20,20,20)                   | Skip to main content Fidelity.com Home …
+.fds-global-layout > *[0/4]                          [0,0,2560,112]           flex         16px/normal 400 Fidelity Sans      (20,20,20)     bg=(55,135,39)              | Skip to main content Fidelity.com Home …
+.fds-global-layout > *[1/4]                          [0,112,2560,6839]        flex         16px/normal 400 Fidelity Sans      (20,20,20)     bg=(249,247,245)              | Guiding you through every milestone We …
+.fds-global-layout > *[2/4]                          [0,6951,2560,1104]       flex         16px/normal 400 Fidelity Sans      (20,20,20)     bg=(249,247,245)              | Keep in mind that investing involves ri…
+.fds-global-layout > *[3/4]                          [0,8055,2560,393]        flex         16px/normal 400 Fidelity Sans      (20,20,20)     bg=(249,247,245)              | Mutual Funds ETFs Fixed Income Bonds CD…
+main ~ *[0/2]                                        [0,6951,2560,1104]       flex         16px/normal 400 Fidelity Sans      (20,20,20)     bg=(249,247,245)              | Keep in mind that investing involves ri…
+main ~ *[1/2]                                        [0,8055,2560,393]        flex         16px/normal 400 Fidelity Sans      (20,20,20)     bg=(249,247,245)              | Mutual Funds ETFs Fixed Income Bonds CD…
+main + *                                             [0,6951,2560,1104]       flex         16px/normal 400 Fidelity Sans      (20,20,20)     bg=(249,247,245)              | Keep in mind that investing involves ri…
+main + * > *                                         [608,6951,1344,1104]     block        16px/normal 400 Fidelity Sans      (20,20,20)                   | Keep in mind that investing involves ri…
+main + * > * > *                                     [608,6951,1344,1104]     block        16px/normal 400 Fidelity Sans      (20,20,20)       pad=24px     maxw=1344px       | Keep in mind that investing involves ri…
+main + * p[0/18]                                     [632,6975,1296,32]       block        12px/16px 400 Fidelity Sans        (82,81,80)       pad=8px        ls=-0.25px    | Keep in mind that investing involves ri…
+main + * p[1/18]                                     [632,7007,1296,272]      block        12px/16px 400 Fidelity Sans        (82,81,80)       pad=8px        ls=-0.25px    | Fidelity Crypto® is offered by Fidelity…
+main + * p[2/18]                                     [640,7015,1280,256]      block        12px/16px 400 Fidelity Sans        (82,81,80)               ls=-0.25px    | Fidelity Crypto® is offered by Fidelity…
+main + * p[3/18]                                     [632,7279,1296,80]       block        12px/16px 400 Fidelity Sans        (82,81,80)       pad=8px        ls=-0.25px    | 1. Applies to online U.S. equity trades…
+main + * p[4/18]                                     [640,7287,1280,64]       block        12px/16px 400 Fidelity Sans        (82,81,80)               ls=-0.25px    | 1. Applies to online U.S. equity trades…
+main + * p[5/18]                                     [632,7359,1296,48]       block        12px/16px 400 Fidelity Sans        (82,81,80)       pad=8px        ls=-0.25px    | 2. Zero account minimums and zero accou…
+main + * p[6/18]                                     [632,7407,1296,32]       block        12px/16px 400 Fidelity Sans        (82,81,80)       pad=8px        ls=-0.25px    | 3. Fractional share quantities can be e…
+main + * p[7/18]                                     [632,7439,1296,32]       block        12px/16px 400 Fidelity Sans        (82,81,80)       pad=8px        ls=-0.25px    | 4. For a distribution to be considered …
+main + * p[8/18]                                     [632,7471,1296,32]       block        12px/16px 400 Fidelity Sans        (82,81,80)       pad=8px        ls=-0.25px    | 5. With respect to federal taxation onl…
+main + * p[9/18]                                     [632,7503,1296,112]      block        12px/16px 400 Fidelity Sans        (82,81,80)       pad=8px        ls=-0.25px    | 6. There are zero account fees and zero…
+main + * p[10/18]                                    [632,7615,1296,144]      block        12px/16px 400 Fidelity Sans        (82,81,80)       pad=8px        ls=-0.25px    | 7. 529 distributions for qualified educ…
+main + * p[11/18]                                    [632,7759,1296,64]       block        12px/16px 400 Fidelity Sans        (82,81,80)       pad=8px        ls=-0.25px    | The information provided herein is gene…
+main + * a[0/4]                                      [1201,7303,143,15]       inline       12px/16px 700 Fidelity Sans        (29,57,134)              ls=-0.25px    | Fidelity.com/commissions
+main + * a[1/4]                                      [780,7319,25,15]         inline       12px/16px 700 Fidelity Sans        (29,57,134)              ls=-0.25px    | here
+main + * a[2/4]                                      [809,7383,137,15]        inline       12px/16px 400 Fidelity Sans        (29,57,134)              ls=-0.25px    | Fidelity.com/commissions
+main + * a[3/4]                                      [893,7975,25,15]         inline       12px/16px 400 Fidelity Sans        (29,57,134)              ls=-0.25px    | SIPC
+main + * button  MISSING
+main + * h2  MISSING
+main + * h3  MISSING
+main + * ol  MISSING
+main + * li  MISSING
+[class*=disclos]  MISSING
+[class*=footnote]  MISSING
+header[0/3]                                          [0,0,2560,112]           block        16px/normal 400 Fidelity Sans      (20,20,20)                   | Skip to main content Fidelity.com Home …
+header[1/3]                                          [0,0,0,0]                block        16px/normal 400 Fidelity Sans      (20,20,20)                  HIDDEN | Skip to main content Fidelity.com Home …
+header[2/3]                                          [0,0,0,0]                block        18px/normal 400 Roboto             (116,115,111)    pad=13px 0px 3px 5% mar=5px      ta=center    HIDDEN | Privacy Settings
+.header-navigation-container                         [0,0,2560,112]           block        16px/normal 400 Fidelity Sans      (20,20,20)                   | Skip to main content Fidelity.com Home …
+.web-only .nav-main[0/2]                             [0,0,2560,112]           block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px    | Fidelity.com Home Fidelity Assistant Cu…
+.web-only .nav-main[1/2]                             [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Fidelity.com Home Fidelity Assistant Cu…
+.nav-utility-container[0/2]                          [0,0,2560,56]            block        16px/24px 400 Fidelity Sans        (20,20,20)     bg=(54,135,39)          ls=-0.25px    | Fidelity.com Home Fidelity Assistant Cu…
+.nav-utility-container[1/2]                          [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)     bg=(54,135,39)          ls=-0.25px   HIDDEN | Fidelity.com Home Fidelity Assistant Cu…
+.nav-utility[0/2]                                    [320,0,1920,56]          flex         16px/24px 400 Fidelity Sans        (20,20,20)     bg=(54,135,39)  pad=8px 24px mar=0px 320px    maxw=1920px   ls=-0.25px    | Fidelity.com Home Fidelity Assistant Cu…
+.nav-utility[1/2]                                    [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)     bg=(54,135,39)  pad=8px 24px mar=0px auto    maxw=1920px   ls=-0.25px   HIDDEN | Fidelity.com Home Fidelity Assistant Cu…
+.logo-div[0/2]                                       [344,8,143,40]           block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px    | Fidelity.com Home
+.logo-div[1/2]                                       [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Fidelity.com Home
+.logo-div .logo[0/2]                                 [344,8,143,40]           block        16px/24px 400 Fidelity Sans        (29,57,134)              ls=-0.25px    | Fidelity.com Home
+.logo-div .logo[1/2]                                 [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (29,57,134)              ls=-0.25px   HIDDEN | Fidelity.com Home
+.logo-div svg[0/2]                                   [344,8,143,41]           inline       16px/24px 400 Fidelity Sans        (29,57,134)              ls=-0.25px    
+.logo-div svg[1/2]                                   [0,0,0,0]                inline       16px/24px 400 Fidelity Sans        (29,57,134)              ls=-0.25px   HIDDEN 
+.web-only .nav-utility-links[0/2]                    [487,8,1729,39]          flex         14px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px    | Fidelity Assistant Customer Support Ope…
+.web-only .nav-utility-links[1/2]                    [0,0,0,0]                flex         14px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Fidelity Assistant Customer Support Ope…
+.web-only .nav-utility-links > li[0/8]               [1803,8,103,39]          list-item    14px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 0px 0px 24px      ta=left ls=-0.25px    | Fidelity Assistant
+.web-only .nav-utility-links > li[1/8]               [1914,8,40,39]           list-item    14px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 0px 0px 8px       ls=-0.25px    | Customer Support
+.web-only .nav-utility-links > li[2/8]               [1978,8,142,39]          list-item    14px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 0px 0px 24px      ta=left ls=-0.25px    | Open an account
+.web-only .nav-utility-links > li[3/8]               [2144,8,72,39]           list-item    14px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 0px 0px 24px      ta=left ls=-0.25px    | Log in
+.web-only .nav-utility-links > li[4/8]               [0,0,0,0]                list-item    14px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 0px 0px 24px      ta=left ls=-0.25px   HIDDEN | Fidelity Assistant
+.web-only .nav-utility-links > li[5/8]               [0,0,0,0]                list-item    14px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 0px 0px 8px       ls=-0.25px   HIDDEN | Customer Support
+.web-only .nav-utility-links > li[6/8]               [0,0,0,0]                list-item    14px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 0px 0px 24px      ta=left ls=-0.25px   HIDDEN | Open an account
+.web-only .nav-utility-links > li[7/8]               [0,0,0,0]                list-item    14px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 0px 0px 24px      ta=left ls=-0.25px   HIDDEN | Log in
+.web-only .nav-utility-links > li > a[0/8]           [1803,8,103,39]          inline-flex  14px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px    | Fidelity Assistant
+.web-only .nav-utility-links > li > a[1/8]           [1914,8,40,40]           inline-flex  14px/24px 400 Fidelity Sans        (20,20,20)      bgi=url("data:image/svg+xml;base64,PHN2ZyB3a    br=50%     ls=-0.25px    | Customer Support
+.web-only .nav-utility-links > li > a[2/8]           [1978,8,142,40]          inline-flex  14px/24px 600 Fidelity Sans        (20,20,20)     bg=(255,255,255)  pad=7px 16px   br=24px bd=1px solid rgb(255, 255, 255)   ta=left ls=-0.25px    | Open an account
+.web-only .nav-utility-links > li > a[3/8]           [2144,8,72,40]           inline-flex  14px/24px 600 Fidelity Sans        (20,20,20)     bg=(54,135,39)  pad=7px 16px   br=24px bd=1px solid rgba(255, 255, 255,    ta=left ls=-0.25px    | Log in
+.web-only .nav-utility-links > li > a[4/8]           [0,0,0,0]                inline-flex  14px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px   HIDDEN | Fidelity Assistant
+.web-only .nav-utility-links > li > a[5/8]           [0,0,0,0]                inline-flex  14px/24px 400 Fidelity Sans        (20,20,20)      bgi=url("data:image/svg+xml;base64,PHN2ZyB3a    br=50%     ls=-0.25px   HIDDEN | Customer Support
+.web-only .nav-utility-links > li > a[6/8]           [0,0,0,0]                inline-flex  14px/24px 600 Fidelity Sans        (20,20,20)     bg=(255,255,255)  pad=7px 16px   br=24px bd=1px solid rgb(255, 255, 255)   ta=left ls=-0.25px   HIDDEN | Open an account
+.web-only .nav-utility-links > li > a[7/8]           [0,0,0,0]                inline-flex  14px/24px 600 Fidelity Sans        (20,20,20)     bg=(54,135,39)  pad=7px 16px   br=24px bd=1px solid rgba(255, 255, 255,    ta=left ls=-0.25px   HIDDEN | Log in
+.web-only .nav-utility-links > li > a span[0/8]      [1803,16,103,24]         block        14px/24px 400 Fidelity Sans        (255,255,255)           ta=left ls=-0.25px    | Fidelity Assistant
+.web-only .nav-utility-links > li > a span[1/8]      [-8087,28,1,1]           block        14px/24px 400 Fidelity Sans        (255,255,255)     mar=-1px       ls=-0.25px    | Customer Support
+.web-only .nav-utility-links > li > a span[2/8]      [1995,16,108,24]         block        14px/24px 600 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px    | Open an account
+.web-only .nav-utility-links > li > a span[3/8]      [2161,16,38,24]          block        14px/24px 600 Fidelity Sans        (255,255,255)           ta=left ls=-0.25px    | Log in
+.web-only .nav-utility-links > li > a span[4/8]      [0,0,0,0]                block        14px/24px 400 Fidelity Sans        (255,255,255)           ta=left ls=-0.25px   HIDDEN | Fidelity Assistant
+.web-only .nav-utility-links > li > a span[5/8]      [0,0,0,0]                block        14px/24px 400 Fidelity Sans        (255,255,255)     mar=-1px       ls=-0.25px   HIDDEN | Customer Support
+.web-only .nav-utility-links > li > a span[6/8]      [0,0,0,0]                block        14px/24px 600 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px   HIDDEN | Open an account
+.web-only .nav-utility-links > li > a span[7/8]      [0,0,0,0]                block        14px/24px 600 Fidelity Sans        (255,255,255)           ta=left ls=-0.25px   HIDDEN | Log in
+.web-only .nav-utility-links > li > a svg  MISSING
+.nav-primary-container[0/2]                          [0,56,2560,56]           block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px    | Accounts & Trade Portfolio Account Posi…
+.nav-primary-container[1/2]                          [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Accounts & Trade Portfolio Account Posi…
+.nav-primary[0/4]                                    [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Accounts & Trade Portfolio Account Posi…
+.nav-primary[1/4]                                    [320,56,1920,55]         flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 320px    maxw=1920px   ls=-0.25px    | Accounts & Trade Portfolio Account Posi…
+.nav-primary[2/4]                                    [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Accounts & Trade Portfolio Account Posi…
+.nav-primary[3/4]                                    [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px auto    maxw=1920px   ls=-0.25px   HIDDEN | Accounts & Trade Portfolio Account Posi…
+.web-only .nav-primary-level1[0/2]                   [320,56,749,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px    | Accounts & Trade Portfolio Account Posi…
+.web-only .nav-primary-level1[1/2]                   [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px   HIDDEN | Accounts & Trade Portfolio Account Posi…
+.web-only .nav-primary-level1-li[0/10]               [325,56,164,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 1px 0px 5px      ta=left ls=-0.25px    | Accounts & Trade Portfolio Account Posi…
+.web-only .nav-primary-level1-li[1/10]               [491,56,102,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 1px      ta=left ls=-0.25px    | Investing Self-Directed Investing Advan…
+.web-only .nav-primary-level1-li[2/10]               [595,56,117,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 1px      ta=left ls=-0.25px    | Retirement Retirement Planning 401(k) R…
+.web-only .nav-primary-level1-li[3/10]               [715,56,188,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 1px      ta=left ls=-0.25px    | Wealth Management Wealth Management Off…
+.web-only .nav-primary-level1-li[4/10]               [905,56,163,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 1px      ta=left ls=-0.25px    | News & Research News Wealth Management …
+.web-only .nav-primary-level1-li[5/10]               [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 1px 0px 5px      ta=left ls=-0.25px   HIDDEN | Accounts & Trade Portfolio Account Posi…
+.web-only .nav-primary-level1-li[6/10]               [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 1px      ta=left ls=-0.25px   HIDDEN | Investing Self-Directed Investing Advan…
+.web-only .nav-primary-level1-li[7/10]               [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 1px      ta=left ls=-0.25px   HIDDEN | Retirement Retirement Planning 401(k) R…
+.web-only .nav-primary-level1-li[8/10]               [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 1px      ta=left ls=-0.25px   HIDDEN | Wealth Management Wealth Management Off…
+.web-only .nav-primary-level1-li[9/10]               [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 1px      ta=left ls=-0.25px   HIDDEN | Education & Research Learn Market & Inv…
+.web-only .nav-primary-level1-li > a[0/10]           [325,56,164,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px    | Accounts & Trade
+.web-only .nav-primary-level1-li > a[1/10]           [491,56,102,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px    | Investing
+.web-only .nav-primary-level1-li > a[2/10]           [595,56,117,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px    | Retirement
+.web-only .nav-primary-level1-li > a[3/10]           [715,56,188,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px    | Wealth Management
+.web-only .nav-primary-level1-li > a[4/10]           [905,56,163,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px    | News & Research
+.web-only .nav-primary-level1-li > a[5/10]           [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px   HIDDEN | Accounts & Trade
+.web-only .nav-primary-level1-li > a[6/10]           [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px   HIDDEN | Investing
+.web-only .nav-primary-level1-li > a[7/10]           [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px   HIDDEN | Retirement
+.web-only .nav-primary-level1-li > a[8/10]           [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px   HIDDEN | Wealth Management
+.web-only .nav-primary-level1-li > a[9/10]           [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px   HIDDEN | Education & Research
+.web-only .nav-primary-level1-li > a span[0/10]      [325,56,164,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 19px       ta=left ls=-0.25px    | Accounts & Trade
+.web-only .nav-primary-level1-li > a span[1/10]      [491,56,102,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 19px       ta=left ls=-0.25px    | Investing
+.web-only .nav-primary-level1-li > a span[2/10]      [595,56,117,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 19px       ta=left ls=-0.25px    | Retirement
+.web-only .nav-primary-level1-li > a span[3/10]      [715,56,188,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 19px       ta=left ls=-0.25px    | Wealth Management
+.web-only .nav-primary-level1-li > a span[4/10]      [905,56,163,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 19px       ta=left ls=-0.25px    | News & Research
+.web-only .nav-primary-level1-li > a span[5/10]      [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 19px       ta=left ls=-0.25px   HIDDEN | Accounts & Trade
+.web-only .nav-primary-level1-li > a span[6/10]      [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 19px       ta=left ls=-0.25px   HIDDEN | Investing
+.web-only .nav-primary-level1-li > a span[7/10]      [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 19px       ta=left ls=-0.25px   HIDDEN | Retirement
+.web-only .nav-primary-level1-li > a span[8/10]      [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 19px       ta=left ls=-0.25px   HIDDEN | Wealth Management
+.web-only .nav-primary-level1-li > a span[9/10]      [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 19px       ta=left ls=-0.25px   HIDDEN | Education & Research
+.web-only .nav-primary-level2-container[0/10]        [257,-944,300,589]       block        16px/24px 400 Fidelity Sans        (20,20,20)     bg=(255,255,255)  pad=24px   br=24px   sh=rgba(20, 20, 20, 0.06) 0px 2px ta=left ls=-0.25px    | Portfolio Account Positions Trade Fidel…
+.web-only .nav-primary-level2-container[1/10]        [392,-944,300,265]       block        16px/24px 400 Fidelity Sans        (20,20,20)     bg=(255,255,255)  pad=24px   br=24px   sh=rgba(20, 20, 20, 0.06) 0px 2px ta=left ls=-0.25px    | Self-Directed Investing Advanced Tradin…
+.web-only .nav-primary-level2-container[2/10]        [504,-944,300,193]       block        16px/24px 400 Fidelity Sans        (20,20,20)     bg=(255,255,255)  pad=24px   br=24px   sh=rgba(20, 20, 20, 0.06) 0px 2px ta=left ls=-0.25px    | Retirement Planning 401(k) Rollovers & …
+.web-only .nav-primary-level2-container[3/10]        [659,-944,300,229]       block        16px/24px 400 Fidelity Sans        (20,20,20)     bg=(255,255,255)  pad=24px   br=24px   sh=rgba(20, 20, 20, 0.06) 0px 2px ta=left ls=-0.25px    | Wealth Management Offerings Financial A…
+.web-only .nav-primary-level2-container[4/10]        [836,-944,300,445]       block        16px/24px 400 Fidelity Sans        (20,20,20)     bg=(255,255,255)  pad=24px   br=24px   sh=rgba(20, 20, 20, 0.06) 0px 2px ta=left ls=-0.25px    | News Wealth Management Insights Watchli…
+.web-only .nav-primary-level2-container[5/10]        [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)     bg=(255,255,255)  pad=24px   br=24px   sh=rgba(20, 20, 20, 0.06) 0px 2px ta=left ls=-0.25px   HIDDEN | Portfolio Account Positions Trade Fidel…
+.web-only .nav-primary-level2-container[6/10]        [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)     bg=(255,255,255)  pad=24px   br=24px   sh=rgba(20, 20, 20, 0.06) 0px 2px ta=left ls=-0.25px   HIDDEN | Self-Directed Investing Advanced Tradin…
+.web-only .nav-primary-level2-container[7/10]        [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)     bg=(255,255,255)  pad=24px   br=24px   sh=rgba(20, 20, 20, 0.06) 0px 2px ta=left ls=-0.25px   HIDDEN | Retirement Planning 401(k) Rollovers & …
+.web-only .nav-primary-level2-container[8/10]        [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)     bg=(255,255,255)  pad=24px   br=24px   sh=rgba(20, 20, 20, 0.06) 0px 2px ta=left ls=-0.25px   HIDDEN | Wealth Management Offerings Financial A…
+.web-only .nav-primary-level2-container[9/10]        [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)     bg=(255,255,255)  pad=24px   br=24px   sh=rgba(20, 20, 20, 0.06) 0px 2px ta=left ls=-0.25px   HIDDEN | Learn Market & Investment Research News
+.smart-suggest-container-web[0/2]                    [1069,64,1171,40]        flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 24px 0px 0px        ls=-0.25px    
+.smart-suggest-container-web[1/2]                    [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 24px 0px 0px        ls=-0.25px   HIDDEN 
+.smart-suggest[0/4]                                  [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN 
+.smart-suggest[1/4]                                  [1881,64,335,40]         block        16px/24px 400 Fidelity Sans        (20,20,20)            maxw=335px   ls=-0.25px    
+.smart-suggest[2/4]                                  [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN 
+.smart-suggest[3/4]                                  [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)            maxw=335px   ls=-0.25px   HIDDEN 
+.smart-suggest > *[0/4]                              [0,0,0,0]                inline       16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN 
+.smart-suggest > *[1/4]                              [1881,64,335,40]         inline       16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px    
+.smart-suggest > *[2/4]                              [0,0,0,0]                inline       16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN 
+.smart-suggest > *[3/4]                              [0,0,0,0]                inline       16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN 
+.smart-suggest input[0/4]                            [0,0,0,0]                block        16px/19.2px 400 Fidelity Sans      (0,0,0)          pad=4px   br=12px  maxw=100%  ta=left    HIDDEN 
+.smart-suggest input[1/4]                            [1910,67,233,33]         block        16px/19.2px 400 Fidelity Sans      (0,0,0)          pad=4px   br=12px  maxw=100%  ta=left     
+.smart-suggest input[2/4]                            [0,0,0,0]                block        16px/19.2px 400 Fidelity Sans      (0,0,0)          pad=4px   br=12px  maxw=100%  ta=left    HIDDEN 
+.smart-suggest input[3/4]                            [0,0,0,0]                block        16px/19.2px 400 Fidelity Sans      (0,0,0)          pad=4px   br=12px  maxw=100%  ta=left    HIDDEN 
+.smart-suggest button[0/4]                           [0,0,0,0]                flex         13.3333px/normal 400 Arial         (0,0,0)           mar=0px 0px 0px 6.66667px  br=50% bd=1px solid rgb(230, 228, 225)   ta=center    HIDDEN 
+.smart-suggest button[1/4]                           [2186,64,40,40]          flex         13.3333px/normal 400 Arial         (0,0,0)           mar=0px 0px 0px 6.66667px  br=50% bd=1px solid rgb(230, 228, 225)   ta=center     
+.smart-suggest button[2/4]                           [0,0,0,0]                flex         13.3333px/normal 400 Arial         (0,0,0)           mar=0px 0px 0px 6.66667px  br=50% bd=1px solid rgb(230, 228, 225)   ta=center    HIDDEN 
+.smart-suggest button[3/4]                           [0,0,0,0]                flex         13.3333px/normal 400 Arial         (0,0,0)           mar=0px 0px 0px 6.66667px  br=50% bd=1px solid rgb(230, 228, 225)   ta=center    HIDDEN 
+.smart-suggest svg[0/12]                             [0,0,0,0]                block        16px/19.2px 400 Fidelity Sans      (82,81,80)              ta=left    HIDDEN 
+.smart-suggest svg[1/12]                             [0,0,0,0]                inline-block 16px/19.2px 400 Fidelity Sans      (0,0,0)                 ta=left    HIDDEN 
+.smart-suggest svg[2/12]                             [0,0,0,0]                block        13.3333px/normal 400 Arial         (0,0,0)           mar=0px auto      ta=center    HIDDEN 
+.smart-suggest svg[3/12]                             [1894,77,14,14]          block        16px/19.2px 400 Fidelity Sans      (82,81,80)              ta=left     
+.smart-suggest svg[4/12]                             [2143,74,20,20]          inline-block 16px/19.2px 400 Fidelity Sans      (0,0,0)                 ta=left     
+.smart-suggest svg[5/12]                             [2194,72,24,24]          block        13.3333px/normal 400 Arial         (0,0,0)                 ta=center     
+.smart-suggest svg[6/12]                             [0,0,0,0]                block        16px/19.2px 400 Fidelity Sans      (82,81,80)              ta=left    HIDDEN 
+.smart-suggest svg[7/12]                             [0,0,0,0]                inline-block 16px/19.2px 400 Fidelity Sans      (0,0,0)                 ta=left    HIDDEN 
+.smart-suggest svg[8/12]                             [0,0,0,0]                block        13.3333px/normal 400 Arial         (0,0,0)           mar=0px auto      ta=center    HIDDEN 
+.smart-suggest svg[9/12]                             [0,0,0,0]                block        16px/19.2px 400 Fidelity Sans      (82,81,80)              ta=left    HIDDEN 
+.smart-suggest svg[10/12]                            [0,0,0,0]                inline-block 16px/19.2px 400 Fidelity Sans      (0,0,0)                 ta=left    HIDDEN 
+.smart-suggest svg[11/12]                            [0,0,0,0]                block        13.3333px/normal 400 Arial         (0,0,0)           mar=0px auto      ta=center    HIDDEN 
+.smart-suggest-container-web ~ *  MISSING
+.nav-primary ~ *[0/2]                                [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN 
+.nav-primary ~ *[1/2]                                [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN 
+.nav-primary-container > *[0/2]                      [320,56,1920,55]         flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px 320px    maxw=1920px   ls=-0.25px    | Accounts & Trade Portfolio Account Posi…
+.nav-primary-container > *[1/2]                      [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)        mar=0px auto    maxw=1920px   ls=-0.25px   HIDDEN | Accounts & Trade Portfolio Account Posi…
+.nav-primary-container > * > *[0/4]                  [320,56,749,55]          flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px    | Accounts & Trade Portfolio Account Posi…
+.nav-primary-container > * > *[1/4]                  [1069,64,1171,40]        flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 24px 0px 0px        ls=-0.25px    
+.nav-primary-container > * > *[2/4]                  [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)              ta=left ls=-0.25px   HIDDEN | Accounts & Trade Portfolio Account Posi…
+.nav-primary-container > * > *[3/4]                  [0,0,0,0]                flex         16px/24px 400 Fidelity Sans        (20,20,20)       pad=0px 24px 0px 0px        ls=-0.25px   HIDDEN 
+.mobile-only .header-nav-bar[0/2]                    [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Fidelity.com Home Customer Support Log …
+.mobile-only .header-nav-bar[1/2]                    [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Fidelity.com Home Customer Support Log …
+.mobile-only .header-nav-bar > *[0/8]                [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN 
+.mobile-only .header-nav-bar > *[1/8]                [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Fidelity.com Home
+.mobile-only .header-nav-bar > *[2/8]                [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Customer Support
+.mobile-only .header-nav-bar > *[3/8]                [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Log in
+.mobile-only .header-nav-bar > *[4/8]                [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN 
+.mobile-only .header-nav-bar > *[5/8]                [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Fidelity.com Home
+.mobile-only .header-nav-bar > *[6/8]                [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Customer Support
+.mobile-only .header-nav-bar > *[7/8]                [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Log in
+.mobile-only .menu button[0/2]                       [0,0,0,0]                inline-block 13.3333px/normal 400 Fidelity Sans (0,0,0)                 ta=center    HIDDEN 
+.mobile-only .menu button[1/2]                       [0,0,0,0]                inline-block 13.3333px/normal 400 Fidelity Sans (0,0,0)                 ta=center    HIDDEN 
+.mobile-only .logo a[0/2]                            [0,0,0,0]                inline       16px/24px 400 Fidelity Sans        (29,57,134)              ls=-0.25px   HIDDEN | Fidelity.com Home
+.mobile-only .logo a[1/2]                            [0,0,0,0]                inline       16px/24px 400 Fidelity Sans        (29,57,134)              ls=-0.25px   HIDDEN | Fidelity.com Home
+.mobile-only .logo svg[0/2]                          [0,0,0,0]                inline       16px/24px 400 Fidelity Sans        (29,57,134)              ls=-0.25px   HIDDEN 
+.mobile-only .logo svg[1/2]                          [0,0,0,0]                inline       16px/24px 400 Fidelity Sans        (29,57,134)              ls=-0.25px   HIDDEN 
+.mobile-only .nav-utility-links[0/4]                 [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Customer Support
+.mobile-only .nav-utility-links[1/4]                 [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Fidelity Assistant
+.mobile-only .nav-utility-links[2/4]                 [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Customer Support
+.mobile-only .nav-utility-links[3/4]                 [0,0,0,0]                block        16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Fidelity Assistant
+.mobile-only .nav-utility-links a[0/4]               [0,0,0,0]                inline-flex  16px/24px 400 Fidelity Sans        (20,20,20)      bgi=url("data:image/svg+xml;base64,PHN2ZyB3a    br=50%     ls=-0.25px   HIDDEN | Customer Support
+.mobile-only .nav-utility-links a[1/4]               [0,0,0,0]                inline-flex  16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Fidelity Assistant
+.mobile-only .nav-utility-links a[2/4]               [0,0,0,0]                inline-flex  16px/24px 400 Fidelity Sans        (20,20,20)      bgi=url("data:image/svg+xml;base64,PHN2ZyB3a    br=50%     ls=-0.25px   HIDDEN | Customer Support
+.mobile-only .nav-utility-links a[3/4]               [0,0,0,0]                inline-flex  16px/24px 400 Fidelity Sans        (20,20,20)               ls=-0.25px   HIDDEN | Fidelity Assistant
+.mobile-only .log-in-out a[0/2]                      [0,0,0,0]                inline       16px/24px 400 Fidelity Sans        (29,57,134)              ls=-0.25px   HIDDEN | Log in
+.mobile-only .log-in-out a[1/2]                      [0,0,0,0]                inline       16px/24px 400 Fidelity Sans        (29,57,134)              ls=-0.25px   HIDDEN | Log in
+.full-hero__image                                    [560,112,1440,700]       block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=100%    fit=cover   
+.full-hero picture                                   [560,112,1440,700]       block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=100%       
+.full-hero picture source  MISSING
+.scroll-reveal > *                                   [560,860,1440,3136]      block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=1440px       | Start investing Save for retirement Sav…
+.scroll-reveal > * > *                               [692,868,1176,3120]      grid         16px/normal 400 Fidelity Sans      (20,20,20)        mar=8px 0px gap=normal 0px   maxw=1176px       | Start investing Save for retirement Sav…
+.scroll-reveal > * > * > *[0/8]                      [692,868,216,3120]       block        16px/normal 400 Fidelity Sans      (20,20,20)                   | Start investing Save for retirement Sav…
+.scroll-reveal > * > * > *[1/8]                      [988,868,509,60]         block        16px/normal 400 Fidelity Sans      (20,20,20)      bgi=linear-gradient(rgb(255, 255, 255), rgba             
+.scroll-reveal > * > * > *[2/8]                      [988,928,509,600]        flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Invest smart from the start with a brok…
+.scroll-reveal > * > * > *[3/8]                      [988,1728,509,600]       flex         16px/normal 400 Fidelity Sans      (20,20,20)        mar=200px 0px 0px           | Plan for the possibilities ahead with a…
+.scroll-reveal > * > * > *[4/8]                      [988,2528,509,600]       flex         16px/normal 400 Fidelity Sans      (20,20,20)        mar=200px 0px 0px           | Save, earn, and invest for health care …
+.scroll-reveal > * > * > *[5/8]                      [988,3328,509,600]       flex         16px/normal 400 Fidelity Sans      (20,20,20)        mar=200px 0px 0px           | Save for the next generation’s educatio…
+.scroll-reveal > * > * > *[6/8]                      [988,868,509,60]         block        16px/normal 400 Fidelity Sans      (20,20,20)      bgi=linear-gradient(rgba(0, 0, 0, 0), rgb(25             
+.scroll-reveal > * > * > *[7/8]                      [1529,868,339,3120]      block        16px/normal 400 Fidelity Sans      (20,20,20)                   
+.scroll-reveal h2  MISSING
+.scroll-reveal h3[0/4]                               [988,1040,509,88]        block        40px/44px 300 Fidelity Slab        (20,20,20)              ta=left ls=-1px    | Invest smart from the start with a brok…
+.scroll-reveal h3[1/4]                               [988,1810,509,88]        block        40px/44px 300 Fidelity Slab        (20,20,20)              ta=left ls=-1px    | Plan for the possibilities ahead with a…
+.scroll-reveal h3[2/4]                               [988,2610,509,88]        block        40px/44px 300 Fidelity Slab        (20,20,20)              ta=left ls=-1px    | Save, earn, and invest for health care …
+.scroll-reveal h3[3/4]                               [988,3388,509,132]       block        40px/44px 300 Fidelity Slab        (20,20,20)              ta=left ls=-1px    | Save for the next generation’s educatio…
+.scroll-reveal img[0/4]                              [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal img[1/4]                              [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal img[2/4]                              [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal img[3/4]                              [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal picture  MISSING
+.scroll-reveal button[0/4]                           [693,1100,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Start investing
+.scroll-reveal button[1/4]                           [693,1164,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Save for retirement
+.scroll-reveal button[2/4]                           [693,1228,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Save for health care
+.scroll-reveal button[3/4]                           [693,1292,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Invest for a child
+.scroll-reveal [class*=tab][0/8]                     [693,1100,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Start investing
+.scroll-reveal [class*=tab][1/8]                     [714,1122,89,20]         block        14px/20px 600 Fidelity Sans        (82,81,80)              ta=left ls=-0.25px    | Start investing
+.scroll-reveal [class*=tab][2/8]                     [693,1164,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Save for retirement
+.scroll-reveal [class*=tab][3/8]                     [714,1186,120,20]        block        14px/20px 600 Fidelity Sans        (82,81,80)              ta=left ls=-0.25px    | Save for retirement
+.scroll-reveal [class*=tab][4/8]                     [693,1228,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Save for health care
+.scroll-reveal [class*=tab][5/8]                     [714,1250,124,20]        block        14px/20px 600 Fidelity Sans        (82,81,80)              ta=left ls=-0.25px    | Save for health care
+.scroll-reveal [class*=tab][6/8]                     [693,1292,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Invest for a child
+.scroll-reveal [class*=tab][7/8]                     [714,1314,102,20]        block        14px/20px 600 Fidelity Sans        (82,81,80)              ta=left ls=-0.25px    | Invest for a child
+.scroll-reveal [class*=media][0/5]                   [1529,978,339,500]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   
+.scroll-reveal [class*=media][1/5]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal [class*=media][2/5]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal [class*=media][3/5]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal [class*=media][4/5]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal [class*=sticky]  MISSING
+.scroll-reveal [class*=image][0/7]                   [1529,868,339,3120]      block        16px/normal 400 Fidelity Sans      (20,20,20)                   
+.scroll-reveal [class*=image][1/7]                   [1529,868,339,720]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   
+.scroll-reveal [class*=image][2/7]                   [1529,978,339,500]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   
+.scroll-reveal [class*=image][3/7]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal [class*=image][4/7]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal [class*=image][5/7]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal [class*=image][6/7]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal .content > *[0/4]                     [988,1040,509,376]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Invest smart from the start with a brok…
+.scroll-reveal .content > *[1/4]                     [988,1810,509,436]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Plan for the possibilities ahead with a…
+.scroll-reveal .content > *[2/4]                     [988,2610,509,436]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Save, earn, and invest for health care …
+.scroll-reveal .content > *[3/4]                     [988,3388,509,480]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Save for the next generation’s educatio…
+.scroll-reveal .slide > *[0/4]                       [988,1040,509,376]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Invest smart from the start with a brok…
+.scroll-reveal .slide > *[1/4]                       [988,1810,509,436]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Plan for the possibilities ahead with a…
+.scroll-reveal .slide > *[2/4]                       [988,2610,509,436]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Save, earn, and invest for health care …
+.scroll-reveal .slide > *[3/4]                       [988,3388,509,480]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Save for the next generation’s educatio…
+.scroll-reveal .text-content-half > *[0/12]          [988,1040,509,88]        block        40px/44px 300 Fidelity Slab        (20,20,20)              ta=left ls=-1px    | Invest smart from the start with a brok…
+.scroll-reveal .text-content-half > *[1/12]          [988,1152,509,192]       flex         16px/normal 400 Fidelity Sans      (20,20,20)        mar=24px 0px 0px gap=24px          | $0 account fees2 Keep your money workin…
+.scroll-reveal .text-content-half > *[2/12]          [988,1376,509,40]        flex         16px/normal 400 Fidelity Sans      (20,20,20)        mar=32px 0px 0px gap=12px          | Open a brokerage account Explore ways t…
+.scroll-reveal .text-content-half > *[3/12]          [988,1810,509,88]        block        40px/44px 300 Fidelity Slab        (20,20,20)              ta=left ls=-1px    | Plan for the possibilities ahead with a…
+.scroll-reveal .text-content-half > *[4/12]          [988,1922,509,252]       flex         16px/normal 400 Fidelity Sans      (20,20,20)        mar=24px 0px 0px gap=24px          | Tax savings Any investment growth in a …
+.scroll-reveal .text-content-half > *[5/12]          [988,2206,509,40]        flex         16px/normal 400 Fidelity Sans      (20,20,20)        mar=32px 0px 0px gap=12px          | Open a Roth IRA Explore retirement plan…
+.scroll-reveal .text-content-half > *[6/12]          [988,2610,509,88]        block        40px/44px 300 Fidelity Slab        (20,20,20)              ta=left ls=-1px    | Save, earn, and invest for health care …
+.scroll-reveal .text-content-half > *[7/12]          [988,2722,509,252]       flex         16px/normal 400 Fidelity Sans      (20,20,20)        mar=24px 0px 0px gap=24px          | Triple-tax advantage Get tax-deductible…
+.scroll-reveal .text-content-half > *[8/12]          [988,3006,509,40]        flex         16px/normal 400 Fidelity Sans      (20,20,20)        mar=32px 0px 0px gap=12px          | Open an HSA Explore health savings at F…
+.scroll-reveal .text-content-half > *[9/12]          [988,3388,509,132]       block        40px/44px 300 Fidelity Slab        (20,20,20)              ta=left ls=-1px    | Save for the next generation’s educatio…
+.scroll-reveal .text-content-half > *[10/12]         [988,3544,509,252]       flex         16px/normal 400 Fidelity Sans      (20,20,20)        mar=24px 0px 0px gap=24px          | Tax-smart savings Any earnings grow fed…
+.scroll-reveal .text-content-half > *[11/12]         [988,3828,509,40]        flex         16px/normal 400 Fidelity Sans      (20,20,20)        mar=32px 0px 0px gap=12px          | Open a 529 account Explore saving for a…
+.scroll-reveal .image-box                            [1529,978,339,500]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   
+.scroll-reveal .image-box > *[0/4]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal .image-box > *[1/4]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal .image-box > *[2/4]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal .image-box > *[3/4]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal .image-box img[0/4]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal .image-box img[1/4]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal .image-box img[2/4]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal .image-box img[3/4]                   [1529,978,339,500]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px      fit=cover   
+.scroll-reveal ul  MISSING
+.scroll-reveal li  MISSING
+.scroll-reveal a[0/8]                                [988,1376,236,40]        inline-flex  16px/16px 700 Fidelity Sans        (255,255,255)  bg=(54,135,39)  pad=0px 16px  gap=8px br=24px bd=1px solid rgb(54, 135, 39) maxw=100%  ta=center     | Open a brokerage account
+.scroll-reveal a[1/8]                                [1236,1376,232,40]       inline-flex  16px/16px 600 Fidelity Sans        (20,20,20)     bg=(255,255,255,0)  pad=0px 16px  gap=8px br=24px bd=1px solid rgba(255, 255, 255,  maxw=100%  ta=center     | Explore ways to invest
+.scroll-reveal a[2/8]                                [988,2206,160,40]        inline-flex  16px/16px 700 Fidelity Sans        (255,255,255)  bg=(54,135,39)  pad=0px 16px  gap=8px br=24px bd=1px solid rgb(54, 135, 39) maxw=100%  ta=center     | Open a Roth IRA
+.scroll-reveal a[3/8]                                [1160,2206,276,40]       inline-flex  16px/16px 600 Fidelity Sans        (20,20,20)     bg=(255,255,255,0)  pad=0px 16px  gap=8px br=24px bd=1px solid rgba(255, 255, 255,  maxw=100%  ta=center     | Explore retirement planning
+.scroll-reveal a[4/8]                                [988,3006,136,40]        inline-flex  16px/16px 700 Fidelity Sans        (255,255,255)  bg=(54,135,39)  pad=0px 16px  gap=8px br=24px bd=1px solid rgb(54, 135, 39) maxw=100%  ta=center     | Open an HSA
+.scroll-reveal a[5/8]                                [1136,3006,310,40]       inline-flex  16px/16px 600 Fidelity Sans        (20,20,20)     bg=(255,255,255,0)  pad=0px 16px  gap=8px br=24px bd=1px solid rgba(255, 255, 255,  maxw=100%  ta=center     | Explore health savings at Fidelity
+.scroll-reveal a[6/8]                                [988,3828,185,40]        inline-flex  16px/16px 700 Fidelity Sans        (255,255,255)  bg=(54,135,39)  pad=0px 16px  gap=8px br=24px bd=1px solid rgb(54, 135, 39) maxw=100%  ta=center     | Open a 529 account
+.scroll-reveal a[7/8]                                [1185,3828,253,40]       inline-flex  16px/16px 600 Fidelity Sans        (20,20,20)     bg=(255,255,255,0)  pad=0px 16px  gap=8px br=24px bd=1px solid rgba(255, 255, 255,  maxw=100%  ta=center     | Explore saving for a child
+.scroll-reveal [role=tablist]                        [697,1100,211,256]       flex         16px/normal 400 Fidelity Sans      (20,20,20)         gap=0px          | Start investing Save for retirement Sav…
+.scroll-reveal [role=tab][0/4]                       [693,1100,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Start investing
+.scroll-reveal [role=tab][1/4]                       [693,1164,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Save for retirement
+.scroll-reveal [role=tab][2/4]                       [693,1228,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Save for health care
+.scroll-reveal [role=tab][3/4]                       [693,1292,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Invest for a child
+.scroll-reveal [role=tabpanel][0/4]                  [988,1040,509,376]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Invest smart from the start with a brok…
+.scroll-reveal [role=tabpanel][1/4]                  [988,1810,509,436]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Plan for the possibilities ahead with a…
+.scroll-reveal [role=tabpanel][2/4]                  [988,2610,509,436]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Save, earn, and invest for health care …
+.scroll-reveal [role=tabpanel][3/4]                  [988,3388,509,480]       flex         16px/normal 400 Fidelity Sans      (20,20,20)                   | Save for the next generation’s educatio…
+.scroll-reveal [aria-selected][0/4]                  [693,1100,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Start investing
+.scroll-reveal [aria-selected][1/4]                  [693,1164,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Save for retirement
+.scroll-reveal [aria-selected][2/4]                  [693,1228,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Save for health care
+.scroll-reveal [aria-selected][3/4]                  [693,1292,220,64]        flex         13.3333px/normal 400 Arial         (0,0,0)          pad=16px mar=0px -5px      ta=left     | Invest for a child
+.carousel-track > * > *[0/3]                         [668,5161,392,480]       block        16px/normal 400 Fidelity Sans      (20,20,20)                   | 3 ways to use your health savings accou…
+.carousel-track > * > *[1/3]                         [1084,5161,392,480]      block        16px/normal 400 Fidelity Sans      (20,20,20)                   | Market Sense: Weekly insights Our exper…
+.carousel-track > * > *[2/3]                         [1500,5161,392,480]      block        16px/normal 400 Fidelity Sans      (20,20,20)                   | How to start investing It doesn't have …
+.carousel-track > * > * > *[0/3]                     [668,5161,392,480]       block        16px/normal 400 Fidelity Sans      (20,20,20)     bg=(255,255,255)  pad=32px   br=24px bd=1px solid rgb(230, 228, 225) maxw=392px       | 3 ways to use your health savings accou…
+.carousel-track > * > * > *[1/3]                     [1084,5161,392,480]      block        16px/normal 400 Fidelity Sans      (20,20,20)     bg=(255,255,255)  pad=32px   br=24px bd=1px solid rgb(230, 228, 225) maxw=392px       | Market Sense: Weekly insights Our exper…
+.carousel-track > * > * > *[2/3]                     [1500,5161,392,480]      block        16px/normal 400 Fidelity Sans      (20,20,20)     bg=(255,255,255)  pad=32px   br=24px bd=1px solid rgb(230, 228, 225) maxw=392px       | How to start investing It doesn't have …
+.carousel-track a  MISSING
+.carousel-track [role=link][0/3]                     [668,5161,392,480]       block        16px/normal 400 Fidelity Sans      (20,20,20)     bg=(255,255,255)  pad=32px   br=24px bd=1px solid rgb(230, 228, 225) maxw=392px       | 3 ways to use your health savings accou…
+.carousel-track [role=link][1/3]                     [1084,5161,392,480]      block        16px/normal 400 Fidelity Sans      (20,20,20)     bg=(255,255,255)  pad=32px   br=24px bd=1px solid rgb(230, 228, 225) maxw=392px       | Market Sense: Weekly insights Our exper…
+.carousel-track [role=link][2/3]                     [1500,5161,392,480]      block        16px/normal 400 Fidelity Sans      (20,20,20)     bg=(255,255,255)  pad=32px   br=24px bd=1px solid rgb(230, 228, 225) maxw=392px       | How to start investing It doesn't have …
+.carousel-track img[0/3]                             [701,5194,326,248]       block        16px/normal 400 Fidelity Sans      (20,20,20)        mar=0px 0px 24px  br=12px  maxw=100%    fit=cover   
+.carousel-track img[1/3]                             [1117,5194,326,246]      block        16px/normal 400 Fidelity Sans      (20,20,20)        mar=0px 0px 24px  br=12px  maxw=100%    fit=cover   
+.carousel-track img[2/3]                             [1533,5194,326,248]      block        16px/normal 400 Fidelity Sans      (20,20,20)        mar=0px 0px 24px  br=12px  maxw=100%    fit=cover   
+.carousel-track h3 > *  MISSING
+.carousel-track h3 a  MISSING
+.carousel-track picture  MISSING
+.carousel-track [class*=meta]  MISSING
+.carousel-track [class*=tag]  MISSING
+.carousel-track [class*=badge]  MISSING
+.carousel-track [class*=type]  MISSING
+section[name=card-carousel] button[0/5]              [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)        mar=0px 12px 0px 0px      ta=center    HIDDEN 
+section[name=card-carousel] button[1/5]              [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] button[2/5]              [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] button[3/5]              [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] button[4/5]              [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)        mar=0px 0px 0px 12px      ta=center    HIDDEN 
+section[name=card-carousel] [class*=nav][0/9]        [0,0,0,0]                none         16px/normal 400 Fidelity Sans      (20,20,20)         gap=4px         HIDDEN 
+section[name=card-carousel] [class*=nav][1/9]        [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)        mar=0px 12px 0px 0px      ta=center    HIDDEN 
+section[name=card-carousel] [class*=nav][2/9]        [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] [class*=nav][3/9]        [0,0,0,0]                block        16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] [class*=nav][4/9]        [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] [class*=nav][5/9]        [0,0,0,0]                block        16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] [class*=nav][6/9]        [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] [class*=nav][7/9]        [0,0,0,0]                block        16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] [class*=nav][8/9]        [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)        mar=0px 0px 0px 12px      ta=center    HIDDEN 
+section[name=card-carousel] [class*=arrow][0/4]      [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)        mar=0px 12px 0px 0px      ta=center    HIDDEN 
+section[name=card-carousel] [class*=arrow][1/4]      [0,0,0,0]                block        16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] [class*=arrow][2/4]      [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)        mar=0px 0px 0px 12px      ta=center    HIDDEN 
+section[name=card-carousel] [class*=arrow][3/4]      [0,0,0,0]                block        16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] [class*=dot][0/3]        [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] [class*=dot][1/3]        [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+section[name=card-carousel] [class*=dot][2/3]        [0,0,0,0]                inline-block 16px/normal 400 Fidelity Sans      (20,20,20)              ta=center    HIDDEN 
+.featured-image[0/3]                                 [560,4044,928,889]       block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=calc(100% - 24px)    fit=cover   
+.featured-image[1/3]                                 [1072,5717,928,889]      block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=calc(100% - 24px)    fit=cover   
+.featured-image[2/3]                                 [804,6653,456,250]       block        16px/normal 400 Fidelity Sans      (20,20,20)          br=24px  maxw=456px    fit=cover   
+.image-box picture  MISSING
+footer                                               [0,8055,2560,393]        flex         16px/normal 400 Fidelity Sans      (20,20,20)     bg=(249,247,245)              | Mutual Funds ETFs Fixed Income Bonds CD…
+footer > *                                           [0,8055,2560,393]        block        16px/normal 400 Fidelity Sans      (20,20,20)                   | Mutual Funds ETFs Fixed Income Bonds CD…
+footer > section > *  MISSING
+footer > section > div > *  MISSING
+.glpg-seo-footer                                     [608,8073,1344,375]      block        16px/normal 400 Fidelity Sans      (20,20,20)     bg=(240,240,240)  pad=9px 0px mar=18px 0px 0px    maxw=1344px       | Mutual Funds ETFs Fixed Income Bonds CD…
+.glpg-seo-footer > *[0/4]                            [608,8082,726,267]       block        14.928px/17.9136px 700 Fidelity Sans (20,20,20)       pad=0px 7.464px mar=0px 0px 16.794px           | Mutual Funds ETFs Fixed Income Bonds CD…
+.glpg-seo-footer > *[1/4]                            [1334,8082,618,198]      block        16px/normal 400 Fidelity Sans      (20,20,20)       pad=1px 0px 0px 8px            | Stay Connected Locate an Investor Cente…
+.glpg-seo-footer > *[2/4]                            [608,8366,726,58]        block        12.8px/normal 400 Fidelity Sans    (20,20,20)       pad=0px 6.4px            | Careers News Releases About Fidelity In…
+.glpg-seo-footer > *[3/4]                            [1334,8366,618,73]       block        12.8px/16px 400 Fidelity Sans      (20,20,20)       pad=2.4px 12.8px 3.2px            | Copyright 1998-2026 FMR LLC. All Rights…
+.glpg-seo-footer--projects-list                      [608,8082,726,267]       block        14.928px/17.9136px 700 Fidelity Sans (20,20,20)       pad=0px 7.464px mar=0px 0px 16.794px           | Mutual Funds ETFs Fixed Income Bonds CD…
+.glpg-seo-footer--products[0/3]                      [615,8082,220,267]       block        14.928px/17.9136px 700 Fidelity Sans (20,20,20)       pad=5.598px 0px 8.397px mar=0px 12.129px 0px 0px           | Mutual Funds ETFs Fixed Income Bonds CD…
+.glpg-seo-footer--products[1/3]                      [847,8082,220,267]       block        14.928px/17.9136px 700 Fidelity Sans (20,20,20)       pad=5.598px 0px 8.397px mar=0px 12.129px 0px 0px           | Stocks Online Trading Direct Indexing S…
+.glpg-seo-footer--products[2/3]                      [1079,8082,220,229]      block        14.928px/17.9136px 700 Fidelity Sans (20,20,20)       pad=5.598px 0px 8.397px mar=0px 12.129px 0px 0px           | IRAs Retirement Planning Small Business…
+.glpg-seo-footer--products-list[0/25]                [615,8088,220,18]        list-item    14.928px/17.9136px 700 Fidelity Sans (20,20,20)        mar=0px 0px 10.263px           | Mutual Funds
+.glpg-seo-footer--products-list[1/25]                [615,8116,220,18]        list-item    14.928px/17.9136px 700 Fidelity Sans (20,20,20)        mar=0px 0px 10.263px           | ETFs
+.glpg-seo-footer--products-list[2/25]                [615,8144,220,18]        list-item    14.928px/17.9136px 700 Fidelity Sans (20,20,20)        mar=0px 0px 10.263px           | Fixed Income
+.glpg-seo-footer--products-list[3/25]                [615,8172,220,18]        list-item    14.928px/17.9136px 700 Fidelity Sans (20,20,20)        mar=0px 0px 10.263px           | Bonds
+.glpg-seo-footer--products-list[4/25]                [615,8200,220,18]        list-item    14.928px/17.9136px 700 Fidelity Sans (20,20,20)        mar=0px 0px 10.263px           | CDs
+.glpg-seo-footer--products-list[5/25]                [615,8228,220,18]        list-item    14.928px/17.9136px 700 Fidelity Sans (20,20,20)        mar=0px 0px 10.263px           | Options
+.glpg-seo-footer--products-list[6/25]                [615,8257,220,18]        list-item    14.928px/17.9136px 700 Fidelity Sans (20,20,20)        mar=0px 0px 10.263px           | Crypto
+.glpg-seo-footer--products-list[7/25]                [615,8285,220,18]        list-item    14.928px/17.9136px 700 Fidelity Sans (20,20,20)        mar=0px 0px 10.263px           | Fidelity Trader+
+.glpg-seo-footer--products-list[8/25]                [615,8313,220,18]        list-item    14.928px/17.9136px 700 Fidelity Sans (20,20,20)        mar=0px 0px 10.263px           | Investor Centers
+.glpg-seo-footer--products-list[9/25]                [847,8088,220,18]        list-item    14.928px/17.9136px 700 Fidelity Sans (20,20,20)        mar=0px 0px 10.263px           | Stocks
+.glpg-seo-footer--products-list[10/25]               [847,8116,220,18]        list-item    14.928px/17.9136px 700 Fidelity Sans (20,20,20)        mar=0px 0px 10.263px           | Online Trading
+.glpg-seo-footer--products-list[11/25]               [847,8144,220,18]        list-item    14.928px/17.9136px 700 Fidelity Sans (20,20,20)        mar=0px 0px 10.263px           | Direct Indexing
+.glpg-seo-footer--products-list a[0/25]              [615,8087,97,19]         inline       14.928px/17.9136px 700 Fidelity Sans (14,103,169)                 | Mutual Funds
+.glpg-seo-footer--products-list a[1/25]              [615,8115,33,19]         inline       14.928px/17.9136px 700 Fidelity Sans (14,103,169)                 | ETFs
+.glpg-seo-footer--products-list a[2/25]              [615,8143,96,19]         inline       14.928px/17.9136px 700 Fidelity Sans (14,103,169)                 | Fixed Income
+.glpg-seo-footer--products-list a[3/25]              [615,8171,45,19]         inline       14.928px/17.9136px 700 Fidelity Sans (14,103,169)                 | Bonds
+.glpg-seo-footer--products-list a[4/25]              [615,8199,29,19]         inline       14.928px/17.9136px 700 Fidelity Sans (14,103,169)                 | CDs
+.glpg-seo-footer--products-list a[5/25]              [615,8227,57,19]         inline       14.928px/17.9136px 700 Fidelity Sans (14,103,169)                 | Options
+.glpg-seo-footer--products-list a[6/25]              [615,8256,49,19]         inline       14.928px/17.9136px 700 Fidelity Sans (14,103,169)                 | Crypto
+.glpg-seo-footer--products-list a[7/25]              [615,8284,111,19]        inline       14.928px/17.9136px 700 Fidelity Sans (14,103,169)                 | Fidelity Trader+
+.glpg-seo-footer--products-list a[8/25]              [615,8312,117,19]        inline       14.928px/17.9136px 700 Fidelity Sans (14,103,169)                 | Investor Centers
+.glpg-seo-footer--products-list a[9/25]              [847,8087,46,19]         inline       14.928px/17.9136px 700 Fidelity Sans (14,103,169)                 | Stocks
+.glpg-seo-footer--products-list a[10/25]             [847,8115,106,19]        inline       14.928px/17.9136px 700 Fidelity Sans (14,103,169)                 | Online Trading
+.glpg-seo-footer--products-list a[11/25]             [847,8143,109,19]        inline       14.928px/17.9136px 700 Fidelity Sans (14,103,169)                 | Direct Indexing
+.glpg-seo-footer--investor-center-social-media       [1334,8082,618,198]      block        16px/normal 400 Fidelity Sans      (20,20,20)       pad=1px 0px 0px 8px            | Stay Connected Locate an Investor Cente…
+.glpg-seo-footer--stay-connected                     [1343,8083,609,25]       block        19.2px/23.04px 700 Fidelity Sans   (64,136,0)       pad=0px 0px 2.4px 9.6px            | Stay Connected
+.glpg-seo-footer--investor-center-zipcode            [1351,8108,282,22]       block        16px/normal 400 Fidelity Sans      (20,20,20)                   | Locate an Investor Center by ZIP Code
+.glpg-seo-footer--zipcode                            [1351,8108,282,20]       inline       16px/normal 400 Fidelity Sans      (20,20,20)                   | Locate an Investor Center by ZIP Code
+.glpg-seo-footer--investor-center-fields             [1641,8108,289,22]       block        16px/normal 400 Fidelity Sans      (20,20,20)                   
+.glpg-seo-footer--input-field                        [1641,8108,289,22]       block        16px/normal 400 Fidelity Sans      (20,20,20)                   
+.glpg-seo-footer--text                               [1641,8109,153,21]       inline-block 13.3333px/normal 400 Arial         (0,0,0)        bg=(255,255,255)  pad=1px 2px    bd=2px inset rgb(118, 118, 118)        
+.glpg-seo-footer--btn                                [1794,8109,58,21]        inline-block 13.3333px/normal 400 Arial         (0,0,0)        bg=(239,239,239)  pad=1px 6px    bd=2px outset rgb(0, 0, 0)   ta=center     
+.glpg-seo-footer--social-media                       [1343,8144,609,136]      block        16px/normal 400 Fidelity Sans      (20,20,20)       pad=0px 0px 88px 8px            | Instagram , (Opens in a new window) Lin…
+.glpg-seo-footer--social-media ul                    [1885,8144,0,0]          inline       16px/normal 400 Fidelity Sans      (20,20,20)                   | Instagram , (Opens in a new window) Lin…
+.glpg-seo-footer--social-media-list[0/9]             [1351,8144,94,24]        flex         16px/normal 400 Fidelity Sans      (20,20,20)       pad=0px 14px 6px 0px  gap=4px          | Instagram , (Opens in a new window)
+.glpg-seo-footer--social-media-list[1/9]             [1445,8144,86,24]        flex         16px/normal 400 Fidelity Sans      (20,20,20)       pad=0px 14px 6px 0px  gap=4px          | LinkedIn , (Opens in a new window)
+.glpg-seo-footer--social-media-list[2/9]             [1531,8144,89,24]        flex         16px/normal 400 Fidelity Sans      (20,20,20)       pad=0px 14px 6px 0px  gap=4px          | YouTube , (Opens in a new window)
+.glpg-seo-footer--social-media-list[3/9]             [1620,8144,75,24]        flex         16px/normal 400 Fidelity Sans      (20,20,20)       pad=0px 14px 6px 0px  gap=4px          | Reddit , (Opens in a new window)
+.glpg-seo-footer--social-media-list[4/9]             [1695,8144,96,24]        flex         16px/normal 400 Fidelity Sans      (20,20,20)       pad=0px 14px 6px 0px  gap=4px          | X (Twitter) , (Opens in a new window)
+.glpg-seo-footer--social-media-list[5/9]             [1791,8144,94,24]        flex         16px/normal 400 Fidelity Sans      (20,20,20)       pad=0px 14px 6px 0px  gap=4px          | Facebook , (Opens in a new window)
+.glpg-seo-footer--social-media-list[6/9]             [1351,8168,74,24]        flex         16px/normal 400 Fidelity Sans      (20,20,20)       pad=0px 14px 6px 0px  gap=4px          | TikTok , (Opens in a new window)
+.glpg-seo-footer--social-media-list[7/9]             [1425,8168,113,24]       flex         16px/normal 400 Fidelity Sans      (20,20,20)       pad=0px 14px 6px 0px  gap=4px          | Fidelity Apps
+.glpg-seo-footer--social-media-list[8/9]             [1537,8168,118,24]       flex         16px/normal 400 Fidelity Sans      (20,20,20)       pad=0px 14px 6px 0px  gap=4px          | Refer a Friend
+.glpg-seo-footer--social-media-icon[0/9]             [1351,8144,18,18]        block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=100%       
+.glpg-seo-footer--social-media-icon[1/9]             [1445,8144,18,18]        block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=100%       
+.glpg-seo-footer--social-media-icon[2/9]             [1531,8144,18,18]        block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=100%       
+.glpg-seo-footer--social-media-icon[3/9]             [1620,8144,18,18]        block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=100%       
+.glpg-seo-footer--social-media-icon[4/9]             [1695,8144,18,18]        block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=100%       
+.glpg-seo-footer--social-media-icon[5/9]             [1791,8144,18,18]        block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=100%       
+.glpg-seo-footer--social-media-icon[6/9]             [1351,8168,18,18]        block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=100%       
+.glpg-seo-footer--social-media-icon[7/9]             [1425,8168,18,18]        block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=100%       
+.glpg-seo-footer--social-media-icon[8/9]             [1537,8168,18,18]        block        16px/normal 400 Fidelity Sans      (20,20,20)            maxw=100%       
+.glpg-seo-footer--social-media-list a[0/9]           [1373,8144,58,18]        block        12.8px/normal 400 Fidelity Sans    (14,103,169)                 | Instagram , (Opens in a new window)
+.glpg-seo-footer--social-media-list a[1/9]           [1467,8144,50,18]        block        12.8px/normal 400 Fidelity Sans    (14,103,169)                 | LinkedIn , (Opens in a new window)
+.glpg-seo-footer--social-media-list a[2/9]           [1553,8144,53,18]        block        12.8px/normal 400 Fidelity Sans    (14,103,169)                 | YouTube , (Opens in a new window)
+.glpg-seo-footer--social-media-list a[3/9]           [1642,8144,39,18]        block        12.8px/normal 400 Fidelity Sans    (14,103,169)                 | Reddit , (Opens in a new window)
+.glpg-seo-footer--social-media-list a[4/9]           [1717,8144,60,18]        block        12.8px/normal 400 Fidelity Sans    (14,103,169)                 | X (Twitter) , (Opens in a new window)
+.glpg-seo-footer--social-media-list a[5/9]           [1813,8144,58,18]        block        12.8px/normal 400 Fidelity Sans    (14,103,169)                 | Facebook , (Opens in a new window)
+.glpg-seo-footer--social-media-list a[6/9]           [1373,8168,38,18]        block        12.8px/normal 400 Fidelity Sans    (14,103,169)                 | TikTok , (Opens in a new window)
+.glpg-seo-footer--social-media-list a[7/9]           [1447,8168,77,18]        block        12.8px/normal 400 Fidelity Sans    (14,103,169)                 | Fidelity Apps
+.glpg-seo-footer--social-media-list a[8/9]           [1559,8168,82,18]        block        12.8px/normal 400 Fidelity Sans    (14,103,169)                 | Refer a Friend
+.glpg-seo-footer--internal-links                     [608,8366,726,58]        block        12.8px/normal 400 Fidelity Sans    (20,20,20)       pad=0px 6.4px            | Careers News Releases About Fidelity In…
+.glpg-seo-footer--fid-logo                           [614,8366,164,36]        block        12.8px/normal 400 Fidelity Sans    (20,20,20)            maxw=100%       
+.glpg-seo-footer--internal-link-list                 [614,8402,713,22]        block        12.8px/normal 400 Fidelity Sans    (20,20,20)       pad=2.4px 0px 4px            | Careers News Releases About Fidelity In…
+.glpg-seo-footer--internal-list-items[0/4]           [614,8405,52,16]         inline       12.8px/normal 400 Fidelity Sans    (20,20,20)      bgi=url("https://www.fidelity.com/bin-public pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | Careers
+.glpg-seo-footer--internal-list-items[1/4]           [676,8405,94,16]         inline       12.8px/normal 400 Fidelity Sans    (20,20,20)      bgi=url("https://www.fidelity.com/bin-public pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | News Releases
+.glpg-seo-footer--internal-list-items[2/4]           [780,8405,89,16]         inline       12.8px/normal 400 Fidelity Sans    (20,20,20)      bgi=url("https://www.fidelity.com/bin-public pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | About Fidelity
+.glpg-seo-footer--internal-list-items[3/4]           [878,8405,81,16]         inline       12.8px/normal 400 Fidelity Sans    (20,20,20)       pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | International
+.glpg-seo-footer--internal-list-items a[0/4]         [614,8405,45,16]         inline       12.8px/normal 400 Fidelity Sans    (14,103,169)                 | Careers
+.glpg-seo-footer--internal-list-items a[1/4]         [676,8405,88,16]         inline       12.8px/normal 400 Fidelity Sans    (14,103,169)                 | News Releases
+.glpg-seo-footer--internal-list-items a[2/4]         [780,8405,82,16]         inline       12.8px/normal 400 Fidelity Sans    (14,103,169)                 | About Fidelity
+.glpg-seo-footer--internal-list-items a[3/4]         [878,8405,74,16]         inline       12.8px/normal 400 Fidelity Sans    (14,103,169)                 | International
+.glpg-seo-footer--reserved-links                     [1334,8366,618,73]       block        12.8px/16px 400 Fidelity Sans      (20,20,20)       pad=2.4px 12.8px 3.2px            | Copyright 1998-2026 FMR LLC. All Rights…
+.glpg-seo-footer-copyright                           [1348,8369,302,16]       inline       12.8px/16px 400 Fidelity Sans      (102,102,102)                | Copyright 1998-2026 FMR LLC. All Rights…
+.glpg-seo-footer--reserved-link-list                 [1348,8386,592,32]       block        12.8px/16px 400 Fidelity Sans      (20,20,20)        mar=1.6px 0px           | Terms of Use Privacy Security Site Map …
+.glpg-seo-footer--reserved-link-items[0/9]           [1348,8386,83,16]        inline       12.8px/16px 400 Fidelity Sans      (20,20,20)      bgi=url("https://www.fidelity.com/bin-public pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | Terms of Use
+.glpg-seo-footer--reserved-link-items[1/9]           [1440,8386,48,16]        inline       12.8px/16px 400 Fidelity Sans      (20,20,20)      bgi=url("https://www.fidelity.com/bin-public pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | Privacy
+.glpg-seo-footer--reserved-link-items[2/9]           [1498,8386,53,16]        inline       12.8px/16px 400 Fidelity Sans      (20,20,20)      bgi=url("https://www.fidelity.com/bin-public pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | Security
+.glpg-seo-footer--reserved-link-items[3/9]           [1561,8386,58,16]        inline       12.8px/16px 400 Fidelity Sans      (20,20,20)      bgi=url("https://www.fidelity.com/bin-public pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | Site Map
+.glpg-seo-footer--reserved-link-items[4/9]           [1629,8386,78,16]        inline       12.8px/16px 400 Fidelity Sans      (20,20,20)      bgi=url("https://www.fidelity.com/bin-public pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | Accessibility
+.glpg-seo-footer--reserved-link-items[5/9]           [1716,8386,71,16]        inline       12.8px/16px 400 Fidelity Sans      (20,20,20)      bgi=url("https://www.fidelity.com/bin-public pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | Contact Us , (Opens in a new window)
+.glpg-seo-footer--reserved-link-items[6/9]           [1797,8386,114,16]       inline       12.8px/16px 400 Fidelity Sans      (20,20,20)      bgi=url("https://www.fidelity.com/bin-public pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | Share Your Screen
+.glpg-seo-footer--reserved-link-items[7/9]           [1348,8402,73,16]        inline       12.8px/16px 400 Fidelity Sans      (20,20,20)      bgi=url("https://www.fidelity.com/bin-public pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | Disclosures , (Opens in a new window)
+.glpg-seo-footer--reserved-link-items[8/9]           [1430,8402,257,16]       inline       12.8px/16px 400 Fidelity Sans      (20,20,20)       pad=0px 6.4px 0px 0px mar=0px 6.4px 0px 0px           | Manage My Targeting/Advertising Cookies
+.glpg-seo-footer--reserved-link-items a[0/9]         [1348,8386,77,16]        inline       12.8px/16px 400 Fidelity Sans      (14,103,169)                 | Terms of Use
+.glpg-seo-footer--reserved-link-items a[1/9]         [1440,8386,42,16]        inline       12.8px/16px 400 Fidelity Sans      (14,103,169)                 | Privacy
+.glpg-seo-footer--reserved-link-items a[2/9]         [1498,8386,47,16]        inline       12.8px/16px 400 Fidelity Sans      (14,103,169)                 | Security
+.glpg-seo-footer--reserved-link-items a[3/9]         [1561,8386,52,16]        inline       12.8px/16px 400 Fidelity Sans      (14,103,169)                 | Site Map
+.glpg-seo-footer--reserved-link-items a[4/9]         [1629,8386,72,16]        inline       12.8px/16px 400 Fidelity Sans      (14,103,169)                 | Accessibility
+.glpg-seo-footer--reserved-link-items a[5/9]         [1716,8386,65,16]        inline       12.8px/16px 400 Fidelity Sans      (14,103,169)                 | Contact Us , (Opens in a new window)
+.glpg-seo-footer--reserved-link-items a[6/9]         [1797,8386,108,16]       inline       12.8px/16px 400 Fidelity Sans      (14,103,169)                 | Share Your Screen
+.glpg-seo-footer--reserved-link-items a[7/9]         [1348,8402,67,16]        inline       12.8px/16px 400 Fidelity Sans      (14,103,169)                 | Disclosures , (Opens in a new window)
+.glpg-seo-footer--reserved-link-items a[8/9]         [1430,8402,251,16]       inline       12.8px/16px 400 Fidelity Sans      (14,103,169)                 | Manage My Targeting/Advertising Cookies
+.glpg-seo-footer--reserved-links > a                 [1348,8420,193,16]       inline       12.8px/16px 400 Fidelity Sans      (14,103,169)                 | This is for persons in the US only.
+.QSIFeedbackButton                                   [0,0,2560,900]           flex         16px/normal 400 Fidelity Sans      (20,20,20)                  HIDDEN 
+.QSIFeedbackButton > div  MISSING
+.QSIFeedbackButton div div  MISSING

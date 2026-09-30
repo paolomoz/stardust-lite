@@ -1,0 +1,4369 @@
+{
+ "W": 360,
+ "doc": 8493,
+ "bodyH": 8493,
+ "body": "path-frontpage home should-stickey scroll-anim-end eu-cookie-compliance-status-2",
+ "bodyBg": "rgb(230, 230, 227)",
+ "secs": [
+  {
+   "id": "HEADER site-header fixed-top show",
+   "box": [
+    0,
+    0,
+    360,
+    90
+   ],
+   "pad": "0px",
+   "pos": "fixed",
+   "items": [
+    {
+     "k": "u",
+     "cls": "",
+     "box": [
+      25,
+      0,
+      1,
+      1
+     ],
+     "t": "Bain Capital",
+     "ff": "Martina Plantijn",
+     "fs": "36px",
+     "fw": "300",
+     "lh": "43.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(28, 33, 86)",
+     "fst": "normal",
+     "td": "underline",
+     "inline": true
+    },
+    {
+     "k": "img",
+     "cls": "",
+     "box": [
+      25,
+      30,
+      180,
+      30
+     ],
+     "src": "https://www.baincapital.com/themes/custom/baincapital/images/bain-capital-logo.svg",
+     "alt": "Bain Capital",
+     "fit": "fill"
+    }
+   ]
+  },
+  {
+   "id": "SECTION section-parent home-section-parent",
+   "box": [
+    0,
+    -7,
+    360,
+    800
+   ],
+   "pad": "0px",
+   "pos": "static",
+   "items": [
+    {
+     "k": "h2",
+     "cls": "h1 banner-title",
+     "box": [
+      25,
+      73,
+      310,
+      87
+     ],
+     "t": "Embrace possibility,",
+     "ff": "Martina Plantijn",
+     "fs": "36px",
+     "fw": "300",
+     "lh": "43.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "em",
+     "cls": "",
+     "box": [
+      25,
+      116,
+      237,
+      45
+     ],
+     "t": "realize potential",
+     "ff": "Martina Plantijn",
+     "fs": "36px",
+     "fw": "300",
+     "lh": "43.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 75, 63)",
+     "fst": "italic",
+     "td": "none",
+     "inline": true
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      5,
+      171,
+      362,
+      314
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "slick-list draggable",
+     "box": [
+      25,
+      548,
+      310,
+      159
+     ],
+     "pad": "0px",
+     "tf": "matrix(1, 0, 0, 1, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "slick-track",
+     "box": [
+      25,
+      548,
+      930,
+      159
+     ],
+     "pad": "0px",
+     "tf": "matrix(1, 0, 0, 1, 0, 0)"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      25,
+      548,
+      310,
+      108
+     ],
+     "t": "Bain Capital is a global private investment firm that partners differently to unlock opportunity and help people and companies .",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      25,
+      548,
+      310,
+      108
+     ],
+     "t": "We invest in what could be. Through , we connect deep and diverse vertical and regional expertise to deliver unconventional insight.",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      25,
+      548,
+      310,
+      86
+     ],
+     "t": "As a member of our team, you can accelerate your professional growth with supportive leaders who invest in you. at Bain Capital.",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "em",
+     "cls": "",
+     "box": [
+      25,
+      569,
+      204,
+      23
+     ],
+     "t": "cross-platform collaboration",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 75, 63)",
+     "fst": "italic",
+     "td": "none",
+     "inline": true
+    },
+    {
+     "k": "em",
+     "cls": "",
+     "box": [
+      25,
+      612,
+      247,
+      45
+     ],
+     "t": "create exceptional outcomes",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 75, 63)",
+     "fst": "italic",
+     "td": "none",
+     "inline": true
+    },
+    {
+     "k": "em",
+     "cls": "",
+     "box": [
+      25,
+      612,
+      187,
+      23
+     ],
+     "t": "Discover your opportunity",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 75, 63)",
+     "fst": "italic",
+     "td": "none",
+     "inline": true
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "btn btn-outline btn-blue",
+     "box": [
+      25,
+      655,
+      195,
+      31
+     ],
+     "pad": "5px 16px",
+     "br": "30px",
+     "border": "2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255)"
+    },
+    {
+     "k": "a",
+     "cls": "btn btn-outline btn-blue",
+     "box": [
+      25,
+      655,
+      195,
+      31
+     ],
+     "t": "Fulfill your potential",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(0, 26, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "/careers",
+     "br": "30px",
+     "border": "2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255)",
+     "pad": "5px 16px"
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      191,
+      666,
+      6,
+      10
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "btn btn-outline btn-blue",
+     "box": [
+      25,
+      676,
+      243,
+      31
+     ],
+     "pad": "5px 16px",
+     "br": "30px",
+     "border": "2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255)"
+    },
+    {
+     "k": "a",
+     "cls": "btn btn-outline btn-blue",
+     "box": [
+      25,
+      676,
+      243,
+      31
+     ],
+     "t": "See our approach in action",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(0, 26, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "",
+     "br": "30px",
+     "border": "2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255)",
+     "pad": "5px 16px"
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      50,
+      687,
+      6,
+      10
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    }
+   ]
+  },
+  {
+   "id": "SECTION section our-advantages-section position-relative section-light",
+   "box": [
+    0,
+    792,
+    360,
+    1488
+   ],
+   "pad": "60px 0px",
+   "pos": "relative",
+   "items": [
+    {
+     "k": "h2",
+     "cls": "h1 section-title section-title-with-blue-line stagger-anim",
+     "box": [
+      25,
+      852,
+      310,
+      86
+     ],
+     "t": "Turning insights into advantages",
+     "ff": "Martina Plantijn",
+     "fs": "36px",
+     "fw": "300",
+     "lh": "43.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "p",
+     "cls": "half-width-caption stagger-anim",
+     "box": [
+      25,
+      958,
+      310,
+      84
+     ],
+     "t": "We are committed to the value-creation journey, from initial idea to lasting impact.",
+     "ff": "Martina Plantijn",
+     "fs": "20px",
+     "fw": "300",
+     "lh": "28px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "advantage-box-image",
+     "box": [
+      25,
+      1062,
+      310,
+      174
+     ],
+     "pad": "0px",
+     "br": "5px"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "video-player",
+     "box": [
+      25,
+      1062,
+      310,
+      174
+     ],
+     "pad": "0px",
+     "bg": "rgb(0, 0, 0)",
+     "bgi": "url(\"https://cdn-east2.baincapital.com/Casestudy/bc_partnering-differently-v2_1.jpg?VersionId=9Hl3LE9EqU2JNgrqFEbffoqqfEwFzhBC\")"
+    },
+    {
+     "k": "iframe",
+     "cls": "",
+     "box": [
+      25,
+      1062,
+      310,
+      174
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "button",
+     "cls": "play-video-btn",
+     "box": [
+      45,
+      1197,
+      253,
+      20
+     ],
+     "t": "How we partner differently",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "19.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "pad": "0px 20px 0px 0px"
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      45,
+      1197,
+      20,
+      20
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "h3",
+     "cls": "h3 advantage-title",
+     "box": [
+      25,
+      1252,
+      310,
+      36
+     ],
+     "t": "Partnering differently",
+     "ff": "Martina Plantijn",
+     "fs": "30px",
+     "fw": "300",
+     "lh": "36px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      25,
+      1306,
+      310,
+      90
+     ],
+     "t": "We partner differently, building enduring relationships, collaborating across our platform, and focusing on value creation to achieve better outcomes.",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "22.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "advantage-box-image",
+     "box": [
+      25,
+      1445,
+      310,
+      174
+     ],
+     "pad": "0px",
+     "br": "5px"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "video-player",
+     "box": [
+      25,
+      1445,
+      310,
+      174
+     ],
+     "pad": "0px",
+     "bg": "rgb(0, 0, 0)",
+     "bgi": "url(\"https://cdn-east2.baincapital.com/Casestudy/bc_unlocking_opportunity.jpg?VersionId=CdOfJe3e8tnJTu3m7p3LsIXNv3YKxztz\")"
+    },
+    {
+     "k": "iframe",
+     "cls": "",
+     "box": [
+      25,
+      1445,
+      310,
+      174
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "button",
+     "cls": "play-video-btn",
+     "box": [
+      45,
+      1580,
+      257,
+      20
+     ],
+     "t": "How we unlock opportunity",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "19.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "pad": "0px 20px 0px 0px"
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      45,
+      1580,
+      20,
+      20
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "h3",
+     "cls": "h3 advantage-title",
+     "box": [
+      25,
+      1635,
+      310,
+      36
+     ],
+     "t": "Unlocking opportunity",
+     "ff": "Martina Plantijn",
+     "fs": "30px",
+     "fw": "300",
+     "lh": "36px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      25,
+      1689,
+      310,
+      90
+     ],
+     "t": "We bring together diverse perspectives in pursuit of transformative ideas. Through our collaborative culture, we connect insights to unlock potential.",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "22.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "advantage-box-image",
+     "box": [
+      25,
+      1828,
+      310,
+      174
+     ],
+     "pad": "0px",
+     "br": "5px"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "video-player",
+     "box": [
+      25,
+      1828,
+      310,
+      174
+     ],
+     "pad": "0px",
+     "bg": "rgb(0, 0, 0)",
+     "bgi": "url(\"https://cdn-east2.baincapital.com/Casestudy/bc_creating_exceptional_outcomes.jpg?VersionId=i6gHZ.SQqM2Ix9Z2tlfLFZ_Il9Ntg.Aq\")"
+    },
+    {
+     "k": "iframe",
+     "cls": "",
+     "box": [
+      25,
+      1828,
+      310,
+      174
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "button",
+     "cls": "play-video-btn",
+     "box": [
+      45,
+      1944,
+      290,
+      38
+     ],
+     "t": "How we strive to create exceptional outcomes",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "19.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "pad": "0px 20px 0px 0px"
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      45,
+      1953,
+      20,
+      20
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "h3",
+     "cls": "h3 advantage-title",
+     "box": [
+      25,
+      2018,
+      310,
+      72
+     ],
+     "t": "Creating exceptional outcomes",
+     "ff": "Martina Plantijn",
+     "fs": "30px",
+     "fw": "300",
+     "lh": "36px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      25,
+      2108,
+      310,
+      112
+     ],
+     "t": "We strive for exceptional outcomes by supporting people and bolstering investment performance. We continuously challenge ourselves to find the best answer.",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "22.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    }
+   ]
+  },
+  {
+   "id": "SECTION section integrated-platform-section section-dark",
+   "box": [
+    0,
+    2278,
+    360,
+    760
+   ],
+   "pad": "60px 0px",
+   "pos": "static",
+   "items": [
+    {
+     "k": "h2",
+     "cls": "section-title",
+     "box": [
+      25,
+      2338,
+      310,
+      77
+     ],
+     "t": "Our integrated platform",
+     "ff": "Martina Plantijn",
+     "fs": "32px",
+     "fw": "300",
+     "lh": "38.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      25,
+      2435,
+      310,
+      90
+     ],
+     "t": "Over four decades, we have strategically grown our business and expanded our focus to address an increasingly complex investment landscape.",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "22.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "li",
+     "cls": "nav-item",
+     "box": [
+      19,
+      2487,
+      160,
+      223
+     ],
+     "pad": "0px",
+     "tf": "matrix(1, 0, 0.466308, 1, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "li",
+     "cls": "nav-item",
+     "box": [
+      180,
+      2488,
+      163,
+      221
+     ],
+     "pad": "0px",
+     "tf": "matrix(0.309017, 0.951057, -0.80696, 0.752502, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "ul",
+     "cls": "nav nav-tabs",
+     "box": [
+      -19,
+      2511,
+      397,
+      397
+     ],
+     "pad": "0px",
+     "tf": "matrix(0.939693, 0.34202, -0.34202, 0.939693, 0, 0)"
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      25,
+      2540,
+      310,
+      310
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "platform-anim-circle",
+     "box": [
+      25,
+      2555,
+      310,
+      310
+     ],
+     "pad": "0px",
+     "br": "50%"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "back-btn-wrap",
+     "box": [
+      426,
+      2555,
+      310,
+      33
+     ],
+     "pad": "0px 0px 10px",
+     "border": "0px none rgb(255, 255, 255) | 1px solid rgb(63, 182, 255) | 0px none rgb(255, 255, 255) | 0px none rgb(255, 255, 255)"
+    },
+    {
+     "k": "button",
+     "cls": "back-business-btn",
+     "box": [
+      426,
+      2555,
+      241,
+      22
+     ],
+     "t": "Back to integrated platform",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "500",
+     "lh": "19.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(63, 182, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      433,
+      2560,
+      7,
+      11
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "paint",
+     "tag": "button",
+     "cls": "nav-link active",
+     "box": [
+      64,
+      2565,
+      103,
+      103
+     ],
+     "pad": "0px",
+     "br": "6px 6px 0px 0px",
+     "tf": "matrix(1, 0, -0.466308, 1, 0, 0)"
+    },
+    {
+     "k": "button",
+     "cls": "nav-link active",
+     "box": [
+      64,
+      2565,
+      103,
+      103
+     ],
+     "t": "",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(63, 182, 255)",
+     "fst": "normal",
+     "td": "none",
+     "br": "6px 6px 0px 0px",
+     "tf": "matrix(1, 0, -0.466308, 1, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "button",
+     "cls": "nav-link",
+     "box": [
+      207,
+      2578,
+      83,
+      83
+     ],
+     "pad": "0px",
+     "br": "6px 6px 0px 0px",
+     "tf": "matrix(1, 0, -0.466308, 1, 0, 0)"
+    },
+    {
+     "k": "button",
+     "cls": "nav-link",
+     "box": [
+      207,
+      2578,
+      83,
+      83
+     ],
+     "t": "",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(63, 182, 255)",
+     "fst": "normal",
+     "td": "none",
+     "br": "6px 6px 0px 0px",
+     "tf": "matrix(1, 0, -0.466308, 1, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "span",
+     "cls": "btn-text",
+     "box": [
+      75,
+      2595,
+      80,
+      43
+     ],
+     "pad": "0px",
+     "tf": "matrix(0.939693, -0.34202, 0.34202, 0.939693, 0, 0)"
+    },
+    {
+     "k": "span",
+     "cls": "btn-text",
+     "box": [
+      75,
+      2595,
+      80,
+      43
+     ],
+     "t": "Private Equity",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(63, 182, 255)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "tf": "matrix(0.939693, -0.34202, 0.34202, 0.939693, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "span",
+     "cls": "btn-text",
+     "box": [
+      208,
+      2598,
+      80,
+      43
+     ],
+     "pad": "0px",
+     "tf": "matrix(-0.0348995, -0.999391, 0.999391, -0.0348995, 0, 0)"
+    },
+    {
+     "k": "span",
+     "cls": "btn-text",
+     "box": [
+      208,
+      2598,
+      80,
+      43
+     ],
+     "t": "Growth & Venture",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(63, 182, 255)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "tf": "matrix(-0.0348995, -0.999391, 0.999391, -0.0348995, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "slick-list",
+     "box": [
+      426,
+      2618,
+      310,
+      424
+     ],
+     "pad": "0px",
+     "tf": "matrix(1, 0, 0, 1, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "slick-track",
+     "box": [
+      426,
+      2618,
+      1550,
+      424
+     ],
+     "pad": "0px",
+     "tf": "matrix(1, 0, 0, 1, 0, 0)"
+    },
+    {
+     "k": "h3",
+     "cls": "h4 platform-title",
+     "box": [
+      426,
+      2618,
+      310,
+      30
+     ],
+     "t": "Private Equity",
+     "ff": "Martina Plantijn",
+     "fs": "25px",
+     "fw": "300",
+     "lh": "30px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "h3",
+     "cls": "h4 platform-title",
+     "box": [
+      426,
+      2618,
+      310,
+      30
+     ],
+     "t": "Growth & Venture",
+     "ff": "Martina Plantijn",
+     "fs": "25px",
+     "fw": "300",
+     "lh": "30px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "h3",
+     "cls": "h4 platform-title",
+     "box": [
+      426,
+      2618,
+      310,
+      30
+     ],
+     "t": "Capital Solutions",
+     "ff": "Martina Plantijn",
+     "fs": "25px",
+     "fw": "300",
+     "lh": "30px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "h3",
+     "cls": "h4 platform-title",
+     "box": [
+      426,
+      2618,
+      310,
+      30
+     ],
+     "t": "Credit",
+     "ff": "Martina Plantijn",
+     "fs": "25px",
+     "fw": "300",
+     "lh": "30px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "h3",
+     "cls": "h4 platform-title",
+     "box": [
+      426,
+      2618,
+      310,
+      30
+     ],
+     "t": "Real Assets",
+     "ff": "Martina Plantijn",
+     "fs": "25px",
+     "fw": "300",
+     "lh": "30px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "li",
+     "cls": "nav-item",
+     "box": [
+      180,
+      2667,
+      261,
+      172
+     ],
+     "pad": "0px",
+     "tf": "matrix(-0.809017, 0.587785, -0.965036, -0.534928, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "li",
+     "cls": "nav-item",
+     "box": [
+      -82,
+      2671,
+      262,
+      160
+     ],
+     "pad": "0px",
+     "tf": "matrix(0.309017, -0.951057, 1.09515, -0.134468, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "platform-business-wrap",
+     "box": [
+      426,
+      2678,
+      310,
+      93
+     ],
+     "pad": "10px 0px 0px",
+     "border": "1px solid rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "platform-business-wrap",
+     "box": [
+      426,
+      2678,
+      310,
+      93
+     ],
+     "pad": "10px 0px 0px",
+     "border": "1px solid rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "platform-business-wrap",
+     "box": [
+      426,
+      2678,
+      310,
+      115
+     ],
+     "pad": "10px 0px 0px",
+     "border": "1px solid rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "platform-business-wrap",
+     "box": [
+      426,
+      2678,
+      310,
+      115
+     ],
+     "pad": "10px 0px 0px",
+     "border": "1px solid rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "platform-business-wrap",
+     "box": [
+      426,
+      2678,
+      310,
+      93
+     ],
+     "pad": "10px 0px 0px",
+     "border": "1px solid rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196)"
+    },
+    {
+     "k": "paint",
+     "tag": "button",
+     "cls": "nav-link",
+     "box": [
+      15,
+      2686,
+      112,
+      112
+     ],
+     "pad": "0px",
+     "br": "6px 6px 0px 0px",
+     "tf": "matrix(1, 0, -0.466308, 1, 0, 0)"
+    },
+    {
+     "k": "button",
+     "cls": "nav-link",
+     "box": [
+      15,
+      2686,
+      112,
+      112
+     ],
+     "t": "",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(63, 182, 255)",
+     "fst": "normal",
+     "td": "none",
+     "br": "6px 6px 0px 0px",
+     "tf": "matrix(1, 0, -0.466308, 1, 0, 0)"
+    },
+    {
+     "k": "h4",
+     "cls": "platform-inner-title",
+     "box": [
+      426,
+      2689,
+      310,
+      17
+     ],
+     "t": "HOW WE CREATE VALUE",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "1.4px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(78, 141, 196)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "h4",
+     "cls": "platform-inner-title",
+     "box": [
+      426,
+      2689,
+      310,
+      17
+     ],
+     "t": "HOW WE CREATE VALUE",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "1.4px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(78, 141, 196)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "h4",
+     "cls": "platform-inner-title",
+     "box": [
+      426,
+      2689,
+      310,
+      17
+     ],
+     "t": "HOW WE CREATE VALUE",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "1.4px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(78, 141, 196)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "h4",
+     "cls": "platform-inner-title",
+     "box": [
+      426,
+      2689,
+      310,
+      17
+     ],
+     "t": "HOW WE CREATE VALUE",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "1.4px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(78, 141, 196)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "h4",
+     "cls": "platform-inner-title",
+     "box": [
+      426,
+      2689,
+      310,
+      17
+     ],
+     "t": "HOW WE CREATE VALUE",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "1.4px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(78, 141, 196)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "button",
+     "cls": "nav-link",
+     "box": [
+      237,
+      2697,
+      99,
+      99
+     ],
+     "pad": "0px",
+     "br": "6px 6px 0px 0px",
+     "tf": "matrix(1, 0, -0.466308, 1, 0, 0)"
+    },
+    {
+     "k": "button",
+     "cls": "nav-link",
+     "box": [
+      237,
+      2697,
+      99,
+      99
+     ],
+     "t": "",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(63, 182, 255)",
+     "fst": "normal",
+     "td": "none",
+     "br": "6px 6px 0px 0px",
+     "tf": "matrix(1, 0, -0.466308, 1, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "li",
+     "cls": "nav-item",
+     "box": [
+      92,
+      2710,
+      175,
+      275
+     ],
+     "pad": "0px",
+     "tf": "matrix(-0.809017, -0.587785, 0.210534, -1.08311, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "span",
+     "cls": "btn-text",
+     "box": [
+      31,
+      2721,
+      80,
+      43
+     ],
+     "pad": "0px",
+     "tf": "matrix(0.615661, 0.788011, -0.788011, 0.615661, 0, 0)"
+    },
+    {
+     "k": "span",
+     "cls": "btn-text",
+     "box": [
+      31,
+      2721,
+      80,
+      43
+     ],
+     "t": "Real Assets",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(63, 182, 255)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "tf": "matrix(0.615661, 0.788011, -0.788011, 0.615661, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "span",
+     "cls": "btn-text",
+     "box": [
+      247,
+      2725,
+      80,
+      43
+     ],
+     "pad": "0px",
+     "tf": "matrix(-0.961262, -0.275637, 0.275637, -0.961262, 0, 0)"
+    },
+    {
+     "k": "span",
+     "cls": "btn-text",
+     "box": [
+      247,
+      2725,
+      80,
+      43
+     ],
+     "t": "Capital Solutions",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(63, 182, 255)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "tf": "matrix(-0.961262, -0.275637, 0.275637, -0.961262, 0, 0)"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      426,
+      2726,
+      310,
+      45
+     ],
+     "t": "Transforming businesses through deep sector expertise and capabilities.",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "22.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      426,
+      2726,
+      310,
+      45
+     ],
+     "t": "Accelerating seed-to-scale growth in partnership with visionary leaders.",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "22.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      426,
+      2726,
+      310,
+      67
+     ],
+     "t": "Structuring bespoke solutions across asset types, industries, markets, and business life cycles.",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "22.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      426,
+      2726,
+      310,
+      67
+     ],
+     "t": "Enabling investment opportunities through rigorous analysis and solutions spanning the credit spectrum.",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "22.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      426,
+      2726,
+      310,
+      45
+     ],
+     "t": "Building the next generation of real assets.",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "22.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "button",
+     "cls": "nav-link",
+     "box": [
+      122,
+      2767,
+      111,
+      111
+     ],
+     "pad": "0px",
+     "br": "6px 6px 0px 0px",
+     "tf": "matrix(1, 0, -0.466308, 1, 0, 0)"
+    },
+    {
+     "k": "button",
+     "cls": "nav-link",
+     "box": [
+      122,
+      2767,
+      111,
+      111
+     ],
+     "t": "",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(63, 182, 255)",
+     "fst": "normal",
+     "td": "none",
+     "br": "6px 6px 0px 0px",
+     "tf": "matrix(1, 0, -0.466308, 1, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "platform-business-wrap",
+     "box": [
+      426,
+      2800,
+      310,
+      242
+     ],
+     "pad": "10px 0px 0px",
+     "border": "1px solid rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "platform-business-wrap",
+     "box": [
+      426,
+      2800,
+      310,
+      207
+     ],
+     "pad": "10px 0px 0px",
+     "border": "1px solid rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "platform-business-wrap",
+     "box": [
+      426,
+      2800,
+      310,
+      125
+     ],
+     "pad": "10px 0px 0px",
+     "border": "1px solid rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196)"
+    },
+    {
+     "k": "h4",
+     "cls": "platform-inner-title",
+     "box": [
+      426,
+      2811,
+      310,
+      17
+     ],
+     "t": "HOW WE INVEST",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "1.4px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(78, 141, 196)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "h4",
+     "cls": "platform-inner-title",
+     "box": [
+      426,
+      2811,
+      310,
+      17
+     ],
+     "t": "HOW WE INVEST",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "1.4px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(78, 141, 196)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "h4",
+     "cls": "platform-inner-title",
+     "box": [
+      426,
+      2811,
+      310,
+      17
+     ],
+     "t": "HOW WE INVEST",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "1.4px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(78, 141, 196)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "span",
+     "cls": "btn-text",
+     "box": [
+      153,
+      2812,
+      49,
+      22
+     ],
+     "pad": "0px",
+     "tf": "matrix(-0.559193, 0.829038, -0.829038, -0.559193, 0, 0)"
+    },
+    {
+     "k": "span",
+     "cls": "btn-text",
+     "box": [
+      153,
+      2812,
+      49,
+      22
+     ],
+     "t": "Credit",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(63, 182, 255)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "tf": "matrix(-0.559193, 0.829038, -0.829038, -0.559193, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "platform-business-wrap",
+     "box": [
+      426,
+      2823,
+      310,
+      84
+     ],
+     "pad": "10px 0px 0px",
+     "border": "1px solid rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "platform-business-wrap",
+     "box": [
+      426,
+      2823,
+      310,
+      84
+     ],
+     "pad": "10px 0px 0px",
+     "border": "1px solid rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196) | 0px none rgb(78, 141, 196)"
+    },
+    {
+     "k": "h4",
+     "cls": "platform-inner-title",
+     "box": [
+      426,
+      2834,
+      310,
+      17
+     ],
+     "t": "HOW WE INVEST",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "1.4px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(78, 141, 196)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "h4",
+     "cls": "platform-inner-title",
+     "box": [
+      426,
+      2834,
+      310,
+      17
+     ],
+     "t": "HOW WE INVEST",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "1.4px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(78, 141, 196)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      426,
+      2858,
+      310,
+      26
+     ],
+     "t": "Global Private Equity",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitalprivateequity.com/"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      426,
+      2858,
+      310,
+      26
+     ],
+     "t": "Ventures",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "/ventures"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      426,
+      2858,
+      310,
+      26
+     ],
+     "t": "Real Estate",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitalrealestate.com/"
+    },
+    {
+     "k": "span",
+     "cls": "arrow-round-icon",
+     "box": [
+      511,
+      2862,
+      22,
+      22
+     ],
+     "t": ">",
+     "ff": "Inter",
+     "fs": "0px",
+     "fw": "400",
+     "lh": "0px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "/ventures",
+     "inline": true,
+     "bgi": "url(\"data:image/svg+xml,%3Csvg id=\\\"Layer_1\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"6.63\\\" height=\\\"11.17\\\" viewBox=\\\"0 0 6.63 11.17\\\"%3E%3Cpath class=\\\"",
+     "br": "50%",
+     "border": "2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255)"
+    },
+    {
+     "k": "span",
+     "cls": "arrow-round-icon",
+     "box": [
+      531,
+      2862,
+      22,
+      22
+     ],
+     "t": ">",
+     "ff": "Inter",
+     "fs": "0px",
+     "fw": "400",
+     "lh": "0px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitalrealestate.com/",
+     "inline": true,
+     "bgi": "url(\"data:image/svg+xml,%3Csvg id=\\\"Layer_1\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"6.63\\\" height=\\\"11.17\\\" viewBox=\\\"0 0 6.63 11.17\\\"%3E%3Cpath class=\\\"",
+     "br": "50%",
+     "border": "2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255)"
+    },
+    {
+     "k": "span",
+     "cls": "arrow-round-icon",
+     "box": [
+      612,
+      2862,
+      22,
+      22
+     ],
+     "t": ">",
+     "ff": "Inter",
+     "fs": "0px",
+     "fw": "400",
+     "lh": "0px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitalprivateequity.com/",
+     "inline": true,
+     "bgi": "url(\"data:image/svg+xml,%3Csvg id=\\\"Layer_1\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"6.63\\\" height=\\\"11.17\\\" viewBox=\\\"0 0 6.63 11.17\\\"%3E%3Cpath class=\\\"",
+     "br": "50%",
+     "border": "2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255)"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      426,
+      2881,
+      310,
+      26
+     ],
+     "t": "Special Situations",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://baincapitalspecialsituations.com/"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      426,
+      2881,
+      310,
+      26
+     ],
+     "t": "Credit",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitalcredit.com/"
+    },
+    {
+     "k": "span",
+     "cls": "arrow-round-icon",
+     "box": [
+      488,
+      2885,
+      22,
+      22
+     ],
+     "t": ">",
+     "ff": "Inter",
+     "fs": "0px",
+     "fw": "400",
+     "lh": "0px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitalcredit.com/",
+     "inline": true,
+     "bgi": "url(\"data:image/svg+xml,%3Csvg id=\\\"Layer_1\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"6.63\\\" height=\\\"11.17\\\" viewBox=\\\"0 0 6.63 11.17\\\"%3E%3Cpath class=\\\"",
+     "br": "50%",
+     "border": "2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255)"
+    },
+    {
+     "k": "span",
+     "cls": "arrow-round-icon",
+     "box": [
+      587,
+      2885,
+      22,
+      22
+     ],
+     "t": ">",
+     "ff": "Inter",
+     "fs": "0px",
+     "fw": "400",
+     "lh": "0px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://baincapitalspecialsituations.com/",
+     "inline": true,
+     "bgi": "url(\"data:image/svg+xml,%3Csvg id=\\\"Layer_1\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"6.63\\\" height=\\\"11.17\\\" viewBox=\\\"0 0 6.63 11.17\\\"%3E%3Cpath class=\\\"",
+     "br": "50%",
+     "border": "2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255)"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      426,
+      2899,
+      310,
+      26
+     ],
+     "t": "Double Impact",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitaldoubleimpact.com/"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      426,
+      2899,
+      310,
+      26
+     ],
+     "t": "Life Sciences",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitallifesciences.com/"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      426,
+      2899,
+      310,
+      26
+     ],
+     "t": "Special Situations",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://baincapitalspecialsituations.com/"
+    },
+    {
+     "k": "span",
+     "cls": "arrow-round-icon",
+     "box": [
+      549,
+      2903,
+      22,
+      22
+     ],
+     "t": ">",
+     "ff": "Inter",
+     "fs": "0px",
+     "fw": "400",
+     "lh": "0px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitallifesciences.com/",
+     "inline": true,
+     "bgi": "url(\"data:image/svg+xml,%3Csvg id=\\\"Layer_1\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"6.63\\\" height=\\\"11.17\\\" viewBox=\\\"0 0 6.63 11.17\\\"%3E%3Cpath class=\\\"",
+     "br": "50%",
+     "border": "2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255)"
+    },
+    {
+     "k": "span",
+     "cls": "arrow-round-icon",
+     "box": [
+      559,
+      2903,
+      22,
+      22
+     ],
+     "t": ">",
+     "ff": "Inter",
+     "fs": "0px",
+     "fw": "400",
+     "lh": "0px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitaldoubleimpact.com/",
+     "inline": true,
+     "bgi": "url(\"data:image/svg+xml,%3Csvg id=\\\"Layer_1\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"6.63\\\" height=\\\"11.17\\\" viewBox=\\\"0 0 6.63 11.17\\\"%3E%3Cpath class=\\\"",
+     "br": "50%",
+     "border": "2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255)"
+    },
+    {
+     "k": "span",
+     "cls": "arrow-round-icon",
+     "box": [
+      587,
+      2903,
+      22,
+      22
+     ],
+     "t": ">",
+     "ff": "Inter",
+     "fs": "0px",
+     "fw": "400",
+     "lh": "0px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://baincapitalspecialsituations.com/",
+     "inline": true,
+     "bgi": "url(\"data:image/svg+xml,%3Csvg id=\\\"Layer_1\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"6.63\\\" height=\\\"11.17\\\" viewBox=\\\"0 0 6.63 11.17\\\"%3E%3Cpath class=\\\"",
+     "br": "50%",
+     "border": "2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255)"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      426,
+      2940,
+      310,
+      26
+     ],
+     "t": "Insurance",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitalinsurance.com/"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      426,
+      2940,
+      310,
+      26
+     ],
+     "t": "Tech Opportunities",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitaltechopportunities.com/"
+    },
+    {
+     "k": "span",
+     "cls": "arrow-round-icon",
+     "box": [
+      519,
+      2944,
+      22,
+      22
+     ],
+     "t": ">",
+     "ff": "Inter",
+     "fs": "0px",
+     "fw": "400",
+     "lh": "0px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitalinsurance.com/",
+     "inline": true,
+     "bgi": "url(\"data:image/svg+xml,%3Csvg id=\\\"Layer_1\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"6.63\\\" height=\\\"11.17\\\" viewBox=\\\"0 0 6.63 11.17\\\"%3E%3Cpath class=\\\"",
+     "br": "50%",
+     "border": "2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255)"
+    },
+    {
+     "k": "span",
+     "cls": "arrow-round-icon",
+     "box": [
+      598,
+      2944,
+      22,
+      22
+     ],
+     "t": ">",
+     "ff": "Inter",
+     "fs": "0px",
+     "fw": "400",
+     "lh": "0px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapitaltechopportunities.com/",
+     "inline": true,
+     "bgi": "url(\"data:image/svg+xml,%3Csvg id=\\\"Layer_1\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"6.63\\\" height=\\\"11.17\\\" viewBox=\\\"0 0 6.63 11.17\\\"%3E%3Cpath class=\\\"",
+     "br": "50%",
+     "border": "2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255)"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      426,
+      2981,
+      310,
+      26
+     ],
+     "t": "Crypto",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "/crypto"
+    },
+    {
+     "k": "span",
+     "cls": "arrow-round-icon",
+     "box": [
+      494,
+      2985,
+      22,
+      22
+     ],
+     "t": ">",
+     "ff": "Inter",
+     "fs": "0px",
+     "fw": "400",
+     "lh": "0px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "/crypto",
+     "inline": true,
+     "bgi": "url(\"data:image/svg+xml,%3Csvg id=\\\"Layer_1\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"6.63\\\" height=\\\"11.17\\\" viewBox=\\\"0 0 6.63 11.17\\\"%3E%3Cpath class=\\\"",
+     "br": "50%",
+     "border": "2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255) | 2px solid rgb(255, 255, 255)"
+    }
+   ]
+  },
+  {
+   "id": "SECTION section spotlight-section spotlight-sec-wrap section-dark",
+   "box": [
+    0,
+    3038,
+    360,
+    1122
+   ],
+   "pad": "60px 0px",
+   "pos": "static",
+   "items": [
+    {
+     "k": "h2",
+     "cls": "section-title",
+     "box": [
+      25,
+      3098,
+      310,
+      38
+     ],
+     "t": "Vertical spotlight",
+     "ff": "Martina Plantijn",
+     "fs": "32px",
+     "fw": "300",
+     "lh": "38.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "image-wrap",
+     "box": [
+      0,
+      3156,
+      242,
+      288
+     ],
+     "pad": "0px",
+     "br": "5px"
+    },
+    {
+     "k": "img",
+     "cls": "",
+     "box": [
+      0,
+      3156,
+      242,
+      288
+     ],
+     "src": "https://cdn-east2.baincapital.com/styles/optimize_image/s3/2026-05/investment-spotlight-indus-v2.jpg?VersionId=W97LVmKXPa5vxwqdYWc73ULDFsX_M5DI&itok=G04BvGvt",
+     "alt": "Bain Capital Industrials",
+     "fit": "cover"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "spotlight-content-wrap",
+     "box": [
+      151,
+      3247,
+      184,
+      288
+     ],
+     "pad": "0px",
+     "tf": "matrix(1, 0, 0, 1, 0, 90.6)"
+    },
+    {
+     "k": "span",
+     "cls": "tag-wrap spotlight-tag",
+     "box": [
+      151,
+      3352,
+      184,
+      14
+     ],
+     "t": "INDUSTRIALS",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "700",
+     "lh": "14.4px",
+     "ls": "1.2px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(119, 178, 249)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://baincapitalindustrials.com/",
+     "inline": true
+    },
+    {
+     "k": "h3",
+     "cls": "spotlight-title h6",
+     "box": [
+      151,
+      3372,
+      184,
+      58
+     ],
+     "t": "Partnering for a new industrial era",
+     "ff": "Martina Plantijn",
+     "fs": "24px",
+     "fw": "300",
+     "lh": "28.8px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://baincapitalindustrials.com/"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "image-wrap",
+     "box": [
+      118,
+      3484,
+      242,
+      288
+     ],
+     "pad": "0px",
+     "br": "5px"
+    },
+    {
+     "k": "img",
+     "cls": "",
+     "box": [
+      118,
+      3484,
+      242,
+      288
+     ],
+     "src": "https://cdn-east2.baincapital.com/styles/optimize_image/s3/2024-11/investment-spotlight-health-v2.png.jpg?VersionId=YYzyulpCTMTsal.TUBXD4K5nHZlxFfRD&itok=Dj5x_MR9",
+     "alt": "Bain Capital Healthcare",
+     "fit": "cover"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "spotlight-content-wrap",
+     "box": [
+      25,
+      3575,
+      184,
+      288
+     ],
+     "pad": "0px",
+     "tf": "matrix(1, 0, 0, 1, 0, 90.6)"
+    },
+    {
+     "k": "span",
+     "cls": "tag-wrap spotlight-tag",
+     "box": [
+      25,
+      3666,
+      184,
+      14
+     ],
+     "t": "HEALTHCARE",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "700",
+     "lh": "14.4px",
+     "ls": "1.2px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(119, 178, 249)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapital.com/healthcare/",
+     "inline": true
+    },
+    {
+     "k": "h3",
+     "cls": "spotlight-title h6",
+     "box": [
+      25,
+      3685,
+      184,
+      86
+     ],
+     "t": "Building great companies to serve patients",
+     "ff": "Martina Plantijn",
+     "fs": "24px",
+     "fw": "300",
+     "lh": "28.8px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapital.com/healthcare/"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "image-wrap",
+     "box": [
+      0,
+      3812,
+      242,
+      288
+     ],
+     "pad": "0px",
+     "br": "5px"
+    },
+    {
+     "k": "img",
+     "cls": "",
+     "box": [
+      0,
+      3812,
+      242,
+      288
+     ],
+     "src": "https://cdn-east2.baincapital.com/styles/optimize_image/s3/2024-11/investment-spotlight-tech-v2.jpg?VersionId=ZneUgARdepaVedhzfoJKX40ThAnfvUvk&itok=hLv8UoXG",
+     "alt": "Bain Capital Technology",
+     "fit": "cover"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "spotlight-content-wrap",
+     "box": [
+      151,
+      3903,
+      184,
+      288
+     ],
+     "pad": "0px",
+     "tf": "matrix(1, 0, 0, 1, 0, 90.6)"
+    },
+    {
+     "k": "span",
+     "cls": "tag-wrap spotlight-tag",
+     "box": [
+      151,
+      3994,
+      184,
+      14
+     ],
+     "t": "TECHNOLOGY",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "700",
+     "lh": "14.4px",
+     "ls": "1.2px",
+     "tt": "uppercase",
+     "ta": "left",
+     "c": "rgb(119, 178, 249)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapital.com/technology/",
+     "inline": true
+    },
+    {
+     "k": "h3",
+     "cls": "spotlight-title h6",
+     "box": [
+      151,
+      4013,
+      184,
+      86
+     ],
+     "t": "Leading companies into the future",
+     "ff": "Martina Plantijn",
+     "fs": "24px",
+     "fw": "300",
+     "lh": "28.8px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapital.com/technology/"
+    }
+   ]
+  },
+  {
+   "id": "SECTION section esg-section home-esg-section section-light",
+   "box": [
+    0,
+    4159,
+    360,
+    910
+   ],
+   "pad": "60px 0px 80px",
+   "pos": "relative",
+   "items": [
+    {
+     "k": "h2",
+     "cls": "section-title",
+     "box": [
+      25,
+      4219,
+      310,
+      77
+     ],
+     "t": "Sustainability & Impact",
+     "ff": "Martina Plantijn",
+     "fs": "32px",
+     "fw": "300",
+     "lh": "38.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      25,
+      4316,
+      310,
+      67
+     ],
+     "t": "Integrating sustainability across our portfolios furthers positive, long-term impacts on our environment and society.",
+     "ff": "Martina Plantijn",
+     "fs": "16px",
+     "fw": "300",
+     "lh": "22.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "btn btn-primary",
+     "box": [
+      25,
+      4408,
+      310,
+      48
+     ],
+     "pad": "5px 16px",
+     "bg": "rgb(27, 33, 90)",
+     "br": "30px",
+     "border": "2px solid rgb(27, 33, 90) | 2px solid rgb(27, 33, 90) | 2px solid rgb(27, 33, 90) | 2px solid rgb(27, 33, 90)"
+    },
+    {
+     "k": "a",
+     "cls": "btn btn-primary",
+     "box": [
+      25,
+      4408,
+      310,
+      48
+     ],
+     "t": "Explore Sustainability & Impact at Bain Capital",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "/sustainability-and-impact",
+     "bg": "rgb(27, 33, 90)",
+     "br": "30px",
+     "border": "2px solid rgb(27, 33, 90) | 2px solid rgb(27, 33, 90) | 2px solid rgb(27, 33, 90) | 2px solid rgb(27, 33, 90)",
+     "pad": "5px 16px"
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      206,
+      4437,
+      6,
+      10
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "esg-content-box",
+     "box": [
+      -2,
+      4516,
+      364,
+      473
+     ],
+     "pad": "0px",
+     "br": "5px"
+    },
+    {
+     "k": "img",
+     "cls": "",
+     "box": [
+      -2,
+      4516,
+      364,
+      473
+     ],
+     "src": "https://cdn-east2.baincapital.com/styles/optimize_image/s3/2026-06/bcsi26-cover_0.jpg?VersionId=2gRUnupJW4mJ.R75B8knywwg7aA9XY5n&itok=fahndAo7",
+     "alt": "Sustainable growth and innovation",
+     "fit": "cover"
+    },
+    {
+     "k": "h4",
+     "cls": "h3 esg-approach-title",
+     "box": [
+      23,
+      4817,
+      314,
+      72
+     ],
+     "t": "Sustainable growth and innovation",
+     "ff": "Martina Plantijn",
+     "fs": "30px",
+     "fw": "300",
+     "lh": "36px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "btn download-btn btn-green",
+     "box": [
+      23,
+      4911,
+      235,
+      31
+     ],
+     "pad": "5px 16px",
+     "bg": "rgb(220, 245, 78)",
+     "br": "30px",
+     "border": "2px solid rgb(220, 245, 78) | 2px solid rgb(220, 245, 78) | 2px solid rgb(220, 245, 78) | 2px solid rgb(220, 245, 78)"
+    },
+    {
+     "k": "a",
+     "cls": "btn download-btn btn-green",
+     "box": [
+      23,
+      4911,
+      235,
+      31
+     ],
+     "t": "2026 Sustainability Report",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://cdn-east2.baincapital.com/2026-07/Bain-Capital-Sustainability-Report-June2026_1.pdf",
+     "bg": "rgb(220, 245, 78)",
+     "br": "30px",
+     "border": "2px solid rgb(220, 245, 78) | 2px solid rgb(220, 245, 78) | 2px solid rgb(220, 245, 78) | 2px solid rgb(220, 245, 78)",
+     "pad": "5px 16px"
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      228,
+      4919,
+      13,
+      12
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    }
+   ]
+  },
+  {
+   "id": "SECTION section our-people-section position-relative",
+   "box": [
+    0,
+    5068,
+    360,
+    800
+   ],
+   "pad": "60px 0px",
+   "pos": "relative",
+   "items": [
+    {
+     "k": "h2",
+     "cls": "section-title",
+     "box": [
+      25,
+      5352,
+      310,
+      78
+     ],
+     "t": "Great outcomes come from",
+     "ff": "Martina Plantijn",
+     "fs": "32px",
+     "fw": "300",
+     "lh": "38.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "em",
+     "cls": "",
+     "box": [
+      97,
+      5391,
+      148,
+      40
+     ],
+     "t": "great teams",
+     "ff": "Martina Plantijn",
+     "fs": "32px",
+     "fw": "300",
+     "lh": "38.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "italic",
+     "td": "none",
+     "inline": true
+    },
+    {
+     "k": "p",
+     "cls": "",
+     "box": [
+      25,
+      5450,
+      279,
+      76
+     ],
+     "t": "We challenge each other to think and work differently to create meaningful and lasting impact.",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "25.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "btn btn-outline btn-light-blue",
+     "box": [
+      25,
+      5554,
+      156,
+      31
+     ],
+     "pad": "5px 16px",
+     "br": "30px",
+     "border": "2px solid rgb(63, 182, 255) | 2px solid rgb(63, 182, 255) | 2px solid rgb(63, 182, 255) | 2px solid rgb(63, 182, 255)"
+    },
+    {
+     "k": "a",
+     "cls": "btn btn-outline btn-light-blue",
+     "box": [
+      25,
+      5554,
+      156,
+      31
+     ],
+     "t": "Meet our people",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(63, 182, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapital.com/people",
+     "br": "30px",
+     "border": "2px solid rgb(63, 182, 255) | 2px solid rgb(63, 182, 255) | 2px solid rgb(63, 182, 255) | 2px solid rgb(63, 182, 255)",
+     "pad": "5px 16px"
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      157,
+      5564,
+      6,
+      10
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    }
+   ]
+  },
+  {
+   "id": "SECTION section news-listing-section news-listing-home-section",
+   "box": [
+    0,
+    5867,
+    360,
+    1388
+   ],
+   "pad": "60px 0px",
+   "pos": "relative",
+   "items": [
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "slick-list draggable",
+     "box": [
+      25,
+      5927,
+      310,
+      452
+     ],
+     "pad": "0px",
+     "tf": "matrix(1, 0, 0, 1, 0, 0)"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "slick-track",
+     "box": [
+      25,
+      5927,
+      310,
+      452
+     ],
+     "pad": "0px",
+     "tf": "matrix(1, 0, 0, 1, 0, 0)"
+    },
+    {
+     "k": "h2",
+     "cls": "section-title",
+     "box": [
+      25,
+      5927,
+      316,
+      38
+     ],
+     "t": "Latest news",
+     "ff": "Martina Plantijn",
+     "fs": "32px",
+     "fw": "300",
+     "lh": "38.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(27, 33, 90)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "featured-news-img",
+     "box": [
+      25,
+      5986,
+      316,
+      183
+     ],
+     "pad": "0px 0px 183.266px",
+     "br": "5px"
+    },
+    {
+     "k": "img",
+     "cls": "",
+     "box": [
+      25,
+      5986,
+      316,
+      183
+     ],
+     "src": "https://cdn-east2.baincapital.com/News/Screenshot%202026-09-28%20181028.png",
+     "alt": "",
+     "fit": "cover"
+    },
+    {
+     "k": "span",
+     "cls": "tag-text press-releases",
+     "box": [
+      25,
+      6197,
+      118,
+      14
+     ],
+     "t": "PRESS RELEASES",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "1.2px",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(0, 26, 255)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "span",
+     "cls": "tag-normal-text",
+     "box": [
+      157,
+      6197,
+      102,
+      14
+     ],
+     "t": "Special Situations",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "normal",
+     "tt": "capitalize",
+     "ta": "left",
+     "c": "rgb(130, 133, 165)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "span",
+     "cls": "date-text",
+     "box": [
+      25,
+      6217,
+      118,
+      14
+     ],
+     "t": "September 28, 2026",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "normal",
+     "tt": "capitalize",
+     "ta": "left",
+     "c": "rgb(130, 133, 165)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      25,
+      6236,
+      316,
+      144
+     ],
+     "t": "AAR accelerates its aftermarket platform strategy by agreeing to acquire a controlling interest in MRO Holdings",
+     "ff": "Martina Plantijn",
+     "fs": "24px",
+     "fw": "300",
+     "lh": "28.8px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(28, 33, 86)",
+     "fst": "normal",
+     "td": "none",
+     "href": "/news/aar-accelerates-its-aftermarket-platform-strategy-agreeing-acquire-controlling-interest-mro"
+    },
+    {
+     "k": "span",
+     "cls": "tag-text press-releases",
+     "box": [
+      25,
+      6466,
+      118,
+      14
+     ],
+     "t": "PRESS RELEASES",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "1.2px",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(0, 26, 255)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "span",
+     "cls": "tag-normal-text",
+     "box": [
+      157,
+      6466,
+      102,
+      14
+     ],
+     "t": "Special Situations",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "normal",
+     "tt": "capitalize",
+     "ta": "left",
+     "c": "rgb(130, 133, 165)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "span",
+     "cls": "date-text",
+     "box": [
+      25,
+      6485,
+      118,
+      14
+     ],
+     "t": "September 28, 2026",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "normal",
+     "tt": "capitalize",
+     "ta": "left",
+     "c": "rgb(130, 133, 165)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      25,
+      6505,
+      310,
+      65
+     ],
+     "t": "AAR accelerates its aftermarket platform strategy by agreeing to acquire a controlling interest in MRO Holdings",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(28, 33, 86)",
+     "fst": "normal",
+     "td": "none",
+     "href": "/news/aar-accelerates-its-aftermarket-platform-strategy-agreeing-acquire-controlling-interest-mro"
+    },
+    {
+     "k": "span",
+     "cls": "tag-text press-releases",
+     "box": [
+      25,
+      6604,
+      118,
+      14
+     ],
+     "t": "PRESS RELEASES",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "1.2px",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(0, 26, 255)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "span",
+     "cls": "tag-normal-text",
+     "box": [
+      157,
+      6604,
+      83,
+      14
+     ],
+     "t": "Double Impact",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "normal",
+     "tt": "capitalize",
+     "ta": "left",
+     "c": "rgb(130, 133, 165)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "span",
+     "cls": "date-text",
+     "box": [
+      25,
+      6624,
+      118,
+      14
+     ],
+     "t": "September 22, 2026",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "normal",
+     "tt": "capitalize",
+     "ta": "left",
+     "c": "rgb(130, 133, 165)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      25,
+      6643,
+      310,
+      43
+     ],
+     "t": "Announcement of Sale of SOLitude Lake Management, LLC to Bain Capital",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(28, 33, 86)",
+     "fst": "normal",
+     "td": "none",
+     "href": "/news/announcement-sale-solitude-lake-management-llc-bain-capital"
+    },
+    {
+     "k": "span",
+     "cls": "tag-text press-releases",
+     "box": [
+      25,
+      6721,
+      118,
+      14
+     ],
+     "t": "PRESS RELEASES",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "1.2px",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(0, 26, 255)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "span",
+     "cls": "tag-normal-text",
+     "box": [
+      157,
+      6721,
+      64,
+      14
+     ],
+     "t": "Real Estate",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "normal",
+     "tt": "capitalize",
+     "ta": "left",
+     "c": "rgb(130, 133, 165)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "span",
+     "cls": "date-text",
+     "box": [
+      25,
+      6741,
+      116,
+      14
+     ],
+     "t": "September 21, 2026",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "normal",
+     "tt": "capitalize",
+     "ta": "left",
+     "c": "rgb(130, 133, 165)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      25,
+      6760,
+      310,
+      86
+     ],
+     "t": "BlueWater Marinas and Bain Capital Acquire Mystic River Marina in Mystic, CT, and Ripley Light Drystack Marina in Charleston, SC",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(28, 33, 86)",
+     "fst": "normal",
+     "td": "none",
+     "href": "/news/bluewater-marinas-and-bain-capital-acquire-mystic-river-marina-mystic-ct-and-ripley-light"
+    },
+    {
+     "k": "span",
+     "cls": "tag-text press-releases",
+     "box": [
+      25,
+      6882,
+      118,
+      14
+     ],
+     "t": "PRESS RELEASES",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "1.2px",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(0, 26, 255)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "span",
+     "cls": "tag-normal-text",
+     "box": [
+      157,
+      6882,
+      35,
+      14
+     ],
+     "t": "Credit",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "normal",
+     "tt": "capitalize",
+     "ta": "left",
+     "c": "rgb(130, 133, 165)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "span",
+     "cls": "date-text",
+     "box": [
+      206,
+      6882,
+      94,
+      14
+     ],
+     "t": "August 27, 2026",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "normal",
+     "tt": "capitalize",
+     "ta": "left",
+     "c": "rgb(130, 133, 165)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      25,
+      6901,
+      310,
+      65
+     ],
+     "t": "Bain Capital’s Private Credit Group Announces $6 Billion of Financing Investments for First Half 2026",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(28, 33, 86)",
+     "fst": "normal",
+     "td": "none",
+     "href": "/news/bain-capitals-private-credit-group-announces-6-billion-financing-investments-first-half-2026"
+    },
+    {
+     "k": "span",
+     "cls": "tag-text press-releases",
+     "box": [
+      25,
+      7001,
+      118,
+      14
+     ],
+     "t": "PRESS RELEASES",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "1.2px",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(0, 26, 255)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "span",
+     "cls": "tag-normal-text",
+     "box": [
+      157,
+      7001,
+      110,
+      14
+     ],
+     "t": "Tech Opportunities",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "normal",
+     "tt": "capitalize",
+     "ta": "left",
+     "c": "rgb(130, 133, 165)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "span",
+     "cls": "date-text",
+     "box": [
+      25,
+      7020,
+      94,
+      14
+     ],
+     "t": "August 27, 2026",
+     "ff": "Inter",
+     "fs": "12px",
+     "fw": "500",
+     "lh": "14.4px",
+     "ls": "normal",
+     "tt": "capitalize",
+     "ta": "left",
+     "c": "rgb(130, 133, 165)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true,
+     "br": "7px"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      25,
+      7040,
+      310,
+      65
+     ],
+     "t": "RQD* Clearing Secures $74 Million Strategic Growth Investment Led by Bain Capital",
+     "ff": "Martina Plantijn",
+     "fs": "18px",
+     "fw": "300",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(28, 33, 86)",
+     "fst": "normal",
+     "td": "none",
+     "href": "/news/rqd-clearing-secures-74-million-strategic-growth-investment-led-bain-capital"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "btn btn-outline btn-blue",
+     "box": [
+      25,
+      7164,
+      130,
+      31
+     ],
+     "pad": "5px 16px",
+     "br": "30px",
+     "border": "2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255)"
+    },
+    {
+     "k": "a",
+     "cls": "btn btn-outline btn-blue",
+     "box": [
+      25,
+      7164,
+      130,
+      31
+     ],
+     "t": "See all news",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "16.8px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "center",
+     "c": "rgb(0, 26, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapital.com/news",
+     "br": "30px",
+     "border": "2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255) | 2px solid rgb(0, 26, 255)",
+     "pad": "5px 16px"
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      131,
+      7174,
+      6,
+      10
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    }
+   ]
+  },
+  {
+   "id": "SECTION section contact-section home-page-contact-section",
+   "box": [
+    0,
+    7254,
+    360,
+    810
+   ],
+   "pad": "60px 0px 0px",
+   "pos": "relative",
+   "items": [
+    {
+     "k": "canvas",
+     "cls": "am5-layer-0",
+     "box": [
+      1,
+      7314,
+      358,
+      1050
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "canvas",
+     "cls": "am5-layer-30",
+     "box": [
+      1,
+      7314,
+      358,
+      1050
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "h2",
+     "cls": "section-title tagger-anim",
+     "box": [
+      25,
+      7414,
+      310,
+      38
+     ],
+     "t": "Our global presence",
+     "ff": "Martina Plantijn",
+     "fs": "32px",
+     "fw": "300",
+     "lh": "38.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "button",
+     "cls": "btn btn-default dropdown-toggle psorting people-region",
+     "box": [
+      25,
+      7478,
+      116,
+      16
+     ],
+     "pad": "0px 23px 0px 0px",
+     "br": "30px"
+    },
+    {
+     "k": "button",
+     "cls": "btn btn-default dropdown-toggle psorting people-region",
+     "box": [
+      25,
+      7478,
+      116,
+      16
+     ],
+     "t": "",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "500",
+     "lh": "16px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "right",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "br": "30px",
+     "pad": "0px 23px 0px 0px"
+    },
+    {
+     "k": "span",
+     "cls": "selected-value",
+     "box": [
+      99,
+      7478,
+      19,
+      16
+     ],
+     "t": "All",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "500",
+     "lh": "16px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "right",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true
+    },
+    {
+     "k": "span",
+     "cls": "psorting-label",
+     "box": [
+      25,
+      7479,
+      64,
+      14
+     ],
+     "t": "Business:",
+     "ff": "Inter",
+     "fs": "14px",
+     "fw": "500",
+     "lh": "14px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "right",
+     "c": "rgb(163, 203, 236)",
+     "fst": "normal",
+     "td": "none",
+     "inline": true
+    },
+    {
+     "k": "svg",
+     "cls": "",
+     "box": [
+      126,
+      7483,
+      15,
+      9
+     ],
+     "src": "",
+     "alt": "",
+     "fit": "fill"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "nav-link active",
+     "box": [
+      25,
+      7544,
+      300,
+      45
+     ],
+     "pad": "10px 0px",
+     "br": "6px 6px 0px 0px",
+     "border": "0px none rgb(255, 255, 255) | 3px solid rgb(255, 255, 255) | 0px none rgb(255, 255, 255) | 0px none rgb(255, 255, 255)"
+    },
+    {
+     "k": "a",
+     "cls": "nav-link active",
+     "box": [
+      25,
+      7544,
+      300,
+      45
+     ],
+     "t": "Global Locations",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "700",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "#tabmap",
+     "br": "6px 6px 0px 0px",
+     "border": "0px none rgb(255, 255, 255) | 3px solid rgb(255, 255, 255) | 0px none rgb(255, 255, 255) | 0px none rgb(255, 255, 255)",
+     "pad": "10px 0px"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "nav-link",
+     "box": [
+      25,
+      7587,
+      79,
+      42
+     ],
+     "pad": "10px 0px",
+     "br": "6px 6px 0px 0px"
+    },
+    {
+     "k": "a",
+     "cls": "nav-link",
+     "box": [
+      25,
+      7587,
+      79,
+      42
+     ],
+     "t": "Americas",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "#americas",
+     "br": "6px 6px 0px 0px",
+     "pad": "10px 0px"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "nav-link",
+     "box": [
+      124,
+      7587,
+      36,
+      42
+     ],
+     "pad": "10px 0px",
+     "br": "6px 6px 0px 0px"
+    },
+    {
+     "k": "a",
+     "cls": "nav-link",
+     "box": [
+      124,
+      7587,
+      36,
+      42
+     ],
+     "t": "Asia",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "#asia",
+     "br": "6px 6px 0px 0px",
+     "pad": "10px 0px"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "nav-link",
+     "box": [
+      180,
+      7587,
+      60,
+      42
+     ],
+     "pad": "10px 0px",
+     "br": "6px 6px 0px 0px"
+    },
+    {
+     "k": "a",
+     "cls": "nav-link",
+     "box": [
+      180,
+      7587,
+      60,
+      42
+     ],
+     "t": "Europe",
+     "ff": "Inter",
+     "fs": "18px",
+     "fw": "400",
+     "lh": "21.6px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(255, 255, 255)",
+     "fst": "normal",
+     "td": "none",
+     "href": "#europe",
+     "br": "6px 6px 0px 0px",
+     "pad": "10px 0px"
+    }
+   ]
+  },
+  {
+   "id": "FOOTER site-footer section",
+   "box": [
+    0,
+    8063,
+    360,
+    423
+   ],
+   "pad": "40px 0px",
+   "pos": "relative",
+   "items": [
+    {
+     "k": "paint",
+     "tag": "div",
+     "cls": "copyright-wrap",
+     "box": [
+      25,
+      8103,
+      310,
+      343
+     ],
+     "pad": "28px 0px 0px",
+     "border": "1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "p",
+     "cls": "copyright-txt",
+     "box": [
+      25,
+      8132,
+      310,
+      67
+     ],
+     "t": "© 2012-2026 Bain Capital, LP. The Bain Capital square symbol is a trademark of Bain Capital, LP All Rights Reserved.",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "22.4px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(171, 202, 233)",
+     "fst": "normal",
+     "td": "none"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "",
+     "box": [
+      25,
+      8213,
+      105,
+      21
+     ],
+     "pad": "0px",
+     "border": "0px none rgb(171, 202, 233) | 1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      25,
+      8213,
+      105,
+      21
+     ],
+     "t": "Privacy Policy",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "19.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(171, 202, 233)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapital.com/privacy-policy",
+     "border": "0px none rgb(171, 202, 233) | 1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "",
+     "box": [
+      155,
+      8213,
+      100,
+      21
+     ],
+     "pad": "0px",
+     "border": "0px none rgb(171, 202, 233) | 1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      155,
+      8213,
+      100,
+      21
+     ],
+     "t": "Terms of Use",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "19.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(171, 202, 233)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapital.com/terms-use",
+     "border": "0px none rgb(171, 202, 233) | 1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "",
+     "box": [
+      25,
+      8247,
+      173,
+      21
+     ],
+     "pad": "0px",
+     "border": "0px none rgb(171, 202, 233) | 1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      25,
+      8247,
+      173,
+      21
+     ],
+     "t": "Regulatory Disclosures",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "19.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(171, 202, 233)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapital.com/regulatory-disclosures",
+     "border": "0px none rgb(171, 202, 233) | 1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "",
+     "box": [
+      25,
+      8282,
+      253,
+      21
+     ],
+     "pad": "0px",
+     "border": "0px none rgb(171, 202, 233) | 1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      25,
+      8282,
+      253,
+      21
+     ],
+     "t": "Fraud and Cybersecurity Warning",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "19.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(171, 202, 233)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapital.com/fraud-and-cybersecurity-warning",
+     "border": "0px none rgb(171, 202, 233) | 1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "",
+     "box": [
+      25,
+      8316,
+      192,
+      21
+     ],
+     "pad": "0px",
+     "border": "0px none rgb(171, 202, 233) | 1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      25,
+      8316,
+      192,
+      21
+     ],
+     "t": "警告：网络欺诈及网络钓鱼",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "19.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(171, 202, 233)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapital.com/fraud-and-cybersecurity-warning-chinese",
+     "border": "0px none rgb(171, 202, 233) | 1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "",
+     "box": [
+      25,
+      8350,
+      184,
+      40
+     ],
+     "pad": "0px",
+     "border": "0px none rgb(171, 202, 233) | 1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "a",
+     "cls": "",
+     "box": [
+      25,
+      8350,
+      184,
+      40
+     ],
+     "t": "Fraude y advertencia de ciberseguridad",
+     "ff": "Inter",
+     "fs": "16px",
+     "fw": "400",
+     "lh": "19.2px",
+     "ls": "normal",
+     "tt": "none",
+     "ta": "left",
+     "c": "rgb(171, 202, 233)",
+     "fst": "normal",
+     "td": "none",
+     "href": "https://www.baincapital.com/fraud-and-cybersecurity-warning-spanish",
+     "border": "0px none rgb(171, 202, 233) | 1px solid rgb(171, 202, 233) | 0px none rgb(171, 202, 233) | 0px none rgb(171, 202, 233)"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "linkIco ",
+     "box": [
+      25,
+      8414,
+      32,
+      32
+     ],
+     "pad": "0px",
+     "bg": "rgb(27, 33, 90)",
+     "br": "50%"
+    },
+    {
+     "k": "paint",
+     "tag": "a",
+     "cls": "twtIco at300b ",
+     "box": [
+      72,
+      8414,
+      32,
+      32
+     ],
+     "pad": "0px",
+     "bg": "rgb(27, 33, 90)",
+     "br": "50%"
+    }
+   ]
+  }
+ ]
+}
