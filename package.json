@@ -31,9 +31,9 @@
     "cases/*/REPORT.md",
     "cases/*/REGISTER.md",
     "cases/*/LINT.md",
-    "cases/*/doc",
-    "cases/*/registers",
-    "cases/*/authored"
+    "cases/*/doc/**",
+    "cases/*/registers/**",
+    "cases/*/authored/**"
   ],
   "repository": {
     "type": "git",
