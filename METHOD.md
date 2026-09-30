@@ -6,6 +6,8 @@ v2 source: baincapital.com home, 2026-09-29/30 (`cases/baincapital-home`). v1 fo
 pixel-faithful (prototype 27.2 / 34.6 / 23.3 %, served 23.8 / 34.4 / 23.6 % at 1440 / 360 / 2560, leak table identical) and
 **failed David's Model** (3 🔴, 5 🟡): the document was authored for the block's decorate, not for an author. v2 changes what
 step 2 produces so the structure is right by construction, and names the prerequisites v1 assumed silently.
+v2.1 source: travelers.com home, 2026-09-30 (`cases/travelers-home`, 3.26 / 1.09 / 0.57 % at 360 / 1440 / 2560, served = prototype):
+adds the shell rule in step 4, the round discipline and the deep probes in step 6, the served-only differences in step 7.
 
 ## The rule
 
@@ -26,6 +28,8 @@ cloned. The document is written in reading order; blocks hold only what default 
 | scroll-state probes when the site is scroll-driven | `scripts/scroll-probe.mjs` | fixed-layer colour thresholds, header states, scroll-linked transforms, autoplay periods — measured BEFORE code |
 | motion observation | `motion-observe.mjs` on the live page, plus a deep hover diff (pseudo-elements, subtree) | the hover probe alone reads no `::before` underline and no colour on a child; the deep diff does |
 | fonts | download the source's woff2 files into `/fonts` | `live-spec` records family/weight/style in use |
+| media | upload the source's **bytes** (webp stays webp) to a draft media folder on the site, preview them, reference the preview URL in the document | DA and the pipeline store them unchanged and serve optimised renditions; re-encoding to jpg costs ≈ 1 % in photo bands (travelers-home r1 → r2) |
+| paint that is not on a node | `scripts/deep-probe.mjs <url> <W> --sels …` on the elements the spec shows without paint | `::before`/`::after` (curved edges, underlines, elevation shadows) are invisible to `live-spec` |
 
 ## Procedure, per template
 
@@ -57,21 +61,31 @@ cloned. The document is written in reading order; blocks hold only what default 
    step 1 only. Every selector carries the template body class and the block root. Geometry above 1440 is fractions or vw from the probe
    measurement, never the 1440 pixel value. Mobile in the block's own media query. A block that paints an authored image as a background
    reads the pipeline's large rendition (`<picture> > source[media]`), not `img.src` (a 750 px rendition on the served page).
+   When cap-probe reports a shell or content cap, `main` carries that cap (`max-width`, centred) and full-bleed section styles bleed out
+   of it with `margin: 0 calc(50% - 50vw)`; a fluid source keeps sections full width. Chrome follows the same shell: a header bar anchored
+   to the viewport passes every gate at the base width and is wrong on every wider screen (travelers-home).
 
 5. **Produce the prototype with the harness** (`scripts/harness.mjs`): lint → fold (section-metadata → classes, metadata → `<meta>`,
    empty sections dropped) → load with the branch runtime → wait for every block `data-block-status="loaded"` → serialise. **The gated
    prototype is the runtime page the harness serves**, not the serialised file: JS-driven state (fixed colour layers, header morph,
    autoplay, parallax) is part of the pixels. The serialised file is the review artifact and the vocabulary-gate input.
 
-6. **Gate at all three widths** against the cached origin: pixel, Δh, cap-probe compare, clip, content-presence; motion-compare at 1440
-   plus a state probe for click states the frame sampler is blind to (class-toggled panels, tabs, list views). Read the section-height
-   table and the text-anchored pairing before touching CSS. A round may change only properties those tables name; a round whose target
-   bands do not move is void. Register every session-variable region (autoplay slide at freeze time, per-load photo) and every
+6. **Gate at all three widths** against the cached origin: pixel, Δh, cap-probe compare, clip, content-presence; motion-compare at the base
+   width plus `click-state.mjs` for the panels the frame sampler is blind to and `hover-diff.mjs` (element, subtree, pseudo-elements) for
+   the hovers it reads as dead. Read the section-height table and the text-anchored pairing **at all three widths** before touching CSS;
+   `pair.mjs` prints group offsets — a run of anchors sharing one Δx is a displaced bar, whatever the tolerance says. Between CSS rounds
+   gate the base width only (`gate --widths <base>`); the three widths and the probes once the tables are clean. A round may change only
+   properties those tables name; a round whose target bands do not move is void. The 1–2 px class: rows the table shows within 2 px that
+   turn a whole text band red come from inline-block baselines, mixed font sizes on one line and margins that do not collapse through a
+   flex item — read `deep-probe` on both sides for those rows; the fix is a display / line-height / margin rule, never a pixel value.
+   Look at `diff-<W>-top.png` (the chrome band) every round: a 1 % header band can hold a bar displaced by a whole column. Register every session-variable region (autoplay slide at freeze time, per-load photo) and every
    instrument artifact (smooth-scroll lag, JS entrances captured mid-flight) with its band cost; they are not defects to chase.
 
 7. **Deploy the same document and the same code** to a draft path on the branch (preview only) and gate the served page at the same
    three widths, same motion probes. Expect the prototype's numbers. Any gap is a runtime difference, found with the leak table
-   (`scripts/leak.mjs`, prototype vs served, one row per wrapper) — never by eye.
+   (`scripts/leak.mjs`, prototype vs served, one row per wrapper, header and footer wrappers included) — never by eye. Known served-only
+   difference: the pipeline leaves the metadata block behind as an **empty section**; the harness fold drops it, so a section-rhythm rule
+   (`.section + .section`) adds a gap only on the served page — exclude empty sections (`main > .section:not(:has(> *))`).
 
 8. **Approval = block approval.** Prototype, blocks, authored document, triage table, deviations and motion registers are one artifact.
    The prototype number becomes the page's budget for rollout.
@@ -88,7 +102,11 @@ cloned. The document is written in reading order; blocks hold only what default 
   a live/build pair at the three widths without a `state.json`; prints the three-width table.
 - `scripts/measure-view.mjs`, `scripts/measure-to-spec.mjs` — readout of `tools/replica/measure.mjs --json` and its conversion to the live-spec schema, for an origin `live-spec` cannot open (bot-managed).
 - `scripts/origin-pick.mjs` — capture the origin until its session-variable region (rotating hero) matches the build.
-- Deep hover diff and click-state probes are page-specific by nature; `cases/*/motion` hold the ones written so far as templates.
+- `scripts/deep-probe.mjs` — rect + paint of named selectors including `::before`/`::after`, live or build.
+- `scripts/hover-diff.mjs` — deep hover diff (element, subtree, pseudo-elements; first visible match), live or build.
+- `scripts/click-state.mjs` — click a control, dump the opened panel with boxes/paint/fonts, screenshot.
+- `scripts/crop.mjs` — one band of a stitched capture, optionally downscaled, to look at.
+- Page-specific probes (a sticky bar's state, an icon-sprite inventory) live in `cases/*/scripts` as templates.
 
 ## Deviations register (write it in step 3)
 
@@ -107,6 +125,9 @@ match). Session-variable regions and instrument artifacts are separate rows with
 - **Trusting the hover probe's "dead"**: a `::before` underline and a child colour change are invisible to it; the deep diff sees them.
 - **A desktop `justify-self` on a grid item**: Chrome applies it to block-level boxes too, and a mobile `display:block` override collapses
   the box to zero width.
+- **Reading the band number instead of the band.** 1.2 % in the top band read as anti-aliasing; it was the whole header bar 3 px off at
+  1440 and viewport-anchored at 2560.
+- **Re-encoding media.** The source's bytes are the origin's pixels; anything else is noise in every photo band.
 
 ## What the skills must change (v1 list, plus)
 

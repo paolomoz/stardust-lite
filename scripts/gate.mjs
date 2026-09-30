@@ -3,10 +3,13 @@
 // replica scripts: stitch-shot (--settle on BOTH sides; the origin is captured once and cached), pixel-compare, cap-probe compare;
 // optionally motion-observe on both sides + motion-compare with a probes file. Prints the three-width table.
 // Usage: node gate.mjs --live <url> --build <url> --out <dir> [--widths 360,1440,2560] [--consent <css>] [--main <css>] [--build-main main]
-//        [--probes <file>] [--recapture-origin] [--band 450]
+//        [--probes <file>] [--recapture-origin] [--band 450] [--top 120]
 //   <probes file>: one line per probe: `hover <live-sel> => <build-sel>` or `click <live-sel> => <build-sel>` (same order both sides).
+//   Between CSS rounds run `--widths <base>` only; the three widths + probes once the section table and the pairing are clean.
+//   Every width also writes `diff-<W>-top.png`, the first --top px of the diff (the header band hides a displaced bar in a 1 % number).
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { PNG } from 'pngjs';
 import { join } from 'node:path';
 import { arg, stardustScripts } from './common.mjs';
 
@@ -22,6 +25,10 @@ for (const W of widths) {
   console.log(`build ${W}…`); run([join(S, 'stitch-shot.mjs'), build, eds, '--width', String(W), '--settle']);
   const px = run([join(S, 'pixel-compare.mjs'), origin, eds, '--out', join(out, `diff-${W}.png`), '--band', String(W === 360 ? 900 : band), '--json'], true);
   try { const j = JSON.parse(px.stdout.slice(px.stdout.indexOf('{'))); writeFileSync(join(out, `pixel-${W}.json`), JSON.stringify(j, null, 1)); rows.push({ W, pct: j.pct, dh: j.heightDelta, bands: j.bands.map((b) => `${b.y0}:${b.pct}`).join(' ') }); } catch { rows.push({ W, pct: 'ERR', dh: '', bands: px.stdout.slice(-200) }); }
+  try { // the top band of the diff as its own file: look at the chrome, do not read it as a number
+    const src = PNG.sync.read(readFileSync(join(out, `diff-${W}.png`))); const H = Math.min(Number(arg('--top', 120)), src.height); const dst = new PNG({ width: src.width, height: H });
+    src.data.copy(dst.data, 0, 0, src.width * H * 4); writeFileSync(join(out, `diff-${W}-top.png`), PNG.sync.write(dst));
+  } catch { /* diff image missing */ }
 }
 const probe = widths.includes(2560) ? 2560 : Math.max(...widths);
 console.log('cap-probe…'); const cap = run([join(S, 'cap-probe.mjs'), live, '--against', build, '--build-main', arg('--build-main', 'main'), ...(arg('--main', null) ? ['--main', arg('--main')] : []), ...(consent ? ['--consent', consent] : []), '--out', join(out, 'cap.json')], true);
