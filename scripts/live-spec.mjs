@@ -19,9 +19,9 @@ import { arg, openPage, settle, overlayOpts } from './common.mjs';
 const [,, url, wArg] = process.argv;
 if (!url || !wArg) { console.error('usage: live-spec.mjs <url> <W> --out <dir> [--sections <css>] [--header <css>] [--footer <css>] [--consent <css>]'); process.exit(1); }
 const W = Number(wArg); const out = arg('--out', '.'); const vh = Number(arg('--vh', 900));
-const sections = arg('--sections', 'main > .section'); const header = arg('--header', 'header'); const footer = arg('--footer', 'footer'); const consent = arg('--consent', null);
+const sections = arg('--sections', 'main > .section'); const header = arg('--header', 'header'); const footer = arg('--footer', 'footer');
 const browser = await chromium.launch();
-const page = await openPage(browser, url, { width: W, height: vh, consent, ...overlayOpts() });
+const page = await openPage(browser, url, { width: W, height: vh, ...overlayOpts() });
 await settle(page);
 const spec = await page.evaluate(({ sections, header, footer }) => {
   const R = (e) => { const b = e.getBoundingClientRect(); return [Math.round(b.x), Math.round(b.y + scrollY), Math.round(b.width), Math.round(b.height)]; };

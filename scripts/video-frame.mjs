@@ -15,7 +15,7 @@ if (!url || !W || !out) { console.error('usage: video-frame.mjs <url> <W> <out.p
 const boxSel = arg('--box', null); const sel = arg('--video', 'video'); const t = Number(arg('--t', 0)); const scale = Number(arg('--scale', 2));
 const hide = String(arg('--hide', '')).split(',').map((s) => s.trim()).filter(Boolean); const wait = Number(arg('--wait', 3000));
 const browser = await chromium.launch();
-const page = await openPage(browser, url, { width: Number(W), height: 900, scale, consent: arg('--consent', null), ...overlayOpts() });
+const page = await openPage(browser, url, { width: Number(W), height: 900, scale, ...overlayOpts() });
 const target = boxSel || sel;
 const found = await page.waitForSelector(target, { timeout: 30000 }).catch(() => null);
 if (!found) {

@@ -20,7 +20,7 @@ loss in the first two pilots.
 - `scripts/` — the instruments (Node + Playwright): `probe-load`, `probe-structure`, `content-dump`, `content-view`, `media-list`,
   `media-fetch`, `live-spec`, `scroll-probe`, `deep-probe`, `click-dump`, `text-ladder`, `video-frame`, `da-put`, `sync-poll`, `serve`, `harness`,
   `sections`, `pair`, `leak`, `gate`, `hover-diff`, `click-state`, `crop`, `shift-probe`, `extent`, `measure-view`, `measure-to-spec`, `origin-pick`,
-  `spec-view`.
+  `spec-view`, `site-profile` (the site's state after a template run — `migration/site.json`, read by every instrument as its flag defaults).
 - `tools/` — vendored, unmodified, from Adobe's stardust plugin (Apache-2.0, see `NOTICE`): `replica/` capture and compare tools
   (`stitch-shot`, `pixel-compare`, `cap-probe`, `motion-observe`, `motion-compare`, `measure`, `anchor`), `diff/live-session.mjs`
   (their live-page session), `lint/davids-model-lint.mjs` + `davids-model.md`.
@@ -68,7 +68,7 @@ method changes and new instruments are pull requests here, traced to a case.
 | 4 blocks | in the site repo, on a branch |
 | 5 prototype | `npx stardust-lite serve proto --port 89xx --site .` (concurrent server, creates the `scripts blocks styles fonts icons` symlinks) then `npx stardust-lite harness doc/home.html --serve proto --name home --port 89xx --fragments <branch-host> --content measure/content-1440.json,measure/clicks.json` |
 | 6 gate | `npx stardust-lite sections spec-<W>.json <build>` · `npx stardust-lite pair spec-<W>.json <build>` at all three widths before every CSS change · between rounds `npx stardust-lite gate --live <url> --build http://localhost:89xx/home.harness.html --out gate --widths <base>` (`--main <css>` for a `main`-less origin; crop the first gate's hottest band before any CSS round; a red photo band: `npx stardust-lite shift-probe live-<W>.png build-<W>.png --x0 … --y1 …` and `crop … --vs build-<W>.png`) · once clean: the three widths with `--probes probes.txt`, plus `hover-diff` / `click-state --hover` (repeat `--click` for a control inside a closed panel) on both sides |
-| 7 deploy + gate | same document to DA (`da-put`), push the code, `npx stardust-lite sync-poll <branch-host> . blocks/x/x.css …` until the bus serves the repo's files, `gate … --origin <prototype gate dir>` against the served URL (one origin for both gates), `npx stardust-lite leak <url> --sels sels.txt` on both and diff |
+| 7 deploy + gate | same document to DA (`da-put`), push the code, `npx stardust-lite sync-poll <branch-host> . blocks/x/x.css …` until the bus serves the repo's files, `gate … --origin <prototype gate dir>` against the served URL (one origin for both gates), `npx stardust-lite leak <url> --sels sels.txt` on both and diff · end the template run with `npx stardust-lite site-profile init migration/cases/<template> --out migration/site.json` (overlays, cap, chrome heights, DA, port, noise, numbers; every instrument then reads it as its defaults — `--site <file>` or the file under the cwd; `site-profile check` before a page run, `site-profile print` for the README) |
 
 Definition of done: three-width pixel table with the noise floor, cap-probe PASS at the probe width, motion-compare parity, lint clean at
 step 2, served page within the prototype's numbers, leak table identical.

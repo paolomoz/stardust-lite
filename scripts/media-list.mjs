@@ -13,7 +13,7 @@ const url = process.argv[2]; const W = Number(process.argv[3] || 1440);
 if (!url) { console.error('usage: media-list.mjs <url> [W] [--out file.json] [--consent <css>] [--dismiss <css,…>]'); process.exit(1); }
 const fontReqs = []; let lockBefore = '';
 const b = await chromium.launch();
-const p = await openPage(b, url, { width: W, consent: arg('--consent', null), ...overlayOpts(), wait: 4000, before: (page) => {
+const p = await openPage(b, url, { width: W, ...overlayOpts(), wait: 4000, before: (page) => {
   page.on('response', (r) => { const u = r.url(); if (/\.(woff2?|ttf|otf)(\?|$)/i.test(u) || (r.headers()['content-type'] || '').includes('font')) fontReqs.push(u); });
   page.on('domcontentloaded', async () => { lockBefore = await page.evaluate(() => `${getComputedStyle(document.body).overflow}/${getComputedStyle(document.documentElement).overflow}`).catch(() => ''); });
 } });

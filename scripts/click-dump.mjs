@@ -14,7 +14,7 @@ const [url, wArg] = process.argv.slice(2); const panel = arg('--panel', null);
 const clicks = process.argv.map((a, i, all) => (a === '--click' ? all[i + 1] : null)).filter((v) => v && !v.startsWith('--'));
 if (!url || !wArg || !panel || !clicks.length) { console.error('usage: click-dump.mjs <url> <W> --panel <css> --click <css> [--click <css> …] [--open <css>] [--out <file.json>] [--wait 900]'); process.exit(1); }
 const W = Number(wArg); const wait = Number(arg('--wait', 900)); const open = arg('--open', null);
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: 900, consent: arg('--consent', null), ...overlayOpts() });
+const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: 900, ...overlayOpts() });
 
 const dump = () => page.evaluate((s) => {
   const roots = [...document.querySelectorAll(s)]; if (!roots.length) return { nodes: [], lines: [`NO PANEL ${s}`] };

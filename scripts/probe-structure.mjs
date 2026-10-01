@@ -12,7 +12,7 @@ import { openPage, settle, arg, overlayOpts } from './common.mjs';
 const url = process.argv[2]; const W = Number(process.argv[3] || 1440);
 if (!url) { console.error('usage: probe-structure.mjs <url> [W] [--root <css>] [--depth N] [--pierce] [--out file] [--click <css> --no-settle]'); process.exit(1); }
 const depth = Number(arg('--depth', 3)); const root = arg('--root', 'body'); const pierce = process.argv.includes('--pierce');
-const b = await chromium.launch(); const p = await openPage(b, url, { width: W, consent: arg('--consent', null), ...overlayOpts(), wait: 4000 });
+const b = await chromium.launch(); const p = await openPage(b, url, { width: W, ...overlayOpts(), wait: 4000 });
 if (arg('--click', null)) { try { await p.click(arg('--click'), { timeout: 3000 }); await p.waitForTimeout(1500); } catch (e) { console.log('no click', arg('--click'), String(e).slice(0, 80)); } }
 if (!arg('--no-settle', false)) await settle(p);
 const out = await p.evaluate(({ root, depth, pierce }) => {

@@ -19,14 +19,15 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from
 import { PNG } from 'pngjs';
 import { join } from 'node:path';
 import { chromium } from 'playwright';
-import { arg, openPage, overlayOpts, stardustScripts } from './common.mjs';
+import { arg, openPage, overlayOpts, overlayArgs, siteProfile, stardustScripts } from './common.mjs';
 
 const live = arg('--live'); const build = arg('--build'); const out = arg('--out');
 if (!live || !build || !out) { console.error('usage: gate.mjs --live <url> --build <url> --out <dir> [--widths 360,1440,2560] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--main <live-content-root>] [--build-main main] [--probes <file>] [--origin <gate-dir>]'); process.exit(1); }
-const widths = String(arg('--widths', '360,1440,2560')).split(',').map(Number); const consent = arg('--consent', null); const band = Number(arg('--band', 450));
+const widths = String(arg('--widths', '360,1440,2560')).split(',').map(Number); const band = Number(arg('--band', 450));
 // overlays and locale reach the LIVE side of every capture tool (a geo modal or a marketing interstitial is not consent; a geo-redirecting
-// origin captures another locale per run without the pin)
-const liveOpts = [...(consent ? ['--consent', consent] : []), ...(arg('--dismiss', null) ? ['--dismiss', arg('--dismiss')] : []), ...(arg('--locale', null) ? ['--locale', arg('--locale')] : [])];
+// origin captures another locale per run without the pin); without the flags they come from the site profile (`--site`, migration/site.json),
+// as does the cap-probe `--main` root
+const liveOpts = overlayArgs(); const liveMain = arg('--main', null) ?? siteProfile()?.cap?.mainSelector ?? null;
 const S = stardustScripts(); mkdirSync(out, { recursive: true });
 const run = (args, quiet) => { const r = spawnSync('node', args, { encoding: 'utf8' }); if (!quiet) process.stdout.write(r.stdout.split('\n').slice(-3).join('\n') + '\n'); if (r.stderr && r.status) process.stderr.write(r.stderr.slice(-400)); return r; };
 const rows = [];
@@ -44,7 +45,7 @@ for (const W of widths) {
   } catch { /* diff image missing */ }
 }
 const probe = widths.includes(2560) ? 2560 : Math.max(...widths);
-console.log('cap-probe…'); const cap = run([join(S, 'cap-probe.mjs'), live, '--against', build, '--build-main', arg('--build-main', 'main'), ...(arg('--main', null) ? ['--main', arg('--main')] : []), ...liveOpts, '--out', join(out, 'cap.json')], true);
+console.log('cap-probe…'); const cap = run([join(S, 'cap-probe.mjs'), live, '--against', build, '--build-main', arg('--build-main', 'main'), ...(liveMain ? ['--main', liveMain] : []), ...liveOpts, '--out', join(out, 'cap.json')], true);
 // the verdict AND the failing rows: "FAIL — 1 of 4 rows" without the row sent walgreens-home to run cap-probe --against by hand
 const capLine = [(cap.stdout.match(/cap-probe: .*/) || ['cap-probe: (no verdict line)'])[0], ...cap.stdout.split('\n').filter((l) => /^\s*✗/.test(l))].join('\n');
 let motionLine = '';
@@ -55,7 +56,7 @@ if (arg('--probes', null)) {
   const parsed = lines.map((l) => l.match(/^(hover|click)\s+(.+?)\s*=>\s*(.+)$/)).filter(Boolean);
   const clicks = parsed.filter((m) => m[1] === 'click').map((m) => m[2]);
   if (clicks.length) {
-    const br = await chromium.launch(); const pg = await openPage(br, live, { width: 1440, consent, ...overlayOpts() });
+    const br = await chromium.launch(); const pg = await openPage(br, live, { width: 1440, ...overlayOpts() });
     const nav = await pg.evaluate((sels) => sels.filter((s) => { let e; try { e = document.querySelector(s); } catch { return false; } const a = e && e.closest('a[href]'); if (!a) return false; const h = a.getAttribute('href') || ''; return h && !h.startsWith('#') && !/^javascript:/i.test(h) && a.getAttribute('target') !== '_blank' && !(a.getAttribute('role') === 'button') && a.href.split('#')[0] !== location.href.split('#')[0]; }), clicks);
     await br.close();
     if (nav.length) { console.error(`gate: ${nav.length} click probe(s) target a link that navigates on the live side — dropped (the click destroys the live context and the motion run; hover the item or use click-state --hover):\n  ${nav.join('\n  ')}`); for (const m of parsed) if (m[1] === 'click' && nav.includes(m[2])) m.drop = true; }

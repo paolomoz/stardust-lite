@@ -17,7 +17,7 @@ const clicks = process.argv.map((a, i, all) => (a === '--click' ? all[i + 1] : n
 const hover = arg('--hover', null);
 if (!url || !wArg || !panel || (!clicks.length && typeof hover !== 'string')) { console.error('usage: click-state.mjs <url> <W> [--click <css> …] --panel <css> [--hover [<css>]] (--hover <css> alone: hover, no click) [--shot <out.png>] [--consent <css>] [--depth 7]'); process.exit(1); }
 const W = Number(wArg); const depth = Number(arg('--depth', 7)); const click = clicks.length ? clicks[clicks.length - 1] : hover;
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: 900, consent: arg('--consent', null), ...overlayOpts() });
+const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: 900, ...overlayOpts() });
 if (hover) { await page.hover(hover === true ? clicks[0] : hover); await page.waitForTimeout(600); }
 for (const c of clicks) {
   try { await page.click(c, { timeout: 8000 }); } catch (e) { console.log(`click-state: click ${c} failed — ${e.message.split('\n')[0]}`); }

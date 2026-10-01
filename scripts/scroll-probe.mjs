@@ -13,7 +13,7 @@ import { arg, openPage, overlayOpts } from './common.mjs';
 const url = process.argv[2]; if (!url) { console.error('usage: scroll-probe.mjs <url> [--layers <css,…>] [--header <css>] [--track <css,…>] [--paint <css,…>] [--up]'); process.exit(1); }
 const W = Number(arg('--width', 1440)); const vh = Number(arg('--vh', 900)); const step = Number(arg('--step', 20)); const max = Number(arg('--max', 9000));
 const layers = String(arg('--layers', '')).split(',').filter(Boolean); const header = arg('--header', 'header'); const track = String(arg('--track', '')).split(',').filter(Boolean); const paint = String(arg('--paint', '')).split(',').filter(Boolean);
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: vh, consent: arg('--consent', null), ...overlayOpts() });
+const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: vh, ...overlayOpts() });
 let prev = ''; let prevSy = -1; let bottom = 0;
 const sample = async (y, tag) => {
   await page.evaluate((y) => window.scrollTo(0, y), y); await page.waitForTimeout(350);

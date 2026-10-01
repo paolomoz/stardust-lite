@@ -22,7 +22,7 @@ const url = process.argv[2]; const W = Number(process.argv[3] || 1440);
 if (!url) { console.error('usage: content-dump.mjs <url> [W] --roots <css,…> --out file.json [--require <css,…>]'); process.exit(1); }
 const roots = String(arg('--roots', 'header,main,footer')).split(',').map((s) => s.trim());
 const hidden = String(arg('--hidden', '')).split(',').map((s) => s.trim()).filter(Boolean);
-const b = await chromium.launch(); const p = await openPage(b, url, { width: W, consent: arg('--consent', null), ...overlayOpts(), wait: 4000 });
+const b = await chromium.launch(); const p = await openPage(b, url, { width: W, ...overlayOpts(), wait: 4000 });
 await settle(p);
 const tree = await p.evaluate(([roots, hidden]) => {
   const R = (e) => { const r = e.getBoundingClientRect(); return [Math.round(r.x), Math.round(r.y + scrollY), Math.round(r.width), Math.round(r.height)]; };

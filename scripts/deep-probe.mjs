@@ -21,7 +21,7 @@ const W = Number(wArg); const MAX = Number(arg('--max', 3));
 // (ENAMETOOLONG, then ENOENT — marriottvacationsworldwide-home); a selector with a comma inside goes in a file
 const sels = (existsSync(selsFile) ? readFileSync(selsFile, 'utf8').split('\n') : String(selsFile).split(',')).map((s) => s.trim()).filter((s) => s && !/^(#\s|#$|\/\/)/.test(s));
 const CHILDREN = arg('--children', false); const PROPS = String(arg('--props', '')).split(',').map((s) => s.trim()).filter(Boolean); const ANIM = Boolean(arg('--anim', false));
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: Number(arg('--vh', 900)), consent: arg('--consent', null), ...overlayOpts() });
+const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: Number(arg('--vh', 900)), ...overlayOpts() });
 await settle(page, 600, 100, 1200);
 const out = await page.evaluate(new Function('args', `${DEEP_HELPERS}
  return (${String(([sels, MAX, CHILDREN, PROPS, ANIM]) => {
