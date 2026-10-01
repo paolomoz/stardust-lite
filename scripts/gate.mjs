@@ -9,13 +9,17 @@
 //   <probes file>: one line per probe: `hover <live-sel> => <build-sel>` or `click <live-sel> => <build-sel>` (same order both sides).
 //   --main <css>: the LIVE content root for cap-probe when the origin has no `main` (its body default read "1920 ×1 of 4 sections" and
 //   every build FAILed; pinned to the content grid the same build PASSed 0 of 13 — usta2-home). --build-main defaults to `main`.
+//   A click probe whose LIVE target is a link that navigates (`a[href]` to another document) destroys the live context and the whole
+//   motion run ("Execution context was destroyed" — marriottvacationsworldwide-home): gate opens the live page once, drops those probes
+//   with a warning and runs the rest (hover the item instead, or `click-state --hover`).
 //   Between CSS rounds run `--widths <base>` only; the three widths + probes once the section table and the pairing are clean.
 //   Every width also writes `diff-<W>-top.png`, the first --top px of the diff (the header band hides a displaced bar in a 1 % number).
 import { spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import { join } from 'node:path';
-import { arg, stardustScripts } from './common.mjs';
+import { chromium } from 'playwright';
+import { arg, openPage, overlayOpts, stardustScripts } from './common.mjs';
 
 const live = arg('--live'); const build = arg('--build'); const out = arg('--out');
 if (!live || !build || !out) { console.error('usage: gate.mjs --live <url> --build <url> --out <dir> [--widths 360,1440,2560] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--main <live-content-root>] [--build-main main] [--probes <file>] [--origin <gate-dir>]'); process.exit(1); }
@@ -48,7 +52,15 @@ if (arg('--probes', null)) {
   const lines = readFileSync(arg('--probes'), 'utf8').split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
   // CSS only: motion-observe resolves selectors with querySelector; a Playwright pseudo-class (`:visible`, `:has-text()`) costs a whole run (walgreens-home)
   const bad = lines.filter((l) => /:(visible|hidden|has-text|text|text-is|nth-match|is-visible)\b/.test(l)); if (bad.length) { console.error(`gate: probes are CSS selectors, not Playwright locators — use an id or :nth-of-type to reach the visible copy:\n  ${bad.join('\n  ')}`); process.exit(1); }
-  const side = (i) => lines.flatMap((l) => { const m = l.match(/^(hover|click)\s+(.+?)\s*=>\s*(.+)$/); return m ? [`--${m[1]}`, m[i]] : []; });
+  const parsed = lines.map((l) => l.match(/^(hover|click)\s+(.+?)\s*=>\s*(.+)$/)).filter(Boolean);
+  const clicks = parsed.filter((m) => m[1] === 'click').map((m) => m[2]);
+  if (clicks.length) {
+    const br = await chromium.launch(); const pg = await openPage(br, live, { width: 1440, consent, ...overlayOpts() });
+    const nav = await pg.evaluate((sels) => sels.filter((s) => { let e; try { e = document.querySelector(s); } catch { return false; } const a = e && e.closest('a[href]'); if (!a) return false; const h = a.getAttribute('href') || ''; return h && !h.startsWith('#') && !/^javascript:/i.test(h) && a.getAttribute('target') !== '_blank' && !(a.getAttribute('role') === 'button') && a.href.split('#')[0] !== location.href.split('#')[0]; }), clicks);
+    await br.close();
+    if (nav.length) { console.error(`gate: ${nav.length} click probe(s) target a link that navigates on the live side — dropped (the click destroys the live context and the motion run; hover the item or use click-state --hover):\n  ${nav.join('\n  ')}`); for (const m of parsed) if (m[1] === 'click' && nav.includes(m[2])) m.drop = true; }
+  }
+  const side = (i) => parsed.flatMap((m) => (m.drop ? [] : [`--${m[1]}`, m[i]]));
   console.log('motion live…'); run([join(S, 'motion-observe.mjs'), live, join(out, 'motion-live.json'), '--width', '1440', ...liveOpts, ...side(2)], true);
   console.log('motion build…'); run([join(S, 'motion-observe.mjs'), build, join(out, 'motion-build.json'), '--width', '1440', ...side(3)], true);
   const mc = run([join(S, 'motion-compare.mjs'), join(out, 'motion-live.json'), join(out, 'motion-build.json'), '--json', join(out, 'motion-compare.json')], true);

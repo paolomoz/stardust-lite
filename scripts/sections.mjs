@@ -16,7 +16,8 @@ const sections = arg('--sections', 'main > .section'); const header = arg('--hea
 // x −995 anchored the ad section to nothing every round (usta2-home)
 const onPage = (it) => it.box[0] + it.box[2] > 0 && it.box[0] < spec.W && it.box[3] >= 8;
 const anchorOf = (s) => s.items.find((it) => ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'li'].includes(it.k) && it.t && it.t.length >= 3 && onPage(it));
-const live = spec.secs.map((s) => { const a = anchorOf(s); return { box: s.box, id: s.id, anchor: a ? { t: a.t.slice(0, 28), box: a.box } : null }; });
+// an anchor read inside an entrance state (`rest` on the item — live-spec) is located at its rest position
+const live = spec.secs.map((s) => { const a = anchorOf(s); return { box: s.box, id: s.id, anchor: a ? { t: a.t.slice(0, 28), box: a.rest || a.box } : null }; });
 const browser = await chromium.launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800, consent: arg('--consent', null), ...overlayOpts() });
 await settle(page, 800, 50, 400);
 const r = await page.evaluate(({ sections, header, footer, live }) => {

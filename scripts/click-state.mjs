@@ -5,17 +5,20 @@
 // closes on the click this probe makes ("no visible panel" was the only output — usta2-home): pass --hover to hover it first, and read
 // the control's aria-expanded that is printed after the click. A control inside a closed panel needs the opener first: repeat --click
 // (`--click <opener> --click <item>`), the clicks run in order and the panel is dumped after the last (a drawer item's sub-panel
-// could not be reached with one click — hiltongrandvacations-home).
-// Usage: node click-state.mjs <url> <W> --click <css> [--click <css> …] --panel <css> [--hover [<css>]] [--shot <out.png>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--depth 7]
+// could not be reached with one click — hiltongrandvacations-home). A panel that opens on hover only, whose click navigates or whose
+// toggle is visually hidden to mouse users, takes `--hover <css>` with no `--click`: the probe hovers and dumps (it waited the 8 s click
+// timeout before printing the panel it had already opened — marriottvacationsworldwide-home).
+// Usage: node click-state.mjs <url> <W> [--click <css> [--click <css> …]] --panel <css> [--hover [<css>]] [--shot <out.png>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--depth 7]
 import { chromium } from 'playwright';
 import { arg, openPage, overlayOpts } from './common.mjs';
 
 const [,, url, wArg] = process.argv; const panel = arg('--panel');
 const clicks = process.argv.map((a, i, all) => (a === '--click' ? all[i + 1] : null)).filter((v) => v && !v.startsWith('--'));
-if (!url || !wArg || !clicks.length || !panel) { console.error('usage: click-state.mjs <url> <W> --click <css> [--click <css> …] --panel <css> [--hover [<css>]] [--shot <out.png>] [--consent <css>] [--depth 7]'); process.exit(1); }
-const W = Number(wArg); const depth = Number(arg('--depth', 7)); const click = clicks[clicks.length - 1];
+const hover = arg('--hover', null);
+if (!url || !wArg || !panel || (!clicks.length && typeof hover !== 'string')) { console.error('usage: click-state.mjs <url> <W> [--click <css> …] --panel <css> [--hover [<css>]] (--hover <css> alone: hover, no click) [--shot <out.png>] [--consent <css>] [--depth 7]'); process.exit(1); }
+const W = Number(wArg); const depth = Number(arg('--depth', 7)); const click = clicks.length ? clicks[clicks.length - 1] : hover;
 const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: 900, consent: arg('--consent', null), ...overlayOpts() });
-const hover = arg('--hover', null); if (hover) { await page.hover(hover === true ? clicks[0] : hover); await page.waitForTimeout(600); }
+if (hover) { await page.hover(hover === true ? clicks[0] : hover); await page.waitForTimeout(600); }
 for (const c of clicks) {
   try { await page.click(c, { timeout: 8000 }); } catch (e) { console.log(`click-state: click ${c} failed — ${e.message.split('\n')[0]}`); }
   await page.waitForTimeout(1200);
