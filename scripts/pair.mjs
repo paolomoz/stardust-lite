@@ -9,6 +9,9 @@
 // A live anchor that is one rendered LINE of a paragraph (a text-reveal library's one-element-per-line; `live-spec` merges the runs it can
 // see, the rest arrive here) is not MISSING when its text sits inside the build element the previous anchor paired with: it prints as ⤷
 // (continuation) and counts as located — 14 of 29 rows read MISSING on audemarspiguet-home for that.
+// A build element at `display: contents` has no box of its own and read as MISSING (the stat numbers were painted — marriottvacationsworldwide-home):
+// its box is its contents' range box, and it counts as a block. A live anchor the spec read inside an entrance state (`rest` on the item:
+// an AOS wrapper at translateY/opacity 0 — step 1) is compared at its rest box.
 // Usage: node pair.mjs <spec.json> <build-url> [--max 120] [--filter <regex>] [--all]   (--all also prints rows within tolerance) [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>]
 import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
@@ -23,28 +26,30 @@ for (const s of spec.secs) for (const it of s.items) {
   // off-page anchors (a 4×4 "Skip Advertisement" link at x −995) are not visible text: they pair with nothing a reader sees (usta2-home)
   if (!it.t || it.t.length < 3 || it.box[0] >= spec.W || it.box[0] + it.box[2] <= 0 || it.box[3] < 8) continue;
   const key = it.t.slice(0, 28); if (seen.has(key)) continue; if (filter && !filter.test(it.t)) continue;
-  seen.add(key); anchors.push({ t: key, box: it.box, cbox: it.cbox || null, pad: it.pad || null, fs: it.fs, lh: it.lh, fw: it.fw, ff: it.ff, c: it.c, tt: it.tt, inline: !!it.inline || it.k === 'a' || it.k === 'span' });
+  seen.add(key); anchors.push({ t: key, box: it.rest || it.box, cbox: it.cbox || null, pad: it.pad || null, fs: it.fs, lh: it.lh, fw: it.fw, ff: it.ff, c: it.c, tt: it.tt, inline: !!it.inline || it.k === 'a' || it.k === 'span' });
 }
 const browser = await chromium.launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800, consent: arg('--consent', null), ...overlayOpts() });
 await settle(page, 800, 50, 400);
 const out = await page.evaluate((anchors) => {
-  const R = (e) => { const b = e.getBoundingClientRect(); return [Math.round(b.x), Math.round(b.y + scrollY), Math.round(b.width), Math.round(b.height)]; };
+  // `display: contents` paints its children and has a 0×0 rect: its box is the range box of its contents
+  const rect = (e) => { if (getComputedStyle(e).display !== 'contents') return e.getBoundingClientRect(); const r = document.createRange(); r.selectNodeContents(e); return r.getBoundingClientRect(); };
+  const R = (e) => { const b = rect(e); return [Math.round(b.x), Math.round(b.y + scrollY), Math.round(b.width), Math.round(b.height)]; };
   const norm = (s) => s.replace(/\s+/g, ' ').trim();
   // visible text only: a `visibility: hidden` title (an ad block's white-on-white heading) paired a live section with the footer every round (walgreens-home)
-  const shown = (e) => { const b = e.getBoundingClientRect(); const s = getComputedStyle(e); return b.width > 0 && b.height > 0 && s.visibility !== 'hidden' && parseFloat(s.opacity) > 0.05; };
+  const shown = (e) => { const b = rect(e); const s = getComputedStyle(e); return b.width > 0 && b.height > 0 && s.visibility !== 'hidden' && parseFloat(s.opacity) > 0.05; };
   const all = [...document.querySelectorAll('h1,h2,h3,h4,h5,h6,p,span,a,li,button,em,strong,div')].filter((e) => shown(e) && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()));
   let prevBlock = null;
   return anchors.map((a) => {
     const lc = a.t.toLowerCase();
     const cands = all.filter((e) => norm(e.textContent).toLowerCase().startsWith(lc) || norm([...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(' ')).toLowerCase().startsWith(lc));
     // nearest the live y first (the same words recur in nav, cards and footer), shortest text second
-    let e = cands.sort((x, y) => Math.abs(x.getBoundingClientRect().top + scrollY - a.box[1]) - Math.abs(y.getBoundingClientRect().top + scrollY - a.box[1]) || x.textContent.length - y.textContent.length)[0];
+    let e = cands.sort((x, y) => Math.abs(rect(x).top + scrollY - a.box[1]) - Math.abs(rect(y).top + scrollY - a.box[1]) || x.textContent.length - y.textContent.length)[0];
     if (!e) {
       // a continuation line: its text is inside the previous anchor's build block (the block's Δh row already says whether the lines fit)
       if (prevBlock && norm(prevBlock.textContent).toLowerCase().includes(lc)) return { box: R(prevBlock), cont: true };
       return null;
     }
-    const isInline = (el) => /^(inline|contents)/.test(getComputedStyle(el).display) || ['A', 'SPAN', 'STRONG', 'EM', 'B', 'I', 'U', 'SUP', 'SUB'].includes(el.tagName);
+    const isInline = (el) => /^inline/.test(getComputedStyle(el).display) || ['A', 'SPAN', 'STRONG', 'EM', 'B', 'I', 'U', 'SUP', 'SUB'].includes(el.tagName);
     // a block-level live anchor pairs with the build's nearest block box (the authored inline wrapper is not the box the source has)
     if (!a.inline) while (e.parentElement && isInline(e) && e.parentElement !== document.body) e = e.parentElement;
     // a label inside a control (span in a button, text in a pill link) pairs control with control: the live spec carries the control's

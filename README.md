@@ -19,7 +19,8 @@ loss in the first two pilots.
 - `METHOD.md` — the procedure. Every rule traces to a case; `BACKLOG.md` holds what the cases found wrong or missing.
 - `scripts/` — the instruments (Node + Playwright): `probe-load`, `probe-structure`, `content-dump`, `content-view`, `media-list`,
   `media-fetch`, `live-spec`, `scroll-probe`, `deep-probe`, `click-dump`, `text-ladder`, `video-frame`, `da-put`, `sync-poll`, `serve`, `harness`,
-  `sections`, `pair`, `leak`, `gate`, `hover-diff`, `click-state`, `crop`, `shift-probe`, `measure-view`, `measure-to-spec`, `origin-pick`, `spec-view`.
+  `sections`, `pair`, `leak`, `gate`, `hover-diff`, `click-state`, `crop`, `shift-probe`, `extent`, `measure-view`, `measure-to-spec`, `origin-pick`,
+  `spec-view`.
 - `tools/` — vendored, unmodified, from Adobe's stardust plugin (Apache-2.0, see `NOTICE`): `replica/` capture and compare tools
   (`stitch-shot`, `pixel-compare`, `cap-probe`, `motion-observe`, `motion-compare`, `measure`, `anchor`), `diff/live-session.mjs`
   (their live-page session), `lint/davids-model-lint.mjs` + `davids-model.md`.
@@ -86,6 +87,7 @@ step 2, served page within the prototype's numbers, leak table identical.
 | `audemarspiguet-home` | 2026-10-01 | 4.28 / 2.50 / 1.34 | 4.19 / 2.48 / 1.34 | 6 harness rounds (none void, 1 regression) + 1 served fix (the pipeline's list-item `<p>`); 80 min wall, first shareable URL at 60 min; light-DOM AEM Sites origin with React islands (drawer, language selector), OneTrust + geo redirect, text-reveal line splits, Swiper `autoHeight` carousels, hero videos, noise floor 0.00; leak table 0 lines; every block a Block Collection shape |
 | `hiltongrandvacations-home` | 2026-10-01 | 5.91 / 2.76 / 3.29 | 5.94 / 2.76 / 3.28 | 3 table rounds (r0–r2) to the first push + 3 gate rounds (r3–r5, none void) + 0 served fixes; 110 min wall, first shareable URL at 77 min; light-DOM Angular origin, Osano consent bar, Vimeo iframe hero (≈ 80 % of every width's number), two count-ups, Font Awesome Pro icons redrawn, avif media end to end, noise floor 0.10 (the hero frame); leak table 0 lines; cap-probe 11/11 |
 | `dentsu-home` | 2026-10-01 | 4.88 / 2.21 / 2.12 | 4.98 / 2.21 / 2.11 | 2 table rounds (r0–r1) to the first push + 5 gate rounds (r2–r6, none void, 1 regression) + 0 served fixes; 55 min wall, first shareable URL at 37 min; light-DOM Kentico origin serving its Switzerland edition by IP, OneTrust bottom bar, header absolute over a 100vh hero, rellax parallax on four elements, no video, noise floor 0.84 (the parallax band); leak table 0 lines; every block a Block Collection shape |
+| `marriottvacationsworldwide-home` | 2026-10-01 | 2.66 / 0.30 / 0.16 | 2.82 / 0.33 / 0.20 | 3 table rounds (r0–r2) to the first push + 6 gate rounds (r3–r8, none void, 2 cost by instrument readings: an entrance-state spec and a mis-attributed `background-size`) + 0 served fixes; 110 min wall, first shareable URL at 57 min; light-DOM WordPress / Kadence origin, Splide hero with a Brightcove player (its playback API's progressive MP4 served `video/mp4` by DA), AOS entrances parked in the spec, nine body modals as hidden-but-present content, OneTrust reload-on-accept, noise floor 0.00; leak table 0 lines; every block but `brand-bar` a Block Collection shape |
 
 Next: one static-CMS site, passing the lint at step 2 and holding its prototype number on the served page. ibm-home was the JS-heavy
 one (Carbon web components); the composed-tree tier it needed is in `common.mjs` (`DEEP_HELPERS`), `deep-probe` and `hover-diff`.
@@ -107,3 +109,7 @@ hiltongrandvacations-home was the one whose content was not all at rest: a hero 
 while the capture runs, captions and tab panels that exist only after a click, an iframe player no `<video>` probe can pause — and those are now
 `content-dump` walking through 0-size wrappers, `text-ladder`, `click-dump` (a second `harness --content` source), `video-frame --box --hide`
 and a repeated `--click` in `click-state`; the body weight, `[hidden]`, `decorateIcons(block)` and the fragment runtime's wrapper are method text.
+marriottvacationsworldwide-home was the one whose spec was parked: an AOS library held every tile at its entrance translate while the capture showed
+it at rest, nine modals sat hidden in `<body>`, two sizes were settled by pixels and a click probe navigated — now `live-spec`'s entrance flag (`rest`,
+read by `pair` / `sections`), `content-dump --hidden`, `extent`, `gate` dropping a navigating click probe, `click-state --hover` alone and
+`deep-probe --sels` as a list; `inlineIcons()` for `currentColor` and the two specificity traps are method text.

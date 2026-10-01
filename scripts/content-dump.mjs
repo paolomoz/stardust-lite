@@ -10,7 +10,10 @@
 // skipped with its subtree (hiltongrandvacations-home: the hero's header). Read the dump with `content-view.mjs` (full texts), never a
 // truncating viewer. Hidden content a click reveals (a carousel caption, a tab panel, a drawer's sub-menu) is `click-dump.mjs`'s.
 // --require <css,…> refuses (exit 4) a session whose composition is not the canonical one, so the dump matches the cached origin.
-// Usage: node content-dump.mjs <url> [W] --roots <css,…> --out file.json [--require <css,…>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>]
+// --hidden <css,…> dumps the named roots WITHOUT the visibility test (boxes 0): hidden-but-present content a JS opener reveals that no
+// click the probes make fires — modals appended to `<body>` with `aria-hidden` at rest (nine brand modals; `harness --content` listed
+// every authored modal text as "not in the capture" — marriottvacationsworldwide-home). Opt-in and per root: hidden DOM stays NOT content.
+// Usage: node content-dump.mjs <url> [W] --roots <css,…> [--hidden <css,…>] --out file.json [--require <css,…>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>]
 import { chromium } from 'playwright';
 import { writeFileSync } from 'node:fs';
 import { openPage, settle, arg, overlayOpts } from './common.mjs';
@@ -18,11 +21,13 @@ import { openPage, settle, arg, overlayOpts } from './common.mjs';
 const url = process.argv[2]; const W = Number(process.argv[3] || 1440);
 if (!url) { console.error('usage: content-dump.mjs <url> [W] --roots <css,…> --out file.json [--require <css,…>]'); process.exit(1); }
 const roots = String(arg('--roots', 'header,main,footer')).split(',').map((s) => s.trim());
+const hidden = String(arg('--hidden', '')).split(',').map((s) => s.trim()).filter(Boolean);
 const b = await chromium.launch(); const p = await openPage(b, url, { width: W, consent: arg('--consent', null), ...overlayOpts(), wait: 4000 });
 await settle(p);
-const tree = await p.evaluate((roots) => {
+const tree = await p.evaluate(([roots, hidden]) => {
   const R = (e) => { const r = e.getBoundingClientRect(); return [Math.round(r.x), Math.round(r.y + scrollY), Math.round(r.width), Math.round(r.height)]; };
-  const vis = (e) => { const r = e.getBoundingClientRect(); const s = getComputedStyle(e); return (r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none') || e.tagName === 'PICTURE' || e.tagName === 'SOURCE'; };
+  let force = false; // --hidden roots: every element counts as visible
+  const vis = (e) => { if (force) return true; const r = e.getBoundingClientRect(); const s = getComputedStyle(e); return (r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none') || e.tagName === 'PICTURE' || e.tagName === 'SOURCE'; };
   const norm = (t) => t.replace(/\s+/g, ' ').trim();
   const own = (e) => [...e.childNodes].filter((n) => n.nodeType === 3).map((n) => norm(n.textContent)).filter(Boolean).join(' ');
   const PHRASING = ['STRONG', 'EM', 'B', 'I', 'U', 'SPAN', 'A', 'SUP', 'SUB', 'BR', 'SMALL', 'MARK', 'ABBR'];
@@ -75,9 +80,10 @@ const tree = await p.evaluate((roots) => {
     return n;
   };
   const out = {}; for (const r of roots) out[r] = [...document.querySelectorAll(r)].map(walk).filter(Boolean);
+  force = true; for (const r of hidden) out[`hidden ${r}`] = [...document.querySelectorAll(r)].map(walk).filter(Boolean); force = false;
   out.__doc = document.documentElement.scrollHeight; out.__title = document.title; out.__desc = document.querySelector('meta[name=description]')?.content;
   return out;
-}, roots);
+}, [roots, hidden]);
 writeFileSync(arg('--out', 'content.json'), JSON.stringify(tree, null, 1));
-console.log('doc', tree.__doc, 'roots', roots.length, '→', arg('--out', 'content.json'));
+console.log('doc', tree.__doc, 'roots', roots.length, hidden.length ? `+ ${hidden.length} hidden root(s) (boxes 0: hidden-but-present content, register which opener reveals it)` : '', '→', arg('--out', 'content.json'));
 await b.close();
