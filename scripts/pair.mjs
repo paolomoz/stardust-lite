@@ -5,6 +5,7 @@
 // with the same size was hidden before — ibm-home read every offset chain from the section table instead). Runs of anchors sharing
 // one Δx or Δy — even under the 3 px tolerance — are reported as a group offset: that is how a whole header bar shifted by 3 px shows up.
 // An inline live anchor (a span in a heading) paired with a block-level build box is compared as its line box (≈), not its glyph box.
+// A text-transform change (live `uppercase`, build `none`) is hot: the anchor text is DOM text, the pixels are the rendered case.
 // Usage: node pair.mjs <spec.json> <build-url> [--max 120] [--filter <regex>] [--all]   (--all also prints rows within tolerance) [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>]
 import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
@@ -16,9 +17,10 @@ const spec = JSON.parse(readFileSync(specPath, 'utf8')); const MAX = Number(arg(
 const anchors = []; const seen = new Set();
 for (const s of spec.secs) for (const it of s.items) {
   if (!['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'span', 'button', 'li', 'div'].includes(it.k)) continue;
-  if (!it.t || it.t.length < 3 || it.box[0] >= spec.W) continue;
+  // off-page anchors (a 4×4 "Skip Advertisement" link at x −995) are not visible text: they pair with nothing a reader sees (usta2-home)
+  if (!it.t || it.t.length < 3 || it.box[0] >= spec.W || it.box[0] + it.box[2] <= 0 || it.box[3] < 8) continue;
   const key = it.t.slice(0, 28); if (seen.has(key)) continue; if (filter && !filter.test(it.t)) continue;
-  seen.add(key); anchors.push({ t: key, box: it.box, cbox: it.cbox || null, pad: it.pad || null, fs: it.fs, lh: it.lh, fw: it.fw, ff: it.ff, c: it.c, inline: !!it.inline || it.k === 'a' || it.k === 'span' });
+  seen.add(key); anchors.push({ t: key, box: it.box, cbox: it.cbox || null, pad: it.pad || null, fs: it.fs, lh: it.lh, fw: it.fw, ff: it.ff, c: it.c, tt: it.tt, inline: !!it.inline || it.k === 'a' || it.k === 'span' });
 }
 const browser = await chromium.launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800, consent: arg('--consent', null), ...overlayOpts() });
 await settle(page, 800, 50, 400);
@@ -38,7 +40,7 @@ const out = await page.evaluate((anchors) => {
     if (!a.inline) while (e.parentElement && isInline(e) && e.parentElement !== document.body) e = e.parentElement;
     // a label inside a control (span in a button, text in a pill link) pairs control with control: the live spec carries the control's
     // box (cbox) and the build's a/button is the box — the span-vs-a.button rows (Δy −12 / Δh 24 = padding) meant nothing (walgreens-home)
-    const s0 = getComputedStyle(e); const font = { fs: s0.fontSize, lh: s0.lineHeight, fw: s0.fontWeight, ff: s0.fontFamily.split(',')[0].replace(/"/g, ''), c: s0.color };
+    const s0 = getComputedStyle(e); const font = { fs: s0.fontSize, lh: s0.lineHeight, fw: s0.fontWeight, ff: s0.fontFamily.split(',')[0].replace(/"/g, ''), c: s0.color, tt: s0.textTransform };
     const ctl = a.cbox ? e.closest('a,button') : null; if (ctl) return { box: R(ctl), ctl: true, ...font };
     return { box: R(e), block: !isInline(e), ...font };
   });
@@ -55,9 +57,11 @@ let n = 0;
 anchors.forEach((a, i) => {
   if (n >= MAX) return; const o = out[i]; const lb = liveBox(a, o); // control paired with control (⌗); inline glyph box read as its line box (≈)
   const d = o ? [o.box[0] - lb[0], o.box[1] - lb[1], o.box[2] - lb[2], o.box[3] - lb[3]] : null;
-  const hot = !o || Math.abs(d[0]) > 3 || Math.abs(d[1]) > 3 || Math.abs(d[3]) > 3 || a.fs !== o.fs || a.fw !== o.fw || a.c !== o.c;
+  // text-transform is a font delta too: the live renders `uppercase` on DOM text no table showed — three 1440 bands for a round (usta2-home)
+  const ttHot = o && a.tt && a.tt !== o.tt;
+  const hot = !o || Math.abs(d[0]) > 3 || Math.abs(d[1]) > 3 || Math.abs(d[3]) > 3 || a.fs !== o.fs || a.fw !== o.fw || a.c !== o.c || ttHot;
   if (!all && !hot) return; n += 1;
-  const f = o ? `${a.fs}/${a.lh} ${a.fw} ${a.ff.slice(0, 7)} → ${o.fs}/${o.lh} ${o.fw} ${o.ff.slice(0, 7)}${a.c !== o.c ? ` COLOR ${a.c}→${o.c}` : ''}` : '';
+  const f = o ? `${a.fs}/${a.lh} ${a.fw} ${a.ff.slice(0, 7)} → ${o.fs}/${o.lh} ${o.fw} ${o.ff.slice(0, 7)}${a.c !== o.c ? ` COLOR ${a.c}→${o.c}` : ''}${ttHot ? ` TRANSFORM ${a.tt}→${o.tt}` : ''}` : '';
   console.log((o && o.ctl ? `${a.t.slice(0, 26)} ⌗` : (lb !== a.box ? `${a.t.slice(0, 26)} ≈` : a.t)).padEnd(30), JSON.stringify(lb).padEnd(22), (o ? JSON.stringify(o.box) : '-').padEnd(22), o ? d.map((v) => String(v).padStart(4)).join('') : ' MISSING', '|', f);
 });
 console.log(`${anchors.length} anchors, ${out.filter(Boolean).length} located${out.some((o) => o && o.ctl) ? ', ⌗ = control paired with control' : ''}${out.some((o, i) => o && liveBox(anchors[i], o) !== anchors[i].box && !o.ctl) ? ', ≈ = live inline glyph box read as its line box' : ''}${all ? '' : ` (rows within 3 px and same font hidden; --all shows them)`}`);

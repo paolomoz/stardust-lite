@@ -12,7 +12,10 @@ const [,, specPath, url] = process.argv;
 if (!specPath || !url) { console.error('usage: sections.mjs <spec.json> <build-url> [--sections <css>] [--header <css>] [--footer <css>]'); process.exit(1); }
 const spec = JSON.parse(readFileSync(specPath, 'utf8'));
 const sections = arg('--sections', 'main > .section'); const header = arg('--header', 'header'); const footer = arg('--footer', 'footer');
-const anchorOf = (s) => s.items.find((it) => ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'li'].includes(it.k) && it.t && it.t.length >= 3); // h5/h6: a small section head is an h5 on Carbon sites (ibm-home)
+// h5/h6: a small section head is an h5 on Carbon sites (ibm-home); the anchor must sit on the page — a 4×4 "Skip Advertisement" link at
+// x −995 anchored the ad section to nothing every round (usta2-home)
+const onPage = (it) => it.box[0] + it.box[2] > 0 && it.box[0] < spec.W && it.box[3] >= 8;
+const anchorOf = (s) => s.items.find((it) => ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'li'].includes(it.k) && it.t && it.t.length >= 3 && onPage(it));
 const live = spec.secs.map((s) => { const a = anchorOf(s); return { box: s.box, id: s.id, anchor: a ? { t: a.t.slice(0, 28), box: a.box } : null }; });
 const browser = await chromium.launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800, consent: arg('--consent', null), ...overlayOpts() });
 await settle(page, 800, 50, 400);

@@ -5,6 +5,8 @@
 // Usage: node gate.mjs --live <url> --build <url> --out <dir> [--widths 360,1440,2560] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--main <css>] [--build-main main]
 //        [--probes <file>] [--recapture-origin] [--band 450] [--top 120]
 //   <probes file>: one line per probe: `hover <live-sel> => <build-sel>` or `click <live-sel> => <build-sel>` (same order both sides).
+//   --main <css>: the LIVE content root for cap-probe when the origin has no `main` (its body default read "1920 ×1 of 4 sections" and
+//   every build FAILed; pinned to the content grid the same build PASSed 0 of 13 — usta2-home). --build-main defaults to `main`.
 //   Between CSS rounds run `--widths <base>` only; the three widths + probes once the section table and the pairing are clean.
 //   Every width also writes `diff-<W>-top.png`, the first --top px of the diff (the header band hides a displaced bar in a 1 % number).
 import { spawnSync } from 'node:child_process';
@@ -14,7 +16,7 @@ import { join } from 'node:path';
 import { arg, stardustScripts } from './common.mjs';
 
 const live = arg('--live'); const build = arg('--build'); const out = arg('--out');
-if (!live || !build || !out) { console.error('usage: gate.mjs --live <url> --build <url> --out <dir> [--widths 360,1440,2560] [--consent <css>] [--probes <file>]'); process.exit(1); }
+if (!live || !build || !out) { console.error('usage: gate.mjs --live <url> --build <url> --out <dir> [--widths 360,1440,2560] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--main <live-content-root>] [--build-main main] [--probes <file>]'); process.exit(1); }
 const widths = String(arg('--widths', '360,1440,2560')).split(',').map(Number); const consent = arg('--consent', null); const band = Number(arg('--band', 450));
 // overlays and locale reach the LIVE side of every capture tool (a geo modal or a marketing interstitial is not consent; a geo-redirecting
 // origin captures another locale per run without the pin)
