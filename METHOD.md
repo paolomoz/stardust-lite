@@ -20,9 +20,9 @@ order; blocks hold only what default content cannot.
 | artifact | produced by | notes |
 |---|---|---|
 | repo + branch + DA site, code synced on the branch | `eds-new-site`, then `scripts/sync-poll.mjs` (`--trigger` POSTs `admin.hlx.page/code/<org>/<site>/<branch>/*`) | new branches did not sync on push in 2026-09, and the trigger has answered 404 while the push synced on its own: the poll decides (md5 of the decompressed body against the pushed commit's file; a push reached the bus in 10 s once and in > 200 s the next time — poll for minutes and record the time) |
-| archetype list: which page represents which template | `prepare-migration` | one page per template is prototyped; the rest is rollout |
+| archetype list: which page represents which template | `scripts/roster.mjs` (`--nav` / `--urls` / `--crawl`, one light pass per page: content dump, section fingerprints, inventory match; writes `migration/roster.json` + `roster.md`) | one page per template is prototyped; the rest is rollout. The roster's coverage matrix (pages × blocks), novelty per page and skeleton clusters say which pages share a template and which look like a new one; `roster pick` writes the page list the rollout consumes, reuse-first or novelty-first |
 | page capture: texts, hrefs, media URLs, hidden DOM | `extract` page capture, or `scripts/live-spec.mjs` (writes the DOM too) | hidden DOM (mobile duplicates, `display:none` promos) is NOT content — what a click reveals is (`click-dump`): pick one composition. A **web-components origin** (custom elements, shadow roots, no `main`) keeps its paint, boxes and hover states inside shadow roots: light-DOM `querySelectorAll` reads slotted text but no paint and calls every hover dead. Count the shadow roots in the first look; use the composed-tree tier (`deep-probe` / `hover-diff` with ` >> ` selectors, `DEEP_HELPERS` in `common.mjs`) for paint and motion, and dump the structure through the shadow roots before triaging |
-| overlays and locale | `--consent <css>` **and** `--dismiss <css,…>` **and** `--locale <tag>` on every instrument | consent is one overlay; a geo-mismatch modal (full viewport, in the visitor's language, over the pinned locale's page) or a marketing interstitial is another. Find both in the first look; pass both to every tool; the origin captures need the locale pinned or a geo-redirecting site captures a different page per run. A consent accept may **reload the page** (OneTrust "reload on consent"): `openPage` waits the navigation out; a tool that does not survive it takes the close/reject control instead. An origin may also serve another **edition at the same URL by IP** (no redirect; `Accept-Language` and `--locale` change nothing): compare a market marker across `curl` with two languages and the browser, record which edition `/` is for this operator — that is the page measured |
+| overlays and locale | `--consent <css>` **and** `--dismiss <css,…>` **and** `--locale <tag>` on every instrument | consent is one overlay; a geo-mismatch modal (full viewport, in the visitor's language, over the pinned locale's page) or a marketing interstitial is another. Find both in the first look; pass both to every tool; the origin captures need the locale pinned or a geo-redirecting site captures a different page per run. A consent accept may **reload the page** (OneTrust "reload on consent"): `openPage` waits the navigation out; a tool that does not survive it takes the close/reject control instead. An origin may also serve another **edition at the same URL by IP** (no redirect; `Accept-Language` and `--locale` change nothing): compare a market marker across `curl` with two languages and the browser, record which edition `/` is for this operator — that is the page measured. Once the template is approved these live in `migration/site.json` (`site-profile init`): every instrument reads the profile's overlays, cap root and locale as its defaults when the flags are absent (`--site <file>`, explicit flags win), and `site-profile check` opens the origin per width before a page run to verify the controls still resolve and the chrome heights hold |
 | per-node measurement per width (spec JSON) | `scripts/live-spec.mjs <url> <W> --sections <sel> --consent <sel>` | box, paint, font family/size/line-height/weight/transform/align/colour per text node; box and fit per image. One JSON per width |
 | probe width and container model | `tools/replica/cap-probe.mjs <url>` capture | probe = max(2560, largest cap × 1.25) |
 | origin captures per width | `stitch-shot.mjs <url> live-<W>.png --width W --settle` | cache them: every gate round compares against the same origin; capture the live page twice once and keep the self-diff as the noise floor. A self-diff band far above the others is not noise but a **composition** (an A/B alert, a personalised slot that holds a carousel in one session and a banner in the next — walgreens-home read 33.6 % between two loads): name the regions, pick one composition, capture the origins in it and pass its markers as `--require <css,…>` to every measurement instrument — a run in another session exits 4 |
@@ -35,7 +35,9 @@ order; blocks hold only what default content cannot.
 
 ## Procedure, per template
 
-1. **Measure the source at three widths** (360, 1440, probe): `probe-load` at **every gated width** (status, overlays, fixed layers, shadow roots — a header
+1. **Measure the source at three widths** (360, 1440, probe): `measure-page` is the single-session reading of this step's instruments — one load per width,
+   then the first look, the structure dump, the content dump, the media list, the spec with its DOM and the deep-probe set from that same settled page; the
+   single instruments are for targeted re-reads. `probe-load` at **every gated width** (status, overlays, fixed layers, shadow roots — a header
    fixed at the base width may scroll at 360), `probe-structure` (the section selector for `live-spec --sections`), `content-dump` read through `content-view`
    (the authoring input: full texts in reading order with inline markup, links, media, boxes, and the font string with `text-transform` — the dump holds DOM
    text, the page may render it uppercase and no table shows the case), `media-list`, `live-spec`. The dump is the **authoring set, not the painted set**: a
@@ -58,7 +60,10 @@ order; blocks hold only what default content cannot.
      sources), *container* (own rows, then one row per child, ≤ 4 columns, one property per column). A composition that fits none is a modelling error
      (D1/D2/D10), not a fourth shape.
    - **Block Collection match** — hero, cards, columns, tabs, accordion, carousel, quote, embed. If it matches, take the name and the authoring shape;
-     the site's look is a variant or the block's CSS. A site-specific name is for what the collection has no shape for.
+     the site's look is a variant or the block's CSS. A site-specific name is for what the collection has no shape for. Match the site's own
+     inventory first (`block-inventory` — `migration/blocks.json`: the blocks and variants earlier pages approved, with their source signatures
+     and budgets), the collection second, a new name last; `triage` drafts the table from the content dump (fingerprint, repeat, inventory match
+     with its confidence, default content, rows × cols, the page's novelty) and the agent edits the draft — it never decides.
    - **default content around it** — section heads, ledes and closing CTAs are default content; the block decorate may *move* them into its DOM but the
      document keeps them where an author expects them.
    - **embeds in repeating units** — a video that belongs to a card is a fully qualified link in that card's row; the block opens the player.
@@ -75,7 +80,9 @@ order; blocks hold only what default content cannot.
      fold it (step 5). **This is the first deliverable.** Preview the three documents on the branch as soon as they lint clean and share the URLs with
      the triage table: the content model is approvable before a block exists.
 
-3. **Author the document** from the triage table. Section styles for the source's spacing (authored, not by position), section-metadata for
+3. **Author the document** from the triage table. `author` writes it from the triage and the dump through the inventory's recipes (`blocks.json`: how a
+   source unit becomes a block row, derived once from the case document that approved the block); the agent reviews the draft, its stderr table and the
+   lint, never types a text, and a NEW section stops the run until the block is named and its recipe written. Section styles for the source's spacing (authored, not by position), section-metadata for
    configuration, `<em>` for accents, bold/italic links for button weight (the block decides the variant). A picture on its own line is a paragraph:
    author it in `<p>` (the pipeline emits `<p><picture>`; the runtime wraps a bare picture-first cell into one `<p>` with whatever follows). Type every
    text from the capture (`content-view`, never a truncating viewer; `harness --content` names each authored text the dumps do not hold). Write the
@@ -147,7 +154,10 @@ order; blocks hold only what default content cannot.
    `background-size`, a logo's painted width) `extent` reads the bbox of a colour or of the non-background pixels in a region of the capture: a computed value
    is one element in one state, the extent is what was painted. **Stop rule.** Once every section row is within 2 px at the three widths and the residual bands
    are named in the register (a third-party layer, a video frame, anti-aliasing, a rendition, an entrance the capture caught mid-flight on the live side), ship:
-   three more rounds (ibm-home) taught the reviewer nothing.
+   three more rounds (ibm-home) taught the reviewer nothing. On a page after the template the chrome is approved: `gate` masks the header and footer bands
+   (heights from the site profile), skips the probes inside them, and reads every authored section against its block's budget from the inventory (`gate
+   --budget`, the triage names the block) — the per-section table says which section is red, not one page number; a section whose block is new or has no
+   budget is gated as in a template run, at the three widths.
 
 7. **Deploy the same document and the same code** to a draft path on the branch (preview only) and gate the served page at the same three widths, same
    motion probes, **and the hidden states** (`click-state --hover`, `hover-diff`): a drawer at rest is read by no table, and a fragment decorate meets
@@ -156,14 +166,21 @@ order; blocks hold only what default content cannot.
    body with the pushed commit's file). Any gap is a runtime difference, found with the leak table (`scripts/leak.mjs`, prototype vs served, one row per
    wrapper, header and footer included) — never by eye. Known served-only difference: the pipeline leaves the metadata block behind as an **empty
    section** the harness fold drops, so a section-rhythm rule (`.section + .section`) adds a gap only on the served page — exclude empty sections (`main
-   > .section:not(:has(> *))`).
+   > .section:not(:has(> *))`). The template run ends by writing the site profile — `site-profile init migration/cases/<template> --out migration/site.json`
+   (overlays, cap model, fonts and body row, tokens, chrome selectors, heights and states per width, fragment paths, DA coordinates, serve port, noise
+   floor, this page's numbers; `site-profile print` renders it for the README) and the block inventory (`block-inventory scan --cases`, its budgets from
+   the served per-section table) — the state every later page run reads instead of re-discovering it; a page after the template follows `ROLLOUT.md`. A
+   rollout runs the list `roster pick` wrote: `harness --pages` on one serve, `gate --pages` per page with one origin cache each and one summary table,
+   `da-put --pages` to each page's docPath (`--dry` first), `gate --served-pages` against the branch host reusing the prototype origins.
 
 8. **Approval = block approval.** Prototype, blocks, authored document, triage table, deviations and motion registers are one artifact. The prototype
-   number becomes the page's budget for rollout.
+   number is the page's budget for rollout only until the served per-section table is read: the inventory then carries each block's budget per width
+   (`block-inventory scan` / `budgets`), and a rollout page is gated section by section against those.
 
 ## Instruments (`scripts/`, each prints its usage without arguments; capture, compare and lint tools vendored unmodified under `tools/` — see NOTICE)
 
-- Step 1 — `probe-load` (first look at one or several widths: status, overlays, fixed layers, shadow roots), `probe-structure` (structure dump; `--pierce`
+- Step 1 — `measure-page` (the step in one session per width: probe-load's first look before the overlays are clicked, the structure dump, the content dump,
+  the media list, the spec + DOM and the default deep-probe set from one settled page, byte-compatible files, `summary.json`), `probe-load` (first look at one or several widths: status, overlays, fixed layers, shadow roots), `probe-structure` (structure dump; `--pierce`
   shadow roots), `content-dump` + `content-view` (the authoring input: full texts with font and text-transform, line runs as one paragraph, lazy media;
   `--hidden` roots), `media-list`, `media-fetch` (the dump's media bytes, a-z0-9 names, manifest), `live-spec` (per-node measurement per width, control boxes,
   line runs, 0-height spacing, entrance states with their rest box; writes the DOM), `scroll-probe` (layers at a scroll ladder, `--paint` children, `--up`),
@@ -172,6 +189,16 @@ order; blocks hold only what default content cannot.
   `harness --content`), `text-ladder` (a text sampled over time: a count-up's duration and easing), `video-frame` (a `<video>` at t = 0 at 2×, or an iframe
   player's box with its overlays hidden), `da-put` (DA source PUT + branch preview; warns on upper case, `--`, `_` and dots), `sync-poll` (the code bus serves
   the pushed commit's files).
+- Step 2 — `block-inventory` (scan `blocks/*/` + a case's register, dump and document into `migration/blocks.json`: block, variant, shape,
+  collection, rows × cols, authoring example, source signature, recipe, budget per width; `diff` a triage against it; `budgets --gate-dir` recomputes the
+  budgets from a served per-section gate table; `print`), `triage` (the draft triage table from a
+  content dump as JSON and markdown: per section fingerprint, repeat, media ratio, source classes, inventory / collection / new match with confidence,
+  default content, rows × cols; the page's novelty; `--from-md` reads the agent's edits back; `lib/fingerprint.mjs` holds the rules).
+- Step 3 — `author` (the document from the triage and the dump through the inventory's recipes: default content as the dump holds it, a block table
+  per recipe with the unit's leaves bucketed into cells by kind, media through media-fetch's manifest, section-metadata, the metadata block, then the
+  lint; a stderr table per section — block / default / new, cells filled, texts, what did not fit; `--nav` / `--footer` write the chrome documents in
+  the simplest shape only when absent). `block-inventory scan --cases` derives every recipe from the case documents, `block-inventory recipe` one;
+  `lib/recipes.mjs` documents the recipe, `lib/doc-diff.mjs` compares an authored document with a reference structurally.
 - Step 5 — `serve` (concurrent static server, boilerplate symlinks), `harness` (lint → fold (cell and list-item rules) → warm the remote media → runtime
   → serialise; refuses a 🔴; `--fragments` fetches the pipeline's plain.html and media; `--content` checks the authored texts against the capture and the
   click dumps, comma-separated).
@@ -181,7 +208,8 @@ order; blocks hold only what default content cannot.
   (first visible match), `click-state` (`--hover` first or alone; repeated `--click` for a control inside a closed panel; prints the panel and the control's
   `aria-expanded`), `leak` (every wrapper, prototype vs served), `crop`, `extent` (painted bbox of a colour / alpha / non-background pixels in a region of a
   capture).
-- Page-specific probes (a sticky bar's state machine, an icon-sprite inventory, a document generator) live in `cases/*/scripts` as templates.
+- Page-specific probes (a sticky bar's state machine, an icon-sprite inventory) live in `cases/*/scripts` as templates; `page-report` writes a rollout page's
+  row and screen (`ROLLOUT.md`).
 - Every instrument that opens a page takes `--consent`, `--dismiss <css,…>`, `--locale <tag>` and `--require <css,…>` (`common.mjs openPage`;
   `--require` exits 4 when the session is not the composition the origin shows); `gate` passes the overlay options to the live capture side. `settle`
   reads after the fonts, every image and every finite animation — a table read before them is not a measurement.

@@ -9,7 +9,7 @@ import { arg, openPage, settle, overlayOpts } from './common.mjs';
 const url = process.argv[2]; const selsFile = arg('--sels');
 if (!url || !selsFile) { console.error('usage: leak.mjs <url> --sels <file> [--width 1440]'); process.exit(1); }
 const SELS = readFileSync(selsFile, 'utf8').split('\n').map((s) => s.trim()).filter((s) => s && !s.startsWith('#'));
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: Number(arg('--width', 1440)), height: Number(arg('--vh', 900)), wait: 800, consent: arg('--consent', null), ...overlayOpts() });
+const browser = await chromium.launch(); const page = await openPage(browser, url, { width: Number(arg('--width', 1440)), height: Number(arg('--vh', 900)), wait: 800, ...overlayOpts() });
 await settle(page, 800, 60, 400);
 const rows = await page.evaluate((SELS) => SELS.map((sel) => {
   const e = document.querySelector(sel); if (!e) return `${sel.padEnd(70)} MISSING`;

@@ -1,0 +1,11 @@
+/* fonts.css — one @font-face per face the source loads (site.json `fonts.faces`: family, weight, style, file). The woff2/woff bytes go
+   to /fonts unchanged (METHOD prerequisites: fonts). styles.css imports this file so the faces load while gating; keep the family
+   name exactly as --body-font-family / --heading-font-family use it. Delete the template face below once the real ones are in. */
+
+@font-face {
+  font-family: 'Site Sans';            /* spec: fonts.faces[].family */
+  font-style: normal;                  /* spec: fonts.faces[].style */
+  font-weight: 400;                    /* spec: fonts.faces[].weight — a range (100 900) for a variable font */
+  font-display: swap;
+  src: url('../fonts/site-sans-regular.woff2') format('woff2');   /* spec: fonts.faces[].file */
+}

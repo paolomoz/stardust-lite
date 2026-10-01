@@ -1,7 +1,8 @@
 // common.mjs — shared helpers: real-Chrome UA, consent (waits out a reload-on-consent) + overlay dismissal, locale, device scale,
-// lazyload settle (fonts included), composed-tree (shadow DOM) queries, stardust plugin script paths.
-import { existsSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+// lazyload settle (fonts included), composed-tree (shadow DOM) queries, stardust plugin script paths, the site profile
+// (`migration/site.json`, written by `site-profile init`) as the default for every overlay flag.
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
@@ -13,30 +14,69 @@ export function arg(name, def) {
   return v === undefined || v.startsWith('--') ? true : v;
 }
 
-/** `--dismiss`, `--locale` and `--require` read from argv the way every instrument reads them (a geo-mismatch modal or a marketing
- * interstitial is not consent: every overlay control must reach every tool — BACKLOG #2; a geo-redirecting origin needs the locale
- * pinned; a page with session-variable composition — an A/B alert, a personalised slot — needs every measurement run gated to the
- * composition the origin was captured in: `--require <css,…>` exits 4 when one of the markers is absent — walgreens-home). */
-export const overlayOpts = () => ({ dismiss: String(arg('--dismiss', '')).split(',').map((s) => s.trim()).filter(Boolean), locale: arg('--locale', null), require: String(arg('--require', '')).split(',').map((s) => s.trim()).filter(Boolean) });
+/** The site profile: `--site <file>`, or `migration/site.json` under the cwd when it exists (`--no-site` ignores it). Loaded once per
+ * process; one stderr line names the file in use. Every flag an instrument takes still wins over the profile (site-profile.mjs documents
+ * the JSON shape; `siteProfile()` is the read for the other instruments — cap main selector, chrome heights, DA coordinates, branch host). */
+let SITE; // undefined = not looked up yet; null = none
+export function siteDefaults() {
+  if (SITE !== undefined) return SITE;
+  SITE = null;
+  if (process.argv.includes('--no-site')) return SITE;
+  const flag = arg('--site', null); const def = join(process.cwd(), 'migration', 'site.json');
+  const file = typeof flag === 'string' ? resolve(flag) : (existsSync(def) ? def : null);
+  if (!file) return SITE;
+  try { SITE = JSON.parse(readFileSync(file, 'utf8')); SITE._file = file; console.error(`site: ${file}`); } catch (e) { console.error(`site: ${file} unreadable (${e.message}) — running without a profile`); }
+  return SITE;
+}
+export const siteProfile = () => siteDefaults();
 
-export async function openPage(browser, url, { width = 1440, height = 900, scale = 1, consent = null, dismiss = [], locale = null, require = [], wait = 2500, before = null } = {}) {
-  const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: scale, userAgent: UA, ...(locale ? { locale, extraHTTPHeaders: { 'Accept-Language': `${locale},${locale.split('-')[0]};q=0.9` } } : {}) });
-  if (before) await before(page); // listeners that must exist before navigation (response log for font requests — media-list)
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
-  await page.waitForTimeout(wait);
+/** `--consent`, `--dismiss`, `--locale` and `--require` read from argv the way every instrument reads them (a geo-mismatch modal or a
+ * marketing interstitial is not consent: every overlay control must reach every tool — BACKLOG #2; a geo-redirecting origin needs the
+ * locale pinned; a page with session-variable composition — an A/B alert, a personalised slot — needs every measurement run gated to
+ * the composition the origin was captured in: `--require <css,…>` exits 4 when one of the markers is absent — walgreens-home).
+ * A flag that is not on the command line falls back to the site profile's `overlays` (explicit flags win). */
+const list = (v) => String(v ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+export const overlayOpts = () => {
+  const o = siteDefaults()?.overlays || {};
+  const pick = (name, key) => { const v = arg(name, null); return v === null ? (o[key] ?? null) : v; };
+  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')) };
+};
+/** The same options as argv for a vendored capture tool's live side (`stitch-shot`, `cap-probe`, `motion-observe`). */
+export const overlayArgs = () => { const o = overlayOpts(); return [...(o.consent ? ['--consent', o.consent] : []), ...(o.dismiss.length ? ['--dismiss', o.dismiss.join(',')] : []), ...(o.locale ? ['--locale', o.locale] : [])]; };
+
+/** Click the dismiss controls, then the first consent control that resolves; a consent accept may RELOAD the page (OneTrust "reload on
+ * consent" — stryker-home): every instrument then ran `settle` in a destroyed context. Arm the navigation wait before the click; when it
+ * fires, wait the page in again and re-dismiss the other overlays. Returns the control that was clicked (null when none resolved). */
+export async function acceptOverlays(page, { consent = null, dismiss = [], wait = 2500 } = {}) {
   const dismissAll = async () => { for (const sel of dismiss) { try { await page.click(sel, { timeout: 1500 }); } catch { /* absent */ } } };
   await dismissAll();
   const candidates = [consent, '#onetrust-accept-btn-handler', '.agree-button', 'button:has-text("Accept all")', 'button:has-text("Accept All")'].filter(Boolean);
   for (const sel of candidates) {
     try {
-      // a consent accept may RELOAD the page (OneTrust "reload on consent" — stryker-home): every instrument then ran `settle` in a destroyed
-      // context. Arm the navigation wait before the click; when it fires, wait the page in again and re-dismiss the other overlays
       const nav = page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 3000 }).catch(() => null);
       await page.click(sel, { timeout: 1200 });
       if (await nav) { console.error(`openPage: consent control ${sel} reloaded the page — waited for it`); await page.waitForTimeout(wait); await dismissAll(); }
-      break;
+      else console.error(`openPage: consent control ${sel} clicked`);
+      return sel;
     } catch { /* next */ }
   }
+  return null;
+}
+
+/** `browser` may also be a BrowserContext (no `newContext`): the caller owns UA, locale, scale and cookies — a consent accepted once holds
+ * for every page the context opens next (roster's light pass, one context per worker); only the viewport is set per page. */
+export const contextOptions = ({ width = 1440, height = 900, scale = 1, locale = null } = {}) => ({ viewport: { width, height }, deviceScaleFactor: scale, userAgent: UA, ...(locale ? { locale, extraHTTPHeaders: { 'Accept-Language': `${locale},${locale.split('-')[0]};q=0.9` } } : {}) });
+/** `afterLoad(page)` runs after the first wait and BEFORE the overlays are clicked: the first look probe-load takes (fixed layers,
+ * consent candidates) read from the same load every other instrument then measures (measure-page, one session per width). */
+export async function openPage(browser, url, { width = 1440, height = 900, scale = 1, consent = null, dismiss = [], locale = null, require = [], wait = 2500, before = null, afterLoad = null } = {}) {
+  const isContext = typeof browser.newContext !== 'function';
+  const page = isContext ? await browser.newPage() : await browser.newPage(contextOptions({ width, height, scale, locale }));
+  if (isContext) await page.setViewportSize({ width, height });
+  if (before) await before(page); // listeners that must exist before navigation (response log for font requests — media-list)
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
+  await page.waitForTimeout(wait);
+  if (afterLoad) await afterLoad(page);
+  await acceptOverlays(page, { consent, dismiss, wait });
   await page.waitForFunction(() => [...document.querySelectorAll('.block')].every((el) => el.dataset.blockStatus === 'loaded'), null, { timeout: 15000 }).catch(() => {});
   // fonts are a measurement precondition: the boilerplate loads fonts.css lazily and a table read before the swap measures fallback metrics
   // (sections / pair / deep-probe disagreed by 40–100 px between runs on one page — stryker-home)

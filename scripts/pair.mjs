@@ -28,7 +28,7 @@ for (const s of spec.secs) for (const it of s.items) {
   const key = it.t.slice(0, 28); if (seen.has(key)) continue; if (filter && !filter.test(it.t)) continue;
   seen.add(key); anchors.push({ t: key, box: it.rest || it.box, cbox: it.cbox || null, pad: it.pad || null, fs: it.fs, lh: it.lh, fw: it.fw, ff: it.ff, c: it.c, tt: it.tt, inline: !!it.inline || it.k === 'a' || it.k === 'span' });
 }
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800, consent: arg('--consent', null), ...overlayOpts() });
+const browser = await chromium.launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800, ...overlayOpts() });
 await settle(page, 800, 50, 400);
 const out = await page.evaluate((anchors) => {
   // `display: contents` paints its children and has a 0×0 rect: its box is the range box of its contents

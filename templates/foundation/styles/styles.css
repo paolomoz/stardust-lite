@@ -1,0 +1,73 @@
+/* styles.css — the foundation skeleton `init --foundation` copies. Every value below is a placeholder to replace with the step-1
+   measurement (migration/site.json: cap, fonts, body, tokens; measure/spec-<W>.json): the boilerplate's unmeasured rules are not here
+   (no decorateButtons look, no `main > .section > div { max-width }` cap, no heading scale) — METHOD step 4: a rule no spec row asked for
+   is a round. Fonts load from here while gating (a lazily loaded fonts.css measures fallback metrics — BACKLOG #51). */
+
+@import url('reset.css');
+@import url('fonts.css');
+
+:root {
+  /* cap model — site.json `cap` (cap-probe): kind shell | content | module, the px at the base width, the gutter below the shell */
+  --shell: 1200px;              /* spec: cap.shell — a shell cap goes on main; a module cap on main > .section > div */
+  --content-max: 1200px;        /* spec: cap.content — the content cap when it differs from the shell */
+  --gutter: 20px;               /* spec: the shell's horizontal padding at 360 (and per width below) */
+
+  /* chrome — site.json `chrome.header.heightsByWidth` */
+  --nav-height: 80px;           /* spec: chrome.header.heightsByWidth["360"]; 0 for an absolute header over the hero */
+
+  /* rhythm — the live section table (sections / live-spec): the space below a module at 360 */
+  --section-gap: 40px;          /* spec: the measured gap between sections at 360 */
+
+  /* type — site.json `fonts` and `body` (the mode of the spec's p rows at the base width) */
+  --body-font-family: sans-serif;     /* spec: body.family (fonts.css declares the faces) */
+  --heading-font-family: sans-serif;  /* spec: the spec's h1–h3 rows */
+  --body-font-size: 16px;             /* spec: body.size */
+  --body-line-height: 1.5;            /* spec: body.lineHeight / body.size */
+  --body-font-weight: 400;            /* spec: body.weight — a family whose 400 is bold wraps every paragraph a line longer (METHOD step 4) */
+  --body-color: #000;                 /* spec: body.color */
+  --background-color: #fff;           /* spec: the body / first section background */
+}
+
+@media (width >= 900px) {
+  :root {
+    --nav-height: 80px;         /* spec: chrome.header.heightsByWidth["1440"] */
+    --section-gap: 40px;        /* spec: the measured gap at the base width */
+    --gutter: 20px;             /* spec: the shell's padding at the base width */
+  }
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--body-color);
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size);
+  font-weight: var(--body-font-weight);
+  line-height: var(--body-line-height);
+}
+
+@media (width >= 900px) {
+  body {
+    font-size: var(--body-font-size);    /* spec: body.size at the base width when it differs */
+    line-height: var(--body-line-height);
+  }
+}
+
+/* the header reserves its height; 0 when the source's bar is absolute over the hero */
+header { height: var(--nav-height); }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--heading-font-family);
+  font-weight: 400;             /* spec: the spec's heading rows */
+  line-height: 1.2;             /* spec */
+}
+
+/* cap placement — pick ONE from cap-probe's kind (site.json cap.kind) and delete the other two:
+   shell:   main { max-width: var(--shell); margin: 0 auto; padding: 0 var(--gutter); }   full-bleed section styles bleed out with margin: 0 calc(50% - 50vw)
+   content: main > .section { max-width: var(--content-max); margin: 0 auto; padding: 0 var(--gutter); }
+   module:  main > .section > div { max-width: var(--content-max); margin: 0 auto; }   main and the sections stay fluid so band colours bleed */
+main > .section { padding-bottom: var(--section-gap); }    /* spec: module spacing goes on the section as padding, never as a block margin (METHOD step 6) */
+
+/* buttons — only what the spec's control rows say (a bold link is the filled button, an italic one the outlined; the block decides the variant) */
+a.button:any-link { /* spec: control box, padding, colours, radius from the spec's `a` rows */ }
+
+/* section styles the pages author (section-metadata Style → class) go below, one rule per style, values from the spec */

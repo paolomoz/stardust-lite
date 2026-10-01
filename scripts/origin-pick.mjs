@@ -3,13 +3,13 @@
 // (a y-range, e.g. a rotating hero) is closest to a reference capture (the build), so the cached origin holds the same variant the
 // document fixes. Every other region is untouched: this picks a session state, it does not edit pixels.
 // Usage: node origin-pick.mjs <url> <out.png> --ref <build.png> --y0 <px> --y1 <px> [--width 360] [--tries 6] [--accept 12]
-//        [--consent <css>] [--headed]
+//        [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--headed]
 import { spawnSync } from 'node:child_process';
 import { existsSync, copyFileSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { arg, stardustScripts } from './common.mjs';
+import { arg, overlayArgs, stardustScripts } from './common.mjs';
 
 const [,, url, out] = process.argv; const ref = arg('--ref'); const y0 = Number(arg('--y0', 0)); const y1 = Number(arg('--y1', 900));
 if (!url || !out || !ref) { console.error('usage: origin-pick.mjs <url> <out.png> --ref <build.png> --y0 <px> --y1 <px> [--width W] [--tries N] [--accept pct]'); process.exit(1); }
@@ -19,7 +19,7 @@ crop(ref, '/tmp/origin-pick-ref.png');
 let best = { pct: Infinity, file: null };
 for (let t = 1; t <= tries; t += 1) {
   const tmp = `${out}.try${t}.png`;
-  const r = spawnSync('node', [join(S, 'stitch-shot.mjs'), url, tmp, '--width', W, '--settle', ...(arg('--headed', false) ? ['--headed'] : []), ...(arg('--consent', null) ? ['--consent', arg('--consent')] : [])], { encoding: 'utf8' });
+  const r = spawnSync('node', [join(S, 'stitch-shot.mjs'), url, tmp, '--width', W, '--settle', ...(arg('--headed', false) ? ['--headed'] : []), ...overlayArgs()], { encoding: 'utf8' });
   if (!existsSync(tmp)) { console.log(`try ${t}: capture failed ${r.stderr.slice(-120)}`); continue; }
   crop(tmp, '/tmp/origin-pick-try.png');
   const c = spawnSync('node', [join(S, 'pixel-compare.mjs'), '/tmp/origin-pick-ref.png', '/tmp/origin-pick-try.png', '--out', '/tmp/origin-pick-diff.png', '--band', '9999', '--json'], { encoding: 'utf8' });
