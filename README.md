@@ -19,7 +19,7 @@ loss in the first two pilots.
 - `METHOD.md` — the procedure. Every rule traces to a case; `BACKLOG.md` holds what the cases found wrong or missing.
 - `scripts/` — the instruments (Node + Playwright): `probe-load`, `probe-structure`, `content-dump`, `content-view`, `media-list`,
   `media-fetch`, `live-spec`, `scroll-probe`, `deep-probe`, `video-frame`, `da-put`, `sync-poll`, `serve`, `harness`, `sections`, `pair`,
-  `leak`, `gate`, `hover-diff`, `click-state`, `crop`, `measure-view`, `measure-to-spec`, `origin-pick`, `spec-view`.
+  `leak`, `gate`, `hover-diff`, `click-state`, `crop`, `shift-probe`, `measure-view`, `measure-to-spec`, `origin-pick`, `spec-view`.
 - `tools/` — vendored, unmodified, from Adobe's stardust plugin (Apache-2.0, see `NOTICE`): `replica/` capture and compare tools
   (`stitch-shot`, `pixel-compare`, `cap-probe`, `motion-observe`, `motion-compare`, `measure`, `anchor`), `diff/live-session.mjs`
   (their live-page session), `lint/davids-model-lint.mjs` + `davids-model.md`.
@@ -66,8 +66,8 @@ method changes and new instruments are pull requests here, traced to a case.
 | 2–3 triage, author, lint | write the triage table and the registers, generate the documents (a standalone picture in `<p>`), `npx stardust-lite lint doc/`; `npx stardust-lite da-put <org>/<site>/<branch> media/* --to drafts/media` and `… doc/*.html --to drafts` (bytes unchanged, preview only; warns on upper case and double hyphens) |
 | 4 blocks | in the site repo, on a branch |
 | 5 prototype | `npx stardust-lite serve proto --port 89xx --site .` (concurrent server, creates the `scripts blocks styles fonts icons` symlinks) then `npx stardust-lite harness doc/home.html --serve proto --name home --port 89xx --fragments <branch-host> --content measure/content-1440.json` |
-| 6 gate | `npx stardust-lite sections spec-<W>.json <build>` · `npx stardust-lite pair spec-<W>.json <build>` at all three widths before every CSS change · between rounds `npx stardust-lite gate --live <url> --build http://localhost:89xx/home.harness.html --out gate --widths <base>` (`--main <css>` for a `main`-less origin; crop the first gate's hottest band before any CSS round) · once clean: the three widths with `--probes probes.txt`, plus `hover-diff` / `click-state --hover` on both sides |
-| 7 deploy + gate | same document to DA (`da-put`), push the code, `npx stardust-lite sync-poll <branch-host> . blocks/x/x.css …` until the bus serves the repo's files, `gate` against the served URL, `npx stardust-lite leak <url> --sels sels.txt` on both and diff |
+| 6 gate | `npx stardust-lite sections spec-<W>.json <build>` · `npx stardust-lite pair spec-<W>.json <build>` at all three widths before every CSS change · between rounds `npx stardust-lite gate --live <url> --build http://localhost:89xx/home.harness.html --out gate --widths <base>` (`--main <css>` for a `main`-less origin; crop the first gate's hottest band before any CSS round; a red photo band: `npx stardust-lite shift-probe live-<W>.png build-<W>.png --x0 … --y1 …` and `crop … --vs build-<W>.png`) · once clean: the three widths with `--probes probes.txt`, plus `hover-diff` / `click-state --hover` on both sides |
+| 7 deploy + gate | same document to DA (`da-put`), push the code, `npx stardust-lite sync-poll <branch-host> . blocks/x/x.css …` until the bus serves the repo's files, `gate … --origin <prototype gate dir>` against the served URL (one origin for both gates), `npx stardust-lite leak <url> --sels sels.txt` on both and diff |
 
 Definition of done: three-width pixel table with the noise floor, cap-probe PASS at the probe width, motion-compare parity, lint clean at
 step 2, served page within the prototype's numbers, leak table identical.
@@ -84,6 +84,7 @@ step 2, served page within the prototype's numbers, leak table identical.
 | `stryker-home` | 2026-09-30/10-01 | 10.27 / 1.98 / 2.21 | 10.36 / 1.94 / 2.19 | 7 harness rounds (none void, 1 regression) + 0 served fixes; 67 min wall, first shareable URL at 46 min; light-DOM AEM Sites (Bootstrap 3) origin, reload-on-consent OneTrust bar, Dynamic Media hosted hero video, per-instance card styling (≈ 8 of the 10.3 % at 360), noise floor 0.00 |
 | `usta2-home` | 2026-10-01 | 9.51 / 1.89 / 4.17 | 9.52 / 1.90 / 4.17 | 8 table rounds to the first push + 9 gate rounds (2 regressions, none void) + 0 served fixes; 100 min wall, first shareable URL at 59 min; light-DOM AEM Sites origin without `main`, header fixed at ≥ 900 only, uppercase by CSS, a GAM ad slot, a per-instance separator (≈ 4 of the 9.5 % at 360), noise floor 0.00; leak table 0 lines |
 | `audemarspiguet-home` | 2026-10-01 | 4.28 / 2.50 / 1.34 | 4.19 / 2.48 / 1.34 | 6 harness rounds (none void, 1 regression) + 1 served fix (the pipeline's list-item `<p>`); 80 min wall, first shareable URL at 60 min; light-DOM AEM Sites origin with React islands (drawer, language selector), OneTrust + geo redirect, text-reveal line splits, Swiper `autoHeight` carousels, hero videos, noise floor 0.00; leak table 0 lines; every block a Block Collection shape |
+| `dentsu-home` | 2026-10-01 | 4.88 / 2.21 / 2.12 | 4.98 / 2.21 / 2.11 | 2 table rounds (r0–r1) to the first push + 5 gate rounds (r2–r6, none void, 1 regression) + 0 served fixes; 55 min wall, first shareable URL at 37 min; light-DOM Kentico origin serving its Switzerland edition by IP, OneTrust bottom bar, header absolute over a 100vh hero, rellax parallax on four elements, no video, noise floor 0.84 (the parallax band); leak table 0 lines; every block a Block Collection shape |
 
 Next: one static-CMS site, passing the lint at step 2 and holding its prototype number on the served page. ibm-home was the JS-heavy
 one (Carbon web components); the composed-tree tier it needed is in `common.mjs` (`DEEP_HELPERS`), `deep-probe` and `hover-diff`.
@@ -98,3 +99,6 @@ text-reveal library's one-element-per-line paragraphs, a carousel's cards beyond
 ran, a drawer whose served markup differed from the prototype's — and those are now `content-dump` / `live-spec` line runs and lazy `src`,
 `pair`'s ⤷ rows, `settle` waiting for images and finite animations, the harness folding the list-item rule and warming the media,
 `scroll-probe --paint`.
+dentsu-home was the one whose residuals were paint, not layout: a negative-z veil that paints only below 900 px, a gradient under a picture, a
+tile the capture caught mid-fade, a parallax torn at the chunk boundaries — read by no table and now by `shift-probe` (best shift, scale,
+luminance ratio), `crop --vs` and `deep-probe --props` / `--anim`; `gate --origin` keeps one origin for the prototype and served gates.

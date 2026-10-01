@@ -71,9 +71,12 @@ anchors.forEach((a, i) => {
   const d = o ? [o.box[0] - lb[0], o.box[1] - lb[1], o.box[2] - lb[2], o.box[3] - lb[3]] : null;
   // text-transform is a font delta too: the live renders `uppercase` on DOM text no table showed — three 1440 bands for a round (usta2-home)
   const ttHot = o && a.tt && a.tt !== o.tt;
-  const hot = !o || Math.abs(d[0]) > 3 || Math.abs(d[1]) > 3 || Math.abs(d[3]) > 3 || a.fs !== o.fs || a.fw !== o.fw || a.c !== o.c || ttHot;
+  // the family compares case-insensitively (CSS matches families that way; the boilerplate's stylelint --fix lower-cases them —
+  // `Halcom-Regular` → `halcom-regular` read as a change on every row, dentsu-home); another family is a real delta (a fallback font loaded)
+  const ffHot = o && String(a.ff || '').toLowerCase() !== String(o.ff || '').toLowerCase();
+  const hot = !o || Math.abs(d[0]) > 3 || Math.abs(d[1]) > 3 || Math.abs(d[3]) > 3 || a.fs !== o.fs || a.fw !== o.fw || a.c !== o.c || ttHot || ffHot;
   if (!all && !hot) return; n += 1;
-  const f = o ? `${a.fs}/${a.lh} ${a.fw} ${a.ff.slice(0, 7)} → ${o.fs}/${o.lh} ${o.fw} ${o.ff.slice(0, 7)}${a.c !== o.c ? ` COLOR ${a.c}→${o.c}` : ''}${ttHot ? ` TRANSFORM ${a.tt}→${o.tt}` : ''}` : '';
+  const f = o ? `${a.fs}/${a.lh} ${a.fw} ${a.ff.slice(0, 7)} → ${o.fs}/${o.lh} ${o.fw} ${(ffHot ? o.ff : a.ff).slice(0, 7)}${a.c !== o.c ? ` COLOR ${a.c}→${o.c}` : ''}${ttHot ? ` TRANSFORM ${a.tt}→${o.tt}` : ''}${ffHot ? ` FAMILY ${a.ff}→${o.ff}` : ''}` : '';
   console.log((o && o.ctl ? `${a.t.slice(0, 26)} ⌗` : (lb !== a.box ? `${a.t.slice(0, 26)} ≈` : a.t)).padEnd(30), JSON.stringify(lb).padEnd(22), (o ? JSON.stringify(o.box) : '-').padEnd(22), o ? d.map((v) => String(v).padStart(4)).join('') : ' MISSING', '|', f);
 });
 console.log(`${anchors.length} anchors, ${out.filter(Boolean).length} located${out.some((o) => o && o.cont) ? ` (${out.filter((o) => o && o.cont).length} ⤷ continuation lines of a split paragraph, inside the previous anchor's build box)` : ''}${out.some((o) => o && o.ctl) ? ', ⌗ = control paired with control' : ''}${out.some((o, i) => o && liveBox(anchors[i], o) !== anchors[i].box && !o.ctl) ? ', ≈ = live inline glyph box read as its line box' : ''}${all ? '' : ` (rows within 3 px and same font hidden; --all shows them)`}`);
