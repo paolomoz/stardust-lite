@@ -63,8 +63,13 @@ export async function acceptOverlays(page, { consent = null, dismiss = [], wait 
   return null;
 }
 
+/** `browser` may also be a BrowserContext (no `newContext`): the caller owns UA, locale, scale and cookies — a consent accepted once holds
+ * for every page the context opens next (roster's light pass, one context per worker); only the viewport is set per page. */
+export const contextOptions = ({ width = 1440, height = 900, scale = 1, locale = null } = {}) => ({ viewport: { width, height }, deviceScaleFactor: scale, userAgent: UA, ...(locale ? { locale, extraHTTPHeaders: { 'Accept-Language': `${locale},${locale.split('-')[0]};q=0.9` } } : {}) });
 export async function openPage(browser, url, { width = 1440, height = 900, scale = 1, consent = null, dismiss = [], locale = null, require = [], wait = 2500, before = null } = {}) {
-  const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: scale, userAgent: UA, ...(locale ? { locale, extraHTTPHeaders: { 'Accept-Language': `${locale},${locale.split('-')[0]};q=0.9` } } : {}) });
+  const isContext = typeof browser.newContext !== 'function';
+  const page = isContext ? await browser.newPage() : await browser.newPage(contextOptions({ width, height, scale, locale }));
+  if (isContext) await page.setViewportSize({ width, height });
   if (before) await before(page); // listeners that must exist before navigation (response log for font requests — media-list)
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
   await page.waitForTimeout(wait);

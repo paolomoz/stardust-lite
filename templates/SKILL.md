@@ -17,7 +17,8 @@ Instruments run with `npx stardust-lite <name> [args]` (`npx stardust-lite list`
 `serve`, `harness`, `gate`, `sections`, `pair`, `leak`, `hover-diff`, `click-state`, `crop`, `shift-probe`, `extent` (prototype and gate),
 `site-profile` (init / check / print — `migration/site.json`, the site's state after a template run; every instrument reads it as its flag defaults when present, `--site <file>` names another),
 `block-inventory` (scan / diff / print — `migration/blocks.json`, one row per block + variant the site has: shape, collection, rows × cols, authoring example, source signature, budget; written at the end of a template run, read by triage),
-`triage` (a page's draft triage table from its content dump, as JSON + markdown: fingerprint, repeat, inventory match with confidence, collection match, default content, rows × cols, novelty — edit the draft, never write the table from nothing).
+`triage` (a page's draft triage table from its content dump, as JSON + markdown: fingerprint, repeat, inventory match with confidence, collection match, default content, rows × cols, novelty — edit the draft, never write the table from nothing),
+`roster` (`--nav` / `--urls <file>` / `--crawl <N>` → `migration/roster.json` + `roster.md`: one light pass per page — content dump, section fingerprints, inventory match, no spec or capture — the coverage matrix pages × blocks, novelty per page, template clusters and candidates, reuse-first / novelty-first orders; `roster pick --n 10 --order reuseFirst|noveltyFirst --out pages.json` writes the rollout's page list; `roster print` re-renders the views from the JSON).
 
 Rules that do not bend: the source is measured, never cloned; triage and lint before any block exists; the gated prototype is the
 runtime harness page at 360 / 1440 / probe width against a cached origin with a noise floor; a CSS round changes only what the section
