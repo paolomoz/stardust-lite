@@ -35,7 +35,9 @@ order; blocks hold only what default content cannot.
 
 ## Procedure, per template
 
-1. **Measure the source at three widths** (360, 1440, probe): `probe-load` at **every gated width** (status, overlays, fixed layers, shadow roots — a header
+1. **Measure the source at three widths** (360, 1440, probe): `measure-page` is the single-session reading of this step's instruments — one load per width,
+   then the first look, the structure dump, the content dump, the media list, the spec with its DOM and the deep-probe set from that same settled page; the
+   single instruments are for targeted re-reads. `probe-load` at **every gated width** (status, overlays, fixed layers, shadow roots — a header
    fixed at the base width may scroll at 360), `probe-structure` (the section selector for `live-spec --sections`), `content-dump` read through `content-view`
    (the authoring input: full texts in reading order with inline markup, links, media, boxes, and the font string with `text-transform` — the dump holds DOM
    text, the page may render it uppercase and no table shows the case), `media-list`, `live-spec`. The dump is the **authoring set, not the painted set**: a
@@ -175,7 +177,8 @@ order; blocks hold only what default content cannot.
 
 ## Instruments (`scripts/`, each prints its usage without arguments; capture, compare and lint tools vendored unmodified under `tools/` — see NOTICE)
 
-- Step 1 — `probe-load` (first look at one or several widths: status, overlays, fixed layers, shadow roots), `probe-structure` (structure dump; `--pierce`
+- Step 1 — `measure-page` (the step in one session per width: probe-load's first look before the overlays are clicked, the structure dump, the content dump,
+  the media list, the spec + DOM and the default deep-probe set from one settled page, byte-compatible files, `summary.json`), `probe-load` (first look at one or several widths: status, overlays, fixed layers, shadow roots), `probe-structure` (structure dump; `--pierce`
   shadow roots), `content-dump` + `content-view` (the authoring input: full texts with font and text-transform, line runs as one paragraph, lazy media;
   `--hidden` roots), `media-list`, `media-fetch` (the dump's media bytes, a-z0-9 names, manifest), `live-spec` (per-node measurement per width, control boxes,
   line runs, 0-height spacing, entrance states with their rest box; writes the DOM), `scroll-probe` (layers at a scroll ladder, `--paint` children, `--up`),

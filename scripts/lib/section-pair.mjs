@@ -17,6 +17,18 @@ function markRoot([mainSel, headerSel, footerSel]) {
   let root = 'body'; if (el) { el.setAttribute('data-gate-root', ''); root = '[data-gate-root]'; }
   return { root, header: R(q(headerSel || 'header')), footer: R(q(footerSel || 'footer')), doc: document.documentElement.scrollHeight };
 }
+/** Browser side: the content root as a CSS PATH (`body > div:nth-child(2) > main`), so a caller that must not touch the DOM (the
+ * structure dump and the captured DOM of measure-page) can name the root roster's rule finds: `mainSel` when it resolves, else the
+ * largest ancestor of `main` / `[role=main]` that adds no chrome, else `body`. Returns { path, name }. */
+export function contentRootPath([mainSel]) {
+  const q = (s) => { try { return document.querySelector(s); } catch { return null; } };
+  const chrome = (e) => /^(header|footer|nav|aside)$/i.test(e.tagName) || /\b(header|footer|masthead|colophon|nav)\b/i.test(`${e.className} ${e.id}`);
+  let el = mainSel ? q(mainSel) : null;
+  if (!el) { el = q('main') || q('[role=main]'); while (el && el.parentElement && el.parentElement !== document.body && ![...el.parentElement.children].some((c) => c !== el && chrome(c))) el = el.parentElement; }
+  if (!el) return { path: 'body', name: 'body (no main)', tag: 'body' };
+  const parts = []; for (let n = el; n && n !== document.body; n = n.parentElement) parts.unshift(`${n.tagName.toLowerCase()}:nth-child(${[...n.parentElement.children].indexOf(n) + 1})`);
+  return { path: ['body', ...parts].join(' > '), name: `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}${[...el.classList].slice(0, 2).map((c) => `.${c}`).join('')}`, tag: el.tagName.toLowerCase() };
+}
 const stripChrome = (nodes, depth = 0) => nodes.filter((n) => !(/^(header|footer|nav)$/.test(String(n.tag || '')) || /\b(header|footer|masthead|colophon)\b/i.test(`${n.cls || ''} ${n.id || ''}`))).map((n) => (depth < 2 && n.children ? { ...n, children: stripChrome(n.children, depth + 1) } : n));
 const boxOf = (n) => { if (n.box && n.box[3] > 0) return n.box; let y0 = Infinity; let y1 = -Infinity; const walk = (x) => { if (x.box && x.box[3] > 0) { y0 = Math.min(y0, x.box[1]); y1 = Math.max(y1, x.box[1] + x.box[3]); } (x.children || []).forEach(walk); }; walk(n); return Number.isFinite(y0) ? [0, y0, 0, y1 - y0] : null; };
 

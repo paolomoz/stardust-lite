@@ -19,6 +19,11 @@
 //   diff  <triage.json> --blocks migration/blocks.json   per section: covered by block (variant) | collection match only | new; the
 //         novelty share. Re-matches the triage's stored fingerprints against the inventory given (another site's, a newer one). Exit 0.
 //   print [--blocks migration/blocks.json]   the markdown table.
+//   budgets --gate-dir <dir> [--blocks migration/blocks.json] [--site-repo .]   (re)compute the per-block budgets from an existing gate
+//         dir's `sections-<W>.json` (pass 5's per-section table) without a rescan; scan does the same for every --case that has a
+//         `gate-served/` (else `gate/`) with those files. Per width the budget of a block is the MAX pixel % of the sections that carry
+//         it (plus the profile's noise floor when it has one), `budget._source: "sections"`; a block no section carries (header, footer,
+//         a variant the template page does not use) keeps the page's number, `_source: "page"` (BACKLOG 152 / 155).
 //
 // blocks.json shape (v1):
 // { "_schema": "stardust-lite/block-inventory@1", "_writtenAt", "_source": { "siteRepo", "cases": [] }, "blocks": [
@@ -26,7 +31,8 @@
 //     "collection": hero|cards|columns|tabs|accordion|carousel|quote|embed|header|footer|null,
 //     "authoringExample": "<div><div>…</div><div>…</div></div>" | null,          // the block's first row from the case's document
 //     "sourceSignature": { "classes": [..] | null, "fingerprint": { pattern, repeat, unit, unitSig, cols, kinds, … } | null },
-//     "recipe": { rows, cells, … } | null (lib/recipes.mjs), "budget": { "360", "base", "probe" }, "approvedIn": "home" | null, "document": "home"|"nav"|"footer"|null,
+//     "recipe": { rows, cells, … } | null (lib/recipes.mjs), "budget": { "360", "base", "probe", "_source": "sections"|"page", "_sections": { key: [{ index, anchorText, pct }] } },
+//     "approvedIn": "home" | null, "document": "home"|"nav"|"footer"|null,
 //     "_inferred": ["shape", "classes", …], "_notes": [..] } ] }
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
@@ -35,8 +41,8 @@ import { splitSections, fingerprint, dropGeneric, allClasses, matchSection, rows
 import { parseDoc, deriveRecipe, describeRecipe } from './lib/recipes.mjs';
 
 const [,, cmd, target] = process.argv;
-const usage = () => { console.error('usage: block-inventory.mjs scan [--site-repo .] [--case <case-dir>]… --out migration/blocks.json [--all] [--cases]\n       block-inventory.mjs diff <triage.json> --blocks migration/blocks.json\n       block-inventory.mjs recipe <name> [variant] --from <doc.html> [--triage triage.json --unit <i>] [--blocks migration/blocks.json] [--write]\n       block-inventory.mjs print [--blocks migration/blocks.json]'); process.exit(1); };
-if (!cmd || !['scan', 'diff', 'print', 'recipe'].includes(cmd) || (['diff', 'recipe'].includes(cmd) && (!target || target.startsWith('--')))) usage();
+const usage = () => { console.error('usage: block-inventory.mjs scan [--site-repo .] [--case <case-dir>]… --out migration/blocks.json [--all] [--cases]\n       block-inventory.mjs diff <triage.json> --blocks migration/blocks.json\n       block-inventory.mjs recipe <name> [variant] --from <doc.html> [--triage triage.json --unit <i>] [--blocks migration/blocks.json] [--write]\n       block-inventory.mjs print [--blocks migration/blocks.json]\n       block-inventory.mjs budgets --gate-dir <dir> [--blocks migration/blocks.json] [--site-repo .]'); process.exit(1); };
+if (!cmd || !['scan', 'diff', 'print', 'recipe', 'budgets'].includes(cmd) || (['diff', 'recipe'].includes(cmd) && (!target || target.startsWith('--')))) usage();
 
 /** Recipes for every block occurring in the documents given: { 'name|variant': { recipe, notes, rows } } — the occurrence with the
  * most rows wins; a 1-row occurrence of a block another occurrence shows as `unit` (same name, any variant, same cell kinds) is `unit`. */
@@ -66,6 +72,38 @@ const argAll = (name) => process.argv.flatMap((a, i) => (a === name && process.a
 const table = (rows, head) => { const w = head.map((h, i) => Math.max(h.length, ...rows.map((r) => String(r[i] ?? '').length))); const line = (r) => `| ${r.map((c, i) => String(c ?? '').padEnd(w[i])).join(' | ')} |`; console.log(line(head)); console.log(`|${w.map((x) => '-'.repeat(x + 2)).join('|')}|`); rows.forEach((r) => console.log(line(r))); };
 const label = (b) => `${b.name}${b.variant ? ` (${b.variant})` : ''}`;
 const INFRA = ['fragment', 'widget'];
+
+/** The per-section tables a gate dir holds: { '<W>': sections-<W>.json parsed } (pass 5 writes them with --per-section / --chrome / --budget). */
+function sectionTables(gateDir) {
+  const out = {}; if (!isDir(gateDir)) return out;
+  for (const f of readdirSync(gateDir)) { const m = f.match(/^sections-(\d+)\.json$/); if (!m) continue; const j = readJson(join(gateDir, f)); if (j?.sections) out[m[1]] = { file: join(gateDir, f), ...j }; }
+  return out;
+}
+/** Per-block budgets from the per-section tables: for every width's `budgetKey`, a block's budget is the MAX pixel % over the sections
+ * that carry it (the gate's block per section: the triage row, else the `.block` class), plus `noise` (the profile's floor, 0 when
+ * unknown). Rows a table names get `budget._source: 'sections'` and `_sections[key]`; the others keep what they had. Returns the rows
+ * touched and the blocks a table named that the inventory lacks. */
+function applySectionBudgets(rows, tables, { noise = 0 } = {}) {
+  const tokens = (v) => String(v || '').trim().split(/\s+/).filter(Boolean).sort().join(' ');
+  const find = (name, variant) => { const c = rows.filter((r) => r.name === name); if (!c.length) return null; return c.find((r) => tokens(r.variant) === tokens(variant)) || (variant ? c.find((r) => !r.variant) : null) || c[0]; };
+  const touched = new Set(); const unknown = new Set(); const widths = Object.keys(tables).map(Number).sort((a, b) => a - b);
+  for (const W of widths) {
+    const t = tables[W]; const key = t.budgetKey || (W === 360 ? '360' : W >= 1920 ? 'probe' : 'base');
+    for (const sec of t.sections) {
+      if (!sec.block || sec.pct === null || sec.pct === undefined) continue;
+      const r = find(sec.block, sec.variant); if (!r) { unknown.add(`${sec.block}${sec.variant ? ` (${sec.variant})` : ''}`); continue; }
+      if (!touched.has(r)) { r.budget = { 360: r.budget?.[360] ?? null, base: r.budget?.base ?? null, probe: r.budget?.probe ?? null, _source: 'sections', _page: r.budget && r.budget._source !== 'sections' ? { 360: r.budget[360] ?? null, base: r.budget.base ?? null, probe: r.budget.probe ?? null } : r.budget?._page ?? null, _sections: {} }; touched.add(r); }
+      const list = (r.budget._sections[key] = r.budget._sections[key] || []);
+      if (list.some((x) => x.width === W && x.index === sec.index)) continue;
+      list.push({ width: W, index: sec.index, anchorText: (sec.anchorText || '').slice(0, 40), pct: sec.pct, dh: sec.dh ?? null });
+      const max = Math.max(...list.map((x) => x.pct));
+      r.budget[key] = Number((max + (Number(noise) || 0)).toFixed(2));
+    }
+  }
+  for (const r of touched) { r._notes = (r._notes || []).filter((n) => !/^budget from|^budget: /.test(n)); r._notes.push(`budget: per-section max from ${widths.map((W) => `sections-${W}.json`).join(', ')}${noise ? ` + noise floor ${noise}` : ''}`); }
+  return { touched: [...touched], unknown: [...unknown], widths };
+}
+const noiseFloor = (siteJson) => { const n = siteJson?.noise?.floor1440; return typeof n === 'number' && Number.isFinite(n) ? n : 0; };
 
 // ───────────────────────────── scan ─────────────────────────────
 if (cmd === 'scan') {
@@ -161,7 +199,7 @@ if (cmd === 'scan') {
       if (st.classes.length) r.sourceSignature.classes = [...new Set([...(r.sourceSignature.classes || []), ...st.classes])];
       else if (fp && !r.sourceSignature.classes) { const cls = allClasses(fp); if (cls.length) { r.sourceSignature.classes = cls; if (!r._inferred.includes('classes')) r._inferred.push('classes'); } }
       if (fp && !r.sourceSignature.fingerprint) r.sourceSignature.fingerprint = strip(fp);
-      if (!r.approvedIn) { r.approvedIn = caseName; if (budget) r.budget = budget; if (budgetNote) r._notes.push(budgetNote); }
+      if (!r.approvedIn) { r.approvedIn = caseName; if (budget) r.budget = { ...budget, _source: 'page' }; if (budgetNote) r._notes.push(budgetNote); }
       if (!r.authoringExample) { const html = docs[docName] || docs.home || Object.values(docs)[0]; if (html) { r.authoringExample = ['header', 'footer'].includes(r.name) ? firstSection(html) : firstRow(html, [r.name, ...(r.variant ? r.variant.split(' ') : [])].join(' ')); r.document = r.authoringExample ? docName : null; } }
       if (!r.authoringExample) r._notes.push(`no <div class="${[r.name, r.variant].filter(Boolean).join(' ')}"> in ${caseName}/doc/*.html`);
       if (rowDesc && !r._notes.some((n) => n.startsWith('source:'))) r._notes.push(`source: ${rowDesc.replace(/\s+/g, ' ').slice(0, 160)}`);
@@ -190,6 +228,14 @@ if (cmd === 'scan') {
   if (shared.length) { for (const r of rows) if (r.sourceSignature.classes) { const drop = r.sourceSignature.classes.filter((c) => shared.includes(c)); if (drop.length) { r.sourceSignature.classes = r.sourceSignature.classes.filter((c) => !shared.includes(c)); if (!r.sourceSignature.classes.length) r.sourceSignature.classes = null; r._notes.push(`classes shared across blocks dropped: ${drop.join(' ')}`); } } console.error(`block-inventory: classes shared by several blocks dropped from signatures: ${shared.join(' ')}`); }
   rows.sort((a, b) => (a.name === b.name ? String(a.variant || '').localeCompare(String(b.variant || '')) : a.name.localeCompare(b.name)));
   for (const r of rows) { if (!r.sourceSignature.classes) r._notes.push('no source classes named or read'); if (!r.sourceSignature.fingerprint) r._notes.push('no fingerprint (no dump section mapped)'); if (!r._inferred.length) delete r._inferred; }
+  // 3b. per-block budgets from the template's per-section tables (gate-served/ first, else gate/) — a copied page number is a mean
+  //     (marriott: brands 0.49 % on a page approved at 0.33 %, hero 0.02 % — BACKLOG 152); the page number stays for the rows no table names
+  for (const caseDir of sourceCases) {
+    const tables = { ...sectionTables(join(caseDir, 'gate')), ...sectionTables(join(caseDir, 'gate-served')) }; // served wins per width
+    if (!Object.keys(tables).length) { console.error(`block-inventory: ${basename(caseDir)}: no gate-served/ or gate/ sections-<W>.json — budgets are the page's numbers (run gate --per-section on the served page, then \`block-inventory budgets --gate-dir\`)`); continue; }
+    const { touched, unknown, widths } = applySectionBudgets(rows, tables, { noise: noiseFloor(siteJson) });
+    console.error(`block-inventory: ${basename(caseDir)}: budgets of ${touched.length} rows from the per-section tables at ${widths.join(' / ')} (${Object.values(tables).map((t) => t.file.replace(`${caseDir}/`, '')).join(', ')})${unknown.length ? `; blocks named there that the inventory lacks: ${unknown.join(', ')}` : ''}`);
+  }
   // 4. recipes: a hand-written one in the existing file survives; --cases derives the rest from the case documents
   const previous = readJson(out)?.blocks || [];
   for (const r of rows) { const prev = previous.find((p) => p.name === r.name && (p.variant || null) === (r.variant || null)); if (prev?.recipe?._hand) r.recipe = prev.recipe; else if (prev?.recipe && !arg('--cases', false)) r.recipe = prev.recipe; }
@@ -208,7 +254,7 @@ if (cmd === 'scan') {
 }
 
 function printTable(rows) {
-  table(rows.map((b) => { const f = b.sourceSignature?.fingerprint; const sig = [b.sourceSignature?.classes?.slice(0, 2).join(' '), f ? `${f.unit || f.pattern.slice(0, 30)}${f.repeat ? ` ×${f.repeat}` : ''}` : null].filter(Boolean).join(' · ') || '—'; return [b.name, b.variant || '—', `${b.shape || '—'}${b._inferred?.includes('shape') ? '?' : ''}`, b.collection || '—', b.rowsCols || '—', sig, b.budget && b.budget.base != null ? `${b.budget['360']} / ${b.budget.base} / ${b.budget.probe}` : '—', b.approvedIn || '—', describeRecipe(b.recipe)]; }), ['block', 'variant', 'shape', 'collection', 'rows × cols', 'source signature (classes · unit)', 'budget 360 / base / probe %', 'approved in', 'recipe (rows [cells])']);
+  table(rows.map((b) => { const f = b.sourceSignature?.fingerprint; const sig = [b.sourceSignature?.classes?.slice(0, 2).join(' '), f ? `${f.unit || f.pattern.slice(0, 30)}${f.repeat ? ` ×${f.repeat}` : ''}` : null].filter(Boolean).join(' · ') || '—'; return [b.name, b.variant || '—', `${b.shape || '—'}${b._inferred?.includes('shape') ? '?' : ''}`, b.collection || '—', b.rowsCols || '—', sig, b.budget && (b.budget.base != null || b.budget['360'] != null || b.budget.probe != null) ? `${b.budget['360'] ?? '—'} / ${b.budget.base ?? '—'} / ${b.budget.probe ?? '—'}${b.budget._source === 'sections' ? ' ◂sections' : b.budget._source === 'page' ? ' ◂page' : ''}` : '—', b.approvedIn || '—', describeRecipe(b.recipe)]; }), ['block', 'variant', 'shape', 'collection', 'rows × cols', 'source signature (classes · unit)', 'budget 360 / base / probe %', 'approved in', 'recipe (rows [cells])']);
 }
 const loadBlocks = () => { const f = resolve(arg('--blocks', join('migration', 'blocks.json'))); const j = readJson(f); if (!j?.blocks) { console.error(`block-inventory: ${f} unreadable — run scan first`); process.exit(1); } return { file: f, blocks: j.blocks }; };
 
@@ -243,6 +289,22 @@ if (cmd === 'recipe') {
     r.recipe = { ...recipe, _hand: true }; inv._writtenAt = new Date().toISOString(); writeFileSync(blocksPath, JSON.stringify(inv, null, 1));
     console.log(`written to ${blocksPath} as hand-written (survives rescans)`);
   }
+  process.exit(0);
+}
+
+// ───────────────────────────── budgets ─────────────────────────────
+if (cmd === 'budgets') {
+  const gateDir = arg('--gate-dir', null); if (typeof gateDir !== 'string') usage();
+  const { file, blocks } = loadBlocks(); const inv = readJson(file);
+  const tables = sectionTables(resolve(gateDir));
+  if (!Object.keys(tables).length) { console.error(`block-inventory: no sections-<W>.json in ${resolve(gateDir)} (gate writes them with --per-section, --chrome or --budget)`); process.exit(2); }
+  const siteJson = readJson(join(resolve(arg('--site-repo', '.')), 'migration', 'site.json'));
+  const before = Object.fromEntries(blocks.map((b) => [label(b), JSON.stringify({ 360: b.budget?.[360] ?? null, base: b.budget?.base ?? null, probe: b.budget?.probe ?? null })]));
+  const { touched, unknown, widths } = applySectionBudgets(blocks, tables, { noise: noiseFloor(siteJson) });
+  inv.blocks = blocks; inv._writtenAt = new Date().toISOString(); inv._budgets = { gateDir: resolve(gateDir), tables: Object.values(tables).map((t) => t.file), widths, noise: noiseFloor(siteJson) };
+  writeFileSync(file, JSON.stringify(inv, null, 1));
+  table(blocks.map((b) => { const now = { 360: b.budget?.[360] ?? null, base: b.budget?.base ?? null, probe: b.budget?.probe ?? null }; const secs = b.budget?._sections ? Object.entries(b.budget._sections).map(([k, l]) => `${k}: ${l.map((x) => `#${x.index} ${x.pct}`).join(', ')}`).join('; ') : ''; return [label(b), b.budget?._source || '—', now[360] ?? '—', now.base ?? '—', now.probe ?? '—', before[label(b)] === JSON.stringify(now) ? '' : `was ${before[label(b)].replace(/"/g, '').replace(/[{}]/g, '')}`, secs.slice(0, 70)]; }), ['block', 'source', '360', 'base', 'probe', 'change', 'sections (index pct)']);
+  console.log(`\n${touched.length} of ${blocks.length} rows from ${Object.values(tables).map((t) => basename(t.file)).join(', ')} in ${resolve(gateDir)}${noiseFloor(siteJson) ? ` (+ noise floor ${noiseFloor(siteJson)})` : ''}${unknown.length ? `; named there but not in the inventory: ${unknown.join(', ')}` : ''} → ${file}`);
   process.exit(0);
 }
 

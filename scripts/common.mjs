@@ -66,13 +66,16 @@ export async function acceptOverlays(page, { consent = null, dismiss = [], wait 
 /** `browser` may also be a BrowserContext (no `newContext`): the caller owns UA, locale, scale and cookies — a consent accepted once holds
  * for every page the context opens next (roster's light pass, one context per worker); only the viewport is set per page. */
 export const contextOptions = ({ width = 1440, height = 900, scale = 1, locale = null } = {}) => ({ viewport: { width, height }, deviceScaleFactor: scale, userAgent: UA, ...(locale ? { locale, extraHTTPHeaders: { 'Accept-Language': `${locale},${locale.split('-')[0]};q=0.9` } } : {}) });
-export async function openPage(browser, url, { width = 1440, height = 900, scale = 1, consent = null, dismiss = [], locale = null, require = [], wait = 2500, before = null } = {}) {
+/** `afterLoad(page)` runs after the first wait and BEFORE the overlays are clicked: the first look probe-load takes (fixed layers,
+ * consent candidates) read from the same load every other instrument then measures (measure-page, one session per width). */
+export async function openPage(browser, url, { width = 1440, height = 900, scale = 1, consent = null, dismiss = [], locale = null, require = [], wait = 2500, before = null, afterLoad = null } = {}) {
   const isContext = typeof browser.newContext !== 'function';
   const page = isContext ? await browser.newPage() : await browser.newPage(contextOptions({ width, height, scale, locale }));
   if (isContext) await page.setViewportSize({ width, height });
   if (before) await before(page); // listeners that must exist before navigation (response log for font requests — media-list)
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
   await page.waitForTimeout(wait);
+  if (afterLoad) await afterLoad(page);
   await acceptOverlays(page, { consent, dismiss, wait });
   await page.waitForFunction(() => [...document.querySelectorAll('.block')].every((el) => el.dataset.blockStatus === 'loaded'), null, { timeout: 15000 }).catch(() => {});
   // fonts are a measurement precondition: the boilerplate loads fonts.css lazily and a table read before the swap measures fallback metrics
