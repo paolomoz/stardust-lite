@@ -6,7 +6,9 @@
 // string carries text-transform and letter-spacing (the text is DOM text; the page may render it uppercase — usta2-home). A paragraph a
 // text-reveal library split into one element per rendered line is read as ONE text (`lines: N`); an image not yet loaded (a carousel card
 // beyond the viewport) is read from its lazy attribute (`lazy: true`) — the dump is the AUTHORING set, not the painted one
-// (audemarspiguet-home: 18 cards, 3 painted). Read the dump with `content-view.mjs` (full texts), never a truncating viewer.
+// (audemarspiguet-home: 18 cards, 3 painted). A 0-size wrapper (an aspect-ratio box's `height: 100%` child) is walked through, not
+// skipped with its subtree (hiltongrandvacations-home: the hero's header). Read the dump with `content-view.mjs` (full texts), never a
+// truncating viewer. Hidden content a click reveals (a carousel caption, a tab panel, a drawer's sub-menu) is `click-dump.mjs`'s.
 // --require <css,…> refuses (exit 4) a session whose composition is not the canonical one, so the dump matches the cached origin.
 // Usage: node content-dump.mjs <url> [W] --roots <css,…> --out file.json [--require <css,…>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>]
 import { chromium } from 'playwright';
@@ -30,7 +32,15 @@ const tree = await p.evaluate((roots) => {
       if (e.tagName === 'svg' && vis(e)) return { tag: 'svg', box: R(e), id: e.id, use: e.querySelector('use')?.getAttribute('href') || e.querySelector('use')?.getAttribute('xlink:href') || null, label: e.getAttribute('aria-label') };
       return null;
     }
-    if (!vis(e)) return null;
+    if (!vis(e)) {
+      // a 0-size wrapper hides nothing: `height: 100%` against an aspect-ratio box, a row whose children are absolute — its subtree
+      // paints (the hero's header, h1 and controls sat under one and the dump skipped them — hiltongrandvacations-home). Only
+      // display:none / visibility:hidden end the walk; a 0-size element descends and collapses like a bare wrapper
+      const s0 = getComputedStyle(e);
+      if (s0.display === 'none' || s0.visibility === 'hidden' || !e.children.length) return null;
+      const kids = [...e.children].map(walk).filter(Boolean);
+      return kids.length === 1 ? kids[0] : kids.length ? { tag: e.tagName.toLowerCase(), box: R(e), children: kids } : null;
+    }
     const s = getComputedStyle(e);
     const n = { tag: e.tagName.toLowerCase(), box: R(e) };
     if (e.id) n.id = e.id; const cls = [...e.classList].slice(0, 3).join(' '); if (cls) n.cls = cls;

@@ -40,7 +40,9 @@ const spec = await page.evaluate(({ sections, header, footer }) => {
     // ≥ 2 sibling block children, same font, each one line tall and holding only text — recorded once on the parent with `lines`
     // (audemarspiguet-home read 20 one-line anchors and paired the continuation lines with nothing)
     const skip = new Set();
-    sec.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,a,button,label,input,span,em,i,b,strong,u,td,th,div').forEach((e) => {
+    // own text only, so sectioning and phrasing tags that carry text (`header`, `figcaption`, `small`, `time`…) are read once each — a hero's
+    // `header` label was in no spec item (hiltongrandvacations-home)
+    sec.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,a,button,label,input,span,em,i,b,strong,u,td,th,div,header,footer,section,article,figcaption,blockquote,cite,small,time,dt,dd,legend,summary,address').forEach((e) => {
       if (!vis(e) || skip.has(e)) return;
       const run = lineRun(e);
       if (run) { run.forEach((k) => skip.add(k)); s.items.push({ k: e.tagName.toLowerCase(), cls: (typeof e.className === 'string' ? e.className : '').slice(0, 60), box: R(e), t: run.map((k) => k.textContent.replace(/\s+/g, ' ').trim()).join(' ').slice(0, 400), lines: run.length, ...F(run[0]), ...BG(e) }); return; }
