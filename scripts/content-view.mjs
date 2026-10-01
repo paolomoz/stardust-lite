@@ -16,7 +16,8 @@ const line = (n, depth) => {
   let s = `${pad}${n.tag}${n.id ? `#${n.id}` : ''}${n.cls ? `.${n.cls.split(' ')[0]}` : ''} ${b}`;
   if (n.bg) s += ` bg=${n.bg}`; if (n.bgi) s += ` bgi=${n.bgi}`; if (n.border) s += ` border=${n.border}`; if (n.shadow) s += ` shadow=${n.shadow}`;
   if (n.font) s += ` | ${n.font}`; if (n.href) s += ` -> ${n.href}`; if (n.target) s += ` target=${n.target}`;
-  if (n.src) s += ` src=${n.src} nat=${JSON.stringify(n.nat)} alt=${JSON.stringify(n.alt)}`;
+  if (n.src) s += ` src=${n.src} nat=${JSON.stringify(n.nat)} alt=${JSON.stringify(n.alt)}${n.lazy ? ' LAZY (not painted; from the lazy attribute)' : ''}`;
+  if (n.lines) s += ` lines=${n.lines} (one element per rendered line, read as one paragraph)`;
   if (n.placeholder) s += ` placeholder=${JSON.stringify(n.placeholder)}`; if (n.aria) s += ` aria=${JSON.stringify(n.aria)}`;
   if (n.text !== undefined) s += `\n${pad}  TEXT: ${JSON.stringify(n.text)}`;
   if (n.markup && n.markup !== n.text) s += `\n${pad}  MARKUP: ${n.markup}`;

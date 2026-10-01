@@ -12,7 +12,8 @@
 //   --fragments https://<branch>--<site>--<org>.aem.page fetches the PIPELINE's `<nav>.plain.html` / `<footer>.plain.html` (the paths
 //   in the metadata block, previewed first) into <dir>: a hand-made plain.html differs from the pipeline's (it wraps a list item's own
 //   text in <p> when the item holds a nested list — ibm-home's header decorated on the prototype and crashed on the served page), and
-//   fetches the media the fragments reference. The fold applies the pipeline's single-paragraph cell rule (see below).
+//   fetches the media the fragments reference. The fold applies the pipeline's single-paragraph cell rule and its list-item rule (see
+//   below) and requests every remote media URL of the document once (the branch host renders a rendition on its first request).
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -44,6 +45,9 @@ const folded = await p0.evaluate(() => {
   // the pipeline's cell rule: a block cell holding ONE paragraph and nothing else loses its <p> (`<div><p><a>x</a></p></div>` → `<div><a>x</a></div>`,
   // verified on the served plain.html — walgreens-home); a decorate that read `:scope > p` worked on the prototype only
   document.querySelectorAll('main > div > div > div > div').forEach((cell) => { const k = cell.children; if (k.length === 1 && k[0].tagName === 'P' && ![...cell.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) k[0].replaceWith(...k[0].childNodes); });
+  // the pipeline's list rule: a list item that also holds a nested list keeps its own text (and inline markup) in <p> (`<li><p>Software</p><ul>`);
+  // a decorate that read the label from the li's first node worked on the prototype and left the served drawer's buttons empty (audemarspiguet-home)
+  document.querySelectorAll('main li').forEach((li) => { if (!li.querySelector(':scope > ul, :scope > ol')) return; const own = [...li.childNodes].filter((n) => !(n.nodeType === 1 && /^(UL|OL|P|DIV)$/.test(n.tagName)) && !(n.nodeType === 3 && !n.textContent.trim())); if (!own.length) return; const p = document.createElement('p'); li.insertBefore(p, own[0]); own.forEach((n) => p.appendChild(n)); });
   // every authored text (an element's own text and inline children, nested lists/blocks excluded) for the capture check
   const texts = [...document.querySelectorAll('main h1,main h2,main h3,main h4,main h5,main h6,main p,main li')].map((e) => [...e.childNodes].filter((n) => n.nodeType === 3 || (n.nodeType === 1 && !/^(UL|OL|DIV|P|TABLE)$/.test(n.tagName))).map((n) => n.textContent).join('').replace(/:[a-z0-9-]+:/g, ' ').replace(/\s+/g, ' ').trim()).filter((t) => t.length >= 3 && !/^https?:/.test(t));
   return { metas, main: document.querySelector('main').outerHTML, texts };
@@ -71,6 +75,10 @@ if (arg('--fragments', null)) {
     if (media.length) console.log(`harness: ${k} media ×${media.length} ← pipeline`);
   }
 }
+// the branch host generates a rendition on its first request: the first gate's build capture showed blank picture cells until every media
+// URL had been requested once (audemarspiguet-home, one round). Warm every remote media URL of the document here, once, before the runtime
+const remote = [...new Set([...folded.main.matchAll(/(?:src|srcset|href)="(https?:[^"]+)"/g)].flatMap((m) => m[1].split(',')).map((u) => u.trim().split(/\s+/)[0]).filter((u) => /\.(avif|webp|png|jpe?g|gif|svg|mp4)(\?|$)/i.test(u)))];
+if (remote.length) { let warm = 0; let cold = 0; for (const u of remote) { const r = await fetch(u, { method: 'GET' }).catch(() => null); if (r && r.ok) { warm += 1; await r.arrayBuffer().catch(() => {}); } else { cold += 1; console.log(`harness: media ${u.slice(-90)} → ${r ? r.status : 'unreachable'}`); } } console.log(`harness: ${warm} remote media URLs warmed${cold ? `, ${cold} failed (a 404 here is a blank cell in the gate)` : ''}`); }
 const head = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${metas.map(([k, v]) => `<meta name="${k}" content="${v.replace(/"/g, '&quot;')}">`).join('')}<title>${(metas.find(([k]) => k === 'title') || [, ''])[1]}</title><script src="/scripts/aem.js" type="module"></script><script src="/scripts/scripts.js" type="module"></script><link rel="stylesheet" href="/styles/styles.css"></head>`;
 writeFileSync(`${serveDir}/${name}.harness.html`, `${head}<body><header></header>${folded.main}<footer></footer></body></html>`);
 
