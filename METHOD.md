@@ -58,7 +58,10 @@ order; blocks hold only what default content cannot.
      sources), *container* (own rows, then one row per child, ≤ 4 columns, one property per column). A composition that fits none is a modelling error
      (D1/D2/D10), not a fourth shape.
    - **Block Collection match** — hero, cards, columns, tabs, accordion, carousel, quote, embed. If it matches, take the name and the authoring shape;
-     the site's look is a variant or the block's CSS. A site-specific name is for what the collection has no shape for.
+     the site's look is a variant or the block's CSS. A site-specific name is for what the collection has no shape for. Match the site's own
+     inventory first (`block-inventory` — `migration/blocks.json`: the blocks and variants earlier pages approved, with their source signatures
+     and budgets), the collection second, a new name last; `triage` drafts the table from the content dump (fingerprint, repeat, inventory match
+     with its confidence, default content, rows × cols, the page's novelty) and the agent edits the draft — it never decides.
    - **default content around it** — section heads, ledes and closing CTAs are default content; the block decorate may *move* them into its DOM but the
      document keeps them where an author expects them.
    - **embeds in repeating units** — a video that belongs to a card is a fully qualified link in that card's row; the block opens the player.
@@ -174,6 +177,10 @@ order; blocks hold only what default content cannot.
   `harness --content`), `text-ladder` (a text sampled over time: a count-up's duration and easing), `video-frame` (a `<video>` at t = 0 at 2×, or an iframe
   player's box with its overlays hidden), `da-put` (DA source PUT + branch preview; warns on upper case, `--`, `_` and dots), `sync-poll` (the code bus serves
   the pushed commit's files).
+- Step 2 — `block-inventory` (scan `blocks/*/` + a case's register, dump and document into `migration/blocks.json`: block, variant, shape,
+  collection, rows × cols, authoring example, source signature, budget; `diff` a triage against it; `print`), `triage` (the draft triage table from a
+  content dump as JSON and markdown: per section fingerprint, repeat, media ratio, source classes, inventory / collection / new match with confidence,
+  default content, rows × cols; the page's novelty; `lib/fingerprint.mjs` holds the rules).
 - Step 5 — `serve` (concurrent static server, boilerplate symlinks), `harness` (lint → fold (cell and list-item rules) → warm the remote media → runtime
   → serialise; refuses a 🔴; `--fragments` fetches the pipeline's plain.html and media; `--content` checks the authored texts against the capture and the
   click dumps, comma-separated).

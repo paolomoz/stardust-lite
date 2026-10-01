@@ -15,7 +15,9 @@ Instruments run with `npx stardust-lite <name> [args]` (`npx stardust-lite list`
 `text-ladder`, `video-frame`, `measure-to-spec`,
 `measure-view`, `origin-pick` (measurement), `lint` (David's Model), `da-put`, `sync-poll` (DA upload + preview, code sync),
 `serve`, `harness`, `gate`, `sections`, `pair`, `leak`, `hover-diff`, `click-state`, `crop`, `shift-probe`, `extent` (prototype and gate),
-`site-profile` (init / check / print — `migration/site.json`, the site's state after a template run; every instrument reads it as its flag defaults when present, `--site <file>` names another).
+`site-profile` (init / check / print — `migration/site.json`, the site's state after a template run; every instrument reads it as its flag defaults when present, `--site <file>` names another),
+`block-inventory` (scan / diff / print — `migration/blocks.json`, one row per block + variant the site has: shape, collection, rows × cols, authoring example, source signature, budget; written at the end of a template run, read by triage),
+`triage` (a page's draft triage table from its content dump, as JSON + markdown: fingerprint, repeat, inventory match with confidence, collection match, default content, rows × cols, novelty — edit the draft, never write the table from nothing).
 
 Rules that do not bend: the source is measured, never cloned; triage and lint before any block exists; the gated prototype is the
 runtime harness page at 360 / 1440 / probe width against a cached origin with a noise floor; a CSS round changes only what the section
