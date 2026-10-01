@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // live-spec.mjs — per-node measurement of a page at one width (step 1 of BLOCKS-FIRST-PROTOTYPING.md).
-// Per top-level section: box, padding, paint (bg, image, radius, border, shadow, transform); per text node: font family/size/
+// Per top-level section: box, padding, margin (a 0-height section is spacing: flagged in the table), paint (bg, image, radius, border,
+// shadow, transform); per text node: font family/size/
 // line-height/weight/letter-spacing/transform/align/colour/style/decoration + box + text + href; per image/video/svg/canvas: box, fit, src.
 // Also writes the captured DOM. Usage:
 //   node live-spec.mjs <url> <W> --out <dir> [--sections <css>] [--header <css>] [--footer <css>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>] [--vh 900]
@@ -26,7 +27,7 @@ const spec = await page.evaluate(({ sections, header, footer }) => {
   const secs = [document.querySelector(header), ...document.querySelectorAll(sections), document.querySelector(footer)].filter(Boolean);
   const outSecs = secs.map((sec) => {
     const cs = getComputedStyle(sec);
-    const s = { id: `${sec.tagName} ${sec.className}`.trim().slice(0, 80), box: R(sec), pad: cs.padding, pos: cs.position, ...BG(sec), items: [] };
+    const s = { id: `${sec.tagName} ${sec.className}`.trim().slice(0, 80), box: R(sec), pad: cs.padding, mar: cs.margin, pos: cs.position, ...BG(sec), items: [] };
     sec.querySelectorAll('div,section,ul,li,a,button,span,article,aside,figure,nav,form,input,picture').forEach((e) => { if (!vis(e)) return; const bg = BG(e); const bx = R(e); if (Object.keys(bg).length && bx[2] >= 24 && bx[3] >= 16) s.items.push({ k: 'paint', tag: e.tagName.toLowerCase(), cls: (typeof e.className === 'string' ? e.className : '').slice(0, 60), box: bx, pad: getComputedStyle(e).padding, ...bg }); });
     sec.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,a,button,label,input,span,em,i,b,strong,u,td,th,div').forEach((e) => {
       if (!vis(e)) return;
@@ -49,6 +50,8 @@ const { html, ...rest } = spec;
 writeFileSync(`${out}/spec-${W}.json`, JSON.stringify(rest, null, 1));
 writeFileSync(`${out}/dom-${W}.html`, html);
 console.log(`W ${rest.W} vh ${rest.vh} doc ${rest.doc} sections ${rest.secs.length} bodyBg ${rest.bodyBg}`);
-rest.secs.forEach((s, i) => console.log(String(i).padStart(2), s.id.slice(0, 48).padEnd(48), JSON.stringify(s.box).padEnd(22), s.pad, s.bg || '', s.items.length, 'items'));
+// a 0-height live section is a spacing measurement (a `margin-top-small` container: 32 px of margin, 0 px tall), not an empty row to skip —
+// write it down with the section it precedes, per width (usta2-home; the same container collapses to 0 above its cap)
+rest.secs.forEach((s, i) => console.log(String(i).padStart(2), s.id.slice(0, 48).padEnd(48), JSON.stringify(s.box).padEnd(22), s.pad, s.bg || '', s.items.length, 'items', s.box[3] === 0 ? `  ← 0-height: spacing, margin ${s.mar}` : ''));
 console.log('fonts:', rest.fonts.join(' | '));
 await browser.close();

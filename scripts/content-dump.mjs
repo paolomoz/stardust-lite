@@ -2,7 +2,9 @@
 // content-dump.mjs — the AUTHORING input (step 2): per root selector a nested JSON of the visible elements that carry text, links or
 // media — tag, short class, box, text with font, href/aria, src/alt/natural size, background/radius/border/shadow — bare wrappers
 // collapsed. An element whose children are all phrasing (`strong`, `em`, `a`, `span`…) keeps its full text in reading order plus
-// its inline markup (the own-text-only reading split "Text JOINRX to 21525" into "Text to 21525" + "JOINRX" — walgreens-home).
+// its inline markup (the own-text-only reading split "Text JOINRX to 21525" into "Text to 21525" + "JOINRX" — walgreens-home). The font
+// string carries text-transform and letter-spacing (the text is DOM text; the page may render it uppercase — usta2-home). Read the
+// dump with `content-view.mjs` (full texts), never a truncating viewer.
 // --require <css,…> refuses (exit 4) a session whose composition is not the canonical one, so the dump matches the cached origin.
 // Usage: node content-dump.mjs <url> [W] --roots <css,…> --out file.json [--require <css,…>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>]
 import { chromium } from 'playwright';
@@ -30,7 +32,9 @@ const tree = await p.evaluate((roots) => {
     const s = getComputedStyle(e);
     const n = { tag: e.tagName.toLowerCase(), box: R(e) };
     if (e.id) n.id = e.id; const cls = [...e.classList].slice(0, 3).join(' '); if (cls) n.cls = cls;
-    const font = () => `${s.fontFamily.split(',')[0].replace(/"/g, '')} ${s.fontSize}/${s.lineHeight} ${s.fontWeight} ${s.color}${s.textAlign !== 'start' ? ' ' + s.textAlign : ''}`;
+    // text-transform and letter-spacing belong to the font string: the dump holds DOM text, the page renders `uppercase` eyebrows, titles
+    // and pills — found in a pixel-diff crop after the first gate, three 1440 bands (usta2-home)
+    const font = () => `${s.fontFamily.split(',')[0].replace(/"/g, '')} ${s.fontSize}/${s.lineHeight} ${s.fontWeight} ${s.color}${s.textAlign !== 'start' ? ' ' + s.textAlign : ''}${s.textTransform !== 'none' ? ' ' + s.textTransform : ''}${s.letterSpacing !== 'normal' ? ' ls=' + s.letterSpacing : ''}`;
     // mixed inline content: keep the reading order and the markup, do not descend
     const phrasingOnly = e.children.length && [...e.children].every((c) => PHRASING.includes(c.tagName) && !c.querySelector('img,picture,svg,video'));
     let descend = true;
