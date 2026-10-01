@@ -168,12 +168,14 @@ order; blocks hold only what default content cannot.
    section** the harness fold drops, so a section-rhythm rule (`.section + .section`) adds a gap only on the served page — exclude empty sections (`main
    > .section:not(:has(> *))`). The template run ends by writing the site profile — `site-profile init migration/cases/<template> --out migration/site.json`
    (overlays, cap model, fonts and body row, tokens, chrome selectors, heights and states per width, fragment paths, DA coordinates, serve port, noise
-   floor, this page's numbers; `site-profile print` renders it for the README) — the state every later page run reads instead of re-discovering it. A
+   floor, this page's numbers; `site-profile print` renders it for the README) and the block inventory (`block-inventory scan --cases`, its budgets from
+   the served per-section table) — the state every later page run reads instead of re-discovering it; a page after the template follows `ROLLOUT.md`. A
    rollout runs the list `roster pick` wrote: `harness --pages` on one serve, `gate --pages` per page with one origin cache each and one summary table,
    `da-put --pages` to each page's docPath (`--dry` first), `gate --served-pages` against the branch host reusing the prototype origins.
 
 8. **Approval = block approval.** Prototype, blocks, authored document, triage table, deviations and motion registers are one artifact. The prototype
-   number becomes the page's budget for rollout.
+   number is the page's budget for rollout only until the served per-section table is read: the inventory then carries each block's budget per width
+   (`block-inventory scan` / `budgets`), and a rollout page is gated section by section against those.
 
 ## Instruments (`scripts/`, each prints its usage without arguments; capture, compare and lint tools vendored unmodified under `tools/` — see NOTICE)
 
@@ -188,7 +190,8 @@ order; blocks hold only what default content cannot.
   player's box with its overlays hidden), `da-put` (DA source PUT + branch preview; warns on upper case, `--`, `_` and dots), `sync-poll` (the code bus serves
   the pushed commit's files).
 - Step 2 — `block-inventory` (scan `blocks/*/` + a case's register, dump and document into `migration/blocks.json`: block, variant, shape,
-  collection, rows × cols, authoring example, source signature, budget; `diff` a triage against it; `print`), `triage` (the draft triage table from a
+  collection, rows × cols, authoring example, source signature, recipe, budget per width; `diff` a triage against it; `budgets --gate-dir` recomputes the
+  budgets from a served per-section gate table; `print`), `triage` (the draft triage table from a
   content dump as JSON and markdown: per section fingerprint, repeat, media ratio, source classes, inventory / collection / new match with confidence,
   default content, rows × cols; the page's novelty; `--from-md` reads the agent's edits back; `lib/fingerprint.mjs` holds the rules).
 - Step 3 — `author` (the document from the triage and the dump through the inventory's recipes: default content as the dump holds it, a block table
@@ -205,7 +208,8 @@ order; blocks hold only what default content cannot.
   (first visible match), `click-state` (`--hover` first or alone; repeated `--click` for a control inside a closed panel; prints the panel and the control's
   `aria-expanded`), `leak` (every wrapper, prototype vs served), `crop`, `extent` (painted bbox of a colour / alpha / non-background pixels in a region of a
   capture).
-- Page-specific probes (a sticky bar's state machine, an icon-sprite inventory, a document generator) live in `cases/*/scripts` as templates.
+- Page-specific probes (a sticky bar's state machine, an icon-sprite inventory) live in `cases/*/scripts` as templates; `page-report` writes a rollout page's
+  row and screen (`ROLLOUT.md`).
 - Every instrument that opens a page takes `--consent`, `--dismiss <css,…>`, `--locale <tag>` and `--require <css,…>` (`common.mjs openPage`;
   `--require` exits 4 when the session is not the composition the origin shows); `gate` passes the overlay options to the live capture side. `settle`
   reads after the fonts, every image and every finite animation — a table read before them is not a measurement.

@@ -1,0 +1,44 @@
+/* reset.css — the resets every stardust-lite migration wrote by hand (seven sites, 2026-09/10). Copied by `init --foundation`;
+   styles.css imports it first. Everything sits in :where() (specificity 0) so no block rule ever loses to a reset — an id or a
+   longer compound in a reset silently outranks the block's longhand (METHOD step 4, BACKLOG #125). No measurement lives here:
+   sizes, colours and fonts come from the spec into styles.css. */
+
+:where(*, *::before, *::after) { box-sizing: border-box; }
+
+:where(html) { -webkit-text-size-adjust: 100%; }
+
+:where(body) { margin: 0; }
+
+:where(h1, h2, h3, h4, h5, h6, p, ul, ol, figure, blockquote, dl, dd) { margin: 0; }
+
+:where(ul, ol) { padding: 0; list-style: none; }
+
+:where(img, picture, video, svg) { display: block; max-width: 100%; height: auto; }
+
+:where(img) { font-style: italic; }
+
+:where(input, textarea, select, button) { font: inherit; color: inherit; }
+
+:where(button) { margin: 0; border: 0; padding: 0; background: none; cursor: pointer; }
+
+:where(a:any-link) { color: inherit; text-decoration: none; }
+
+:where(table) { border-collapse: collapse; border-spacing: 0; }
+
+/* the attribute loses to any `display` a class sets (a tabs section showed every panel) — METHOD step 4 */
+[hidden] { display: none !important; }
+
+/* the pipeline leaves the metadata block behind as an empty section the harness fold drops: a `.section + .section` rhythm rule
+   would add a gap on the served page only — METHOD step 7, BACKLOG #24 */
+main > .section:not(:has(> *)) { display: none; }
+
+/* icons: decorateIcons() makes a span.icon > img; inlineIcons() swaps the img for the SVG so currentColor applies */
+:where(.icon) { display: inline-block; }
+:where(.icon img, .icon svg) { display: block; width: 100%; height: 100%; }
+:where(.icon svg) { fill: currentcolor; }
+
+/* the runtime hides the body until the eager phase is done; header and footer blocks until they are loaded */
+body { display: none; }
+body.appear { display: block; }
+header .header, footer .footer { visibility: hidden; }
+header .header[data-block-status="loaded"], footer .footer[data-block-status="loaded"] { visibility: visible; }

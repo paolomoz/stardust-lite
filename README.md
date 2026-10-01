@@ -16,7 +16,8 @@ loss in the first two pilots.
 
 ## Layout
 
-- `METHOD.md` — the procedure. Every rule traces to a case; `BACKLOG.md` holds what the cases found wrong or missing.
+- `METHOD.md` — the procedure, per template. Every rule traces to a case; `BACKLOG.md` holds what the cases found wrong or missing. `ROLLOUT.md` — the
+  procedure for a page after the template (one screen: the commands in order, the stop rule, the escalation rule, the evidence a page leaves).
 - `scripts/` — the instruments (Node + Playwright): `measure-page` (step 1 in one session per width: one load, then probe-load's first look,
   the structure dump, the content dump, the media list, the spec + DOM and the deep-probe set, byte-compatible with the single instruments), `probe-load`, `probe-structure`, `content-dump`, `content-view`, `media-list`,
   `media-fetch`, `live-spec`, `scroll-probe`, `deep-probe`, `click-dump`, `text-ladder`, `video-frame`, `da-put`, `sync-poll`, `serve`, `harness`,
@@ -28,7 +29,11 @@ loss in the first two pilots.
   `author` (the document from the triage and the dump through the inventory's recipes: default content as the dump holds it, blocks as tables per
   recipe, media through the manifest, section-metadata and the metadata block, then the lint — `scripts/lib/recipes.mjs` documents the recipe
   `blocks.json` carries per block, `scripts/lib/doc-diff.mjs` compares two documents structurally: blocks, rows × cols, text sets per section),
-  `roster` (the site's pages from the nav document, a URL list or a bounded crawl, one light pass each — `migration/roster.json` + `roster.md`: coverage matrix pages × blocks, novelty, template clusters, reuse-first / novelty-first orders; `pick` writes `pages.json`, `print` re-renders the views from the JSON).
+  `roster` (the site's pages from the nav document, a URL list or a bounded crawl, one light pass each — `migration/roster.json` + `roster.md`: coverage matrix pages × blocks, novelty, template clusters, reuse-first / novelty-first orders; `pick` writes `pages.json`, `print` re-renders the views from the JSON),
+  `page-report` (a rollout page's row in `migration/site-report.json` from its `gate/gate.json` + `gate-served/gate.json` and a few flags — minutes, rounds, new blocks, deviations, blocked —, then `migration/pages/<slug>.md` and the site table `migration/site-report.md`).
+- `templates/` — what `init` copies into a site repo: the skill stub, the AGENTS.md section, the migration README; `templates/foundation/` (`init --foundation`) the site
+  code every migration rewrote — `scripts/stardust.js` (icon tokens, inline icons, widget auto-block, fragment-section reader, empty sections), `styles/reset.css`
+  (`:where()` resets, `[hidden]`, the empty metadata section), the `styles.css` skeleton with the spec's token names and `fonts.css` — copied once, never overwritten.
 - `tools/` — vendored, unmodified, from Adobe's stardust plugin (Apache-2.0, see `NOTICE`): `replica/` capture and compare tools
   (`stitch-shot`, `pixel-compare`, `cap-probe`, `motion-observe`, `motion-compare`, `measure`, `anchor`), `diff/live-session.mjs`
   (their live-page session), `lint/davids-model-lint.mjs` + `davids-model.md`.
@@ -60,12 +65,21 @@ npx playwright install chromium
 npx stardust-lite init                           # writes .github/skills/stardust-lite/SKILL.md, .claude/skills/…, an AGENTS.md section,
                                                  # migration/cases/ and .gitignore lines
 npx stardust-lite list                           # instruments; each prints usage without arguments
-npx stardust-lite method                         # path of METHOD.md — the agent reads this first
+npx stardust-lite init --foundation              # also scripts/stardust.js, styles/reset.css, styles.css + fonts.css skeletons (never overwrites)
+npx stardust-lite method                         # path of METHOD.md — the template run reads this first
+npx stardust-lite rollout                        # path of ROLLOUT.md — a page after the template reads this instead
 ```
 
 A clean Copilot or Claude Code session opened in the site repo then finds the skill and `AGENTS.md`, reads `node_modules/stardust-lite/METHOD.md`
 and runs `npx stardust-lite <instrument>`. Evidence goes to `migration/cases/<template>/`. Nothing under `node_modules/stardust-lite` is edited;
 method changes and new instruments are pull requests here, traced to a case.
+
+**Rollout (page N of a site).** Once a template is approved and `site-profile init` / `block-inventory scan` have written `migration/site.json` and
+`migration/blocks.json`, every further page of that template is a page run: the agent reads `ROLLOUT.md` instead of METHOD, every instrument takes its
+overlays, cap root, chrome heights and DA coordinates from the profile, `triage` matches the inventory, `author` writes the document through the recipes,
+`gate` masks the approved chrome and reads each section against its block's budget, and the page leaves one row in `migration/site-report.json` plus
+`migration/pages/<slug>.md` (`page-report`) — no case folder unless it added a block or turned out to be a new template (novelty ≥ 0.5, or a section the
+inventory cannot name: then METHOD in full). The batch runs `roster pick`'s ten pages per site and one improvement pass per site after them.
 
 ## Run (per template)
 
@@ -77,7 +91,8 @@ method changes and new instruments are pull requests here, traced to a case.
 | 4 blocks | in the site repo, on a branch |
 | 5 prototype | `npx stardust-lite serve proto --port 89xx --site .` (concurrent server, creates the `scripts blocks styles fonts icons` symlinks) then `npx stardust-lite harness doc/home.html --serve proto --name home --port 89xx --fragments <branch-host> --content measure/content-1440.json,measure/clicks.json`; a page list on the same serve: `npx stardust-lite harness --pages pages.json --doc-dir doc --serve proto --port 89xx --fragments <branch-host>` (one harness per page, one summary line each) |
 | 6 gate | `npx stardust-lite sections spec-<W>.json <build>` · `npx stardust-lite pair spec-<W>.json <build>` at all three widths before every CSS change · between rounds `npx stardust-lite gate --live <url> --build http://localhost:89xx/home.harness.html --out gate --widths <base>` (`--main <css>` for a `main`-less origin; crop the first gate's hottest band before any CSS round; a red photo band: `npx stardust-lite shift-probe live-<W>.png build-<W>.png --x0 … --y1 …` and `crop … --vs build-<W>.png`) · once clean: the three widths with `--probes probes.txt`, plus `hover-diff` / `click-state --hover` (repeat `--click` for a control inside a closed panel) on both sides · on a page after the template the gate is a delta gate by default (the profile and `blocks.json` are read): the header and footer bands are masked (`--chrome`, `--no-chrome`; the profile's heights), the per-section table gives each authored section's pixel %, Δh and its block's budget (`--budget`, `--triage triage.json` names the blocks; `sections-<W>.json`), the verdict is `budget: PASS|FAIL (n over)`; a page list: `npx stardust-lite gate --pages pages.json --build-base http://localhost:89xx --out gate --widths <base> --triage-dir triage` (one origin cache per page under `gate/<slug>/`, the summary table and `gate/pages-summary.json`) |
-| 7 deploy + gate | same document to DA (`da-put`; a list: `npx stardust-lite da-put --pages pages.json --doc-dir doc --dry` then without `--dry` — each document to its `docPath`, the target from the profile's `da`), push the code, `npx stardust-lite sync-poll <branch-host> . blocks/x/x.css …` until the bus serves the repo's files, `gate … --origin <prototype gate dir>` against the served URL (one origin for both gates; a list: `npx stardust-lite gate --served-pages pages.json --branch-host <branch-host> --origin-base gate --out gate-served`), `npx stardust-lite leak <url> --sels sels.txt` on both and diff · end the template run with `npx stardust-lite site-profile init migration/cases/<template> --out migration/site.json` (overlays, cap, chrome heights, DA, port, noise, numbers; every instrument then reads it as its defaults — `--site <file>` or the file under the cwd; `site-profile check` before a page run, `site-profile print` for the README) and the block inventory — `npx stardust-lite block-inventory scan --case migration/cases/<template> --out migration/blocks.json` (one row per block + variant with its source signature and budget; `print` for the README) |
+| 7 deploy + gate | same document to DA (`da-put`; a list: `npx stardust-lite da-put --pages pages.json --doc-dir doc --dry` then without `--dry` — each document to its `docPath`, the target from the profile's `da`), push the code, `npx stardust-lite sync-poll <branch-host> . blocks/x/x.css …` until the bus serves the repo's files, `gate … --origin <prototype gate dir>` against the served URL (one origin for both gates; a list: `npx stardust-lite gate --served-pages pages.json --branch-host <branch-host> --origin-base gate --out gate-served`), `npx stardust-lite leak <url> --sels sels.txt` on both and diff · end the template run with `npx stardust-lite site-profile init migration/cases/<template> --out migration/site.json` (overlays, cap, chrome heights, DA, port, noise, numbers; every instrument then reads it as its defaults — `--site <file>` or the file under the cwd; `site-profile check` before a page run, `site-profile print` for the README) and the block inventory — `npx stardust-lite block-inventory scan --case migration/cases/<template> --cases --out migration/blocks.json` (one row per block + variant with its source signature, recipe and budget; then `gate --per-section` on the served page and `block-inventory budgets --gate-dir gate-served` for the per-block budgets; `print` for the README) |
+| 8 rollout (page N) | `ROLLOUT.md` — `site-profile check` → `measure-page` → `triage` + `block-inventory diff` → `author` → lint → `harness --content` → table rounds → `gate --chrome --budget --triage` at the base width, the three widths once clean → `da-put` → one served gate → `page-report <slug> --minutes … --first-url-minutes … --rounds-table … --rounds-gate … [--new-blocks] [--deviation]… [--blocked]…` (the row in `migration/site-report.json`, `migration/pages/<slug>.md`, `migration/site-report.md`) |
 
 Definition of done: three-width pixel table with the noise floor, cap-probe PASS at the probe width, motion-compare parity, lint clean at
 step 2, served page within the prototype's numbers, leak table identical.
