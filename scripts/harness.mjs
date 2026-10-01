@@ -2,13 +2,14 @@
 // harness.mjs — lint → fold → runtime → serialise (step 5). The served harness page IS the gated prototype; the serialised file is
 // the review artifact. Refuses to fold a document with a David's Model 🔴 (deploy skill lint) unless --no-lint.
 // Usage: node harness.mjs <authored.html> --serve <dir> --name <slug> [--port 8930] [--width 1440] [--no-lint] [--fragments <branch-host>]
-//        [--content <content.json>]
+//        [--content <content.json>[,<click-dump.json>…]]
 //   <dir> must serve the site code: symlinks scripts/ blocks/ styles/ fonts/ icons/ → the repo; plus any local media the document
 //   references (e.g. drafts/media/*) and fragment plain.html files (drafts/nav.plain.html). Start it with `scripts/serve.mjs <dir>
 //   --port <n> --site <repo>` (creates the symlinks, answers concurrent sessions — `python3 -m http.server` under parallel Playwright
 //   sessions timed out the blocks-loaded wait and measured half-styled pages — stryker-home).
-//   --content <content-dump.json> checks every authored text against the capture: a text the dump does not hold was typed from memory
-//   (three descriptions finished from a truncated viewer cost a round — stryker-home). Warns, does not refuse.
+//   --content <content-dump.json>[,<click-dump.json>…] checks every authored text against the capture: a text the dump does not hold was
+//   typed from memory (three descriptions finished from a truncated viewer cost a round — stryker-home). Add the `click-dump` JSONs for
+//   the content a click reveals (captions, tab panels, sub-menus). Warns, does not refuse.
 //   --fragments https://<branch>--<site>--<org>.aem.page fetches the PIPELINE's `<nav>.plain.html` / `<footer>.plain.html` (the paths
 //   in the metadata block, previewed first) into <dir>: a hand-made plain.html differs from the pipeline's (it wraps a list item's own
 //   text in <p> when the item holds a nested list — ibm-home's header decorated on the prototype and crashed on the served page), and
@@ -55,13 +56,16 @@ const folded = await p0.evaluate(() => {
 await b0.close();
 const { metas } = folded;
 if (arg('--content', null)) {
-  const dump = JSON.parse(readFileSync(arg('--content'), 'utf8')); const got = [];
+  // several sources, comma-separated: the content dump holds the page at rest; a `click-dump` JSON holds what a click reveals (carousel
+  // captions, tab panels, a drawer's sub-menus) — 23 correctly authored texts read as "not in the capture" against the dump alone
+  // (hiltongrandvacations-home)
+  const files = String(arg('--content')).split(',').map((f) => f.trim()).filter(Boolean); const got = [];
   const walk = (n) => { if (!n || typeof n !== 'object') return; if (Array.isArray(n)) return n.forEach(walk); if (typeof n.text === 'string') got.push(n.text); walk(n.children); };
-  Object.entries(dump).forEach(([k, v]) => { if (!k.startsWith('__')) walk(v); });
+  for (const f of files) { const dump = JSON.parse(readFileSync(f, 'utf8')); Object.entries(dump).forEach(([k, v]) => { if (!k.startsWith('__')) walk(v); }); }
   const hay = got.join(' ').replace(/\s+/g, ' ').toLowerCase();
   const missing = [...new Set(folded.texts)].filter((t) => !hay.includes(t.toLowerCase()));
   missing.forEach((t) => console.log(`harness: text not in the capture — "${t.slice(0, 100)}${t.length > 100 ? '…' : ''}"`));
-  console.log(`harness: content check ${folded.texts.length} texts, ${missing.length} not in ${arg('--content')}${missing.length ? ' (typed from memory? read the JSON, not a viewer)' : ''}`);
+  console.log(`harness: content check ${folded.texts.length} texts, ${missing.length} not in ${files.join(' + ')}${missing.length ? ' (typed from memory? read the JSON, not a viewer)' : ''}`);
 }
 if (arg('--fragments', null)) {
   const host = String(arg('--fragments')).replace(/\/$/, '');
