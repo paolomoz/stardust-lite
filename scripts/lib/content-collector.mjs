@@ -4,6 +4,9 @@
 // without the visibility test). Factored out here so the roster's light pass (and later passes) dump the same content model without
 // re-typing the rules (batch-7 rollout, pass 3); content-dump's CLI and output are unchanged. Self-contained: Playwright serialises the
 // function by source, so nothing here may close over module scope. Call: `page.evaluate(collectContent, [roots, hidden])`.
+// Pass 4 (author) added keys, all additive — old keys unchanged: `markupFull` (the whole inline markup when `markup` was cut at 600
+// chars), `title` on links, `src` / `poster` on <video> (the first <source> when the element has no src), `icon` on an empty element
+// whose class names an icon font glyph (`icon-*`, `fa-*`, `glyphicon-*`, `material-icons`) — the generator writes `:name:` for it.
 export function collectContent([roots, hidden]) {
   const R = (e) => { const r = e.getBoundingClientRect(); return [Math.round(r.x), Math.round(r.y + scrollY), Math.round(r.width), Math.round(r.height)]; };
   let force = false; // --hidden roots: every element counts as visible
@@ -39,8 +42,11 @@ export function collectContent([roots, hidden]) {
     const phrasingOnly = e.children.length && [...e.children].every((c) => PHRASING.includes(c.tagName) && !c.querySelector('img,picture,svg,video'));
     let descend = true;
     const run = lineRun();
-    if (run) { n.text = run.map((k) => norm(k.textContent)).join(' '); n.lines = run.length; n.font = font(run[0]); descend = false; } else if (phrasingOnly && own(e)) { n.text = norm(e.textContent); n.markup = norm(e.innerHTML).slice(0, 600); n.font = font(); descend = false; } else { const t = own(e); if (t) { n.text = t; n.font = font(); } }
-    if (e.tagName === 'A') { n.href = e.getAttribute('href'); if (e.getAttribute('aria-label')) n.aria = e.getAttribute('aria-label'); if (e.target) n.target = e.target; }
+    if (run) { n.text = run.map((k) => norm(k.textContent)).join(' '); n.lines = run.length; n.font = font(run[0]); descend = false; } else if (phrasingOnly && own(e)) { n.text = norm(e.textContent); const full = norm(e.innerHTML); n.markup = full.slice(0, 600); if (full.length > 600) n.markupFull = full; n.font = font(); descend = false; } else { const t = own(e); if (t) { n.text = t; n.font = font(); } }
+    if (e.tagName === 'A') { n.href = e.getAttribute('href'); if (e.getAttribute('aria-label')) n.aria = e.getAttribute('aria-label'); if (e.target) n.target = e.target; if (e.title) n.title = e.title; }
+    if (e.tagName === 'VIDEO') { n.src = e.currentSrc || e.getAttribute('src') || e.querySelector('source')?.getAttribute('src') || null; if (!n.src) delete n.src; if (e.poster) n.poster = e.poster; }
+    // an icon-font glyph: an empty element whose class names the font (`icon-search`, `fa-chevron-right`) — content, not paint
+    if (!e.children.length && !own(e)) { const ic = [...e.classList].find((c) => /^(icon-|fa-|glyphicon-|material-icons|bi-)/.test(c) && !/^(fa|fas|far|fab)$/.test(c)); if (ic) n.icon = ic.replace(/^(icon-|fa-|glyphicon-|bi-)/, '') || ic; }
     if (e.tagName === 'IMG') {
       n.src = e.currentSrc || e.src; n.alt = e.alt; n.nat = [e.naturalWidth, e.naturalHeight];
       // not painted yet (a card beyond the viewport, a placeholder): the authoring set is in the lazy attribute — media-fetch takes it from `src`
@@ -56,7 +62,7 @@ export function collectContent([roots, hidden]) {
     const kids = descend ? [...e.children].map(walk).filter(Boolean) : [];
     if (kids.length) n.children = kids;
     if (kids.length === 1 && !n.text && !n.href && !n.src && !n.bg && !n.bgi && !n.border && !n.shadow && !n.id) return kids[0]; // bare wrapper
-    if (!kids.length && !n.text && !n.href && !n.src && !n.bg && !n.bgi && !n.border) return null;
+    if (!kids.length && !n.text && !n.href && !n.src && !n.bg && !n.bgi && !n.border && !n.icon) return null;
     return n;
   };
   const out = {}; for (const r of roots) out[r] = [...document.querySelectorAll(r)].map(walk).filter(Boolean);

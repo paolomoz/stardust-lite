@@ -2,8 +2,14 @@
 // block-inventory.mjs — the blocks a site already has, as data: `migration/blocks.json`, one row per block + variant, so page 2's triage
 // matches the site's inventory before the Block Collection and nobody re-invents `cards` under another name (SCALING-PLAN §2.B,
 // batch-7 rollout). Pure Node: reads `blocks/*/<name>.{js,css}`, a finished case's REGISTER.md triage table, its `doc/*.html` and
-// `measure/content-<W>.json`, and the site profile's page numbers. The authoring recipe stays null in this pass (pass 4 fills it).
-//   scan  [--site-repo .] [--case <case-dir>]… --out migration/blocks.json [--all]
+// `measure/content-<W>.json`, and the site profile's page numbers. Pass 4 fills the authoring recipe (lib/recipes.mjs documents it).
+//   scan  [--site-repo .] [--case <case-dir>]… --out migration/blocks.json [--all] [--cases]
+//         --cases derives a recipe for every block that occurs in a case's doc/*.html (the block's rows and cells read back into dump
+//         kinds; the occurrence with the most rows wins; a 1-row variant of a container inherits `unit`); a recipe written by hand
+//         (`recipe._hand: true`) in the existing blocks.json survives the rescan (merged by name + variant).
+//   recipe <name> [variant] --from <doc.html> [--triage triage.json --unit <section index>] [--blocks migration/blocks.json] [--write]
+//         derives one recipe from an authored document; with a triage and its section index, says which dump kinds of that unit land
+//         in which cell and which do not fit. Prints the JSON; --write stores it in blocks.json (as hand-written: `_hand: true`).
 //         rows from blocks/ (variants from the CSS `.name.variant` selectors; shape inferred from decorate: container when it iterates
 //         the rows, key-value when it reads name/value pairs, simple otherwise — marked `_inferred`), refined by every --case given:
 //         the register's "block · shape · collection match · rows × cols" column names shape / collection / rows × cols / variants,
@@ -20,16 +26,38 @@
 //     "collection": hero|cards|columns|tabs|accordion|carousel|quote|embed|header|footer|null,
 //     "authoringExample": "<div><div>…</div><div>…</div></div>" | null,          // the block's first row from the case's document
 //     "sourceSignature": { "classes": [..] | null, "fingerprint": { pattern, repeat, unit, unitSig, cols, kinds, … } | null },
-//     "recipe": null, "budget": { "360", "base", "probe" }, "approvedIn": "home" | null, "document": "home"|"nav"|"footer"|null,
+//     "recipe": { rows, cells, … } | null (lib/recipes.mjs), "budget": { "360", "base", "probe" }, "approvedIn": "home" | null, "document": "home"|"nav"|"footer"|null,
 //     "_inferred": ["shape", "classes", …], "_notes": [..] } ] }
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { arg } from './common.mjs';
 import { splitSections, fingerprint, dropGeneric, allClasses, matchSection, rowsCols, COLLECTIONS } from './lib/fingerprint.mjs';
+import { parseDoc, deriveRecipe, describeRecipe } from './lib/recipes.mjs';
 
 const [,, cmd, target] = process.argv;
-const usage = () => { console.error('usage: block-inventory.mjs scan [--site-repo .] [--case <case-dir>]… --out migration/blocks.json [--all]\n       block-inventory.mjs diff <triage.json> --blocks migration/blocks.json\n       block-inventory.mjs print [--blocks migration/blocks.json]'); process.exit(1); };
-if (!cmd || !['scan', 'diff', 'print'].includes(cmd) || (cmd === 'diff' && (!target || target.startsWith('--')))) usage();
+const usage = () => { console.error('usage: block-inventory.mjs scan [--site-repo .] [--case <case-dir>]… --out migration/blocks.json [--all] [--cases]\n       block-inventory.mjs diff <triage.json> --blocks migration/blocks.json\n       block-inventory.mjs recipe <name> [variant] --from <doc.html> [--triage triage.json --unit <i>] [--blocks migration/blocks.json] [--write]\n       block-inventory.mjs print [--blocks migration/blocks.json]'); process.exit(1); };
+if (!cmd || !['scan', 'diff', 'print', 'recipe'].includes(cmd) || (['diff', 'recipe'].includes(cmd) && (!target || target.startsWith('--')))) usage();
+
+/** Recipes for every block occurring in the documents given: { 'name|variant': { recipe, notes, rows } } — the occurrence with the
+ * most rows wins; a 1-row occurrence of a block another occurrence shows as `unit` (same name, any variant, same cell kinds) is `unit`. */
+function recipesFromDocs(docs, fpFor = () => null) {
+  const best = {};
+  for (const [docName, html] of Object.entries(docs)) {
+    const sections = parseDoc(html);
+    for (const sec of sections) for (const b of sec.blocks) {
+      if (['metadata', 'section-metadata'].includes(b.name)) continue;
+      const key = `${b.name}|${b.variant || ''}`; const { recipe, notes } = deriveRecipe(b, sec, { fingerprint: fpFor(b.name, b.variant), doc: `${docName}.html` });
+      if (!recipe) continue;
+      if (!best[key] || b.rows.length > best[key].rows) best[key] = { recipe, notes, rows: b.rows.length, name: b.name, variant: b.variant };
+    }
+  }
+  for (const r of Object.values(best)) {
+    if (r.recipe.rows !== 'fixed' || r.rows !== 1) continue;
+    const sib = Object.values(best).find((o) => o.name === r.name && o !== r && o.recipe.rows === 'unit' && JSON.stringify((o.recipe.cells || []).map((c) => c.from)) === JSON.stringify((r.recipe.cells || []).map((c) => c.from)));
+    if (sib) { r.recipe.rows = 'unit'; r.notes.push(`1 row in the document; \`unit\` like ${sib.name}${sib.variant ? ` (${sib.variant})` : ''}`); }
+  }
+  return best;
+}
 
 const read = (f) => (existsSync(f) ? readFileSync(f, 'utf8') : null);
 const readJson = (f) => { try { return JSON.parse(readFileSync(f, 'utf8')); } catch { return null; } };
@@ -162,6 +190,16 @@ if (cmd === 'scan') {
   if (shared.length) { for (const r of rows) if (r.sourceSignature.classes) { const drop = r.sourceSignature.classes.filter((c) => shared.includes(c)); if (drop.length) { r.sourceSignature.classes = r.sourceSignature.classes.filter((c) => !shared.includes(c)); if (!r.sourceSignature.classes.length) r.sourceSignature.classes = null; r._notes.push(`classes shared across blocks dropped: ${drop.join(' ')}`); } } console.error(`block-inventory: classes shared by several blocks dropped from signatures: ${shared.join(' ')}`); }
   rows.sort((a, b) => (a.name === b.name ? String(a.variant || '').localeCompare(String(b.variant || '')) : a.name.localeCompare(b.name)));
   for (const r of rows) { if (!r.sourceSignature.classes) r._notes.push('no source classes named or read'); if (!r.sourceSignature.fingerprint) r._notes.push('no fingerprint (no dump section mapped)'); if (!r._inferred.length) delete r._inferred; }
+  // 4. recipes: a hand-written one in the existing file survives; --cases derives the rest from the case documents
+  const previous = readJson(out)?.blocks || [];
+  for (const r of rows) { const prev = previous.find((p) => p.name === r.name && (p.variant || null) === (r.variant || null)); if (prev?.recipe?._hand) r.recipe = prev.recipe; else if (prev?.recipe && !arg('--cases', false)) r.recipe = prev.recipe; }
+  if (arg('--cases', false)) {
+    const docs = {}; for (const c of sourceCases) { const d = join(c, 'doc'); if (isDir(d)) for (const f of readdirSync(d).filter((f) => f.endsWith('.html'))) docs[`${basename(c)}/${f.replace(/\.html$/, '')}`] = read(join(d, f)); }
+    const derived = recipesFromDocs(docs, (name, variant) => rows.find((r) => r.name === name && (r.variant || null) === (variant || null))?.sourceSignature?.fingerprint || null);
+    let n = 0; let kept = 0;
+    for (const r of rows) { const d = derived[`${r.name}|${r.variant || ''}`]; if (r.recipe?._hand) { kept += 1; continue; } if (d) { r.recipe = { ...d.recipe, _notes: [...(d.recipe._notes || []), ...d.notes.filter((x) => !(d.recipe._notes || []).includes(x))] }; n += 1; } else if (!['header', 'footer'].includes(r.name) && !r.recipe) r._notes.push('no recipe: the block occurs in no case document (write one by hand: recipe._hand)'); }
+    console.error(`block-inventory: recipes derived for ${n} rows from ${Object.keys(docs).length} documents${kept ? `, ${kept} hand-written kept` : ''}`);
+  }
   const json = { _schema: 'stardust-lite/block-inventory@1', _writtenAt: new Date().toISOString(), _source: { siteRepo: repo, cases: sourceCases }, blocks: rows };
   mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, JSON.stringify(json, null, 1));
   printTable(rows);
@@ -170,9 +208,43 @@ if (cmd === 'scan') {
 }
 
 function printTable(rows) {
-  table(rows.map((b) => { const f = b.sourceSignature?.fingerprint; const sig = [b.sourceSignature?.classes?.slice(0, 2).join(' '), f ? `${f.unit || f.pattern.slice(0, 30)}${f.repeat ? ` ×${f.repeat}` : ''}` : null].filter(Boolean).join(' · ') || '—'; return [b.name, b.variant || '—', `${b.shape || '—'}${b._inferred?.includes('shape') ? '?' : ''}`, b.collection || '—', b.rowsCols || '—', sig, b.budget && b.budget.base != null ? `${b.budget['360']} / ${b.budget.base} / ${b.budget.probe}` : '—', b.approvedIn || '—', b.recipe ? 'yes' : '—']; }), ['block', 'variant', 'shape', 'collection', 'rows × cols', 'source signature (classes · unit)', 'budget 360 / base / probe %', 'approved in', 'recipe']);
+  table(rows.map((b) => { const f = b.sourceSignature?.fingerprint; const sig = [b.sourceSignature?.classes?.slice(0, 2).join(' '), f ? `${f.unit || f.pattern.slice(0, 30)}${f.repeat ? ` ×${f.repeat}` : ''}` : null].filter(Boolean).join(' · ') || '—'; return [b.name, b.variant || '—', `${b.shape || '—'}${b._inferred?.includes('shape') ? '?' : ''}`, b.collection || '—', b.rowsCols || '—', sig, b.budget && b.budget.base != null ? `${b.budget['360']} / ${b.budget.base} / ${b.budget.probe}` : '—', b.approvedIn || '—', describeRecipe(b.recipe)]; }), ['block', 'variant', 'shape', 'collection', 'rows × cols', 'source signature (classes · unit)', 'budget 360 / base / probe %', 'approved in', 'recipe (rows [cells])']);
 }
 const loadBlocks = () => { const f = resolve(arg('--blocks', join('migration', 'blocks.json'))); const j = readJson(f); if (!j?.blocks) { console.error(`block-inventory: ${f} unreadable — run scan first`); process.exit(1); } return { file: f, blocks: j.blocks }; };
+
+// ───────────────────────────── recipe ─────────────────────────────
+if (cmd === 'recipe') {
+  const variantArg = process.argv[3] && !process.argv[3].startsWith('--') ? process.argv[3] : null;
+  const from = arg('--from', null); if (!from || from === true) usage();
+  const html = read(resolve(from)); if (!html) { console.error(`block-inventory: ${from} unreadable`); process.exit(1); }
+  const blocksPath = resolve(arg('--blocks', join('migration', 'blocks.json'))); const inv = readJson(blocksPath);
+  const row = inv?.blocks?.find((b) => b.name === target && (b.variant || null) === variantArg) || null;
+  const derived = recipesFromDocs({ [basename(from, '.html')]: html }, () => row?.sourceSignature?.fingerprint || null);
+  const hit = derived[`${target}|${variantArg || ''}`];
+  if (!hit) { console.error(`block-inventory: no <div class="${[target, variantArg].filter(Boolean).join(' ')}"> in ${from} (blocks there: ${[...new Set(Object.values(derived).map((d) => `${d.name}${d.variant ? ` (${d.variant})` : ''}`))].join(', ')})`); process.exit(2); }
+  const recipe = hit.recipe;
+  // with a triage section: which dump kinds of the unit land where
+  const triageFile = arg('--triage', null); const unitIdx = arg('--unit', null);
+  if (triageFile && unitIdx !== null) {
+    const tri = readJson(resolve(triageFile)); const sec = tri?.sections?.find((x) => String(x.index) === String(unitIdx));
+    if (!sec) console.error(`block-inventory: no section ${unitIdx} in ${triageFile}`);
+    else {
+      const kinds = (sec.signature?.unitSig?.length ? sec.signature.unitSig : sec.signature?.kinds || []).map((k) => (k === 'media' ? 'picture' : k));
+      const cells = recipe.cells || []; const landing = kinds.map((k) => { const i = cells.findIndex((c) => (Array.isArray(c.from) ? c.from : [c.from]).includes(k) || (Array.isArray(c.from) ? c.from : [c.from]).includes('rest')); return `${k} → ${i >= 0 ? `cell ${i + 1} (${cells[i].name})` : 'does not fit'}`; });
+      console.log(`unit of section ${unitIdx} (${sec.fingerprint}, ×${sec.repeat}): ${landing.join('; ')}`);
+      recipe._notes.push(`checked against triage section ${unitIdx}: ${landing.join('; ')}`);
+    }
+  }
+  console.log(JSON.stringify(recipe, null, 1));
+  console.log(`\n${target}${variantArg ? ` (${variantArg})` : ''}: ${describeRecipe(recipe)} — from ${from} (${hit.rows} row(s))${hit.notes.length ? `; ${hit.notes.join('; ')}` : ''}`);
+  if (arg('--write', false)) {
+    if (!inv?.blocks) { console.error(`block-inventory: ${blocksPath} unreadable — run scan first`); process.exit(1); }
+    let r = row; if (!r) { r = { name: target, variant: variantArg, shape: recipe.rows === 'unit' ? 'container' : recipe.rows === 'key-value' ? 'key-value' : 'simple', rowsCols: null, collection: COLLECTIONS.includes(target) ? target : null, authoringExample: null, sourceSignature: { classes: null, fingerprint: null }, recipe: null, budget: { 360: null, base: null, probe: null }, approvedIn: null, document: null, _notes: ['row created by `block-inventory recipe --write`'] }; inv.blocks.push(r); }
+    r.recipe = { ...recipe, _hand: true }; inv._writtenAt = new Date().toISOString(); writeFileSync(blocksPath, JSON.stringify(inv, null, 1));
+    console.log(`written to ${blocksPath} as hand-written (survives rescans)`);
+  }
+  process.exit(0);
+}
 
 // ───────────────────────────── print ─────────────────────────────
 if (cmd === 'print') { const { file, blocks } = loadBlocks(); printTable(blocks); console.log(`\n${blocks.length} rows from ${file}`); process.exit(0); }

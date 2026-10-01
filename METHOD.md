@@ -78,7 +78,9 @@ order; blocks hold only what default content cannot.
      fold it (step 5). **This is the first deliverable.** Preview the three documents on the branch as soon as they lint clean and share the URLs with
      the triage table: the content model is approvable before a block exists.
 
-3. **Author the document** from the triage table. Section styles for the source's spacing (authored, not by position), section-metadata for
+3. **Author the document** from the triage table. `author` writes it from the triage and the dump through the inventory's recipes (`blocks.json`: how a
+   source unit becomes a block row, derived once from the case document that approved the block); the agent reviews the draft, its stderr table and the
+   lint, never types a text, and a NEW section stops the run until the block is named and its recipe written. Section styles for the source's spacing (authored, not by position), section-metadata for
    configuration, `<em>` for accents, bold/italic links for button weight (the block decides the variant). A picture on its own line is a paragraph:
    author it in `<p>` (the pipeline emits `<p><picture>`; the runtime wraps a bare picture-first cell into one `<p>` with whatever follows). Type every
    text from the capture (`content-view`, never a truncating viewer; `harness --content` names each authored text the dumps do not hold). Write the
@@ -180,7 +182,12 @@ order; blocks hold only what default content cannot.
 - Step 2 — `block-inventory` (scan `blocks/*/` + a case's register, dump and document into `migration/blocks.json`: block, variant, shape,
   collection, rows × cols, authoring example, source signature, budget; `diff` a triage against it; `print`), `triage` (the draft triage table from a
   content dump as JSON and markdown: per section fingerprint, repeat, media ratio, source classes, inventory / collection / new match with confidence,
-  default content, rows × cols; the page's novelty; `lib/fingerprint.mjs` holds the rules).
+  default content, rows × cols; the page's novelty; `--from-md` reads the agent's edits back; `lib/fingerprint.mjs` holds the rules).
+- Step 3 — `author` (the document from the triage and the dump through the inventory's recipes: default content as the dump holds it, a block table
+  per recipe with the unit's leaves bucketed into cells by kind, media through media-fetch's manifest, section-metadata, the metadata block, then the
+  lint; a stderr table per section — block / default / new, cells filled, texts, what did not fit; `--nav` / `--footer` write the chrome documents in
+  the simplest shape only when absent). `block-inventory scan --cases` derives every recipe from the case documents, `block-inventory recipe` one;
+  `lib/recipes.mjs` documents the recipe, `lib/doc-diff.mjs` compares an authored document with a reference structurally.
 - Step 5 — `serve` (concurrent static server, boilerplate symlinks), `harness` (lint → fold (cell and list-item rules) → warm the remote media → runtime
   → serialise; refuses a 🔴; `--fragments` fetches the pipeline's plain.html and media; `--content` checks the authored texts against the capture and the
   click dumps, comma-separated).

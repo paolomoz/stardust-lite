@@ -125,20 +125,32 @@ function pathTo(root, target) {
 }
 
 /** The fingerprint of one section root (a node of the dump). `depth` bounds the structural read below the section's items. */
-export function fingerprint(root, { depth = 6 } = {}) {
-  const a = analyze(root, depth) || { pattern: kindOf(root) === 'box' ? '' : kindOf(root), leaves: [], repeats: [] };
-  const units = a.repeats.filter((r) => r.count >= 2 && r.unit !== '…' && !(isRun(r.unit) && CONTROL.has(r.unit)));
+/** The structural read of a section WITH node references — what `fingerprint` summarises, for the generator (`author`): `leaves`
+ * ({ kind, node, parent, inRepeat, bg }), `repeats` ({ unit, count, nodes, parent, members, sig, unitNode }) and the pattern. */
+export function analyzeSection(root, { depth = 6 } = {}) { return analyze(root, depth) || { pattern: kindOf(root) === 'box' ? '' : kindOf(root), leaves: [], repeats: [] }; }
+/** The unit selection `fingerprint` applies to an analysis: the largest repeat by area (control runs excluded); a unit that itself
+ * holds a repeat reports the INNER repeat as `unit` with the per-group counts. Returns { outer, inner, unit, groups, controls, units }. */
+export function pickUnit(a) {
+  const ok = (r) => r.count >= 2 && r.unit !== '…' && !(isRun(r.unit) && CONTROL.has(r.unit));
+  const units = a.repeats.filter(ok).sort((x, y) => y.area - x.area);
   const controls = a.repeats.filter((r) => r.count >= 2 && isRun(r.unit) && CONTROL.has(r.unit)).map((r) => `${r.unit}×${r.count}`);
-  units.sort((x, y) => y.area - x.area);
   const u = units[0] || null;
-  // a unit that itself holds a repeat (three groups of stat cards under three headings) reports the INNER unit as the row and the
-  // group counts as `groups` (the register's "3 / 3 / 1 × 3"); `repeat` is then the total row count
   let inner = null; let groups = null;
   if (u) {
-    const nested = u.members.flatMap((m) => (m ? m.repeats.filter((r) => r.count >= 2 && r.unit !== '…' && !(isRun(r.unit) && CONTROL.has(r.unit))) : [])).sort((x, y) => y.area - x.area);
+    // only a COMPOSITE repeat inside the unit is a nested row set (cards under group headings); a run of leaves (two paragraphs
+    // in every slide) is the unit's own content, not an inner unit
+    const nested = u.members.flatMap((m) => (m ? m.repeats.filter((r) => ok(r) && !isRun(r.unit)) : [])).sort((x, y) => y.area - x.area);
     if (nested.length) { inner = nested[0]; groups = u.members.map((m) => { if (!m) return 0; const r = m.repeats.find((x) => x.sig.join('+') === inner.sig.join('+')); return r ? r.count : (sigOf(m.leaves).join('+') === inner.sig.join('+') || m.leaves.some((l) => general(l.kind) === 'media') ? 1 : 0); }); }
   }
-  const unit = inner || u;
+  return { outer: u, inner, unit: inner || u, groups, controls, units };
+}
+export const isControlKind = (k) => CONTROL.has(k);
+
+export function fingerprint(root, { depth = 6 } = {}) {
+  const a = analyzeSection(root, { depth });
+  // a unit that itself holds a repeat (three groups of stat cards under three headings) reports the INNER unit as the row and the
+  // group counts as `groups` (the register's "3 / 3 / 1 × 3"); `repeat` is then the total row count
+  const { outer: u, inner, unit, groups, controls } = pickUnit(a);
   const media = a.leaves.filter((l) => general(l.kind) === 'media'); const texts = a.leaves.filter((l) => ['heading', 'text', 'quote'].includes(general(l.kind))); const links = a.leaves.filter((l) => general(l.kind) === 'link');
   const def = a.leaves.filter((l) => !l.inRepeat && ['heading', 'text', 'quote', 'link'].includes(general(l.kind)));
   const y = (n) => (n.box ? n.box[1] : 0); const bottom = (n) => (n.box ? n.box[1] + n.box[3] : 0);

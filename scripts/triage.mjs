@@ -7,6 +7,8 @@
 // triage columns so the agent edits a row instead of writing one (SCALING-PLAN §2.C, batch-7 rollout). Pure Node: no browser.
 // Usage: node triage.mjs <content.json> --blocks migration/blocks.json --out triage.json [--md triage.md] [--spec spec-<W>.json]
 //        [--structure structure.txt] [--root <dump key>] [--sections <sel,…>] [--depth 6]
+//        node triage.mjs --from-md triage.md --out triage.json   round trip: the agent edited the markdown (the block label in the
+//        block column, the section style column) → the JSON `author` reads is updated (match.block / variant / kind, sectionStyle)
 //   <content.json>  what content-dump wrote (header / main / footer roots, or the roots the case dumped — `--root` names the main one)
 //   --blocks        block-inventory's blocks.json; a missing file is an empty inventory (every match is then collection or new)
 //   --sections      simple selectors (`tag.class#id`) for the section roots when the automatic split (the children of the first node
@@ -16,12 +18,42 @@
 //   --structure     probe-structure's structure.txt: the structure line of each section root (selector, box, display)
 // triage.json: { _schema, _writtenAt, _source, page: { title, width, doc }, sections: [{ index, chrome: header|footer|null, anchorText, box,
 //   fingerprint, repeat, groups, mediaRatio, media, texts, links, classes, defaultContent: [{tag, text}], match: { kind: inventory|collection|
-//   new|default, block, variant, confidence: strong|weak|null }, rowsCols, shape, candidates, spec, structure, notes: [] }],
+//   new|default, block, variant, confidence: strong|weak|null }, sectionStyle: null (the agent's; author reads it), rowsCols, shape, candidates, spec, structure, notes: [] }],
 //   novelty, coveredBy: { inventory, collection, default, new }, signature per section (the full fingerprint, for block-inventory diff) }
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { basename, dirname, resolve } from 'node:path';
 import { arg } from './common.mjs';
 import { splitSections, fingerprint, dropGeneric, allClasses, matchSection, rowsCols } from './lib/fingerprint.mjs';
+
+// ── --from-md: the markdown edited by the agent back into the JSON (the block column's first `name (variant)` label, the style column)
+if (arg('--from-md', null)) {
+  const mdFile = resolve(arg('--from-md')); const outFile = resolve(arg('--out', 'triage.json'));
+  const json = (() => { try { return JSON.parse(readFileSync(outFile, 'utf8')); } catch { return null; } })();
+  if (!json?.sections) { console.error(`triage: --from-md needs the JSON it updates at --out (${outFile} unreadable)`); process.exit(1); }
+  const lines = readFileSync(mdFile, 'utf8').split('\n'); const head = lines.findIndex((l) => /^\|\s*#\s*\|/.test(l));
+  if (head === -1) { console.error(`triage: no table in ${mdFile}`); process.exit(1); }
+  const cells = (l) => l.replace(/\\\|/g, '\u0001').split('|').slice(1, -1).map((c) => c.trim().replace(/\u0001/g, '|'));
+  const cols = cells(lines[head]).map((c) => c.toLowerCase()); const iBlock = cols.findIndex((c) => /block/.test(c)); const iStyle = cols.findIndex((c) => /style/.test(c));
+  let changed = 0;
+  for (let i = head + 2; i < lines.length && /^\|/.test(lines[i]); i++) {
+    const c = cells(lines[i]); const row = json.sections.find((s) => String(s.index) === c[0]); if (!row) continue;
+    const style = iStyle >= 0 ? c[iStyle].replace(/`/g, '').trim() : ''; const newStyle = style && style !== '—' ? style : null;
+    if ((row.sectionStyle || null) !== newStyle) { row.sectionStyle = newStyle; changed += 1; }
+    if (iBlock >= 0 && !row.chrome) {
+      const cell = c[iBlock]; const isDefault = cell.trim() === '—';
+      const m = cell.match(/`([a-z][a-z0-9-]*)(?:\s*\(([^)]*)\))?`/); const isNew = /\*\*new\*\*/.test(cell);
+      const kind = isDefault ? 'default' : isNew ? 'new' : m ? 'inventory' : row.match.kind;
+      const block = isDefault ? null : m ? m[1] : row.match.block; const variant = isDefault ? null : m && m[2] && m[2] !== '?' ? m[2].trim() : m ? null : row.match.variant;
+      if (kind !== row.match.kind || block !== row.match.block || (variant || null) !== (row.match.variant || null)) { row.match = { ...row.match, kind, block, variant: variant || null, confidence: kind === 'inventory' ? 'agent' : row.match.confidence }; row.notes = [...(row.notes || []), `edited in ${basename(mdFile)}`]; changed += 1; }
+    }
+  }
+  const mainCount = json.sections.filter((s) => !s.chrome).length; const counts = { inventory: 0, collection: 0, default: 0, new: 0 };
+  json.sections.filter((s) => !s.chrome).forEach((s) => { counts[s.match.kind] = (counts[s.match.kind] || 0) + 1; }); json.coveredBy = counts; json.novelty = mainCount ? Number((counts.new / mainCount).toFixed(2)) : 0;
+  json._source = { ...json._source, md: mdFile }; json._writtenAt = new Date().toISOString();
+  writeFileSync(outFile, JSON.stringify(json, null, 1));
+  console.log(`triage: ${changed} row field(s) updated from ${mdFile} → ${outFile} (novelty ${Math.round(json.novelty * 100)} %)`);
+  process.exit(0);
+}
 
 const file = process.argv[2];
 if (!file || file.startsWith('--')) { console.error('usage: triage.mjs <content.json> --blocks migration/blocks.json --out triage.json [--md triage.md] [--spec spec-<W>.json] [--structure structure.txt] [--root <dump key>] [--sections <sel,…>]'); process.exit(1); }
@@ -58,10 +90,10 @@ entries.forEach((e, index) => {
   const shape = e.chrome ? null : m.kind === 'inventory' && row?.shape ? row.shape : m.kind === 'default' ? null : fp.repeat >= 2 ? 'container' : 'simple';
   const notes = [...m.notes]; if (fp.controls.length) notes.push(`controls outside the unit: ${fp.controls.join(' ')}`); if (fp.groups) notes.push(`${fp.groups.length} groups of ${fp.groups.join(' / ')} rows under their own headings`); if (fp.defaultCount > fp.defaultContent.length) notes.push(`default content truncated to ${fp.defaultContent.length} of ${fp.defaultCount}`);
   const { defaultContent, ...signature } = fp;
-  sections.push({ index, chrome: e.chrome, anchorText: fp.anchorText, box: fp.box, fingerprint: fp.pattern, repeat: fp.repeat, groups: fp.groups, mediaRatio: fp.mediaRatio, media: fp.media, texts: fp.texts, links: fp.links, classes: fp.classes, defaultContent, match: { kind: m.kind, block: m.block, variant: m.variant, confidence: m.confidence }, collection: m.kind === 'inventory' ? row?.collection ?? m.guess?.collection ?? null : m.guess?.collection ?? null, rowsCols: e.chrome || m.kind === 'default' ? null : rowsCols(fp), shape, candidates: m.candidates || [], spec: specFor(fp.box), structure: structureFor(fp.box), notes, signature });
+  sections.push({ index, chrome: e.chrome, anchorText: fp.anchorText, box: fp.box, fingerprint: fp.pattern, repeat: fp.repeat, groups: fp.groups, mediaRatio: fp.mediaRatio, media: fp.media, texts: fp.texts, links: fp.links, classes: fp.classes, defaultContent, match: { kind: m.kind, block: m.block, variant: m.variant, confidence: m.confidence }, sectionStyle: e.chrome ? null : (m.kind === 'inventory' && row?.recipe?.sectionStyle) || null, collection: m.kind === 'inventory' ? row?.collection ?? m.guess?.collection ?? null : m.guess?.collection ?? null, rowsCols: e.chrome || m.kind === 'default' ? null : rowsCols(fp), shape, candidates: m.candidates || [], spec: specFor(fp.box), structure: structureFor(fp.box), notes, signature });
 });
 const novelty = mainCount ? Number((counts.new / mainCount).toFixed(2)) : 0;
-const json = { _schema: 'stardust-lite/triage@1', _writtenAt: new Date().toISOString(), _source: { content: resolve(file), blocks: inventory ? blocksFile : null, spec: specFile ? resolve(specFile) : null, structure: arg('--structure', null) ? resolve(arg('--structure')) : null, mainKey: split.mainKey, genericClassesDropped: generic }, page: { title: dump.__title || null, width, doc: dump.__doc || null, sections: mainCount }, sections, novelty, coveredBy: counts };
+const json = { _schema: 'stardust-lite/triage@1', _writtenAt: new Date().toISOString(), _source: { content: resolve(file), blocks: inventory ? blocksFile : null, spec: specFile ? resolve(specFile) : null, structure: arg('--structure', null) ? resolve(arg('--structure')) : null, mainKey: split.mainKey, root: arg('--root', null), sections: sectionSels, genericClassesDropped: generic }, page: { title: dump.__title || null, width, doc: dump.__doc || null, sections: mainCount }, sections, novelty, coveredBy: counts };
 mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, JSON.stringify(json, null, 1));
 
 // the human view — the cases' triage columns
@@ -78,8 +110,8 @@ const blockCell = (s) => {
 const defCell = (s) => (s.chrome ? `${s.chrome} doc` : s.defaultContent.length ? s.defaultContent.map((d) => (d.tag === 'a' || d.tag === 'button' ? `closing link "${d.text.slice(0, 30)}"` : d.tag)).join(', ') : '—');
 const secCell = (s) => `${s.chrome ? s.chrome : s.anchorText ? `"${s.anchorText}"` : '(no text)'} ${s.box ? `${s.box[2]}×${s.box[3]}` : ''} — \`${s.fingerprint}\`${s.repeat ? ` (unit ×${s.repeat}, media ${Math.round(s.mediaRatio * 100)} %)` : ''}${allClasses(s.signature).length ? ` · ${allClasses(s.signature).slice(0, 3).join(' ')}` : ''}`;
 const lines = [`# ${json.page.title || basename(file)} — triage draft (${width ? `${width}, ` : ''}${new Date().toISOString().slice(0, 10)}; from \`triage\`: review every row, flip what is wrong)`, '', `| # | section (live${width ? `, ${width}` : ''}) | default content | block · shape · collection match · rows × cols | section style |`, '|---|---|---|---|---|'];
-for (const s of sections) lines.push(`| ${s.index} | ${secCell(s)} | ${defCell(s)} | ${blockCell(s)} | — |`);
-lines.push('', `Novelty **${Math.round(novelty * 100)} %** (${counts.new} new of ${mainCount} sections; ${counts.inventory} covered by the inventory, ${counts.collection} collection only, ${counts.default} default content) against \`${inventory ? blocksFile : 'no inventory'}\`.`);
+for (const s of sections) lines.push(`| ${s.index} | ${secCell(s)} | ${defCell(s)} | ${blockCell(s)} | ${s.sectionStyle ? `\`${s.sectionStyle}\`` : '—'} |`);
+lines.push('', 'Edit a row here (the block label in the block column, the section style) and run `triage --from-md triage.md --out triage.json` so `author` reads it.', `Novelty **${Math.round(novelty * 100)} %** (${counts.new} new of ${mainCount} sections; ${counts.inventory} covered by the inventory, ${counts.collection} collection only, ${counts.default} default content) against \`${inventory ? blocksFile : 'no inventory'}\`.`);
 if (generic.length) lines.push(`Generic classes dropped from the signatures: ${generic.map((c) => `\`${c}\``).join(', ')}.`);
 if (md) { writeFileSync(resolve(md), lines.join('\n') + '\n'); }
 
