@@ -3,6 +3,10 @@
 // the review artifact. Refuses to fold a document with a David's Model 🔴 (deploy skill lint) unless --no-lint.
 // Usage: node harness.mjs <authored.html> --serve <dir> --name <slug> [--port 8930] [--width 1440] [--no-lint] [--fragments <branch-host>]
 //        [--content <content.json>[,<click-dump.json>…]]
+//        node harness.mjs --pages <pages.json> [--doc-dir doc] --serve <dir> [--port 8930] [--fragments <branch-host>] [--no-lint] [--content-dir <dir>]
+//   --pages (batch-7 rollout, pass 5): one harness per page of a `roster pick` list — `<doc-dir>/<slug>.html` → `<serve>/<slug>.harness.html`
+//   on the one port — the page's own output first, then one summary line per page (blocks loaded, doc height, texts not in the capture,
+//   or the error). `--content-dir <dir>` passes `<dir>/<slug>.json` (or `<dir>/<slug>/content-1440.json`) as --content when it exists.
 //   <dir> must serve the site code: symlinks scripts/ blocks/ styles/ fonts/ icons/ → the repo; plus any local media the document
 //   references (e.g. drafts/media/*) and fragment plain.html files (drafts/nav.plain.html). Start it with `scripts/serve.mjs <dir>
 //   --port <n> --site <repo>` (creates the symlinks, answers concurrent sessions — `python3 -m http.server` under parallel Playwright
@@ -20,7 +24,32 @@ import { dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { chromium } from 'playwright';
+import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { arg, davidsLint } from './common.mjs';
+
+if (typeof arg('--pages', null) === 'string') {
+  const list = JSON.parse(readFileSync(arg('--pages'), 'utf8')); const pages = list.pages || []; const docDir = String(arg('--doc-dir', 'doc')); const serveDir0 = arg('--serve');
+  if (!pages.length || !serveDir0) { console.error('usage: harness.mjs --pages <pages.json> [--doc-dir doc] --serve <dir> [--port 8930] [--fragments <branch-host>] [--no-lint] [--content-dir <dir>]'); process.exit(1); }
+  const inherit = ['--serve', '--port', '--width', '--fragments'].flatMap((f) => (typeof arg(f, null) === 'string' ? [f, arg(f)] : [])); if (arg('--no-lint', false)) inherit.push('--no-lint');
+  const me = fileURLToPath(import.meta.url); const summary = [];
+  for (const p of pages) {
+    const doc = join(docDir, `${p.slug}.html`); const row = { slug: p.slug, doc, url: `http://localhost:${arg('--port', 8930)}/${p.slug}.harness.html`, exit: null, blocks: null, doc_height: null, missing: null, error: null };
+    console.log(`\n=== ${p.slug}  ${doc}`);
+    if (!existsSync(doc)) { row.error = 'no document'; row.exit = 1; summary.push(row); console.log(`harness: ${doc} does not exist`); continue; }
+    const cDir = arg('--content-dir', null); const cFile = typeof cDir === 'string' ? [join(cDir, `${p.slug}.json`), join(cDir, p.slug, 'content-1440.json')].find(existsSync) : null;
+    const r = spawnSync('node', [me, doc, '--name', p.slug, ...inherit, ...(cFile ? ['--content', cFile] : [])], { encoding: 'utf8' });
+    process.stdout.write(r.stdout); if (r.stderr) process.stderr.write(r.stderr);
+    row.exit = r.status; const b = r.stdout.match(/^blocks: (.*)$/m); const h = r.stdout.match(/doc height (\d+)/); const m = r.stdout.match(/content check (\d+) texts, (\d+) not in/);
+    if (b) { const all = b[1].split(' | ').filter(Boolean); row.blocks = { loaded: all.filter((x) => / → loaded$/.test(x)).length, total: all.length, notLoaded: all.filter((x) => !/ → loaded$/.test(x)) }; }
+    if (h) row.doc_height = Number(h[1]); if (m) row.missing = Number(m[2]);
+    if (r.status) row.error = ((r.stderr.match(/^(?:harness: |[A-Za-z]*Error|page\.evaluate).*$/m) || [r.stderr.trim().split('\n').pop() || `exit ${r.status}`])[0]).slice(0, 160);
+    summary.push(row);
+  }
+  console.log('\n| page | document | blocks loaded | doc height | texts not in capture | result |\n|---|---|---|---|---|---|');
+  for (const s of summary) console.log(`| ${s.slug} | ${s.doc} | ${s.blocks ? `${s.blocks.loaded}/${s.blocks.total}${s.blocks.notLoaded.length ? ` (${s.blocks.notLoaded.join(', ')})` : ''}` : '—'} | ${s.doc_height ?? '—'} | ${s.missing ?? '—'} | ${s.exit ? `ERR ${s.error}` : s.url} |`);
+  process.exit(summary.some((s) => s.exit) ? 2 : 0);
+}
 
 const src = process.argv[2]; const serveDir = arg('--serve'); const name = arg('--name');
 if (!src || !serveDir || !name) { console.error('usage: harness.mjs <authored.html> --serve <dir> --name <slug> [--port 8930] [--width 1440] [--no-lint]'); process.exit(1); }
@@ -41,7 +70,8 @@ await p0.setContent(raw);
 const folded = await p0.evaluate(() => {
   const metas = [];
   document.querySelectorAll('main .metadata').forEach((m) => { m.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (k && v) metas.push([k.textContent.trim().toLowerCase(), v.textContent.trim()]); }); m.closest('main > div').remove(); });
-  document.querySelectorAll('main .section-metadata').forEach((sm) => { const section = sm.parentElement; sm.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (!k || !v) return; const key = k.textContent.trim().toLowerCase(); if (key === 'style') v.textContent.split(',').map((x) => x.trim()).filter(Boolean).forEach((c) => section.classList.add(c)); else if (key === 'id') section.id = v.textContent.trim(); else section.dataset[key.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = (v.querySelector('a, img') ? (v.querySelector('a')?.href || v.querySelector('img')?.src) : v.textContent.trim()); }); sm.remove(); });
+  document.querySelectorAll('main .section-metadata').forEach((sm) => { const section = sm.parentElement; sm.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (!k || !v) return; const key = k.textContent.trim().toLowerCase(); if (key === 'style') v.textContent.split(',').map((x) => x.trim().toLowerCase().replace(/[^0-9a-z]+/g, '-').replace(/^-|-$/g, '')).filter(Boolean).forEach((c) => section.classList.add(c)); else if (key === 'id') section.id = v.textContent.trim(); else section.dataset[key.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = (v.querySelector('a, img') ? (v.querySelector('a')?.href || v.querySelector('img')?.src) : v.textContent.trim()); }); sm.remove(); });
+  // a section style is a class the way aem.js's toClassName writes it (`Brands Divider` → `brands-divider`); the raw token crashed the fold on a space (pass 5)
   document.querySelectorAll('main > div').forEach((d) => { if (!d.textContent.trim() && !d.querySelector('img,picture')) d.remove(); });
   // the pipeline's cell rule: a block cell holding ONE paragraph and nothing else loses its <p> (`<div><p><a>x</a></p></div>` → `<div><a>x</a></div>`,
   // verified on the served plain.html — walgreens-home); a decorate that read `:scope > p` worked on the prototype only

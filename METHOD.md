@@ -152,7 +152,10 @@ order; blocks hold only what default content cannot.
    `background-size`, a logo's painted width) `extent` reads the bbox of a colour or of the non-background pixels in a region of the capture: a computed value
    is one element in one state, the extent is what was painted. **Stop rule.** Once every section row is within 2 px at the three widths and the residual bands
    are named in the register (a third-party layer, a video frame, anti-aliasing, a rendition, an entrance the capture caught mid-flight on the live side), ship:
-   three more rounds (ibm-home) taught the reviewer nothing.
+   three more rounds (ibm-home) taught the reviewer nothing. On a page after the template the chrome is approved: `gate` masks the header and footer bands
+   (heights from the site profile), skips the probes inside them, and reads every authored section against its block's budget from the inventory (`gate
+   --budget`, the triage names the block) — the per-section table says which section is red, not one page number; a section whose block is new or has no
+   budget is gated as in a template run, at the three widths.
 
 7. **Deploy the same document and the same code** to a draft path on the branch (preview only) and gate the served page at the same three widths, same
    motion probes, **and the hidden states** (`click-state --hover`, `hover-diff`): a drawer at rest is read by no table, and a fragment decorate meets
@@ -163,7 +166,9 @@ order; blocks hold only what default content cannot.
    section** the harness fold drops, so a section-rhythm rule (`.section + .section`) adds a gap only on the served page — exclude empty sections (`main
    > .section:not(:has(> *))`). The template run ends by writing the site profile — `site-profile init migration/cases/<template> --out migration/site.json`
    (overlays, cap model, fonts and body row, tokens, chrome selectors, heights and states per width, fragment paths, DA coordinates, serve port, noise
-   floor, this page's numbers; `site-profile print` renders it for the README) — the state every later page run reads instead of re-discovering it.
+   floor, this page's numbers; `site-profile print` renders it for the README) — the state every later page run reads instead of re-discovering it. A
+   rollout runs the list `roster pick` wrote: `harness --pages` on one serve, `gate --pages` per page with one origin cache each and one summary table,
+   `da-put --pages` to each page's docPath (`--dry` first), `gate --served-pages` against the branch host reusing the prototype origins.
 
 8. **Approval = block approval.** Prototype, blocks, authored document, triage table, deviations and motion registers are one artifact. The prototype
    number becomes the page's budget for rollout.

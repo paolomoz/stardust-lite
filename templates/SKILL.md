@@ -14,7 +14,7 @@ Instruments run with `npx stardust-lite <name> [args]` (`npx stardust-lite list`
 `probe-load`, `probe-structure`, `content-dump`, `content-view`, `media-list`, `media-fetch`, `live-spec`, `scroll-probe`, `deep-probe`, `click-dump`,
 `text-ladder`, `video-frame`, `measure-to-spec`,
 `measure-view`, `origin-pick` (measurement), `lint` (David's Model), `da-put`, `sync-poll` (DA upload + preview, code sync),
-`serve`, `harness`, `gate`, `sections`, `pair`, `leak`, `hover-diff`, `click-state`, `crop`, `shift-probe`, `extent` (prototype and gate),
+`serve`, `harness`, `gate`, `sections`, `pair`, `leak`, `hover-diff`, `click-state`, `crop`, `shift-probe`, `extent` (prototype and gate; on a page after the template `gate` masks the chrome from the profile's heights, prints the pixel % per authored section against its block's budget from `blocks.json` — `--chrome` / `--budget` / `--triage`, `--no-chrome` / `--no-budget` — and `harness --pages`, `gate --pages` / `--served-pages`, `da-put --pages [--dry]` run a `roster pick` list with one summary table),
 `site-profile` (init / check / print — `migration/site.json`, the site's state after a template run; every instrument reads it as its flag defaults when present, `--site <file>` names another),
 `block-inventory` (scan / diff / print — `migration/blocks.json`, one row per block + variant the site has: shape, collection, rows × cols, authoring example, source signature, budget; written at the end of a template run, read by triage),
 `triage` (a page's draft triage table from its content dump, as JSON + markdown: fingerprint, repeat, inventory match with confidence, collection match, default content, rows × cols, novelty — edit the draft, never write the table from nothing),
