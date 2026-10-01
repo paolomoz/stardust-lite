@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // media-fetch.mjs — the source's media BYTES, unchanged (METHOD media row: webp stays webp, svg stays svg): collects every img `src`
 // and background `url()` the content-dump JSON holds (the captured composition — hidden DOM is not content) plus extra URLs, downloads
-// each once under a lower-case name with no double hyphen (DA previews a `kids--x.jpg` 404 — usta2-home), fixes the extension from the
+// each once under a lower-case name of a-z0-9 and single hyphens (DA previews `kids--x.jpg`, `musee_hp.jpg`, `a.b.jpg` 404 — usta2-home,
+// audemarspiguet-home), fixes the extension from the
 // served Content-Type (`.jpg.thumb.585.1170.png` is a JPEG), names AEM `.transform/…/img.jpg` renditions after their asset, and writes
 // <out>/manifest.json (url → file) for the document generator. Written per case twice (stryker-home, usta2-home); this is the instrument.
 // Usage: node media-fetch.mjs <content.json…> --out media [--base https://www.site.com] [--extra <url,…>] [--extra-file <list>]
@@ -23,8 +24,10 @@ const EXT = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 
 const nameOf = (u) => {
   const path = decodeURIComponent(new URL(u).pathname); const parts = path.split('/').filter(Boolean); let name = (parts[parts.length - 1] || 'media').toLowerCase();
   if (/^img\.(jpe?g|png|webp)$/.test(name)) { const asset = parts.find((p) => /\.(jpe?g|png|webp|gif|svg)/i.test(p)); if (asset) name = asset.toLowerCase().split('.transform')[0]; } // AEM transform rendition: the asset's name
-  name = name.replace(/[^a-z0-9._-]+/g, '-').replace(/-{2,}/g, '-').replace(/^-|-$/g, '');
-  return name;
+  // the branch host previews `musee_hp-2.jpg` and `a.b.jpg` 404 after a 201 upload (audemarspiguet-home), `kids--x.jpg` too (usta2-home):
+  // the stem keeps a-z0-9 and single hyphens only, the extension stays
+  const m = /^(.*?)(\.[a-z0-9]+)?$/.exec(name); const stem = (m[1] || 'media').replace(/[^a-z0-9]+/g, '-').replace(/-{2,}/g, '-').replace(/^-|-$/g, '');
+  return `${stem || 'media'}${m[2] || ''}`;
 };
 mkdirSync(out, { recursive: true });
 const manifest = existsSync(join(out, 'manifest.json')) ? JSON.parse(readFileSync(join(out, 'manifest.json'), 'utf8')) : {};

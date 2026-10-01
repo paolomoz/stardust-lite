@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // da-put.mjs — upload files to DA (source PUT, bytes unchanged) and preview them on a branch; never publishes. Documents (.html) go to
 // <to>/<name>.html and are previewed at <to>/<name>; media keep their extension. Needs DA_TOKEN (IMS bearer; never printed).
-// Name rules it warns about: upper-case letters (BACKLOG #4) and a double hyphen (a `kids--x.jpg` uploaded 200 and previewed 404).
+// Name rules it warns about: upper-case letters (BACKLOG #4), a double hyphen (`kids--x.jpg` uploaded 200 and previewed 404), an underscore
+// or a second dot in the name (`musee_hp-2.jpg` uploaded 201 and previewed 404 — the same bytes as `musee-hp-2.jpg` previewed 200).
 // METHOD named the two calls in three cases and nothing scripted them (stryker-home wrote two shell scripts with the site hard-coded).
 // Usage: node da-put.mjs <org>/<site>/<branch> <file…> --to <da-folder> [--as <name>] [--no-preview]
 //   node da-put.mjs org/site/blocks-first doc/home.html doc/nav.html --to drafts
@@ -20,6 +21,7 @@ for (const f of files) {
   const name = files.length === 1 && arg('--as', null) ? arg('--as') : basename(f); const ext = extname(name).toLowerCase();
   if (name !== name.toLowerCase()) console.error(`da-put: ${name} has upper-case letters — the DA store is case-insensitive and the pipeline path is lower-case (BACKLOG #4)`);
   if (name.includes('--')) console.error(`da-put: ${name} has a double hyphen — the upload answers 200 and the branch host previews 404 (usta2-home); rename it`);
+  if (/[_]|\..*\./.test(name)) console.error(`da-put: ${name} has an underscore or a dot in its stem — uploaded 201, previewed 404 on the branch host (audemarspiguet-home); use a-z0-9 and single hyphens`);
   const srcPath = `${to}/${name}`; const previewPath = ext === '.html' ? srcPath.slice(0, -5) : srcPath;
   const fd = new FormData(); fd.append('data', new Blob([readFileSync(f)], { type: MIME[ext] || 'application/octet-stream' }), name);
   const up = await fetch(`https://admin.da.live/source/${org}/${site}/${srcPath}`, { method: 'PUT', headers: { Authorization: `Bearer ${token}` }, body: fd }).catch((e) => ({ status: String(e.message) }));

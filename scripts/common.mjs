@@ -53,6 +53,13 @@ export async function settle(page, step = 600, pause = 120, rest = 1500) {
     for (let y = 0; y < document.body.scrollHeight; y += step) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, pause)); }
     window.scrollTo(0, 0); await new Promise((r) => setTimeout(r, rest));
     await document.fonts.ready; // the lazy fonts.css has been requested by now: measure after the swap, not before
+    // boxes read mid-flight are not a measurement: six parallel sessions read a 360 table 665 px short (pictures still loading) and the
+    // live spec read links 6–17 px low (text-reveal transitions still running) — audemarspiguet-home. Wait, bounded, for every image
+    // to be complete and every FINITE running animation/transition to finish (an infinite loop — a marquee, a spinner — is a state)
+    const timeout = (ms) => new Promise((r) => setTimeout(r, ms));
+    await Promise.race([Promise.all([...document.images].filter((i) => !i.complete).map((i) => new Promise((r) => { i.addEventListener('load', r, { once: true }); i.addEventListener('error', r, { once: true }); }))), timeout(5000)]);
+    const finite = (a) => { try { const t = a.effect.getComputedTiming(); return Number.isFinite(t.iterations) && Number.isFinite(t.endTime) && t.endTime < 10000; } catch { return false; } };
+    await Promise.race([Promise.all(document.getAnimations().filter((a) => a.playState === 'running' && finite(a)).map((a) => a.finished.catch(() => {}))), timeout(3000)]);
   }, { step, pause, rest });
 }
 
