@@ -35,6 +35,7 @@ import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync, statSy
 import { basename, dirname, join, resolve } from 'node:path';
 import { chromium } from 'playwright';
 import { UA, arg, acceptOverlays } from './common.mjs';
+import { statusRow, overlayRows, chromeRows, verdictOf } from './lib/profile-check.mjs';
 
 const [,, cmd, target] = process.argv;
 const usage = () => { console.error('usage: site-profile.mjs init <case-dir> --out migration/site.json [--site-repo <dir>] [--live <url>] [--served <url>]\n       site-profile.mjs check <site.json> [--tol 2]\n       site-profile.mjs print <site.json>'); process.exit(1); };
@@ -219,36 +220,26 @@ if (cmd === 'print') {
 }
 
 // ───────────────────────────── check ─────────────────────────────
-const tol = Number(arg('--tol', 2)); const o = P.overlays || {}; const H = P.chrome?.header || {}; const F = P.chrome?.footer || {};
+// the per-width checks live in lib/profile-check.mjs: measure-page runs them from its own sessions (one `profile check:` line per page
+// run); this subcommand is the standalone read — run it on its own when that line says FAIL
+const tol = Number(arg('--tol', 2)); const o = P.overlays || {}; const H = P.chrome?.header || {};
 const widths = [...new Set([...(P.widths || []), ...Object.keys(H.heightsByWidth || {}).map(Number)])].sort((a, b) => a - b);
 if (!P.origin || !widths.length) { console.error('site-profile check: the profile has no origin or no widths'); process.exit(1); }
 const b = await chromium.launch(o.headed ? { headless: false, channel: 'chrome', args: ['--disable-blink-features=AutomationControlled'] } : {});
-const rows = []; let fails = 0; let warns = 0;
-const add = (W, check, expected, actual, verdict) => { rows.push([W, check, expected, actual, verdict]); if (verdict === 'FAIL') fails += 1; if (verdict === 'WARN') warns += 1; };
+const rows = [];
 for (const W of widths) {
   const page = await b.newPage({ viewport: { width: W, height: 900 }, userAgent: UA, ...(o.locale ? { locale: o.locale, extraHTTPHeaders: { 'Accept-Language': `${o.locale},${o.locale.split('-')[0]};q=0.9` } } : {}) });
-  let status = null; try { const r = await page.goto(P.origin, { waitUntil: 'domcontentloaded', timeout: 90000 }); status = r?.status() ?? null; } catch (e) { add(W, 'status', 200, e.message.slice(0, 60), 'FAIL'); await page.close(); continue; }
-  add(W, 'status', 200, status, status === 200 ? 'PASS' : 'FAIL');
+  let status = null; try { const r = await page.goto(P.origin, { waitUntil: 'domcontentloaded', timeout: 90000 }); status = r?.status() ?? null; } catch (e) { rows.push([W, 'status', 200, e.message.slice(0, 60), 'FAIL']); await page.close(); continue; }
+  rows.push(statusRow(W, status));
   await page.waitForTimeout(3000);
-  const count = (sel) => page.evaluate((s) => { try { return document.querySelectorAll(s).length; } catch { return -1; } }, sel);
-  for (const [kind, sel] of [['consent', o.consent], ...(o.dismiss || []).map((d) => ['dismiss', d])]) { if (!sel) continue; const n = await count(sel); add(W, `${kind} ${sel}`, 'resolves', n < 0 ? 'invalid selector' : n ? `${n} match${n > 1 ? 'es' : ''}` : 'absent now', n > 0 ? 'PASS' : 'WARN'); }
+  rows.push(...await overlayRows(page, P, W));
   await acceptOverlays(page, { consent: o.consent, dismiss: o.dismiss || [], wait: 2500 });
   await page.evaluate(() => document.fonts.ready).catch(() => {}); await page.waitForTimeout(800);
-  for (const sel of o.require || []) { const n = await count(sel); add(W, `require ${sel}`, 'present', n > 0 ? 'present' : 'MISSING', n > 0 ? 'PASS' : 'FAIL'); }
-  const m = await page.evaluate(({ header, footer, W, skip }) => {
-    const box = (sel) => { const e = sel && document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return { h: Math.round(r.height), top: Math.round(r.top) }; };
-    const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
-    const skipEls = new Set(skip.flatMap((s) => { try { return [...document.querySelectorAll(s)]; } catch { return []; } }));
-    const fixedTop = [...document.querySelectorAll('body *')].some((el) => { const cs = getComputedStyle(el); if (!(cs.position === 'fixed' || cs.position === 'sticky') || !vis(el)) return false; if ([...skipEls].some((s) => s === el || s.contains(el) || el.contains(s))) return false; const r = el.getBoundingClientRect(); return Math.round(r.top) === 0 && r.width >= W * 0.9; });
-    return { header: box(header), footer: box(footer), fixedTop };
-  }, { header: H.selector, footer: F.selector, W, skip: [o.consent, ...(o.dismiss || [])].filter(Boolean) });
-  const exp = (x) => x?.[W] ?? x?.[String(W)];
-  if (exp(H.heightsByWidth) !== undefined) add(W, `header height ${H.selector}`, exp(H.heightsByWidth), m.header ? m.header.h : 'no element', m.header && Math.abs(m.header.h - exp(H.heightsByWidth)) <= tol ? 'PASS' : 'FAIL');
-  if (exp(F.heightsByWidth) !== undefined) add(W, `footer height ${F.selector}`, exp(F.heightsByWidth), m.footer ? m.footer.h : 'no element', m.footer && Math.abs(m.footer.h - exp(F.heightsByWidth)) <= tol ? 'PASS' : 'FAIL');
-  if (exp(H.fixed) !== undefined) add(W, 'fixed layer at the top', exp(H.fixed), m.fixedTop, m.fixedTop === exp(H.fixed) ? 'PASS' : 'FAIL');
+  rows.push(...await chromeRows(page, P, W, { tol }));
   await page.close();
 }
 await b.close();
 table(rows, ['W', 'check', 'profile', 'live', 'verdict']);
-console.log(`\nsite-profile check: ${fails ? 'FAIL' : warns ? 'WARN' : 'PASS'} — ${rows.length} checks, ${fails} failed, ${warns} warnings (${file})`);
-process.exit(fails ? 2 : 0);
+const v = verdictOf(rows);
+console.log(`\nsite-profile check: ${v.line} (${file})`);
+process.exit(v.fails ? 2 : 0);

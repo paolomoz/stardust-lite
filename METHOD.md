@@ -52,7 +52,9 @@ order; blocks hold only what default content cannot.
    `pair` and `sections` use `rest`), and a section rule from a parked box cost a gate round: read the container and the capture. Hidden-but-present content a
    JS opener reveals and no probe click fires (a modal in `<body>` with `aria-hidden` at rest) is a third source: `content-dump --hidden <css,…>` reads those
    roots, opt-in, for `harness --content`; hidden DOM stays not content. A 406 on an asset fetched outside the browser is a WAF header rule, not a block on
-   headless; a dump that reads "no root" once ran before the page's JS — run it again. Record tables, not screenshots.
+   headless; a dump that reads "no root" once ran before the page's JS — run it again. `measure-page` also writes `live-<W>.png` from the same settled
+   session (the stitched capture, in the shape `stitch-shot` writes; `gate` reads it as the origin by default) and the profile's per-width checks when a
+   profile exists. Record tables, not screenshots.
 
 2. **Triage every section into a content model — before any block exists.** Walk each measured section top to bottom and write what an author would
    type: heading, paragraph, image, link. Whatever is left is a block. Then, per block, decide and write down:
@@ -160,7 +162,10 @@ order; blocks hold only what default content cannot.
    three more rounds (ibm-home) taught the reviewer nothing. On a page after the template the chrome is approved: `gate` masks the header and footer bands
    (heights from the site profile), skips the probes inside them, and reads every authored section against its block's budget from the inventory (`gate
    --budget`, the triage names the block) — the per-section table says which section is red, not one page number; a section whose block is new or has no
-   budget is gated as in a template run, at the three widths.
+   budget is gated as in a template run, at the three widths. `gate` captures live and build in one browser at once (in-process stitching, the same
+   capture as `stitch-shot`'s — `--capture-tool stitch-shot` keeps the vendored tool), pairs the sections from those same pages and prints a timing line
+   per width; `sections --widths … --spec-dir` gives the three tables and one verdict, and a CLEAN verdict on a reuse-only page lets the prototype gate
+   run the base width only (`--skip-widths-when-clean`).
 
 7. **Deploy the same document and the same code** to a draft path on the branch (preview only) and gate the served page at the same three widths, same
    motion probes, **and the hidden states** (`click-state --hover`, `hover-diff`): a drawer at rest is read by no table, and a fragment decorate meets
