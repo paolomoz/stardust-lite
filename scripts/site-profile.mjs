@@ -107,7 +107,13 @@ if (cmd === 'init') {
 
   // cap model
   const mainSelector = cap?._provenance?.pinned || flag('--main') || capPage?.root?.selector || null;
-  const capOut = cap ? { kind: capPage?.fluid ? 'fluid' : (capPage?.contentFrom || (capPage?.shellMaxWidth ? 'shell' : 'module')), shell: capPage?.shellMaxWidth ?? null, content: capPage?.contentMaxWidth ?? null, modules: (() => { const seen = new Set(); return (cap.aggregate?.modules || capPage?.modules || []).filter((m) => { const k = `${m.selector}|${m.px}`; if (seen.has(k)) return false; seen.add(k); return true; }).map((m) => ({ section: m.section ?? m.index ?? null, px: m.px, selector: m.selector })); })(), probeWidth, mainSelector } : { kind: null, shell: null, content: null, modules: [], probeWidth, mainSelector };
+  // the CONTENT root is not the cap shell: measure-page's summary names the root it dumped (`main`, or `div.main-container` when a hero
+  // sits before main) — gate's section table and measure-page read `cap.contentRoot` first (BACKLOG 139; sdt-dentsu's hero was unpaired
+  // on every page while the live split ran from `#main-content`)
+  const measureSummary = readJson(join(M, 'summary.json'));
+  const contentRoot = (() => { const mr = measureSummary?.mainRoot; if (!mr) return null; const row = mr[String(baseWidth)] || Object.values(mr)[0]; return row?.content || null; })();
+  if (!contentRoot) note('cap.contentRoot', 'measure/summary.json mainRoot (run measure-page) — the dump key the triage and the gate split from');
+  const capOut = cap ? { kind: capPage?.fluid ? 'fluid' : (capPage?.contentFrom || (capPage?.shellMaxWidth ? 'shell' : 'module')), shell: capPage?.shellMaxWidth ?? null, content: capPage?.contentMaxWidth ?? null, modules: (() => { const seen = new Set(); return (cap.aggregate?.modules || capPage?.modules || []).filter((m) => { const k = `${m.selector}|${m.px}`; if (seen.has(k)) return false; seen.add(k); return true; }).map((m) => ({ section: m.section ?? m.index ?? null, px: m.px, selector: m.selector })); })(), probeWidth, mainSelector, contentRoot } : { kind: null, shell: null, content: null, modules: [], probeWidth, mainSelector, contentRoot };
   if (!cap) note('cap', 'no measure/cap.json or gate/cap.json — run cap-probe <url> --out measure/cap.json');
   note('cap.mainSelector', cap?._provenance?.pinned ? 'cap-probe --main (pinned)' : (flag('--main') ? '--main in the case prose/logs' : 'cap-probe\'s chosen root (pass gate --main to override)'));
 

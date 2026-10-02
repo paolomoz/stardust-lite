@@ -30,6 +30,7 @@ const tagOf = (n) => String(n.tag || '').toLowerCase();
 /** The leaf kind of a node (see the header). */
 export function kindOf(n) {
   const tag = tagOf(n);
+  if (n.spacer) return 'box'; // an empty source paragraph (`<p>&nbsp;</p>`, `<p><br></p>`) is a spacing measurement, not a text: author reads it, fingerprints do not
   if (tag === 'iframe') return 'embed';
   if (MEDIA_TAGS.has(tag) || n.src) return /video|audio|\.(mp4|webm|m3u8)\b/.test(`${tag} ${n.src || ''}`) ? 'video' : 'picture';
   if (tag === 'svg') return 'icon';
@@ -205,10 +206,14 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
   else if (roots.length === 1) {
     let n = roots[0]; while (n.children?.length === 1 && !n.text) n = n.children[0];
     const h = n.box ? n.box[3] : 0;
+    // flattened only when its children are modules (composite nodes), not a run of leaves: a one-module page whose text column holds 52
+    // paragraphs read as 52 one-paragraph rows (sdt-dentsu cookies-notice, responsible-disclosure)
+    const composite = (x) => { const u = unwrap(x); const k = kindOf(u); return COMPOSITE.has(k) && (u.children || []).length > 0; };
     for (const c0 of n.children || []) {
-      const c = unwrap(c0); const ch = c.box ? c.box[3] : 0;
-      const flat = (c.children?.length >= 2) && ((['main', 'article'].includes(tagOf(c)) || c.children.length >= 3) && h && ch >= h * 0.5) && !hasBg(c);
-      if (flat) secs.push(...c.children); else secs.push(c0);
+      const c = unwrap(c0); const ch = c.box ? c.box[3] : 0; const kids = c.children || [];
+      const mostlyModules = kids.filter(composite).length * 2 >= kids.length;
+      const flat = (kids.length >= 2) && ((['main', 'article'].includes(tagOf(c)) || kids.length >= 3) && h && ch >= h * 0.5) && !hasBg(c) && mostlyModules;
+      if (flat) secs.push(...kids); else secs.push(c0);
     }
   }
   return { header: headerKey ? dump[headerKey]?.[0] || null : null, footer: footerKey ? dump[footerKey]?.[0] || null : null, sections: secs, mainKey, headerKey, footerKey };

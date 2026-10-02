@@ -37,7 +37,7 @@ const profile = siteProfile(); const overlays = overlayOpts();
 const widths = String(arg('--widths', (profile?.widths || [360, 1440, 2560]).join(','))).split(',').map(Number).filter((w) => Number.isFinite(w) && w > 0);
 const vh = Number(arg('--vh', 900)); const wait = Number(arg('--wait', 4000)); const depth = Number(arg('--depth', 3));
 const sections = String(arg('--sections', 'main > .section')); const header = String(arg('--header', 'header')); const footer = String(arg('--footer', 'footer'));
-const mainSel = typeof arg('--main', null) === 'string' ? arg('--main') : (profile?.cap?.mainSelector || null);
+const mainSel = typeof arg('--main', null) === 'string' ? arg('--main') : (profile?.cap?.contentRoot && profile.cap.contentRoot !== 'main' ? profile.cap.contentRoot : profile?.cap?.contentRoot === 'main' ? 'main' : profile?.cap?.mainSelector || null); // the content root (site-profile init records it from this summary), else the cap shell
 const hidden = String(arg('--hidden', '')).split(',').map((s) => s.trim()).filter(Boolean);
 const noSpec = process.argv.includes('--no-spec');
 const parallel = Math.max(1, Math.min(3, Number(arg('--parallel', 3)) || 3)); // never more than three contexts at once
