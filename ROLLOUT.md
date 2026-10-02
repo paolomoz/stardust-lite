@@ -7,10 +7,17 @@ serve dir regenerate — gitignored); its evidence is one row and one screen (be
 
 ## Procedure, in order (every command from the site repo's root; `<url>`, `<slug>`, `<docPath>` from `pages.json`)
 
-1. `npx stardust-lite site-profile check migration/site.json` — PASS or WARN continues; FAIL (an overlay control gone, a chrome height off) is
-   site work: fix the profile or the chrome first, it is not this page's round.
+`npx stardust-lite page-run <slug> [--sections <css>] [--main <css>]` runs steps 1–7 in one call and stops where judgement is needed: after the
+triage draft (exit 5 — review `triage.md`, then `page-run <slug> --resume`; `--accept-draft` to go on as drafted), at a template candidate (exit 6), and
+at the end with the section verdict (exit 0 CLEAN, 1 rows off — the rounds start there); the numbered steps stay as the reference and for a resume by hand.
+
+1. The profile check runs inside `measure-page` (step 2: one `profile check: PASS|WARN|FAIL — …` line from the page's own sessions, `profileCheck` in
+   `summary.json`); run `npx stardust-lite site-profile check migration/site.json` on its own only when it says FAIL. PASS or WARN continues; FAIL (an
+   overlay control gone, a chrome height off) is site work: fix the profile or the chrome first, it is not this page's round.
 2. `npx stardust-lite measure-page <url> --out migration/pages/<slug>/measure` — once with the default sections, read `structure-1440.txt` for the
    source's section selector, once more with `--sections <css>` (and `--hidden <css,…>` for modals at rest, `--main` when the profile's content root does not hold the page).
+   It also writes `live-<W>.png` from the same settled session (the stitched capture the gate reads as its origin — the live page is loaded once for
+   measurement, prototype gate and served gate; `--no-capture` to skip).
 3. `npx stardust-lite triage migration/pages/<slug>/measure/content-1440.json --blocks migration/blocks.json --spec migration/pages/<slug>/measure/spec-1440.json --out migration/pages/<slug>/triage.json --md migration/pages/<slug>/triage.md`,
    then `npx stardust-lite block-inventory diff migration/pages/<slug>/triage.json`. Read the novelty line and the diff before anything else
    (the escalation rule below). A draft with one row per paragraph, or two modules in one row, is the automatic split, not the page: re-run
@@ -27,7 +34,8 @@ serve dir regenerate — gitignored); its evidence is one row and one screen (be
 6. `npx stardust-lite serve proto --port <port> --site .` (the profile's port, one per site) then
    `npx stardust-lite harness migration/pages/<slug>/doc/<slug>.html --serve proto --name <slug> --port <port> --fragments <branch host> --content migration/pages/<slug>/measure/content-1440.json[,clicks.json]`
    — every text the dumps hold must be found; a missing text is a triage or recipe defect.
-7. Table rounds: `npx stardust-lite sections migration/pages/<slug>/measure/spec-<W>.json http://localhost:<port>/<slug>.harness.html` and
+7. Table rounds: `npx stardust-lite sections http://localhost:<port>/<slug>.harness.html --widths 360,<base>,<probe> --spec-dir migration/pages/<slug>/measure --blocks migration/blocks.json --triage migration/pages/<slug>/triage.json --out migration/pages/<slug>/measure`
+   (the three tables in one browser, each row reused / new, then `tables: CLEAN — …` or `tables: n row(s) off — …`; `sections-verdict.json`) and
    `npx stardust-lite pair …` at the three widths before every CSS change. A reused block's rows are expected within 2 px already; what is off
    there is a section style or a recipe, not block CSS — or a block constant measured once on the template page (a parallax rest offset
    read from a stale load-time layout): a page measurement until a second page reads the same value.
@@ -36,11 +44,15 @@ serve dir regenerate — gitignored); its evidence is one row and one screen (be
    (`pairing index` in its header — `anchor` means the document has another section count: fix the document, not the CSS); a row's % is
    its share of the page diff, a Δh marked `b` is a boundary the next row cancels, and cap-probe's rows on a one- or two-section page are
    advisory (one module's own columns). A round changes only what the tables name.
-   Once clean: the three widths (`--widths 360,<base>,<probe>`), with `--probes` only for a section whose block is new or changed.
+   Once clean: the three widths (`--widths 360,<base>,<probe>`), with `--probes` only for a section whose block is new or changed. For a reuse-only
+   page whose tables are CLEAN with 0 new sections, gate the prototype at the base width only — `--skip-widths-when-clean migration/pages/<slug>/measure/sections-verdict.json`
+   does it and says so — and the served page at the three widths (step 10); a new or changed block keeps the full prototype gate with probes.
+   The origin is `measure/live-<W>.png` by default (`origin <W> from …` names it): one origin for measure, prototype and served gates — `--origin <dir>` for another.
 9. `npx stardust-lite da-put <org>/<site>/<branch> migration/pages/<slug>/doc/<slug>.html --to <folder of docPath>` (preview only). If a block changed:
    push the code, `npx stardust-lite sync-poll <branch host> . blocks/<x>/<x>.css …` until the bus serves it.
-10. One served gate, full page: `npx stardust-lite gate --live <url> --build <branch host><docPath> --out migration/pages/<slug>/gate-served --origin migration/pages/<slug>/gate --widths <base> --no-chrome --budget --triage migration/pages/<slug>/triage.json`
-    (a list: `gate --served-pages … --no-chrome`). The chrome is in this one number on purpose — a leak lives there too; expect the prototype's section rows.
+10. One served gate, full page, at the three widths: `npx stardust-lite gate --live <url> --build <branch host><docPath> --out migration/pages/<slug>/gate-served --widths 360,<base>,<probe> --no-chrome --budget --triage migration/pages/<slug>/triage.json`
+    (the origin is the measure dir's `live-<W>.png` — the same one the prototype gate read; `--origin migration/pages/<slug>/gate` when the measure dir has none;
+    a list: `gate --served-pages … --no-chrome`). The chrome is in this one number on purpose — a leak lives there too; expect the prototype's section rows.
 11. Only when a block was added or changed: `npx stardust-lite block-inventory scan --cases --site-repo . --out migration/blocks.json` (recipes;
     every `migration/cases/*` and `migration/pages/*` with a `doc/` is evidence, and it refuses to shrink the file) and
     `npx stardust-lite block-inventory budgets --gate-dir migration/pages/<slug>/gate-served` (the NEW rows' budgets from this page's served table —
