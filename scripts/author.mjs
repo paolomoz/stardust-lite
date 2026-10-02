@@ -19,7 +19,13 @@
 // (block / default / new), cells filled, texts, with the warnings: unknown media, empty cells, leaves that did not fit the recipe.
 // Usage: node author.mjs <triage.json> --content content.json[,clicks.json,hidden.json] --blocks migration/blocks.json --out doc/<slug>.html
 //        [--media media/manifest.json] [--media-host https://<branch-host>/drafts/media] [--nav doc/nav.html --footer doc/footer.html]
-//        [--site migration/site.json] [--nav-path /drafts/nav --footer-path /drafts/footer] [--url <page url>] [--no-lint]
+//        [--site migration/site.json] [--nav-path /drafts/nav --footer-path /drafts/footer] [--url <page url>] [--no-lint] [--keep-spacers]
+//   --keep-spacers  write the source's empty paragraphs (`<p>&nbsp;</p>`, `<p><br></p>` — the collector marks them `spacer`) as a
+//               zero-width-space paragraph, the only empty line box the pipeline keeps; by default they are DROPPED and counted on
+//               stderr with their height (METHOD names the zero-width spacer an anti-pattern: model the rhythm, or file the Δh)
+//   What the dump carries is what is written: `&nbsp;` stays `&nbsp;` (the pipeline keeps an inner one, trims a trailing one), a
+//   `strong` / `em` read as a node of its own keeps its weight, a section root's own background-image is the picture (`bgiUrl` when the
+//   collector cut `bgi`; a cut URL is a warning, never a picture).
 //   --content   the dump the triage was made from first; every further file is an extra source (click-dump, --hidden dump, modals) whose
 //               roots feed `hidden` recipe cells in order and count as capture for the texts
 //   --media     media-fetch's manifest.json; the branch host and folder come from the profile (`media.branchHost`, `media.folder`) or
@@ -63,7 +69,8 @@ for (const { json } of extras) for (const [k, v] of Object.entries(json)) { if (
 let hiddenNext = 0;
 
 // ───────────────────────────── media, links, text ─────────────────────────────
-const esc = (t) => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const esc = (t) => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\u00a0/g, '&nbsp;');
+const keepSpacers = process.argv.includes('--keep-spacers'); const spacers = [];
 const unknownMedia = new Set();
 const mediaKey = (u) => { const cands = [u]; try { cands.push(decodeURI(u)); } catch { /* keep */ } try { cands.push(encodeURI(decodeURI(u))); } catch { /* keep */ } cands.push(u.replace(/ /g, '%20')); return cands; };
 function rewriteMedia(src) {
@@ -72,7 +79,10 @@ function rewriteMedia(src) {
   if (manifest) { for (const k of mediaKey(abs)) if (manifest[k]) return mediaHost ? `${mediaHost.replace(/\/$/, '')}/${manifest[k]}` : manifest[k]; const byPath = Object.keys(manifest).find((k) => { try { return new URL(k).pathname === new URL(abs).pathname; } catch { return false; } }); if (byPath) return mediaHost ? `${mediaHost.replace(/\/$/, '')}/${manifest[byPath]}` : manifest[byPath]; }
   unknownMedia.add(abs); return abs;
 }
-const bgUrl = (n) => { const m = /url\("?([^")]+)"?\)/.exec(n.bgi || ''); return m && !m[1].startsWith('data:') ? m[1] : null; };
+const bgUrl = (n) => { if (n.bgiUrl && !n.bgiUrl.startsWith('data:')) return n.bgiUrl; const m = /url\(("|')?([^"')]+)\1\)/.exec(n.bgi || ''); return m && !m[2].startsWith('data:') ? m[2] : null; };
+// `bgi` is cut at 160 chars in the dump: a long CDN URL has no closing `)` and is no picture — say so instead of writing nothing silently
+const bgCut = (n) => !!(n.bgi && !n.bgiUrl && /url\(/.test(n.bgi) && !/\)/.test(n.bgi.slice(n.bgi.indexOf('url('))));
+const bgCutWarn = (n) => warn(`background-image URL cut in the dump for <${n.tag || 'div'}${n.cls ? `.${String(n.cls).split(' ')[0]}` : ''}> (older collector: 160 chars) — no picture written; re-dump with the current collector (bgiUrl) and media-fetch the URL`);
 const isDead = (href) => !href || /^\s*(javascript:|#\s*$|void\(0\))/i.test(href);
 function href(h) {
   if (!h) return null;
@@ -83,9 +93,12 @@ function href(h) {
 const KEEP = new Set(['a', 'strong', 'em', 'sup', 'sub', 'br']);
 /** The inline markup of a text node, cleaned to the authoring set; the plain text when the dump holds no (complete) markup. */
 function inline(n) {
+  // a `strong` / `em` the collector read as the text node itself (its paragraph held nothing else) keeps its weight
+  const ownTag = /^(strong|b)$/.test(n.tag || '') ? 'strong' : /^(em|i)$/.test(n.tag || '') ? 'em' : null;
+  const wrapOwn = (t) => (ownTag && t && !new RegExp(`^<${ownTag}>`).test(t) ? `<${ownTag}>${t}</${ownTag}>` : t);
   const src = n.markupFull || (n.markup && n.markup.length < 600 ? n.markup : null);
-  if (!src) { if (n.markup && n.markup.length >= 600) warn(`inline markup cut at 600 chars in the dump (re-dump: the collector now keeps markupFull) — plain text written for "${String(n.text).slice(0, 40)}…"`); return esc(n.text || ''); }
-  let s = src.replace(/<!--[\s\S]*?-->/g, '');
+  if (!src) { if (n.markup && n.markup.length >= 600) warn(`inline markup cut at 600 chars in the dump (re-dump: the collector now keeps markupFull) — plain text written for "${String(n.text).slice(0, 40)}…"`); return wrapOwn(esc(n.text || '')); }
+  let s = src.replace(/<!--[\s\S]*?-->/g, '').replace(/&nbsp;|\u00a0/g, '\u0004'); // the source's non-breaking spaces survive the whitespace collapse below
   s = s.replace(/<\/?([a-z][a-z0-9-]*)\b([^>]*)>/gi, (m, tag, attrs) => {
     const t = tag.toLowerCase(); const close = m.startsWith('</');
     if (t === 'b') return close ? '</strong>' : '<strong>'; if (t === 'i') return close ? '</em>' : '<em>';
@@ -97,9 +110,10 @@ function inline(n) {
   });
   // a dead link's text stays as text; a kept link closes normally
   s = s.replace(/\u0002([\s\S]*?)\u0003/g, '$1').replace(/\u0003/g, '</a>').replace(/\u0002/g, '');
-  s = s.replace(/&nbsp;| /g, ' ').replace(/\s+/g, ' ').replace(/\s*<br>\s*/g, '<br>').trim();
+  s = s.replace(/\s+/g, ' ').replace(/\s*<br>\s*/g, '<br>').trim();
   s = s.replace(/^(<br>)+|(<br>)+$/g, '').replace(/\s+(<\/(?:strong|em|a)>)/g, '$1').trim();
-  return s || esc(n.text || '');
+  s = s.replace(/\u0004/g, '&nbsp;');
+  return wrapOwn(s.replace(/^(&nbsp;)+$/, '')) || wrapOwn(esc(n.text || ''));
 }
 /** Paragraph(s) from a text node: `<br><br>` is a paragraph break. */
 const paragraphs = (n) => inline(n).split(/(?:<br>){2,}/).map((t) => t.replace(/^(<br>)+|(<br>)+$/g, '').trim()).filter(Boolean);
@@ -116,12 +130,18 @@ const CONTROL = new Set(['button', 'input']);
  * one leaf; a link is one leaf (its children are its label); a background image is a picture leaf before the node's children. */
 function leavesOf(root) {
   const out = [];
+  // `top` numbers the structural children of the section's first node with several children — through a chain of single-child wrappers
+  // (a bordered block holding the title and the row): with the root's own index every leaf read `top 0` and the recipe's
+  // defaultContentBefore never peeled a title (sdt-dentsu beyond-the-funnel, the profiles)
+  let start = root; while (start && !start.text && !start.src && (start.children || []).length === 1) start = start.children[0];
   const walk = (n, top, parent, depth) => {
+    if (n.spacer) { if (keepSpacers) out.push({ kind: 'text', raw: 'p', node: n, spacer: true, top, parent }); else spacers.push(n); return; }
     const k = kindOf(n);
     if (k === 'box') return;
     const kids = (n.children || []);
     if (hasBg(n) && !kids.map(unwrap).some((c) => MEDIA(kindOf(c)))) out.push({ kind: 'picture', raw: 'picture', node: n, bg: true, top, parent });
-    if (k === 'ul') { if (isControlList(n)) { out.push({ kind: 'control', raw: 'ul', node: n, top, parent }); return; } if (isTextList(n)) { out.push({ kind: 'list', raw: 'ul', node: n, top, parent }); return; } kids.forEach((c, i) => walk(c, depth === 0 ? i : top, n, depth + 1)); return; }
+    else if (bgCut(n) && !kids.map(unwrap).some((c) => MEDIA(kindOf(c)))) bgCutWarn(n);
+    if (k === 'ul') { if (isControlList(n)) { out.push({ kind: 'control', raw: 'ul', node: n, top, parent }); return; } if (isTextList(n)) { out.push({ kind: 'list', raw: 'ul', node: n, top, parent }); return; } kids.forEach((c, i) => walk(c, n === start ? i : top, n, depth + 1)); return; }
     if (k === 'picture' || k === 'video' || k === 'embed' || k === 'icon' || k === 'a' || /^h[1-6]$/.test(k) || k === 'p' || k === 'blockquote' || k === 'hr' || CONTROL.has(k)) {
       if (k === 'picture' && hasBg(n) && !n.src) return; // already pushed as the bg leaf
       out.push({ kind: k === 'hr' ? 'hr' : CONTROL.has(k) ? 'control' : isIconImg(n) ? 'icon' : recipeKind(k), raw: k, node: n, top, parent });
@@ -130,7 +150,7 @@ function leavesOf(root) {
       if (k === 'p' || /^h[1-6]$/.test(k) || k === 'a') { const own = kids.map(unwrap).filter((c) => { const ck = kindOf(c); return MEDIA(ck) || ck === 'ul' || /^h[1-6]$/.test(ck) || (k === 'a' && ck === 'p' && n.text); }); if (!own.length) return; own.forEach((c) => walk(c, top, n, depth + 1)); }
       return;
     }
-    kids.forEach((c, i) => walk(c, depth === 0 ? i : top, n, depth + 1));
+    kids.forEach((c, i) => walk(c, n === start ? i : top, n, depth + 1));
   };
   walk(root, -1, null, 0);
   return out;
@@ -187,7 +207,7 @@ function leafHtml(l, opts = {}) {
     case 'embed': return n.src ? `<p><a href="${esc(n.src)}">${esc(n.title || n.src)}</a></p>` : '';
     case 'icon': return `<p>:${iconName(n)}:</p>`;
     case 'heading': { const tag = opts.heading || l.raw; const ps = paragraphs(n); if (!ps.length) return ''; stats.texts += ps.length; return ps.map((t, i) => (i === 0 ? `<${tag}>${t}</${tag}>` : `<p>${t}</p>`)).join(''); }
-    case 'text': case 'quote': { const ps = paragraphs(n); stats.texts += ps.length; return ps.map((t) => `<p>${t}</p>`).join(''); }
+    case 'text': case 'quote': { if (l.spacer) return '<p>&#8203;</p>'; const ps = paragraphs(n); stats.texts += ps.length; return ps.map((t) => `<p>${t}</p>`).join(''); }
     case 'link': return linkHtml(n, opts.link, opts);
     case 'list': return listHtml(n, opts.link);
     default: return '';
@@ -301,7 +321,8 @@ function containerSection(node, block, recipe, report) {
   };
   const walk = (n) => {
     const kids = (n.children || []).map(unwrap);
-    if (hasBg(n) && n !== node && !kids.some((c) => MEDIA(kindOf(c)))) out.push(pictureHtml(n, ''));
+    if (hasBg(n) && !kids.some((c) => MEDIA(kindOf(c)))) out.push(pictureHtml(n, '')); // the section root's own background is its picture too (a banner's bgi on the root — sdt-dentsu)
+    else if (bgCut(n) && !kids.some((c) => MEDIA(kindOf(c)))) bgCutWarn(n);
     let i = 0;
     while (i < kids.length) {
       const c = kids[i];
@@ -391,6 +412,7 @@ const unf = reports.reduce((s, r) => s + r.unfitted, 0); const emp = reports.red
 if (unf) console.error(`author: ${unf} leaf/leaves did not fit a recipe — placed in the nearest text / picture cell and listed per section above (move them, or fix the recipe)`);
 if (emp) console.error(`author: ${emp} empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)`);
 if (unknownMedia.size) console.error(`author: ${unknownMedia.size} media source(s) not in the manifest — kept as source URLs:\n  ${[...unknownMedia].map((u) => u.slice(0, 120)).join('\n  ')}`);
+if (spacers.length) console.error(`author: ${spacers.length} empty spacer paragraph(s) in the source (${spacers.map((n) => `${n.box ? n.box[3] : '?'} px at y ${n.box ? n.box[1] : '?'}`).join(', ')}) dropped — the pipeline drops <p>&nbsp;</p> and <p><br></p> too; a section table Δh of that size is this: model the rhythm in the section style or file it as a deviation (--keep-spacers writes a zero-width-space paragraph, an anti-pattern METHOD names)`);
 for (const m of [...new Set(warnings)]) console.error(`author: ${m}`);
 
 // ───────────────────────────── lint ─────────────────────────────

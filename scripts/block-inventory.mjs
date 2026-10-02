@@ -3,13 +3,17 @@
 // matches the site's inventory before the Block Collection and nobody re-invents `cards` under another name (SCALING-PLAN §2.B,
 // batch-7 rollout). Pure Node: reads `blocks/*/<name>.{js,css}`, a finished case's REGISTER.md triage table, its `doc/*.html` and
 // `measure/content-<W>.json`, and the site profile's page numbers. Pass 4 fills the authoring recipe (lib/recipes.mjs documents it).
-//   scan  [--site-repo .] [--case <case-dir>]… --out migration/blocks.json [--all] [--cases]
+//   scan  [--site-repo .] [--case <case-dir>]… --out migration/blocks.json [--all] [--cases] [--force]
+//         without --case every `migration/cases/*` and `migration/pages/*` that holds a `doc/` is a case (a rollout page is evidence too:
+//         its document carries the recipes it used, its gate-served/ the budget samples); the scan refuses to write an inventory with
+//         fewer recipes or budgets than the file it replaces (`--force` overrides — a scan over the wrong dirs emptied one, sdt-dentsu).
 //         --cases derives a recipe for every block that occurs in a case's doc/*.html (the block's rows and cells read back into dump
 //         kinds; the occurrence with the most rows wins; a 1-row variant of a container inherits `unit`); a recipe written by hand
 //         (`recipe._hand: true`) in the existing blocks.json survives the rescan (merged by name + variant).
 //   recipe <name> [variant] --from <doc.html> [--triage triage.json --unit <section index>] [--blocks migration/blocks.json] [--write]
-//         derives one recipe from an authored document; with a triage and its section index, says which dump kinds of that unit land
-//         in which cell and which do not fit. Prints the JSON; --write stores it in blocks.json (as hand-written: `_hand: true`).
+//         derives one recipe from an authored document (`recipe columns text-video`, or the one label `recipe "columns (text-video)"`);
+//         with a triage and its section index, says which dump kinds of that unit land in which cell and which do not fit. Prints the
+//         JSON; --write stores it in blocks.json (as hand-written: `_hand: true`) — a variant row is created when the inventory lacks it.
 //         rows from blocks/ (variants from the CSS `.name.variant` selectors; shape inferred from decorate: container when it iterates
 //         the rows, key-value when it reads name/value pairs, simple otherwise — marked `_inferred`), refined by every --case given:
 //         the register's "block · shape · collection match · rows × cols" column names shape / collection / rows × cols / variants,
@@ -19,11 +23,15 @@
 //   diff  <triage.json> --blocks migration/blocks.json   per section: covered by block (variant) | collection match only | new; the
 //         novelty share. Re-matches the triage's stored fingerprints against the inventory given (another site's, a newer one). Exit 0.
 //   print [--blocks migration/blocks.json]   the markdown table.
-//   budgets --gate-dir <dir> [--blocks migration/blocks.json] [--site-repo .]   (re)compute the per-block budgets from an existing gate
-//         dir's `sections-<W>.json` (pass 5's per-section table) without a rescan; scan does the same for every --case that has a
-//         `gate-served/` (else `gate/`) with those files. Per width the budget of a block is the MAX pixel % of the sections that carry
-//         it (plus the profile's noise floor when it has one), `budget._source: "sections"`; a block no section carries (header, footer,
-//         a variant the template page does not use) keeps the page's number, `_source: "page"` (BACKLOG 152 / 155).
+//   budgets --gate-dir <dir> [--blocks migration/blocks.json] [--site-repo .] [--only <label,…> | --all]   add a gate dir's
+//         `sections-<W>.json` (pass 5's per-section table) as budget samples without a rescan; scan does the same for every case that
+//         has a `gate-served/` (else `gate/`) with those files. Per width the budget of a block is the MAX pixel % over EVERY section
+//         sample that carries it, across all the tables given so far (`budget._sections` keeps them; plus the profile's noise floor),
+//         `budget._source: "sections"`; a block no section carries (header, footer, a variant the template page does not use) keeps the
+//         page's number, `_source: "page"` (BACKLOG 152 / 155). `budgets` touches only the rows WITHOUT a sections budget (the page's new
+//         blocks) unless `--only` names rows or `--all` merges every one — a page's table re-derived the template's hero from one
+//         section (2.61 → 0.98, sdt-dentsu); a reused block's over-budget row is a deviation, never a new budget. A sample whose |Δh| > 2
+//         (not a boundary) is skipped and listed: its pixel % measures a shift, not the block.
 //
 // blocks.json shape (v1):
 // { "_schema": "stardust-lite/block-inventory@1", "_writtenAt", "_source": { "siteRepo", "cases": [] }, "blocks": [
@@ -41,7 +49,7 @@ import { splitSections, fingerprint, dropGeneric, allClasses, matchSection, rows
 import { parseDoc, deriveRecipe, describeRecipe } from './lib/recipes.mjs';
 
 const [,, cmd, target] = process.argv;
-const usage = () => { console.error('usage: block-inventory.mjs scan [--site-repo .] [--case <case-dir>]… --out migration/blocks.json [--all] [--cases]\n       block-inventory.mjs diff <triage.json> --blocks migration/blocks.json\n       block-inventory.mjs recipe <name> [variant] --from <doc.html> [--triage triage.json --unit <i>] [--blocks migration/blocks.json] [--write]\n       block-inventory.mjs print [--blocks migration/blocks.json]\n       block-inventory.mjs budgets --gate-dir <dir> [--blocks migration/blocks.json] [--site-repo .]'); process.exit(1); };
+const usage = () => { console.error('usage: block-inventory.mjs scan [--site-repo .] [--case <case-dir>]… --out migration/blocks.json [--all] [--cases]\n       block-inventory.mjs diff <triage.json> --blocks migration/blocks.json\n       block-inventory.mjs recipe <name> [variant] --from <doc.html> [--triage triage.json --unit <i>] [--blocks migration/blocks.json] [--write]\n       block-inventory.mjs print [--blocks migration/blocks.json]\n       block-inventory.mjs budgets --gate-dir <dir> [--blocks migration/blocks.json] [--site-repo .] [--only <label,…> | --all]'); process.exit(1); };
 if (!cmd || !['scan', 'diff', 'print', 'recipe', 'budgets'].includes(cmd) || (['diff', 'recipe'].includes(cmd) && (!target || target.startsWith('--')))) usage();
 
 /** Recipes for every block occurring in the documents given: { 'name|variant': { recipe, notes, rows } } — the occurrence with the
@@ -83,25 +91,33 @@ function sectionTables(gateDir) {
  * that carry it (the gate's block per section: the triage row, else the `.block` class), plus `noise` (the profile's floor, 0 when
  * unknown). Rows a table names get `budget._source: 'sections'` and `_sections[key]`; the others keep what they had. Returns the rows
  * touched and the blocks a table named that the inventory lacks. */
-function applySectionBudgets(rows, tables, { noise = 0 } = {}) {
+function applySectionBudgets(rows, tables, { noise = 0, eligible = () => true } = {}) {
   const tokens = (v) => String(v || '').trim().split(/\s+/).filter(Boolean).sort().join(' ');
   const find = (name, variant) => { const c = rows.filter((r) => r.name === name); if (!c.length) return null; return c.find((r) => tokens(r.variant) === tokens(variant)) || (variant ? c.find((r) => !r.variant) : null) || c[0]; };
-  const touched = new Set(); const unknown = new Set(); const widths = Object.keys(tables).map(Number).sort((a, b) => a - b);
+  const touched = new Set(); const unknown = new Set(); const skipped = []; const widths = Object.keys(tables).map(Number).sort((a, b) => a - b);
   for (const W of widths) {
-    const t = tables[W]; const key = t.budgetKey || (W === 360 ? '360' : W >= 1920 ? 'probe' : 'base');
+    const t = tables[W]; const key = t.budgetKey || (W === 360 ? '360' : W >= 1920 ? 'probe' : 'base'); const src = t.file ? t.file.replace(/^.*\/migration\//, 'migration/') : `sections-${W}.json`;
     for (const sec of t.sections) {
       if (!sec.block || sec.pct === null || sec.pct === undefined) continue;
       const r = find(sec.block, sec.variant); if (!r) { unknown.add(`${sec.block}${sec.variant ? ` (${sec.variant})` : ''}`); continue; }
-      if (!touched.has(r)) { r.budget = { 360: r.budget?.[360] ?? null, base: r.budget?.base ?? null, probe: r.budget?.probe ?? null, _source: 'sections', _page: r.budget && r.budget._source !== 'sections' ? { 360: r.budget[360] ?? null, base: r.budget.base ?? null, probe: r.budget.probe ?? null } : r.budget?._page ?? null, _sections: {} }; touched.add(r); }
+      if (!eligible(r)) continue;
+      const lbl = `${sec.block}${sec.variant ? ` (${sec.variant})` : ''}`;
+      // an unpaired row is still a share of the page diff (its stride read at the same rows on both captures); only a shifted row is no sample
+      if (sec.dh !== null && sec.dh !== undefined && Math.abs(sec.dh) > 2 && sec.dhKind !== 'boundary') { skipped.push(`${W} #${sec.index} ${lbl}: Δh ${sec.dh} — a shift, not a sample`); continue; }
+      if (!touched.has(r)) {
+        const fromSections = r.budget?._source === 'sections';
+        r.budget = { 360: fromSections ? r.budget[360] ?? null : null, base: fromSections ? r.budget.base ?? null : null, probe: fromSections ? r.budget.probe ?? null : null, _source: 'sections', _page: r.budget && !fromSections ? { 360: r.budget[360] ?? null, base: r.budget.base ?? null, probe: r.budget.probe ?? null } : r.budget?._page ?? null, _sections: fromSections && r.budget._sections ? r.budget._sections : {} };
+        touched.add(r);
+      }
       const list = (r.budget._sections[key] = r.budget._sections[key] || []);
-      if (list.some((x) => x.width === W && x.index === sec.index)) continue;
-      list.push({ width: W, index: sec.index, anchorText: (sec.anchorText || '').slice(0, 40), pct: sec.pct, dh: sec.dh ?? null });
+      if (list.some((x) => x.width === W && x.index === sec.index && (x.source || src) === src)) continue;
+      list.push({ source: src, width: W, index: sec.index, anchorText: (sec.anchorText || '').slice(0, 40), pct: sec.pct, dh: sec.dh ?? null });
       const max = Math.max(...list.map((x) => x.pct));
       r.budget[key] = Number((max + (Number(noise) || 0)).toFixed(2));
     }
   }
-  for (const r of touched) { r._notes = (r._notes || []).filter((n) => !/^budget from|^budget: /.test(n)); r._notes.push(`budget: per-section max from ${widths.map((W) => `sections-${W}.json`).join(', ')}${noise ? ` + noise floor ${noise}` : ''}`); }
-  return { touched: [...touched], unknown: [...unknown], widths };
+  for (const r of touched) { r._notes = (r._notes || []).filter((n) => !/^budget from|^budget: /.test(n)); const srcs = [...new Set(Object.values(r.budget._sections).flat().map((x) => x.source).filter(Boolean))]; r._notes.push(`budget: per-section max over ${srcs.length} table(s)${noise ? ` + noise floor ${noise}` : ''}`); }
+  return { touched: [...touched], unknown: [...unknown], widths, skipped };
 }
 const noiseFloor = (siteJson) => { const n = siteJson?.noise?.floor1440; return typeof n === 'number' && Number.isFinite(n) ? n : 0; };
 
@@ -130,7 +146,12 @@ if (cmd === 'scan') {
   }
 
   // 2. the cases — register rows, dump fingerprints, documents, budgets
-  const cases = argAll('--case').map((c) => resolve(c));
+  let cases = argAll('--case').map((c) => resolve(c));
+  if (!cases.length) {
+    // a rollout page is evidence too: its document carries the recipes it used, its gate-served/ the budget samples (ROLLOUT step 11)
+    cases = ['cases', 'pages'].flatMap((d) => { const dir = join(repo, 'migration', d); return isDir(dir) ? readdirSync(dir).filter((n) => isDir(join(dir, n, 'doc'))).sort().map((n) => join(dir, n)) : []; });
+    console.error(`block-inventory: no --case given — ${cases.length} dir(s) with a doc/ under migration/cases and migration/pages: ${cases.map((c) => basename(c)).join(', ') || 'none'}`);
+  }
   const parseRegister = (md) => {
     const lines = md.split('\n'); const head = lines.findIndex((l) => /^\|\s*#\s*\|/.test(l) && /rows × cols/.test(l));
     if (head === -1) return null;
@@ -233,8 +254,8 @@ if (cmd === 'scan') {
   for (const caseDir of sourceCases) {
     const tables = { ...sectionTables(join(caseDir, 'gate')), ...sectionTables(join(caseDir, 'gate-served')) }; // served wins per width
     if (!Object.keys(tables).length) { console.error(`block-inventory: ${basename(caseDir)}: no gate-served/ or gate/ sections-<W>.json — budgets are the page's numbers (run gate --per-section on the served page, then \`block-inventory budgets --gate-dir\`)`); continue; }
-    const { touched, unknown, widths } = applySectionBudgets(rows, tables, { noise: noiseFloor(siteJson) });
-    console.error(`block-inventory: ${basename(caseDir)}: budgets of ${touched.length} rows from the per-section tables at ${widths.join(' / ')} (${Object.values(tables).map((t) => t.file.replace(`${caseDir}/`, '')).join(', ')})${unknown.length ? `; blocks named there that the inventory lacks: ${unknown.join(', ')}` : ''}`);
+    const { touched, unknown, widths, skipped } = applySectionBudgets(rows, tables, { noise: noiseFloor(siteJson) });
+    console.error(`block-inventory: ${basename(caseDir)}: budgets of ${touched.length} rows from the per-section tables at ${widths.join(' / ')} (${Object.values(tables).map((t) => t.file.replace(`${caseDir}/`, '')).join(', ')})${unknown.length ? `; blocks named there that the inventory lacks: ${unknown.join(', ')}` : ''}${skipped.length ? `; ${skipped.length} sample(s) skipped: ${skipped.join('; ')}` : ''}`);
   }
   // 4. recipes: a hand-written one in the existing file survives; --cases derives the rest from the case documents
   const previous = readJson(out)?.blocks || [];
@@ -247,6 +268,10 @@ if (cmd === 'scan') {
     console.error(`block-inventory: recipes derived for ${n} rows from ${Object.keys(docs).length} documents${kept ? `, ${kept} hand-written kept` : ''}`);
   }
   const json = { _schema: 'stardust-lite/block-inventory@1', _writtenAt: new Date().toISOString(), _source: { siteRepo: repo, cases: sourceCases }, blocks: rows };
+  // never shrink an inventory by accident: a scan over the wrong dirs wrote one without recipes or budgets (sdt-dentsu beyond-the-funnel)
+  const count = (list, f) => list.filter(f).length; const hadRecipes = count(previous, (b) => b.recipe); const hadBudgets = count(previous, (b) => b.budget?._source === 'sections');
+  const nowRecipes = count(rows, (b) => b.recipe); const nowBudgets = count(rows, (b) => b.budget?._source === 'sections');
+  if ((nowRecipes < hadRecipes || nowBudgets < hadBudgets) && !process.argv.includes('--force')) { console.error(`block-inventory: refusing to write ${out} — it holds ${hadRecipes} recipes / ${hadBudgets} section budgets, the scan derived ${nowRecipes} / ${nowBudgets} (cases: ${sourceCases.map((c) => basename(c)).join(', ') || 'none'}; --cases derives recipes; pass the --case dirs that hold the evidence, or --force)`); process.exit(2); }
   mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, JSON.stringify(json, null, 1));
   printTable(rows);
   console.log(`\n${rows.length} rows (${names.length} blocks) → ${out}`);
@@ -260,14 +285,19 @@ const loadBlocks = () => { const f = resolve(arg('--blocks', join('migration', '
 
 // ───────────────────────────── recipe ─────────────────────────────
 if (cmd === 'recipe') {
-  const variantArg = process.argv[3] && !process.argv[3].startsWith('--') ? process.argv[3] : null;
+  // `recipe columns text-video` or `recipe "columns (text-video)"`: the name is argv[3], the variant argv[4] (it was read from argv[3]
+  // twice, so no variant recipe could be written — sdt-dentsu diversity-and-inclusion, social-impact)
+  const lab = String(target).match(/^([a-z][a-z0-9-]*)\s*\(([^)]+)\)$/);
+  const name = lab ? lab[1] : target;
+  const variantArg = lab ? lab[2].trim() : process.argv[4] && !process.argv[4].startsWith('--') ? process.argv[4].trim() : null;
   const from = arg('--from', null); if (!from || from === true) usage();
   const html = read(resolve(from)); if (!html) { console.error(`block-inventory: ${from} unreadable`); process.exit(1); }
   const blocksPath = resolve(arg('--blocks', join('migration', 'blocks.json'))); const inv = readJson(blocksPath);
-  const row = inv?.blocks?.find((b) => b.name === target && (b.variant || null) === variantArg) || null;
+  const tokens = (v) => String(v || '').trim().split(/\s+/).filter(Boolean).sort().join(' ');
+  const row = inv?.blocks?.find((b) => b.name === name && tokens(b.variant) === tokens(variantArg)) || null;
   const derived = recipesFromDocs({ [basename(from, '.html')]: html }, () => row?.sourceSignature?.fingerprint || null);
-  const hit = derived[`${target}|${variantArg || ''}`];
-  if (!hit) { console.error(`block-inventory: no <div class="${[target, variantArg].filter(Boolean).join(' ')}"> in ${from} (blocks there: ${[...new Set(Object.values(derived).map((d) => `${d.name}${d.variant ? ` (${d.variant})` : ''}`))].join(', ')})`); process.exit(2); }
+  const hit = Object.values(derived).find((d) => d.name === name && tokens(d.variant) === tokens(variantArg));
+  if (!hit) { console.error(`block-inventory: no <div class="${[name, variantArg].filter(Boolean).join(' ')}"> in ${from} (blocks there: ${[...new Set(Object.values(derived).map((d) => `${d.name}${d.variant ? ` (${d.variant})` : ''}`))].join(', ')})`); process.exit(2); }
   const recipe = hit.recipe;
   // with a triage section: which dump kinds of the unit land where
   const triageFile = arg('--triage', null); const unitIdx = arg('--unit', null);
@@ -282,10 +312,10 @@ if (cmd === 'recipe') {
     }
   }
   console.log(JSON.stringify(recipe, null, 1));
-  console.log(`\n${target}${variantArg ? ` (${variantArg})` : ''}: ${describeRecipe(recipe)} — from ${from} (${hit.rows} row(s))${hit.notes.length ? `; ${hit.notes.join('; ')}` : ''}`);
+  console.log(`\n${name}${variantArg ? ` (${variantArg})` : ''}: ${describeRecipe(recipe)} — from ${from} (${hit.rows} row(s))${hit.notes.length ? `; ${hit.notes.join('; ')}` : ''}`);
   if (arg('--write', false)) {
     if (!inv?.blocks) { console.error(`block-inventory: ${blocksPath} unreadable — run scan first`); process.exit(1); }
-    let r = row; if (!r) { r = { name: target, variant: variantArg, shape: recipe.rows === 'unit' ? 'container' : recipe.rows === 'key-value' ? 'key-value' : 'simple', rowsCols: null, collection: COLLECTIONS.includes(target) ? target : null, authoringExample: null, sourceSignature: { classes: null, fingerprint: null }, recipe: null, budget: { 360: null, base: null, probe: null }, approvedIn: null, document: null, _notes: ['row created by `block-inventory recipe --write`'] }; inv.blocks.push(r); }
+    let r = row; if (!r) { r = { name, variant: variantArg, shape: recipe.rows === 'unit' ? 'container' : recipe.rows === 'key-value' ? 'key-value' : 'simple', rowsCols: null, collection: COLLECTIONS.includes(name) ? name : null, authoringExample: null, sourceSignature: { classes: null, fingerprint: null }, recipe: null, budget: { 360: null, base: null, probe: null }, approvedIn: null, document: null, _notes: ['row created by `block-inventory recipe --write`'] }; inv.blocks.push(r); }
     r.recipe = { ...recipe, _hand: true }; inv._writtenAt = new Date().toISOString(); writeFileSync(blocksPath, JSON.stringify(inv, null, 1));
     console.log(`written to ${blocksPath} as hand-written (survives rescans)`);
   }
@@ -300,11 +330,15 @@ if (cmd === 'budgets') {
   if (!Object.keys(tables).length) { console.error(`block-inventory: no sections-<W>.json in ${resolve(gateDir)} (gate writes them with --per-section, --chrome or --budget)`); process.exit(2); }
   const siteJson = readJson(join(resolve(arg('--site-repo', '.')), 'migration', 'site.json'));
   const before = Object.fromEntries(blocks.map((b) => [label(b), JSON.stringify({ 360: b.budget?.[360] ?? null, base: b.budget?.base ?? null, probe: b.budget?.probe ?? null })]));
-  const { touched, unknown, widths } = applySectionBudgets(blocks, tables, { noise: noiseFloor(siteJson) });
+  const only = typeof arg('--only', null) === 'string' ? new Set(String(arg('--only')).split(',').map((x) => x.trim()).filter(Boolean)) : null;
+  const all = process.argv.includes('--all');
+  const eligible = (r) => (all ? true : only ? only.has(label(r)) || only.has(r.name) : r.budget?._source !== 'sections');
+  if (only) { const miss = [...only].filter((l) => !blocks.some((b) => label(b) === l || b.name === l)); if (miss.length) console.error(`block-inventory: --only names rows the inventory lacks: ${miss.join(', ')}`); }
+  const { touched, unknown, widths, skipped } = applySectionBudgets(blocks, tables, { noise: noiseFloor(siteJson), eligible });
   inv.blocks = blocks; inv._writtenAt = new Date().toISOString(); inv._budgets = { gateDir: resolve(gateDir), tables: Object.values(tables).map((t) => t.file), widths, noise: noiseFloor(siteJson) };
   writeFileSync(file, JSON.stringify(inv, null, 1));
   table(blocks.map((b) => { const now = { 360: b.budget?.[360] ?? null, base: b.budget?.base ?? null, probe: b.budget?.probe ?? null }; const secs = b.budget?._sections ? Object.entries(b.budget._sections).map(([k, l]) => `${k}: ${l.map((x) => `#${x.index} ${x.pct}`).join(', ')}`).join('; ') : ''; return [label(b), b.budget?._source || '—', now[360] ?? '—', now.base ?? '—', now.probe ?? '—', before[label(b)] === JSON.stringify(now) ? '' : `was ${before[label(b)].replace(/"/g, '').replace(/[{}]/g, '')}`, secs.slice(0, 70)]; }), ['block', 'source', '360', 'base', 'probe', 'change', 'sections (index pct)']);
-  console.log(`\n${touched.length} of ${blocks.length} rows from ${Object.values(tables).map((t) => basename(t.file)).join(', ')} in ${resolve(gateDir)}${noiseFloor(siteJson) ? ` (+ noise floor ${noiseFloor(siteJson)})` : ''}${unknown.length ? `; named there but not in the inventory: ${unknown.join(', ')}` : ''} → ${file}`);
+  console.log(`\n${touched.length} of ${blocks.length} rows from ${Object.values(tables).map((t) => basename(t.file)).join(', ')} in ${resolve(gateDir)}${noiseFloor(siteJson) ? ` (+ noise floor ${noiseFloor(siteJson)})` : ''} — ${all ? 'every row (--all)' : only ? `--only ${[...only].join(', ')}` : 'the rows without a sections budget (the page\'s new blocks; --only <label,…> or --all for the rest)'}${unknown.length ? `; named there but not in the inventory: ${unknown.join(', ')}` : ''}${skipped.length ? `\nskipped ${skipped.length} sample(s): ${skipped.join('; ')}` : ''} → ${file}`);
   process.exit(0);
 }
 

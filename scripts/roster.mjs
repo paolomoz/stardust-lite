@@ -104,7 +104,7 @@ if (!inventory) console.error(`roster: ${blocksFile} not found — matching agai
 const width = Number(arg('--width', 1440)); const concurrency = Math.max(1, Math.min(3, Number(arg('--concurrency', 2))));
 const limit = arg('--limit', null) ? Number(arg('--limit')) : null; const slowMs = Number(arg('--slow', 90)) * 1000;
 const include = arg('--include', null) ? new RegExp(arg('--include')) : null; const exclude = arg('--exclude', null) ? new RegExp(arg('--exclude')) : null;
-const mainSel = arg('--main', null); const overlays = overlayOpts(); const md = arg('--md', null); // mainSel null = the content root is found per page (see the header)
+const mainSel = typeof arg('--main', null) === 'string' ? arg('--main') : (profile?.cap?.contentRoot && profile.cap.contentRoot !== 'main' ? profile.cap.contentRoot : null); const overlays = overlayOpts(); const md = arg('--md', null); // mainSel null = the content root is found per page (see the header); the profile's cap.contentRoot when it has one (BACKLOG 139)
 const headerSel = profile?.chrome?.header?.selector || 'header'; const footerSel = profile?.chrome?.footer?.selector || 'footer';
 const FILE_RE = /\.(pdf|jpe?g|png|gif|svg|webp|avif|mp4|webm|mp3|m4a|zip|gz|docx?|xlsx?|pptx?|csv|xml|json|ics|txt|rss|atom)$/i;
 const hostKey = (h) => String(h || '').toLowerCase().replace(/^www\./, '');
@@ -138,14 +138,19 @@ const normalize = (href, base = origin) => {
 };
 const keyOf = (u) => new URL(u).pathname.replace(/\/+$/, '') || '/';
 const seen = new Set(); const queue = [];
-const enqueue = (href, base) => { const u = normalize(href, base); if (!u) return false; const k = keyOf(u); if (seen.has(k)) return false; const cap = mode === 'crawl' ? Math.min(Number(arg('--crawl')), limit || Infinity) : (limit || Infinity); if (queue.length >= cap) return false; seen.add(k); queue.push(u); return true; };
-for (const h of rawList) enqueue(h);
+// the seed survives the include / exclude filters: `--include '/ch/en/.'` rejected the origin itself and no URL was left (sdt-dentsu)
+const enqueue = (href, base, seed = false) => { const u = seed ? normalize(href, base) || (() => { try { const x = new URL(href, base); x.hash = ''; x.search = ''; return x.href; } catch { return null; } })() : normalize(href, base); if (!u) return false; const k = keyOf(u); if (seen.has(k)) return false; const cap = mode === 'crawl' ? Math.min(Number(arg('--crawl')), limit || Infinity) : (limit || Infinity); if (queue.length >= cap) return false; seen.add(k); queue.push(u); return true; };
+for (const h of rawList) enqueue(h, origin, mode === 'crawl' || h === origin);
 if (!queue.length) { console.error('roster: no URL survives the origin / include / exclude filters'); process.exit(1); }
 console.error(`roster: ${mode} — ${queue.length} page(s) queued${mode === 'crawl' ? ' to start' : ''} from ${inputNote}; origin ${origin}; width ${width}; ${concurrency} worker(s); inventory ${blocks.length} row(s)`);
 
 /* ---------------------------------------------------------------- the light pass ------------------------------------------------- */
 const approvedSlugs = new Map((profile?.pages || []).map((p) => [slugOf(`${origin}${String(p.path || '').replace(/^\/drafts\//, '')}`), p.template || slugOf(p.path || '')]));
-const isApproved = (u) => { const slug = slugOf(u); return approvedSlugs.has(slug) && (slug !== 'home' || pathOf(u).split('/').filter(Boolean).length === 0); }; // `/x/home/` is not the approved home
+// the approved home is the ORIGIN (`/ch/en` on a locale edition, not `/`): `pages[].path` is the DA path (`/drafts/home`), so a page whose
+// URL is the origin is approved when the profile has a home / index template; `pages[].url` wins when the profile carries it
+const approvedUrls = new Set((profile?.pages || []).map((p) => p.url).filter(Boolean).map(keyOf));
+const homeApproved = (profile?.pages || []).some((p) => /^(home|index)$/.test(p.template || slugOf(p.path || '')));
+const isApproved = (u) => { if (approvedUrls.has(keyOf(u))) return true; if (homeApproved && keyOf(u) === keyOf(origin)) return true; const slug = slugOf(u); return approvedSlugs.has(slug) && (slug !== 'home' || pathOf(u).split('/').filter(Boolean).length === 0); }; // `/x/home/` is not the approved home
 const keyFor = (m) => (m.kind === 'inventory' ? `${m.block}${m.variant ? `.${m.variant}` : ''}` : m.kind === 'collection' ? `${m.block}?` : m.kind === 'default' ? 'default' : 'new');
 const normPattern = (p) => String(p || '').replace(/×\d+/g, '×n');
 const stripChrome = (nodes, depth = 0) => nodes.filter((n) => !(/^(header|footer|nav)$/.test(String(n.tag || '')) || /\b(header|footer|masthead|colophon)\b/i.test(`${n.cls || ''} ${n.id || ''}`))).map((n) => (depth < 2 && n.children ? { ...n, children: stripChrome(n.children, depth + 1) } : n));

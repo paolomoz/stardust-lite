@@ -15,8 +15,12 @@ const files = process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') &&
 if (!files.length) { console.error('usage: media-fetch.mjs <content.json…> --out media [--base <origin>] [--extra <url,…>] [--extra-file <list>]'); process.exit(1); }
 const out = arg('--out', 'media'); let base = arg('--base', null);
 const urls = [];
-const walk = (n) => { if (!n || typeof n !== 'object') return; if (Array.isArray(n)) return n.forEach(walk); if (n.src && !String(n.src).startsWith('data:')) urls.push(n.src); if (n.bgi) { const m = /url\("?([^")]+)"?\)/.exec(n.bgi); if (m && !m[1].startsWith('data:')) urls.push(m[1]); } walk(n.children); };
+// an iframe's src is a document, not media (a Pardot form fetched as a 39 KB text/html "image" — sdt-dentsu beyond-the-funnel); a cut
+// background-image URL (`bgi` is 160 chars) is read from `bgiUrl` when the collector kept it, else skipped with a note
+const cut = [];
+const walk = (n) => { if (!n || typeof n !== 'object') return; if (Array.isArray(n)) return n.forEach(walk); if (n.src && !String(n.src).startsWith('data:') && !/^(iframe|embed|object)$/.test(String(n.tag || ''))) urls.push(n.src); if (n.bgiUrl) urls.push(n.bgiUrl); else if (n.bgi) { const m = /url\(("|')?([^"')]+)\1\)/.exec(n.bgi); if (m && !m[2].startsWith('data:')) urls.push(m[2]); else if (/url\(/.test(n.bgi) && !/\)/.test(n.bgi.slice(n.bgi.indexOf('url(')))) cut.push(n.bgi.slice(0, 100)); } walk(n.children); };
 for (const f of files) { const d = JSON.parse(readFileSync(f, 'utf8')); Object.entries(d).forEach(([k, v]) => { if (!k.startsWith('__')) walk(v); }); }
+if (cut.length) console.error(`media-fetch: ${cut.length} background-image URL(s) cut in the dump (older collector, 160 chars) — re-dump with the current collector or pass them with --extra:\n  ${cut.join('\n  ')}`);
 if (arg('--extra', null)) urls.push(...String(arg('--extra')).split(',').map((s) => s.trim()).filter(Boolean));
 if (arg('--extra-file', null)) urls.push(...readFileSync(arg('--extra-file'), 'utf8').split('\n').map((s) => s.trim()).filter(Boolean));
 if (!base) { const abs = urls.find((u) => /^https?:/.test(u)); if (abs) base = new URL(abs).origin; }
@@ -37,7 +41,9 @@ for (const u of [...new Set(urls)]) {
   if (manifest[full] && existsSync(join(out, manifest[full]))) continue;
   let name = nameOf(full); const r = await fetch(full).catch(() => null);
   if (!r || !r.ok) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${full}`); failed += 1; continue; }
-  const buf = Buffer.from(await r.arrayBuffer()); const type = (r.headers.get('content-type') || '').split(';')[0].trim(); const ext = EXT[type];
+  const type = (r.headers.get('content-type') || '').split(';')[0].trim(); const ext = EXT[type];
+  if (/^text\/|^application\/(json|javascript|xml|xhtml\+xml)$/.test(type)) { console.error(`media-fetch: skip ${full.slice(-80)} — ${type} is a document, not media`); continue; }
+  const buf = Buffer.from(await r.arrayBuffer());
   if (ext && extname(name) !== ext && !(ext === '.jpg' && extname(name) === '.jpeg')) name = `${name.replace(/\.[a-z0-9]+$/, '')}${ext}`; // the actual bytes name the extension
   const stem = name.replace(/\.[a-z0-9]+$/, ''); const e = extname(name); let k = 1; while (taken.has(name)) { name = `${stem}-${k}${e}`; k += 1; }
   writeFileSync(join(out, name), buf); taken.add(name); manifest[full] = name; n += 1;

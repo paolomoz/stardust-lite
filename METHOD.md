@@ -126,7 +126,10 @@ order; blocks hold only what default content cannot.
    the runtime adds one — `loadFragment` runs `decorateMain`, so a fragment section's default content sits in `.default-content-wrapper` and a header /
    footer decorate that reads `:scope > p` of the section finds nothing (the footer lost two sections). The three: a block cell holding one paragraph
    loses its `<p>`; a list item that also holds a nested list keeps its own text in `<p>` — the fold applies both, and a decorate that reads an item's
-   own text reads its `p` child; a picture in a link in a list item is split into its own `<p><a><picture>` (author an icon token instead). The harness
+   own text reads its `p` child; a picture in a link in a list item is split into its own `<p><a><picture>` (author an icon token instead). Three
+   normalisations show on the served page only: `<p><a><strong>` becomes a bold link (a button to the boilerplate's `decorateButtons`), a trailing
+   `&nbsp;` is trimmed while an inner one stays, and an empty paragraph (`<p>&nbsp;</p>`, `<p><br></p>`) is dropped — `author` reports the source's
+   spacers with their height instead of writing them (a zero-width spacer is the anti-pattern below). The harness
    also requests every remote media URL once (the branch host renders a rendition on first request). **The gated prototype is the runtime page the
    harness serves**, not the serialised file: JS-driven state (fixed colour layers, header morph, autoplay, parallax) is part of the pixels; the
    serialised file is the review artifact and the vocabulary-gate input. Serve the dir with `scripts/serve.mjs` (concurrent: parallel sessions on a
@@ -167,7 +170,7 @@ order; blocks hold only what default content cannot.
    wrapper, header and footer included) — never by eye. Known served-only difference: the pipeline leaves the metadata block behind as an **empty
    section** the harness fold drops, so a section-rhythm rule (`.section + .section`) adds a gap only on the served page — exclude empty sections (`main
    > .section:not(:has(> *))`). The template run ends by writing the site profile — `site-profile init migration/cases/<template> --out migration/site.json`
-   (overlays, cap model, fonts and body row, tokens, chrome selectors, heights and states per width, fragment paths, DA coordinates, serve port, noise
+   (overlays, cap model and content root, fonts and body row, tokens, chrome selectors, heights and states per width, fragment paths, DA coordinates, serve port, noise
    floor, this page's numbers; `site-profile print` renders it for the README) and the block inventory (`block-inventory scan --cases`, its budgets from
    the served per-section table) — the state every later page run reads instead of re-discovering it; a page after the template follows `ROLLOUT.md`. A
    rollout runs the list `roster pick` wrote: `harness --pages` on one serve, `gate --pages` per page with one origin cache each and one summary table,
@@ -175,7 +178,8 @@ order; blocks hold only what default content cannot.
 
 8. **Approval = block approval.** Prototype, blocks, authored document, triage table, deviations and motion registers are one artifact. The prototype
    number is the page's budget for rollout only until the served per-section table is read: the inventory then carries each block's budget per width
-   (`block-inventory scan` / `budgets`), and a rollout page is gated section by section against those.
+   (`block-inventory scan` / `budgets`) — the max over every section sample approved so far, a shifted row being no sample — and a rollout page is
+   gated section by section against those; its over-budget row on a reused block is a deviation, never a new budget.
 
 ## Instruments (`scripts/`, each prints its usage without arguments; capture, compare and lint tools vendored unmodified under `tools/` — see NOTICE)
 

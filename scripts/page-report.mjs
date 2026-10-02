@@ -10,6 +10,9 @@
 //   `gate --pages` layout). url / template / novelty come from pages.json (--pages, else migration/pages.json or pages.json) or the
 //   gate's `live`; the flags win. newBlocks defaults to the blocks of the sections the base-width gate read as `new`.
 //   A repeated flag (--deviation, --blocked, --note) appends; the row's arrays are replaced by what the call passes, kept when it passes none.
+//   The clock comes from the instruments' stamps when the flags are absent: `minutesFromStamps` = measure/summary.json `_writtenAt`
+//   (the page's first instrument) → gate-served/gate.json `_writtenAt` (its last), always recorded; `--minutes` typed over it is kept as
+//   `minutes` and a drift above a quarter is printed (BACKLOG 160). `firstUrlMinutes` has no stamp yet (the first in-tolerance table).
 //   --render only re-renders the two markdown views from the JSON (no gate read).
 // Row shape (stardust-lite/site-report@1, pages[]): { slug, url, template, novelty, newBlocks[], proto { "360", base, probe }, served { … },
 //   dh, budget { proto, served }, over[] ({ W, index, block, pct, budget, dh, over }), roundsTable, roundsGate, minutes, firstUrlMinutes,
@@ -49,6 +52,12 @@ if (!process.argv.includes('--render')) {
   const newFromGate = () => { const f = sectionsFile(proto, gateDir) || sectionsFile(served, servedDir); const s = f ? readJson(f) : null; return [...new Set((s?.sections || []).filter((x) => x.status === 'new' && x.block).map((x) => (x.variant ? `${x.block} (${x.variant})` : x.block)))]; };
   const list = (v) => String(v ?? '').split(',').map((s) => s.trim()).filter(Boolean);
   const servedBase = served?.rows?.find((r) => r.W === baseW) || served?.rows?.[0] || null;
+  const measureDir = resolve(typeof arg('--measure', null) === 'string' ? arg('--measure') : join('migration', 'pages', slug, 'measure'));
+  const stamp = (f) => { const j = readJson(f); const t = j?._writtenAt ? Date.parse(j._writtenAt) : NaN; return Number.isFinite(t) ? t : null; };
+  const t0 = stamp(join(measureDir, 'summary.json')); const t1 = stamp(join(servedDir, 'gate.json')) ?? stamp(join(gateDir, 'gate.json'));
+  const minutesFromStamps = t0 !== null && t1 !== null && t1 > t0 ? Number(((t1 - t0) / 60000).toFixed(1)) : null;
+  const typedMinutes = num('--minutes');
+  if (typedMinutes !== null && minutesFromStamps !== null && Math.abs(typedMinutes - minutesFromStamps) > 0.25 * Math.max(typedMinutes, minutesFromStamps)) console.error(`page-report: --minutes ${typedMinutes} vs ${minutesFromStamps} from the stamps (measure/summary.json → gate-served/gate.json) — the typed clock drifts`);
   const protoBase = proto?.rows?.find((r) => r.W === baseW) || proto?.rows?.[0] || null;
   const prev = row || {};
   row = {
@@ -66,7 +75,8 @@ if (!process.argv.includes('--render')) {
     cap: { proto: proto?.cap?.verdict ?? prev.cap?.proto ?? null, served: served?.cap?.verdict ?? prev.cap?.served ?? null },
     roundsTable: num('--rounds-table') ?? prev.roundsTable ?? null,
     roundsGate: num('--rounds-gate') ?? prev.roundsGate ?? null,
-    minutes: num('--minutes') ?? prev.minutes ?? null,
+    minutes: typedMinutes ?? prev.minutes ?? minutesFromStamps ?? null,
+    minutesFromStamps: minutesFromStamps ?? prev.minutesFromStamps ?? null,
     firstUrlMinutes: num('--first-url-minutes') ?? prev.firstUrlMinutes ?? null,
     deviations: args('--deviation').length ? args('--deviation') : prev.deviations || [],
     blockedOrDegraded: args('--blocked').length ? args('--blocked') : prev.blockedOrDegraded || [],
@@ -100,7 +110,7 @@ template ${n(r.template)} · novelty ${n(r.novelty)} · new blocks: ${r.newBlock
 
 Over budget (served): ${r.over?.length ? r.over.map(overLine).join('; ') : 'none'}
 
-Rounds: ${n(r.roundsTable)} table + ${n(r.roundsGate)} gate · ${n(r.minutes)} min wall, first URL at ${n(r.firstUrlMinutes)} min
+Rounds: ${n(r.roundsTable)} table + ${n(r.roundsGate)} gate · ${n(r.minutes)} min wall${r.minutesFromStamps !== null && r.minutesFromStamps !== undefined && r.minutesFromStamps !== r.minutes ? ` (${r.minutesFromStamps} from the stamps)` : ''}, first URL at ${n(r.firstUrlMinutes)} min
 
 ## Deviations
 ${bullets(r.deviations, 'none')}

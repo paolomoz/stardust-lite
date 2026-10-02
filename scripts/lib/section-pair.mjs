@@ -15,7 +15,8 @@ function markRoot([mainSel, headerSel, footerSel]) {
   let el = mainSel ? q(mainSel) : null;
   if (!el) { el = q('main') || q('[role=main]'); while (el && el.parentElement && el.parentElement !== document.body && ![...el.parentElement.children].some((c) => c !== el && chrome(c))) el = el.parentElement; }
   let root = 'body'; if (el) { el.setAttribute('data-gate-root', ''); root = '[data-gate-root]'; }
-  return { root, header: R(q(headerSel || 'header')), footer: R(q(footerSel || 'footer')), doc: document.documentElement.scrollHeight };
+  const name = el ? `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}${[...el.classList].slice(0, 2).map((c) => `.${c}`).join('')}` : 'body (chrome stripped)';
+  return { root, rootName: name, rootResolved: !!(mainSel && q(mainSel)), header: R(q(headerSel || 'header')), footer: R(q(footerSel || 'footer')), doc: document.documentElement.scrollHeight };
 }
 /** Browser side: the content root as a CSS PATH (`body > div:nth-child(2) > main`), so a caller that must not touch the DOM (the
  * structure dump and the captured DOM of measure-page) can name the root roster's rule finds: `mainSel` when it resolves, else the
@@ -32,14 +33,18 @@ export function contentRootPath([mainSel]) {
 const stripChrome = (nodes, depth = 0) => nodes.filter((n) => !(/^(header|footer|nav)$/.test(String(n.tag || '')) || /\b(header|footer|masthead|colophon)\b/i.test(`${n.cls || ''} ${n.id || ''}`))).map((n) => (depth < 2 && n.children ? { ...n, children: stripChrome(n.children, depth + 1) } : n));
 const boxOf = (n) => { if (n.box && n.box[3] > 0) return n.box; let y0 = Infinity; let y1 = -Infinity; const walk = (x) => { if (x.box && x.box[3] > 0) { y0 = Math.min(y0, x.box[1]); y1 = Math.max(y1, x.box[1] + x.box[3]); } (x.children || []).forEach(walk); }; walk(n); return Number.isFinite(y0) ? [0, y0, 0, y1 - y0] : null; };
 
-/** The live page's sections (the triage's split) with their boxes and anchor texts. `page` is open and settled at the width. */
-export async function liveSections(page, { mainSel = null, headerSel = null, footerSel = null } = {}) {
+/** The live page's sections — the TRIAGE's split, when the triage is known: `mainSel` is the content root the triage's dump was keyed on
+ * (`triage._source.mainKey`: `main`, or the root's short selector such as `div.main-container`; the profile's `cap.contentRoot` next;
+ * the cap-probe main selector is the cap model's shell, not the content root — on a one-module site it left the hero before `main`
+ * unpaired on every page, sdt-dentsu rollout) and `sections` the triage's `--sections` node selectors, so the live rows are the rows
+ * `author` wrote one authored section each for. `page` is open and settled at the width. */
+export async function liveSections(page, { mainSel = null, headerSel = null, footerSel = null, sections = null } = {}) {
   const meta = await page.evaluate(markRoot, [mainSel, headerSel, footerSel]);
   const dumped = await page.evaluate(collectContent, [[meta.root], []]);
   let nodes = dumped[meta.root] || []; if (meta.root === 'body') nodes = stripChrome(nodes);
-  const split = splitSections({ main: nodes });
-  const sections = split.sections.map((n, index) => { const fp = fingerprint(n); return { index, anchorText: fp.anchorText || '', box: boxOf(n) }; });
-  return { sections, header: meta.header, footer: meta.footer, doc: meta.doc };
+  const split = splitSections({ main: nodes }, { sections: sections && sections.length ? sections : null });
+  const rows = split.sections.map((n, index) => { const fp = fingerprint(n); return { index, anchorText: fp.anchorText || '', box: boxOf(n) }; });
+  return { sections: rows, header: meta.header, footer: meta.footer, doc: meta.doc, root: { requested: mainSel, resolved: meta.rootResolved, name: meta.rootName }, split: sections && sections.length ? 'selectors' : 'automatic' };
 }
 
 /** Browser side: the build's authored sections (boxes, first text, block class) and, for every live anchor, the build section holding
@@ -72,13 +77,21 @@ function readBuild([secSel, live]) {
 /** Pair the live sections with the build's: returns the build sections (empty ones dropped), each with `build: { y0, y1, h, box }` and
  * `live: { y0, y1, h, box, indices }` — y0…y1 is the stride to the next section's top, `box` the element's own box; live null when no
  * live section located inside it — and the live sections that paired with no authored section. */
-export async function pairSections(buildPage, live, { secSel = 'main > .section' } = {}) {
+export async function pairSections(buildPage, live, { secSel = 'main > .section', byIndex = 'auto' } = {}) {
   const b = await buildPage.evaluate(readBuild, [secSel, live.sections.map((s) => ({ anchorText: s.anchorText, box: s.box }))]);
-  const partner = live.sections.map((s, i) => { const l = b.located[i]; if (typeof l.idx === 'number') return l.idx; if (l.idx === 'header' || l.idx === 'footer') return l.idx; return null; });
-  // a live section without a located anchor takes the build section its neighbours bracket (index order, sections.mjs's fallback)
-  partner.forEach((p, i) => { if (p !== null) return; const prev = [...partner.slice(0, i)].reverse().find((x) => typeof x === 'number'); const next = partner.slice(i + 1).find((x) => typeof x === 'number'); if (prev !== undefined && prev === next) partner[i] = prev; else if (prev === undefined && typeof next === 'number' && next === 0) partner[i] = 0; else if (next === undefined && typeof prev === 'number' && prev === b.sections.length - 1) partner[i] = prev; });
   // an authored section without a box (the empty section the pipeline leaves for the metadata block) is not a row
   const empty = b.sections.filter((s) => !s.box || s.box[3] <= 0); const kept = b.sections.filter((s) => s.box && s.box[3] > 0);
+  const located = live.sections.map((s, i) => { const l = b.located[i]; if (typeof l.idx === 'number') return l.idx; if (l.idx === 'header' || l.idx === 'footer') return l.idx; return null; });
+  // `author` writes one authored section per triage row: when the live split IS the triage's (same count as the authored sections), the
+  // k-th live section is the k-th authored one — pairing by anchor text instead folded a live section whose first text no build element
+  // starts with (a tile band of unit labels, a portrait before its title at 360) into its neighbour and read Δh 668 / 48 % on a 0 px page
+  // (sdt-dentsu home and the ten pages after it). The anchor pairing stays for a split the triage did not shape, and as the check.
+  const indexable = byIndex === true || (byIndex === 'auto' && live.sections.length > 0 && live.sections.length === kept.length);
+  const mode = indexable ? 'index' : 'anchor';
+  const partner = indexable ? live.sections.map((s, i) => kept[i].index) : located.slice();
+  const mismatches = indexable ? live.sections.map((s, i) => (typeof located[i] === 'number' && located[i] !== partner[i] ? { live: i, anchorText: s.anchorText, anchorIn: located[i], pairedTo: partner[i] } : null)).filter(Boolean) : [];
+  // a live section without a located anchor takes the build section its neighbours bracket (index order, sections.mjs's fallback)
+  if (!indexable) partner.forEach((p, i) => { if (p !== null) return; const prev = [...partner.slice(0, i)].reverse().find((x) => typeof x === 'number'); const next = partner.slice(i + 1).find((x) => typeof x === 'number'); if (prev !== undefined && prev === next) partner[i] = prev; else if (prev === undefined && typeof next === 'number' && next === 0) partner[i] = 0; else if (next === undefined && typeof prev === 'number' && prev === b.sections.length - 1) partner[i] = prev; });
   const sections = kept.map((s) => {
     const idx = partner.map((p, i) => (p === s.index ? i : -1)).filter((i) => i >= 0); const boxes = idx.map((i) => live.sections[i].box).filter(Boolean);
     const y0 = boxes.length ? Math.min(...boxes.map((x) => x[1])) : null; const y1 = boxes.length ? Math.max(...boxes.map((x) => x[1] + x[3])) : null;
@@ -91,9 +104,23 @@ export async function pairSections(buildPage, live, { secSel = 'main > .section'
     s.build.box = { y0: s.build.y0, y1: s.build.y1, h: s.build.h }; if (next && next.build.y0 > s.build.y0) { s.build.y1 = next.build.y0; s.build.h = s.build.y1 - s.build.y0; }
     if (s.live) { s.live.box = { y0: s.live.y0, y1: s.live.y1, h: s.live.h }; if (nextLive && nextLive.live.y0 > s.live.y0) { s.live.y1 = nextLive.live.y0; s.live.h = s.live.y1 - s.live.y0; } }
   });
+  // Δh is a HEIGHT only when the build/live offset it opens never closes: with the offset chain o₀ = 0, oᵢ = build.y1 − live.y1 of row i
+  // (Δhᵢ = oᵢ − oᵢ₋₁), a row whose top offset recurs at a later bottom, or whose bottom offset occurred at an earlier top, is one gap the
+  // two pages attribute to different sections (a module margin on the live, section padding on the build: −40 / 0 / +40 with every row's
+  // pixels at the same y and Δ doc 0 — sdt-dentsu social-impact) — marked `boundary`, left out of the budget verdict
+  const offs = [0]; sections.forEach((s) => { offs.push(s.live ? s.build.y1 - s.live.y1 : offs[offs.length - 1]); });
+  const near = (a, b) => Math.abs(a - b) <= 2;
+  sections.forEach((s, i) => {
+    const dh = s.live ? s.build.h - s.live.h : null;
+    if (dh === null) { s.dhKind = null; return; }
+    if (Math.abs(dh) <= 2) { s.dhKind = 'ok'; return; }
+    const top = offs[i]; const bottom = offs[i + 1];
+    const closesLater = offs.slice(i + 2).some((o) => near(o, top)); const openedEarlier = offs.slice(0, i).some((o) => near(o, bottom));
+    s.dhKind = closesLater || openedEarlier ? 'boundary' : 'height';
+  });
   const unpaired = live.sections.filter((s, i) => partner[i] === null).map((s) => ({ index: s.index, anchorText: s.anchorText, box: s.box }));
   const chrome = live.sections.map((s, i) => ({ index: s.index, anchorText: s.anchorText, in: partner[i] })).filter((x) => typeof x.in === 'string');
-  return { sections, unpaired, chrome, empty: empty.map((s) => s.index), build: { header: b.header, footer: b.footer, doc: b.doc }, live: { header: live.header, footer: live.footer, doc: live.doc } };
+  return { sections, unpaired, chrome, empty: empty.map((s) => s.index), mode, mismatches, build: { header: b.header, footer: b.footer, doc: b.doc }, live: { header: live.header, footer: live.footer, doc: live.doc, root: live.root || null, split: live.split || null } };
 }
 
 /** The triage row (non-chrome, in order) for a live section: by anchor text first, by position among the non-chrome rows second. */
