@@ -69,6 +69,7 @@ const depth = Number(arg('--depth', 6));
 const sectionSels = arg('--sections', null) ? String(arg('--sections')).split(',').map((s) => s.trim()).filter(Boolean) : null;
 
 const split = splitSections(dump, { root: arg('--root', null), sections: sectionSels });
+if (split.extraRoots) console.error(`triage: ${split.extraRoots} unassigned band(s) outside main (measure-page's extra roots) are rows of their own — chrome or content, decide in the table (a breadcrumb bar never reached the document before — wellsfargo)`);
 if (split.marked) console.error(`triage: ${split.marked} sections split as measure-page's --sections marked them (the spec's and the gate's split)`);
 if (!split.sections.length) { console.error(`triage: no sections under "${split.mainKey}" (keys: ${Object.keys(dump).filter((k) => !k.startsWith('__')).join(', ')}) — pass --root or --sections`); process.exit(2); }
 const width = (() => { const m = basename(file).match(/-(\d+)\.json$/); if (m) return Number(m[1]); const r = dump[split.mainKey]?.[0]; return r?.box ? r.box[2] : null; })();

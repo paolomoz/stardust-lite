@@ -59,5 +59,15 @@ if (existsSync(stylesDir)) for (const f of readdirSync(stylesDir).filter((x) => 
     if (/#[a-z]/i.test(sel) && !/^:where/.test(sel)) F(file, r.line, `id in a foundation selector: "${sel}" — outranks every block rule; :where() it`);
   }
 }
+// same-file specificity inversions: an earlier rule with HIGHER specificity sets a property a later rule with lower specificity also sets on a
+// selector that can match the same element (a shared trailing compound) — the later one silently loses (two gate rounds, citizens footer)
+const specOf = (sel) => { const s = sel.replace(/:where\([^)]*\)/g, ''); return [(s.match(/#[\w-]+/g) || []).length, (s.match(/\.[\w-]+|\[[^\]]+\]|:(?!:)[\w-]+(\([^)]*\))?/g) || []).length, (s.match(/(^|[\s>+~])[a-z][\w-]*|::[\w-]+/gi) || []).length]; };
+const higher = (a, b) => a[0] !== b[0] ? a[0] > b[0] : a[1] !== b[1] ? a[1] > b[1] : a[2] > b[2];
+const tail = (sel) => sel.trim().split(/\s*[>+~\s]\s*/).pop();
+if (existsSync(blocksDir)) for (const name of readdirSync(blocksDir)) {
+  const file = join(blocksDir, name, `${name}.css`); if (!existsSync(file)) continue; const rules = parse(readFileSync(file, 'utf8'));
+  for (let i = 0; i < rules.length; i++) for (let j = i + 1; j < rules.length; j++) { if (rules[i].media !== rules[j].media) continue; for (const a of rules[i].sel.split(',')) for (const b of rules[j].sel.split(',')) { const ta = tail(a); const tb = tail(b); const overlap = ta === tb || (/^\.[\w-]+$/.test(tb) && new RegExp(`(^|[\\s>])${tb.replace('.', '\\.')}(\\b|$)`).test(a)) || (/^div$/.test(ta) && /^\.[\w-]+$/.test(tb)); if (!overlap) continue; const shared = rules[i].decls.filter(([p]) => rules[j].decls.some(([q]) => q === p || q.startsWith(p + '-') || p.startsWith(q + '-'))).map(([p]) => p); if (shared.length && higher(specOf(a), specOf(b))) F(file, rules[j].line, `specificity inversion: "${b.trim()}" (${specOf(b).join(',')}) loses ${shared.slice(0, 3).join(', ')} to "${a.trim()}" (${specOf(a).join(',')}) at line ${rules[i].line} — the later rule never applies; raise it or :where() the first`); } }
+  if (/^(header|footer)$/.test(name)) for (const r of rules) for (const sel of r.sel.split(',')) { const s = sel.trim(); if (new RegExp(`^${name}\\s+\\.${name}\\s*$`).test(s) && r.decls.some(([p]) => /^(display|padding|width|max-width|margin)/.test(p))) F(file, r.line, `"${s}" is the block element itself (.${name}.block): a layout here also hits the wrapper the runtime adds — target ${name === 'header' ? 'nav or .nav-wrapper' : '.footer > div'}`); }
+}
 if (findings.length) { console.log(findings.join('\n')); console.log(`css-lint: ${findings.length} finding(s) — each cost a gate round in a loop case; fix before the first harness`); process.exit(1); }
 console.log(`css-lint: clean (${existsSync(blocksDir) ? readdirSync(blocksDir).length : 0} blocks${spec ? `, spec ${measure}` : ', no spec: value checks skipped — pass --measure'})`);

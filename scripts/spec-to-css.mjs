@@ -144,6 +144,27 @@ rows.forEach((row, i) => {
     sectionsDraft.push(...textRules(items, base, sel).map((t) => t.css));
   }
 });
+// the chrome: header and footer drafts from the spec's HEADER / FOOTER rows — the structure is the foundation skeleton's (nav > .nav-brand /
+// .nav-sections / .nav-tools; .footer > .footer-N), the values the live chrome's; the fixed / sticky state from the measure summary's first look
+for (const [kind, re] of [['header', /^HEADER\b/], ['footer', /^FOOTER\b/]]) {
+  const secsK = S.secs.filter((s) => re.test(s.id)); if (!secsK.length) continue;
+  const lines = []; const root = kind === 'header' ? 'header .header' : 'footer .footer';
+  secsK.forEach((live, j) => {
+    const items = live.items.filter((it) => onPage(it, base)); const r = xr(items, base); const k = S.secs.indexOf(live); const m = twin(M, k); const p = twin(P, k);
+    const fixed = (summary.fixedLayers?.[String(base)] || []).find((f) => new RegExp(`^${kind}\\b`).test(f.split(' [')[0]));
+    lines.push(`/* ${kind}${secsK.length > 1 ? ` (${j + 1} of ${secsK.length})` : ''} — live "${live.id.slice(0, 40)}" h${live.box[3]} at ${base}${m ? `; ${mobile}: h${m.box[3]}` : ''}${p ? `; ${probe}: h${p.box[3]}` : ''}${fixed ? `; ${fixed.split(' ').pop()} layer at rest (${fixed.split(' [')[0]})` : '; in the flow at rest'}${summary.scrolled?.[String(base)]?.gone?.length ? '; hides on scroll' : ''}\n   DRAFT: values are the live chrome's; the structure is the foundation skeleton's (nav > .nav-brand / .nav-sections / .nav-tools, .footer > .footer-N) */`);
+    const bg = live.bg && live.bg !== 'rgba(0, 0, 0, 0)' ? live.bg : (items.find((it) => it.k === 'paint' && it.box[2] >= base - 2 && it.bg) || {}).bg;
+    lines.push(`${root} { height: ${px(live.box[3])};${bg ? ` background: ${rgb(bg)};` : ''}${live.inset ? ` padding: ${px(live.inset.first)} 0 ${px(live.inset.last)};` : ''} }  /* box h${live.box[3]}${r ? `, content x${r[0]}..${r[1]} (${r[1] - r[0]})` : ''}${live.inset ? `; inset ${live.inset.top.join(' → ')} / ${live.inset.bottom.join(' → ')}` : ''} */`);
+    if (r && pageCap && Math.abs((r[1] - r[0]) - pageCap) > 8) lines.push(`${root} > div, ${root} nav { max-width: ${px(r[1] - r[0])}; margin: 0 auto; }  /* the chrome's own cap */`);
+    const logos = items.filter((it) => ['img', 'svg'].includes(it.k) && it.box[2] >= 40 && it.box[3] >= 16 && it.box[2] <= 400); if (logos.length) lines.push(`${root} .nav-brand img, ${root} .footer-1 img { width: ${px(logos[0].box[2])}; height: ${px(logos[0].box[3])}; }  /* the first image ${logos[0].box[2]}×${logos[0].box[3]} at x${logos[0].box[0]} y${logos[0].box[1] - live.box[1]} (a logo) */`);
+    const links = items.filter((it) => isText(it) && it.t && (it.k === 'a' || (it.inline && it.href)) && onPage(it, base)); if (links.length) { const [key, n] = count(links.map((it) => `${it.fs}|${it.lh}|${it.fw}|${fam(it.ff)}|${it.c}|${it.tt}`))[0]; const [fs, lh, fw, ff, c, tt] = key.split('|'); const xs = links.filter((it) => it.box[1] === links[0].box[1]).map((it) => it.box).sort((a, b) => a[0] - b[0]); const gaps = xs.slice(1).map((b, i) => b[0] - (xs[i][0] + xs[i][2])).filter((g) => g > 0); lines.push(`${root} a { font: ${fw !== '400' ? `${fw} ` : ''}${fs}${lh !== 'normal' ? `/${lh}` : ''} '${ff}'; color: ${rgb(c)};${tt && tt !== 'none' ? ` text-transform: ${tt};` : ''} }  /* ${n} of ${links.length} links; the first row's gaps ${gaps.slice(0, 6).join('/') || '—'} px */`); }
+    lines.push(...textRules(items.filter((it) => !(it.k === 'a')), base, root).map((t) => t.css));
+    lines.push(...controls(items, base, root));
+    const bars = items.filter((it) => it.k === 'paint' && it.box[2] >= base - 2 && it.box[3] >= 20 && it.box[3] < live.box[3]).map((it) => `${it.tag}.${String(it.cls).split(' ')[0]} h${it.box[3]} at +${it.box[1] - live.box[1]}${it.bg ? ` bg ${rgb(it.bg)}` : ''}${it.border ? ` bd ${String(it.border).split(' | ')[0].slice(0, 24)}` : ''}`); if (bars.length) lines.push(`/* full-width bars inside: ${[...new Set(bars)].slice(0, 6).join(' | ')} */`);
+    if (m) { const mbg = m.bg && m.bg !== 'rgba(0, 0, 0, 0)' ? m.bg : null; lines.push(`@media (max-width: ${bp - 1}px) { ${root} { height: ${px(m.box[3])};${mbg && mbg !== bg ? ` background: ${rgb(mbg)};` : ''} }  /* ${mobile}: h${m.box[3]}${(summary.fixedLayers?.[String(mobile)] || []).some((f) => new RegExp(`^${kind}\\b`).test(f)) ? ', fixed / sticky' : ', in the flow'} */ }`); }
+  });
+  const file = join(outDir, kind, `${kind}.draft.css`); files.set(file, lines.map((l) => l).length ? [lines.join('\n')] : []);
+}
 // write
 for (const [file, parts] of files) { if (existsSync(file.replace('.draft.css', '.css')) && force) { /* --force: over the block's css */ } mkdirSync(dirname(file), { recursive: true }); const target = force ? file.replace('.draft.css', '.css') : file; writeFileSync(target, `${parts.join('\n\n')}\n`); console.log(`${target}: ${parts.length} section(s)`); }
 const scale = [...pageScale.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([k, n]) => `   ${k} ×${n}`).join('\n');
