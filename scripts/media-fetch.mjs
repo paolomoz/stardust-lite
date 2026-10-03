@@ -6,11 +6,24 @@
 // served Content-Type (`.jpg.thumb.585.1170.png` is a JPEG), names AEM `.transform/…/img.jpg` renditions after their asset, and writes
 // <out>/manifest.json (url → file) for the document generator. Written per case twice (stryker-home, usta2-home); this is the instrument.
 // Usage: node media-fetch.mjs <content.json…> --out media [--base https://www.site.com] [--extra <url,…>] [--extra-file <list>]
+//        node media-fetch.mjs <media-<W>.json> --fonts fonts   the font FILES: media-list's requested font URLs downloaded, and the @font-face
+//                                                             faces embedded as data: URIs written as files (`<family>-<weight>-<style>.woff2`;
+//                                                             a case font-dump.mjs did this — covermore, loop r6); then fonts.css declares them
 import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync } from 'node:fs';
 import { join, extname } from 'node:path';
 import { arg } from './common.mjs';
 
-const OPTS = ['--out', '--base', '--extra', '--extra-file'];
+const OPTS = ['--out', '--base', '--extra', '--extra-file', '--fonts'];
+if (typeof arg('--fonts', null) === 'string') {
+  const dir = arg('--fonts'); mkdirSync(dir, { recursive: true }); let n = 0;
+  const safe = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  for (const f of process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && OPTS.includes(all[i - 1])))) {
+    const m = JSON.parse(readFileSync(f, 'utf8'));
+    for (const d of m.dataFaces || []) { const mm = /^data:([^;,]+)(;base64)?,(.*)$/s.exec(d.data); if (!mm) continue; const ext = /woff2/.test(mm[1]) ? '.woff2' : /woff/.test(mm[1]) ? '.woff' : /ttf|truetype/.test(mm[1]) ? '.ttf' : /otf|opentype/.test(mm[1]) ? '.otf' : '.bin'; const name = `${safe(d.family)}-${safe(d.weight)}-${safe(d.style)}${ext}`; writeFileSync(join(dir, name), mm[2] ? Buffer.from(mm[3], 'base64') : Buffer.from(decodeURIComponent(mm[3]), 'latin1')); console.log(`data: ${d.family} ${d.weight} ${d.style} → ${name}`); n += 1; }
+    for (const u of m.fontRequests || []) { const r = await fetch(u).catch(() => null); if (!r || !r.ok) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${u}`); continue; } const name = safe(new URL(u).pathname.split('/').pop().replace(/\.[a-z0-9]+$/, '')) + (extname(new URL(u).pathname) || '.woff2'); writeFileSync(join(dir, name), Buffer.from(await r.arrayBuffer())); console.log(`${r.status} ${u.slice(-70)} → ${name}`); n += 1; }
+  }
+  console.log(`media-fetch: ${n} font file(s) in ${dir}/ — declare them in styles/fonts.css with the families the spec names`); process.exit(0);
+}
 const files = process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && OPTS.includes(all[i - 1])));
 if (!files.length) { console.error('usage: media-fetch.mjs <content.json…> --out media [--base <origin>] [--extra <url,…>] [--extra-file <list>]'); process.exit(1); }
 const out = arg('--out', 'media'); let base = arg('--base', null);
