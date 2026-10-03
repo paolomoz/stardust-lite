@@ -52,7 +52,8 @@ export const overlayOpts = () => {
   const o = siteDefaults()?.overlays || {};
   const pick = (name, key) => { const v = arg(name, null); return v === null ? (o[key] ?? null) : v; };
   const cookie = pick('--cookie', 'cookie') ?? process.env.STARDUST_COOKIE ?? null; if (cookie) process.env.STARDUST_COOKIE = String(cookie); // the children (gate → cap-probe …) read the env; the preload adds them to the vendored tools' contexts
-  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')), cookie: cookie ? String(cookie) : null };
+  const hide = list(pick('--hide', 'hide')); if (hide.length) process.env.STARDUST_HIDE = hide.join(','); else if (process.env.STARDUST_HIDE) hide.push(...process.env.STARDUST_HIDE.split(',')); // the children inherit it
+  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')), cookie: cookie ? String(cookie) : null, hide };
 };
 /** `--cookie 'name=value; name2=value2'` (or the profile's `overlays.cookie`, or STARDUST_COOKIE) as Playwright cookies for the page's host —
  * an attestation gate (HarbourVest: `HV.attestation`, `HV.country`, `HV.language`) forwarded every cookieless session to a persona page and
@@ -107,6 +108,9 @@ export async function openPage(browser, url, { width = 1440, height = 900, scale
   // fonts are a measurement precondition: the boilerplate loads fonts.css lazily and a table read before the swap measures fallback metrics
   // (sections / pair / deep-probe disagreed by 40–100 px between runs on one page — stryker-home)
   await page.evaluate(() => document.fonts.ready.then(() => document.fonts.status)).catch(() => {});
+  // --hide <css,…> (profile `overlays.hide`): a third-party fixed widget (an accessibility launcher, a chat bubble) is not the page — hidden on every
+  // live reading and capture, and registered (Userway was the whole 360 residue, 2.6 %, bny-leadership, loop r9)
+  const hide = overlayOpts().hide; if (hide.length) await page.addStyleTag({ content: hide.map((s) => `${s} { display: none !important; visibility: hidden !important; }`).join('\n') }).catch(() => {});
   if (page.url().split('#')[0] !== url.split('#')[0]) console.error(`openPage: URL changed ${url} → ${page.url()} (a redirect or a JS forward: an edition, a locale, an attestation page — measure the page you mean)`);
   if (require.length) { // composition gate: the session must be the one the cached origin shows (retry the run otherwise); a marker a fragment
     // loads by AJAX is WAITED for (10 s) before it counts as missing — a one-shot check exited 4 twice on the same fragment race (loop r5)

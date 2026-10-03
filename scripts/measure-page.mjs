@@ -135,7 +135,7 @@ async function measure(W) {
     const y0 = Math.round(first.getBoundingClientRect().top + scrollY); const at0 = pinned();
     window.scrollTo(0, vh); await new Promise((r) => setTimeout(r, 500)); const at1 = pinned(); const y1 = Math.round(first.getBoundingClientRect().top + scrollY);
     window.scrollTo(0, 0); await new Promise((r) => setTimeout(r, 400));
-    return { at0, at1, shift: y1 - y0, newlyPinned: at1.filter((x) => !at0.includes(x)) };
+    return { at0, at1, shift: y1 - y0, newlyPinned: at1.filter((x) => !at0.includes(x)), gone: at0.filter((x) => !at1.includes(x)) };
   }, [vh, root.path]).catch(() => null);
   if (sectionsGuess && sectionsGuess.n >= 2 && typeof arg('--sections', null) !== 'string') { // the default matched nothing: measure with the guess now, from this same page
     usedSections = sectionsGuess.sel; log(`--sections default matched nothing — measuring with the guess '${usedSections}' (${sectionsGuess.n} sections)`);
@@ -185,6 +185,7 @@ for (const r of rows) {
   if (r.first?.breakpoints?.length) notes.push(`${r.W}: breakpoints (media queries by count) ${r.first.breakpoints.slice(0, 6).join(', ')}`);
   if (r.nSections < 0) notes.push(`${r.W}: --sections "${sections}" is not a valid selector`);
   if (r.root.tag !== 'main' && typeof arg('--main', null) !== 'string') notes.push(`${r.W}: content root ${r.root.name} (${r.hasMain ? 'the largest ancestor of main that adds no chrome' : 'no <main>'}) — dump key "${r.contentMain}"`);
+  if (r.scrolled?.gone?.length) notes.push(`${r.W}: ${r.scrolled.gone.join(', ')} fixed at rest but GONE after one viewport of scroll — a header that hides on scroll (the live capture has it in the first chunk only; a build that keeps it paints it in every chunk — 5 min of crops, bny)`);
   if (r.scrolled && (r.scrolled.newlyPinned.length || Math.abs(r.scrolled.shift) >= 2)) notes.push(`${r.W}: after one viewport of scroll ${r.scrolled.newlyPinned.length ? `${r.scrolled.newlyPinned.join(', ')} pin${r.scrolled.newlyPinned.length > 1 ? '' : 's'} fixed / sticky` : 'no new fixed layer'}${Math.abs(r.scrolled.shift) >= 2 ? ` and the first content box moved ${r.scrolled.shift} px — a layer that leaves the flow when it pins: reproduce it or every chunk after the first is offset in the capture` : ''}`);
   if (r.first?.tallHeader) notes.push(`${r.W}: ${r.first.tallHeader}`);
   if (r.unassigned?.length) notes.push(`${r.W}: UNASSIGNED band(s) outside header / main / footer dumped as extra content roots — ${r.unassigned.join(', ')} (the first look names their boxes; triage them as chrome or content)`);

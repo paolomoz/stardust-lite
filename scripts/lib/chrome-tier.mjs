@@ -7,7 +7,10 @@ const launch = chromium.launch.bind(chromium);
 const parse = (cookie, url) => { let host; try { host = new URL(url).hostname; } catch { return []; } return String(cookie).split(/;\s*/).map((kv) => kv.trim()).filter(Boolean).map((kv) => { const i = kv.indexOf('='); return { name: kv.slice(0, i).trim(), value: kv.slice(i + 1).trim(), domain: host.replace(/^www\./, '.'), path: '/' }; }).filter((c) => c.name); };
 chromium.launch = async (opts = {}) => {
   const b = await launch({ ...(process.env.STARDUST_CHROME === '1' ? { channel: 'chrome' } : {}), ...opts });
-  const cookie = process.env.STARDUST_COOKIE; if (!cookie) return b;
+  const hide = process.env.STARDUST_HIDE; // the vendored tools' live pages get the --hide rule too (gate → cap-probe, motion-observe)
+  const hideOn = (p) => { if (!hide) return; p.on('load', () => p.addStyleTag({ content: hide.split(',').map((s) => `${s} { display: none !important; visibility: hidden !important; }`).join('\n') }).catch(() => {})); };
+  const cookie = process.env.STARDUST_COOKIE; if (!cookie && !hide) return b;
+  if (!cookie) { const nc0 = b.newContext.bind(b); b.newContext = async (...a) => { const c = await nc0(...a); const np0 = c.newPage.bind(c); c.newPage = async (...x) => { const p = await np0(...x); hideOn(p); return p; }; return c; }; const np1 = b.newPage.bind(b); b.newPage = async (...a) => { const p = await np1(...a); hideOn(p); return p; }; return b; }
   const armContext = (c) => { const goto = (p) => { const g = p.goto.bind(p); p.goto = async (url, o) => { await c.addCookies(parse(cookie, url)).catch(() => {}); return g(url, o); }; }; const np = c.newPage.bind(c); c.newPage = async (...a) => { const p = await np(...a); goto(p); return p; }; c.pages().forEach(goto); return c; };
   const nc = b.newContext.bind(b); b.newContext = async (...a) => armContext(await nc(...a));
   const np = b.newPage.bind(b); b.newPage = async (...a) => { const p = await np(...a); armContext(p.context()); const g = p.goto.bind(p); p.goto = async (url, o) => { await p.context().addCookies(parse(cookie, url)).catch(() => {}); return g(url, o); }; return p; };

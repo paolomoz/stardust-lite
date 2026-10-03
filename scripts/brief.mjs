@@ -38,6 +38,7 @@ const roles = new Map();
 for (const s of S.secs) for (const it of s.items) if (isText(it) && onPage(it, base) && it.t) { const f = fam(it.ff); if (!roles.has(f)) roles.set(f, new Map()); const r = roles.get(f); const key = `${it.k} ${it.fs}/${it.lh} ${it.fw}`; r.set(key, (r.get(key) || 0) + 1); }
 console.log(`fonts: ${[...roles.entries()].map(([f, r]) => `${f} — ${[...r.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k, n]) => `${k} ×${n}`).join(', ')}`).join(' | ')}`);
 console.log(`faces loaded: ${[...new Set(S.fonts || [])].slice(0, 12).join('; ')}`);
+{ const loaded = new Set((S.fonts || []).map((f) => f.split(' ')[0].toLowerCase())); const used = [...roles.keys()].filter((f) => f && !loaded.has(f.toLowerCase()) && ![...loaded].some((l) => f.toLowerCase().startsWith(l) || l.startsWith(f.toLowerCase()))); if (used.length) console.log(`FALLBACK families: ${used.join(', ')} — named by the CSS but no face loaded: the live renders the fallback (declare no face for it; a declared Roman wrapped two names at 360, bny)`); }
 const mediaFile = join(dir, `media-${base}.json`); // the font FILES (media-list's request log): what /fonts needs, by URL
 if (existsSync(mediaFile)) { try { const m = JSON.parse(readFileSync(mediaFile, 'utf8')); const files = m.fontRequests || []; if (files.length) console.log(`font files: ${files.slice(0, 10).map((u) => u.split('/').pop().split('?')[0]).join(', ')}${files.length > 10 ? ` (+${files.length - 10})` : ''} — full URLs in media-${base}.json fontRequests`); } catch { /* unreadable */ } }
 const textColours = count(S.secs.flatMap((s) => s.items.filter((it) => isText(it) && onPage(it, base) && it.t).map((it) => rgb(it.c))));
@@ -51,7 +52,8 @@ S.secs.forEach((s, i) => {
   const items = s.items.filter((it) => onPage(it, base));
   const texts = items.filter((it) => isText(it) && it.t);
   if (!all && (s.box[3] === 0 || (!texts.length && !items.some((it) => ['img', 'video', 'svg'].includes(it.k))))) { if (s.box[3] === 0) console.log(`#${i} ${s.id.slice(0, 40)} y${s.box[1]} h0 — spacing (margin ${s.mar})`); return; }
-  const tw = others.map((W) => { const t = twin(W, i); if (!t) return `${W}: —`; const r = xr(t.items, W); return `${W}: h${t.box[3]}${r ? ` x${r[0]}..${r[1]}` : ''}`; });
+  const paintW = (sec, W) => { const ps = sec.items.filter((it) => it.k === 'paint' && onPage(it, W) && it.box[2] < W - 2); return ps.length ? Math.max(...ps.map((it) => it.box[2])) : null; };
+  const tw = others.map((W) => { const t = twin(W, i); if (!t) return `${W}: —`; const r = xr(t.items, W); const pw = paintW(t, W); return `${W}: h${t.box[3]}${r ? ` x${r[0]}..${r[1]}` : ''}${pw ? ` paint ${pw}w` : ''}`; }); // `paint Nw` at the probe: the widest painted box under the viewport — a 1440 band at 2560 is a shell cap, not a module cap (2 rounds, bny)
   const r = xr(items, base);
   console.log(`#${i} ${s.id.slice(0, 48)}${label(s)} y${s.box[1]} h${s.box[3]} pad ${s.pad}${s.bg && s.bg !== 'rgba(0, 0, 0, 0)' ? ` bg ${rgb(s.bg)}` : ''}${s.bgi ? ` bgi ${s.bgs || ''}` : ''}${r ? ` | content x${r[0]}..${r[1]} (${r[1] - r[0]})` : ''} | ${tw.join(' | ')}`);
   const styles = count(texts.map((it) => `${it.k}${it.inline ? '·inl' : ''} ${it.fs}/${it.lh} ${it.fw} ${fam(it.ff)} ${rgb(it.c)}${it.tt && it.tt !== 'none' ? ` ${it.tt}` : ''}${it.ta && !['start', 'left'].includes(it.ta) ? ` ${it.ta}` : ''}${it.fst && it.fst !== 'normal' ? ` ${it.fst}` : ''}${it.td && it.td !== 'none' ? ` ${it.td}` : ''}`));
