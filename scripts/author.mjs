@@ -151,6 +151,11 @@ function leavesOf(root) {
     if (hasBg(n) && !kids.map(unwrap).some((c) => MEDIA(kindOf(c)))) out.push({ kind: 'picture', raw: 'picture', node: n, bg: true, top, parent });
     else if (bgCut(n) && !kids.map(unwrap).some((c) => MEDIA(kindOf(c)))) bgCutWarn(n);
     if (k === 'ul') { if (isControlList(n)) { out.push({ kind: 'control', raw: 'ul', node: n, top, parent }); return; } if (isTextList(n)) { out.push({ kind: 'list', raw: 'ul', node: n, top, parent }); return; } kids.forEach((c, i) => walk(c, n === start ? i : top, n, depth + 1)); return; }
+    if (k === 'a' && kids.map(unwrap).some((c) => { const ck = kindOf(c); return MEDIA(ck) || /^h[1-6]$/.test(ck) || ck === 'p' || ck === 'group'; }) && !n.text) {
+      // a card-wide link: the <a> wraps the heading, the picture and the paragraphs — its children are the leaves, the href one link leaf at the end
+      // (every card read as one flattened text, the picture in the wrong cell, a .gif card dropped — takeda, validation V3)
+      kids.forEach((c) => walk(c, top, n)); out.push({ kind: 'link', raw: 'a', node: { ...n, children: undefined, text: n.aria || n.title || (kids.map(unwrap).find((c) => /^h[1-6]$/.test(kindOf(c)))?.text) || 'Learn more' }, top, parent, wrapLink: true }); return;
+    }
     if (k === 'picture' || k === 'video' || k === 'embed' || k === 'icon' || k === 'a' || /^h[1-6]$/.test(k) || k === 'p' || k === 'blockquote' || k === 'hr' || CONTROL.has(k)) {
       if (k === 'picture' && hasBg(n) && !n.src) return; // already pushed as the bg leaf
       out.push({ kind: k === 'hr' ? 'hr' : CONTROL.has(k) ? 'control' : isIconImg(n) ? 'icon' : recipeKind(k), raw: k, node: n, top, parent });
