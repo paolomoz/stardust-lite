@@ -110,12 +110,12 @@ order; blocks hold only what default content cannot.
    width: a viewport-fraction column or a margin that collapses above its cap is right at 1440 and wrong at 2560. Mobile in the block's own media query; every
    positional property the mobile query sets (`top`, `transform`, `position`) is reset in the desktop one. A hover affordance is `text-decoration` or a transparent border present at rest, never a border added on hover (1 px per row entered
    the layout, cibc-careers). Default content a block splits (head before, closing
-   link after) is two `.default-content-wrapper`s: style the first for the head, the last for the link, never a `:first-child`. Resets go in `:where()`: an id
+   link after) is two `.default-content-wrapper`s: style the first for the head, the last for the link, never a `:first-child`. Resets go in `:where()` — the whole selector inside it, not a prefix (`:where(footer) .footer ul` still carries the class, two rounds, manulife): an id
    in a reset (`nav#nav button`) outranks every class rule the block writes, and a foundation shorthand with more compounds (`footer .footer > div > .section >
    div { padding }`) silently beats a block's longhand (`deep-probe` reads the loser's value); `[hidden] { display: none !important }` is one of them — the
    attribute loses to any `display` the class sets (a tabs section showed every panel). A decorate that classes fragment sections must not reuse a block
    variant's name. `decorateIcons(main)` runs before any block decorate: the `.icon` spans a block creates (arrows, hamburger, play) are decorated only by its
-   own `decorateIcons(block)`, called after the controls exist — and it makes an `<img>`, which never takes a hover colour: a control icon that follows
+   own `decorateIcons(block)`, called after the controls exist (the foundation's `decorateBlockIcons(block)` does it and inlines the SVGs) — and it makes an `<img>`, which never takes a hover colour: a control icon that follows
    `currentColor` on the source (arrows, chevrons, close, social, scroll-up are inline SVG there) needs a foundation `inlineIcons()` that swaps the `<img>` for
    the fetched `<svg>` (ibm-home and marriottvacationsworldwide-home wrote the same helper). A block that paints an authored image as a background reads the
    pipeline's large rendition (`<picture> > source[media]`), not `img.src`. cap-probe's *kind* names the CSS placement: a **shell** cap goes on `main`

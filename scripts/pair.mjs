@@ -40,7 +40,9 @@ const out = await page.evaluate((anchors) => {
   let prevBlock = null;
   return anchors.map((a) => {
     const lc = a.t.toLowerCase();
-    const cands = all.filter((e) => norm(e.textContent).toLowerCase().startsWith(lc) || norm([...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(' ')).toLowerCase().startsWith(lc));
+    let cands = all.filter((e) => norm(e.textContent).toLowerCase().startsWith(lc) || norm([...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(' ')).toLowerCase().startsWith(lc));
+    // a short control text ("Search", "Sign in") starts many longer texts: when some candidate's text IS the anchor, only those count (manulife: every table anchored them on another element)
+    if (lc.length <= 12) { const exact = cands.filter((e) => norm(e.textContent).toLowerCase() === lc || norm([...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(' ')).toLowerCase() === lc); if (exact.length) cands = exact; }
     // nearest the live y first (the same words recur in nav, cards and footer), shortest text second
     let e = cands.sort((x, y) => Math.abs(rect(x).top + scrollY - a.box[1]) - Math.abs(rect(y).top + scrollY - a.box[1]) || x.textContent.length - y.textContent.length)[0];
     if (!e) {
