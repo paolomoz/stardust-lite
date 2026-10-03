@@ -37,6 +37,7 @@ if (arg('--from-md', null)) {
   let changed = 0;
   for (let i = head + 2; i < lines.length && /^\|/.test(lines[i]); i++) {
     const c = cells(lines[i]); const row = json.sections.find((s) => String(s.index) === c[0]); if (!row) continue;
+    if (c.length !== cols.length) console.error(`triage: row ${c[0]} has ${c.length} cells, the header ${cols.length} — an unescaped \`|\` in a cell shifts the block / style columns (escape it as \\|)`);
     const style = iStyle >= 0 ? c[iStyle].replace(/`/g, '').trim() : ''; const newStyle = style && style !== '—' ? style : null;
     if ((row.sectionStyle || null) !== newStyle) { row.sectionStyle = newStyle; changed += 1; }
     if (iBlock >= 0 && !row.chrome) {

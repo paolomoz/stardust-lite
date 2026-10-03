@@ -58,7 +58,7 @@ export const collectMedia = () => {
   return { doc: document.documentElement.scrollHeight, imgs, videos, bgs, svgs, faces: [...new Set(faces)], loaded, bodyFont: getComputedStyle(document.body).fontFamily, lock: `${getComputedStyle(document.body).overflow}/${getComputedStyle(document.documentElement).overflow}` };
 };
 
-export const fontResponse = (r) => { const u = r.url(); return /\.(woff2?|ttf|otf)(\?|$)/i.test(u) || (r.headers()['content-type'] || '').includes('font') ? u : null; };
+export const fontResponse = (r) => { const u = r.url(); if (r.status() >= 400) return null; return /\.(woff2?|ttf|otf)(\?|$)/i.test(u) || (r.headers()['content-type'] || '').includes('font') ? u : null; }; // a 404 font file is not a file to fetch (brief listed one twice — natixis)
 
 export const deepProbe = ([sels, MAX, CHILDREN, PROPS, ANIM]) => {
   const R = (e) => { const r = e.getBoundingClientRect(); return `[${Math.round(r.x)},${Math.round(r.y + scrollY)},${Math.round(r.width)},${Math.round(r.height)}]`; };

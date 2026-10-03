@@ -121,6 +121,9 @@ async function measure(W) {
   const deep = await page.evaluate(new Function('args', `${DEEP_HELPERS}\n return (${String(deepProbe)})(args);`), [sels, DEEP_MAX, false, [], false]);
   write(`deep-${W}.txt`, deep + '\n');
   const nSections = await page.evaluate((s) => { try { return document.querySelectorAll(s).length; } catch { return -1; } }, sections);
+  // the default --sections matches nothing on a source page: guess it — the first node down from the content root (single-child chains
+  // descended) with ≥ 3 children taller than 100 px, as their common `tag.class` — the second run then takes `--sections <guess>` (natixis: an extra probe-structure)
+  const sectionsGuess = nSections === 0 ? await page.evaluate((rootPath) => { let n = document.querySelector(rootPath) || document.querySelector('main') || document.body; const tall = (el) => [...el.children].filter((c) => c.getBoundingClientRect().height > 100 && !/^(SCRIPT|STYLE)$/.test(c.tagName)); for (let d = 0; d < 8; d++) { const t = tall(n); if (t.length >= 3) { const cls = [...t[0].classList].find((c) => t.every((x) => x.classList.contains(c))); const sel = `${n.tagName.toLowerCase()}${n.id ? '#' + n.id : [...n.classList].slice(0, 1).map((c) => '.' + c).join('')} > ${t[0].tagName.toLowerCase()}${cls ? '.' + cls : ''}`; return { sel, n: document.querySelectorAll(sel).length, heights: t.map((x) => Math.round(x.getBoundingClientRect().height)) }; } if (t.length === 1) n = t[0]; else if (n.children.length === 1) n = n.children[0]; else return null; } return null; }, root.path).catch(() => null) : null;
   // the scrolled state: which layers are fixed / sticky after one viewport and how far the first content box moved — a mobile bar that pins on
   // scroll took 50 px out of the flow from chunk 2 on and no table at rest showed it (360 at 15 % for three rounds, cibc-careers, loop r2)
   const scrolled = await page.evaluate(async ([vh, rootPath]) => {
@@ -140,7 +143,7 @@ async function measure(W) {
   await ctx.close();
   const elapsed = Number(((Date.now() - t0) / 1000).toFixed(1));
   log(`done in ${elapsed} s`);
-  return { W, elapsed, status, files, root, contentMain, hasMain, cap, checkRows, first: results[W]?.first || null, doc: content.__doc, unassigned: extraRoots, scrolled, contentRoots: [header, ...extraRoots, contentMain, footer].map((r) => `${r}: ${(content[r] || []).length}`), hiddenRoots: hidden.map((r) => `${r}: ${(content[`hidden ${r}`] || []).length}`), media: { imgs: media.imgs.length, videos: media.videos.length, bgs: media.bgs.length, svgs: media.svgs.length, faces: media.faces.length, fontRequests: media.fontRequests.length }, spec: spec ? { secs: spec.secs.length, items: spec.secs.reduce((n, s) => n + s.items.length, 0), running: spec.running, entrance: spec.secs.reduce((n, s) => n + s.items.filter((it) => it.ent).length, 0) } : null, nSections, deepLines: deep.split('\n').length };
+  return { W, elapsed, status, files, root, contentMain, hasMain, cap, checkRows, first: results[W]?.first || null, doc: content.__doc, unassigned: extraRoots, scrolled, sectionsGuess, contentRoots: [header, ...extraRoots, contentMain, footer].map((r) => `${r}: ${(content[r] || []).length}`), hiddenRoots: hidden.map((r) => `${r}: ${(content[`hidden ${r}`] || []).length}`), media: { imgs: media.imgs.length, videos: media.videos.length, bgs: media.bgs.length, svgs: media.svgs.length, faces: media.faces.length, fontRequests: media.fontRequests.length }, spec: spec ? { secs: spec.secs.length, items: spec.secs.reduce((n, s) => n + s.items.length, 0), running: spec.running, entrance: spec.secs.reduce((n, s) => n + s.items.filter((it) => it.ent).length, 0) } : null, nSections, deepLines: deep.split('\n').length };
 }
 
 // up to `parallel` widths at once, in order
@@ -164,7 +167,7 @@ await browser.close();
 rows.sort((a, b) => a.W - b.W);
 for (const r of rows) {
   if (r.error) { notes.push(`${r.W}: ${r.error}`); continue; }
-  if (r.nSections === 0) notes.push(`${r.W}: --sections "${sections}" matches nothing — the spec has header/footer only; read structure-${r.W}.txt for the section selector`);
+  if (r.nSections === 0) notes.push(`${r.W}: --sections "${sections}" matches nothing — the spec has header/footer only; ${r.sectionsGuess ? `guess: --sections '${r.sectionsGuess.sel}' (${r.sectionsGuess.n} matches, heights ${r.sectionsGuess.heights.slice(0, 8).join('/')}) — run again with it` : `read structure-${r.W}.txt for the section selector`}`);
   if (r.nSections < 0) notes.push(`${r.W}: --sections "${sections}" is not a valid selector`);
   if (r.root.tag !== 'main' && typeof arg('--main', null) !== 'string') notes.push(`${r.W}: content root ${r.root.name} (${r.hasMain ? 'the largest ancestor of main that adds no chrome' : 'no <main>'}) — dump key "${r.contentMain}"`);
   if (r.scrolled && (r.scrolled.newlyPinned.length || Math.abs(r.scrolled.shift) >= 2)) notes.push(`${r.W}: after one viewport of scroll ${r.scrolled.newlyPinned.length ? `${r.scrolled.newlyPinned.join(', ')} pin${r.scrolled.newlyPinned.length > 1 ? '' : 's'} fixed / sticky` : 'no new fixed layer'}${Math.abs(r.scrolled.shift) >= 2 ? ` and the first content box moved ${r.scrolled.shift} px — a layer that leaves the flow when it pins: reproduce it or every chunk after the first is offset in the capture` : ''}`);

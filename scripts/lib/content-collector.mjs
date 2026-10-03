@@ -64,6 +64,7 @@ export function collectContent([roots, hidden, sectionSel = null]) {
       const lazy = e.dataset.src || e.dataset.lazySrc || e.dataset.original || (e.dataset.srcset || e.dataset.lazySrcset || '').split(',').pop().trim().split(/\s+/)[0] || (e.closest('picture')?.querySelector('source[data-srcset]')?.dataset.srcset || '').split(',').pop().trim().split(/\s+/)[0];
       if (lazy && (!n.src || /^data:/.test(n.src) || (e.naturalWidth <= 1 && e.naturalHeight <= 1) || !e.complete)) { try { n.src = new URL(lazy, location.href).href; n.lazy = true; } catch { /* keep */ } }
     }
+    if (e.getAttribute('aria-controls')) n.controls = e.getAttribute('aria-controls'); // the panel a control opens: author pairs hidden roots by it
     if (e.tagName === 'INPUT' || e.tagName === 'BUTTON') { n.type = e.type; if (e.placeholder) n.placeholder = e.placeholder; if (e.getAttribute('aria-label')) n.aria = e.getAttribute('aria-label'); }
     if (!/rgba\(0, 0, 0, 0\)/.test(s.backgroundColor)) n.bg = s.backgroundColor;
     if (s.backgroundImage !== 'none') { n.bgi = s.backgroundImage.slice(0, 160); if (s.backgroundImage.length > 160) { const u = /url\((["']?)(.*?)\1\)/.exec(s.backgroundImage); if (u && u[2] && !/^data:/.test(u[2])) n.bgiUrl = u[2]; } }

@@ -67,11 +67,13 @@ if (!arg('--no-lint', false)) {
 }
 
 const raw = readFileSync(src, 'utf8');
+// an unbalanced inline tag swallows everything after it (the metadata block parsed inside a <strong>: `closest('main > div')` null, natixis): count before folding
+for (const tag of ['strong', 'b', 'em', 'i', 'a', 'span']) { const o = (raw.match(new RegExp(`<${tag}\\b`, 'gi')) || []).length; const c = (raw.match(new RegExp(`</${tag}>`, 'gi')) || []).length; if (o !== c) console.log(`harness: <${tag}> opened ${o} times, closed ${c} — an unbalanced inline tag shifts every later node (the browser re-parents it); fix the document`); }
 const b0 = await launch(); const p0 = await b0.newPage();
 await p0.setContent(raw);
 const folded = await p0.evaluate(() => {
   const metas = [];
-  document.querySelectorAll('main .metadata').forEach((m) => { m.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (k && v) metas.push([k.textContent.trim().toLowerCase(), v.textContent.trim()]); }); m.closest('main > div').remove(); });
+  document.querySelectorAll('main .metadata').forEach((m) => { m.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (k && v) metas.push([k.textContent.trim().toLowerCase(), v.textContent.trim()]); }); const sec = m.closest('main > div'); if (sec && sec.children.length === 1) sec.remove(); else m.remove(); });
   document.querySelectorAll('main .section-metadata').forEach((sm) => { const section = sm.parentElement; sm.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (!k || !v) return; const key = k.textContent.trim().toLowerCase(); if (key === 'style') v.textContent.split(',').map((x) => x.trim().toLowerCase().replace(/[^0-9a-z]+/g, '-').replace(/^-|-$/g, '')).filter(Boolean).forEach((c) => section.classList.add(c)); else if (key === 'id') section.id = v.textContent.trim(); else section.dataset[key.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = (v.querySelector('a, img') ? (v.querySelector('a')?.href || v.querySelector('img')?.src) : v.textContent.trim()); }); sm.remove(); });
   // a section style is a class the way aem.js's toClassName writes it (`Brands Divider` → `brands-divider`); the raw token crashed the fold on a space (pass 5)
   document.querySelectorAll('main > div').forEach((d) => { if (!d.textContent.trim() && !d.querySelector('img,picture')) d.remove(); });

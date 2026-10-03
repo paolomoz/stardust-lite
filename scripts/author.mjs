@@ -99,7 +99,13 @@ function inline(n) {
   // a `strong` / `em` the collector read as the text node itself (its paragraph held nothing else) keeps its weight
   const ownTag = /^(strong|b)$/.test(n.tag || '') ? 'strong' : /^(em|i)$/.test(n.tag || '') ? 'em' : null;
   const wrapOwn = (t) => (ownTag && t && !new RegExp(`^<${ownTag}>`).test(t) ? `<${ownTag}>${t}</${ownTag}>` : t);
-  const src = n.markupFull || (n.markup && n.markup.length < 600 ? n.markup : null);
+  // the dump's `markup` may be shorter than its `text` (a cut: an unclosed <b> parsed the metadata block inside a <strong> and crashed the fold —
+  // natixis about-article, two gate rounds): a markup whose plain text is shorter than the text is dropped for the text, and open inline tags are closed
+  const plainOf = (h) => String(h).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+  const balanced = (h) => { const open = []; const out = String(h).replace(/<(\/?)(b|strong|em|i|a|span|sup|sub|u|small|mark)\b[^>]*>/gi, (m, close, tag) => { const t = tag.toLowerCase(); if (close) { const k = open.lastIndexOf(t); if (k < 0) return ''; open.splice(k, 1); return m; } open.push(t); return m; }); return out + open.reverse().map((t) => `</${t}>`).join(''); };
+  let src = n.markupFull || (n.markup && n.markup.length < 600 ? n.markup : null);
+  if (src && n.text && plainOf(src).length < String(n.text).replace(/\s+/g, ' ').trim().length - 2) { warn(`inline markup shorter than the text in the dump (cut) — plain text written for "${String(n.text).slice(0, 40)}…"`); src = null; }
+  if (src) src = balanced(src);
   if (!src) { if (n.markup && n.markup.length >= 600) warn(`inline markup cut at 600 chars in the dump (re-dump: the collector now keeps markupFull) — plain text written for "${String(n.text).slice(0, 40)}…"`); return wrapOwn(esc(n.text || '')); }
   let s = src.replace(/<!--[\s\S]*?-->/g, '').replace(/&nbsp;|\u00a0/g, '\u0004'); // the source's non-breaking spaces survive the whitespace collapse below
   s = s.replace(/<\/?([a-z][a-z0-9-]*)\b([^>]*)>/gi, (m, tag, attrs) => {
@@ -292,10 +298,10 @@ function authorSection(node, row) {
     else parts.push(...fixedSection(node, block, recipe, report));
     report.notes.unshift(...(recipe._notes || []).filter((n) => /default recipe/.test(n)));
     // the section style: the triage row, else the recipe's
-    const style = row.sectionStyle || recipe.sectionStyle || null;
+    const style = styleTokens(row.sectionStyle || recipe.sectionStyle || null, report);
     if (style) parts.push(`<div class="section-metadata"><div><div>style</div><div>${esc(style)}</div></div></div>`);
   }
-  if (!block && row.sectionStyle) parts.push(`<div class="section-metadata"><div><div>style</div><div>${esc(row.sectionStyle)}</div></div></div>`);
+  if (!block && row.sectionStyle) parts.push(`<div class="section-metadata"><div><div>style</div><div>${esc(styleTokens(row.sectionStyle, report))}</div></div></div>`);
   report.texts = stats.texts - t0;
   if (report.controls) report.notes.push(`${report.controls} control(s) dropped (buttons / inputs)`);
   return { html: `<div>\n${parts.filter(Boolean).join('\n')}\n</div>`, report };
@@ -309,21 +315,48 @@ function defaultContent(node, report, opts = {}) {
   for (const l of leaves) { if (l.kind === 'control' || l.kind === 'hr' || drop.has(l)) continue; if (l.kind === 'link' && isDead(l.node.href) && !l.node.text && !(l.node.children || []).some((c) => MEDIA(kindOf(unwrap(c))))) continue; const h = leafHtml(l, opts); if (h) out.push(h); }
   return out;
 }
+// aem.js splits the style value on commas and classes each token: a space-separated list became one class (`spacing-top-spacing-bottom`, 3 min, natixis)
+const styleTokens = (v, rep) => { if (!v) return v; if (!v.includes(',') && /\s/.test(v.trim()) && v.trim().split(/\s+/).every((t) => /^[a-z0-9-]+$/i.test(t))) { rep.notes.push(`section style "${v}" written comma-separated (aem.js splits on commas)`); return v.trim().split(/\s+/).join(', '); } return v; };
 /** A container block: walk the section; consecutive unit members form one block table, everything else is default content in place. */
 function containerSection(node, block, recipe, report) {
   const a = analyzeSection(node); const picked = pickUnit(a);
-  const unit = picked.unit; const unitSig = unit ? unit.sig.join('+') : null;
+  let unit = picked.unit; let unitSig = unit ? unit.sig.join('+') : null;
+  // a collection default on a unit without media drops the picture cell (facts: number | text — an empty image cell on every row, natixis)
+  if (recipe._collectionDefault && unit && !unit.sig.some((k) => k === 'media') && (recipe.cells || [])[0] && (Array.isArray(recipe.cells[0].from) ? recipe.cells[0].from : [recipe.cells[0].from]).includes('picture')) { recipe = { ...recipe, cells: [{ name: 'lead', from: ['heading', 'text', 'link'], take: 1 }, ...recipe.cells.slice(1)] }; report.notes.push('text-only unit: picture cell dropped (lead | body)'); }
+  // accordion / tabs: the controls (buttons, dead links) ARE the unit, one row each, the panel from the k-th hidden root (natixis: three
+  // accordions whose summaries the dump holds as buttons and whose panels sit in the --hidden dump read as 1 × 2 with 0 cells)
+  if (recipe.controlsAreUnits && !unit) {
+    const ctls = []; const rest = []; const collect = (n) => { const u = unwrap(n); const k = kindOf(u); if (k === 'button' || (k === 'a' && isDead(u.href) && u.text)) { ctls.push(u); return; } if (!(u.children || []).length) { rest.push(u); return; } if (u.text) rest.push({ ...u, children: undefined }); (u.children || []).forEach(collect); };
+    (node.children || []).forEach(collect);
+    if (ctls.length >= 2) {
+      report.notes.push(`${ctls.length} controls as rows (summary | hidden panel)`);
+      const out = rest.flatMap((n) => defaultContent(n, report)); // the section's own heading / lede stay default content before the block
+      const lines = [blockOpen(block.name, block.variant)]; let rows = 0;
+      for (const c of ctls) { const f = fillControlRow(c, recipe.cells || [], report); lines.push(rowHtml(f.cells)); rows += 1; }
+      lines.push('</div>'); out.push(lines.join('\n')); report.rowsCols = `${rows} × 2`; return out;
+    }
+  }
+  function fillControlRow(ctl, cells, rep) {
+    // the panel: the hidden root whose id is the control's aria-controls (or `<control id>-panel` / `-button` → `-panel`, the core-components convention), else the next in order
+    const want = ctl.controls || (ctl.id ? ctl.id.replace(/-button$/, '') + '-panel' : null); const findId = (n) => n && (n.id === want ? n : (n.children || []).map(findId).find(Boolean));
+    let root = want ? hiddenRoots.map(findId).find(Boolean) : null; if (root) { const k = hiddenRoots.findIndex((r) => findId(r)); if (k >= 0) { hiddenRoots.splice(k, 1); if (k < hiddenNext) hiddenNext -= 1; } } else { root = hiddenRoots[hiddenNext]; if (root) hiddenRoots.splice(hiddenNext, 1); }
+    if (!root) rep.notes.push('control row: no hidden root left for its panel (pass the --hidden dump with --content)'); const summary = esc(ctl.text || ctl.aria || ''); const panel = root ? cellHtml(leavesOf(root).filter((l) => !['control', 'hr'].includes(l.kind)), cells[1] || {}, '') : ''; rep.filled += (summary ? 1 : 0) + (panel ? 1 : 0); rep.cellsTotal += 2; if (!panel) rep.empty += 1; stats.texts += summary ? 1 : 0; return { cells: [`<p>${summary}</p>`, panel], filled: 0, unfitted: [], empty: [] }; }
   const rowNodes = new Set(); if (unit) for (const r of a.repeats) if (r.count >= 2 && r.sig.join('+') === unitSig) r.nodes.forEach((n) => rowNodes.add(n));
   // a lone node is a row when it is shaped like the unit: same pattern (a grid OF tiles has the tiles' kinds but a `[…]×N` pattern)
   const looksLikeUnit = (n) => { if (!unit || rowNodes.has(n)) return rowNodes.has(n); const k = kindOf(n); if (!['group', 'li', 'ul'].includes(k)) return false; const sub = analyzeSection(n); if (!sub.leaves.length || sub.repeats.some((r) => r.count >= 2 && r.unit.includes(' '))) return false; /* a composite repeat inside = a grid, not a row */ const sig = [...new Set(sub.leaves.map((l) => general(l.kind)))].sort().join('+'); return sub.pattern === unit.unit || (sig === unitSig && sub.leaves.length <= unit.leaves.length + 1); };
   const out = []; let dividerNext = false; let blocks = 0; let rows = 0; const cols = (recipe.cells || []).length;
+  let lastBlockAt = -1; // index in `out` of the last table: a unit continued in the next row wrapper joins it (6 × 2 in 2 tables → one, natixis)
   const emitBlock = (members) => {
     const variant = dividerNext ? dividerVariant(block.name, block.variant) || block.variant : block.variant; if (dividerNext && variant !== block.variant) report.notes.push(`<hr> before a unit → variant "${variant}"`); dividerNext = false;
-    const lines = [blockOpen(block.name, variant)];
-    if (recipe.headRow) { const head = fillCells(members[0], recipe.headRow, report); lines.push(rowHtml(head.cells)); }
+    const joining = lastBlockAt === out.length - 1 && out.length > 0 && !dividerNext;
+    const lines = joining ? [] : [blockOpen(block.name, variant)];
+    if (recipe.headRow && !joining) { const head = fillCells(members[0], recipe.headRow, report); lines.push(rowHtml(head.cells)); }
     for (const mNode of members) { const f = fillCells(mNode, recipe.cells || [], report); lines.push(rowHtml(f.cells)); rows += 1; report.filled += f.filled; report.cellsTotal += cols; report.unfitted += f.unfitted.length; report.empty += f.empty.length; if (f.unfitted.length) report.notes.push(`row ${rows}: ${f.unfitted.map((l) => `${l.kind}${l.fallbackCell ? `→cell ${l.fallbackCell}` : ''}`).join(' ')} did not fit the recipe`); }
-    lines.push('</div>'); out.push(lines.join('\n')); blocks += 1;
+    if (joining) { out[out.length - 1] = out[out.length - 1].replace(/<\/div>\s*$/, '') + '\n' + lines.join('\n') + '\n</div>'; report.notes.push('rows continued from the next row wrapper (one table)'); }
+    else { lines.push('</div>'); out.push(lines.join('\n')); blocks += 1; }
+    lastBlockAt = out.length - 1;
   };
+  
   const walk = (n) => {
     const kids = (n.children || []).map(unwrap);
     if (hasBg(n) && !kids.some((c) => MEDIA(kindOf(c)))) out.push(pictureHtml(n, '')); // the section root's own background is its picture too (a banner's bgi on the root — sdt-dentsu)
@@ -358,6 +391,15 @@ function fixedSection(node, block, recipe, report) {
   const out = head.map((l) => leafHtml(l)).filter(Boolean);
   const cells = recipe.cells || [{ name: 'body', from: ['rest'] }];
   const lines = [blockOpen(block.name, block.variant)];
+  if (recipe.cellsFromChildren) { // columns: one cell per top-level child of the content (≤ 4; more → one cell), the Block Collection's shape
+    // the columns are the children of the first node that branches (a wrapper chain above them gives every leaf `top` 0 — natixis: 4 columns × 3 logos)
+    const holds = (n, leaf) => n === leaf || (n.children || []).some((c) => holds(c, leaf));
+    let g = node; for (;;) { const kids = (g.children || []).map(unwrap).filter((c) => inner.some((l) => holds(c, l.node))); if (kids.length === 1) g = kids[0]; else break; }
+    const cols = (g.children || []).map(unwrap).filter((c) => inner.some((l) => holds(c, l.node)));
+    const tops = cols.map((c) => inner.filter((l) => holds(c, l.node)));
+    if (tops.length >= 2 && tops.length <= 4) { const cellsHtml = tops.map((ls) => cellHtml(ls, { from: ['rest'] }, '')); lines.push(rowHtml(cellsHtml)); report.filled += cellsHtml.filter(Boolean).length; report.cellsTotal += tops.length; report.rowsCols = `1 × ${tops.length}`; report.notes.push('columns: one cell per child'); lines.push('</div>'); out.push(lines.join('\n')); out.push(...tail.map((l) => leafHtml(l)).filter(Boolean)); return out; }
+    report.notes.push(`columns: ${tops.length} children — one cell (2–4 children make the columns)`);
+  }
   if (recipe.rows === 'leaf') { for (const l of inner) { const h = cellHtml([l], cells[0] || {}, ''); lines.push(rowHtml([h])); report.filled += h ? 1 : 0; report.cellsTotal += 1; } report.rowsCols = `${inner.length} × 1`; }
   else {
     // one row: bucket the leaves as a unit would be (the whole section is the unit)
