@@ -11,7 +11,7 @@ export const firstLook = () => {
   const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
   const sel = (el) => `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${[...el.classList].slice(0, 3).map((c) => '.' + c).join('')}`;
   const box = (el) => { const r = el.getBoundingClientRect(); return `[${Math.round(r.left)},${Math.round(r.top + scrollY)},${Math.round(r.width)},${Math.round(r.height)}]`; };
-  const fixed = [...document.querySelectorAll('body *')].filter((el) => { const cs = getComputedStyle(el); return (cs.position === 'fixed' || cs.position === 'sticky') && vis(el); }).slice(0, 30).map((el) => `${sel(el)} ${box(el)} z=${getComputedStyle(el).zIndex}`);
+  const fixed = [...document.querySelectorAll('body *')].filter((el) => { const cs = getComputedStyle(el); return (cs.position === 'fixed' || cs.position === 'sticky') && vis(el); }).slice(0, 30).map((el) => `${sel(el)} ${box(el)} z=${getComputedStyle(el).zIndex} ${getComputedStyle(el).position}`); // sticky vs fixed: a sticky bar scrolls until it pins (take2games)
   const consent = [...document.querySelectorAll('[id*=onetrust],[class*=onetrust],[id*=consent],[class*=consent],[id*=cookie],[class*=cookie],[class*=truste],[id*=truste],[id*=privacy],[class*=privacy],[role=dialog],[aria-modal=true]')].filter(vis).slice(0, 12).map((el) => `${sel(el)} ${box(el)}`);
   const kids = (root) => [...root.children].map((el) => `${sel(el)} ${box(el)}`);
   const main = document.querySelector('main');

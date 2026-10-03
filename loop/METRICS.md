@@ -11,3 +11,4 @@ t0 = first instrument run on the page (repo setup excluded, reported apart). `<1
 | 5 | harbourvest.com /it/en/about-harbourvest (attestation cookie gate) | 2.4 | 48 | 66 at 1440 / 2560 only (16.7 / 3.5 / 5.1); 360 never (trailing-nbsp wrap, −42 px) | 83 | 83 | 15.73 / 3.56 / 3.57 (served 15.55 / 3.53 / 3.55) | 2 / 8 | +4.9 % |
 | 6 | covermore.com /travel-assistance | 2.1 | 22 | 27 (3.65 / 1.95 / 1.07, round 2) | 27 | 32 | 3.65 / 1.95 / 1.07 (served identical) | 1 / 2 | +5.8 % |
 | 7 | manulife.com /ca/en/business (web components, --chrome) | 2.2 | 31 | 43 (9.06 / 1.33 / 0.74) | 58 | 62 | 2.01 / 0.67 / 0.37 (served 2.02 / 0.67 / 0.38) | 2 / 7 | +6.4 % |
+| 8 | take2games.com /ir/news/… (press release) | 1.8 | 17 | 29 (gate r3) | 33 | 45 | 1.11 / 1.76 / 1.14 (served 1.6 / 1.85 / 1.2) | 2 / 5 | +7.0 % |

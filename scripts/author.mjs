@@ -105,7 +105,7 @@ function inline(n) {
   const balanced = (h) => { const open = []; const out = String(h).replace(/<(\/?)(b|strong|em|i|a|span|sup|sub|u|small|mark)\b[^>]*>/gi, (m, close, tag) => { const t = tag.toLowerCase(); if (close) { const k = open.lastIndexOf(t); if (k < 0) return ''; open.splice(k, 1); return m; } open.push(t); return m; }); return out + open.reverse().map((t) => `</${t}>`).join(''); };
   let src = n.markupFull || (n.markup && n.markup.length < 600 ? n.markup : null);
   if (src && n.text && plainOf(src).length < String(n.text).replace(/\s+/g, ' ').trim().length - 2) { warn(`inline markup shorter than the text in the dump (cut) — plain text written for "${String(n.text).slice(0, 40)}…"`); src = null; }
-  if (src) src = balanced(src);
+  if (src) src = balanced(src.replace(/<\/?(?!(?:strong|b|em|i|a|br|sup|sub|u|span|small|mark)\b)[a-z][a-z0-9-]*\b[^>]*>/gi, '')); // unknown inline tags (<org>, <chron>) are text
   if (!src) { if (n.markup && n.markup.length >= 600) warn(`inline markup cut at 600 chars in the dump (re-dump: the collector now keeps markupFull) — plain text written for "${String(n.text).slice(0, 40)}…"`); return wrapOwn(esc(n.text || '')); }
   let s = src.replace(/<!--[\s\S]*?-->/g, '').replace(/&nbsp;|\u00a0/g, '\u0004'); // the source's non-breaking spaces survive the whitespace collapse below
   s = s.replace(/<\/?([a-z][a-z0-9-]*)\b([^>]*)>/gi, (m, tag, attrs) => {
@@ -312,7 +312,8 @@ function defaultContent(node, report, opts = {}) {
   const controls = leaves.filter((l) => l.kind === 'control').length; if (controls) report.controls += controls;
   // a run of icons with no text between them is a control strip (slider arrows), not content
   const drop = new Set(); for (let i = 0; i < leaves.length; i++) { if (leaves[i].kind !== 'icon') continue; let j = i; while (j < leaves.length && leaves[j].kind === 'icon') j++; if (j - i >= 2) { for (let k = i; k < j; k++) drop.add(leaves[k]); report.controls += j - i; } i = j; }
-  for (const l of leaves) { if (l.kind === 'control' || l.kind === 'hr' || drop.has(l)) continue; if (l.kind === 'link' && isDead(l.node.href) && !l.node.text && !(l.node.children || []).some((c) => MEDIA(kindOf(unwrap(c))))) continue; const h = leafHtml(l, opts); if (h) out.push(h); }
+  for (const l of leaves) { if (l.kind === 'control' && l.raw === 'button' && l.node.text && !/^(submit|reset)$/.test(l.node.type || '')) { stats.texts += 1; out.push(`<p>${esc(l.node.text)}</p>`); continue; } // a labelled button (a menu's item, an opener) is a text an author types; the lint's control rule is for forms (ir-nav lost 1 of 4 items — take2games)
+    if (l.kind === 'control' || l.kind === 'hr' || drop.has(l)) continue; if (l.kind === 'link' && isDead(l.node.href) && !l.node.text && !(l.node.children || []).some((c) => MEDIA(kindOf(unwrap(c))))) continue; const h = leafHtml(l, opts); if (h) out.push(h); }
   return out;
 }
 // aem.js splits the style value on commas and classes each token: a space-separated list became one class (`spacing-top-spacing-bottom`, 3 min, natixis)
