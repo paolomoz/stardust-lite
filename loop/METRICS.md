@@ -13,3 +13,4 @@ t0 = first instrument run on the page (repo setup excluded, reported apart). `<1
 | 7 | manulife.com /ca/en/business (web components, --chrome) | 2.2 | 31 | 43 (9.06 / 1.33 / 0.74) | 58 | 62 | 2.01 / 0.67 / 0.37 (served 2.02 / 0.67 / 0.38) | 2 / 7 | +6.4 % |
 | 8 | take2games.com /ir/news/… (press release) | 1.8 | 17 | 29 (gate r3) | 33 | 45 | 1.11 / 1.76 / 1.14 (served 1.6 / 1.85 / 1.2) | 2 / 5 | +7.0 % |
 | 9 | bny.com /corporate/global/en/about-us/leadership.html | 1.5 | 20 | 43 (r6: 9.93 / 0.62 / 0.35) | 52 | 56 | 2.62 / 0.19 / 0.10 (served 2.62 / 0.23 / 0.13) | 1 / 9 | +7.6 % |
+| 10 | usa.canon.com /support/about-consumer-support (WAF, --chrome) | 2 | 28 | 51 (r7: 7.88 / 3.52 / 2.78) | 65 | 84 (10 min a dead sync-poll) | 4.04 / 1.95 / 1.16 (served 4.15 / 1.99 / 1.18) | 1 / 11 | +8.1 % |

@@ -8,6 +8,9 @@
 // Usage: node media-fetch.mjs <content.json…> --out media [--base https://www.site.com] [--extra <url,…>] [--extra-file <list>]
 //        … --browser   fetch every URL by navigating a browser page to it (common.launch: --chrome tier, cookies) and reading the response body —
 //                      the only path a WAF lets through when curl, node fetch and an in-page fetch() all 403 (manulife, loop r7); slower, use on a 403
+//        … --from-page <url>   the third tier: open the PAGE (chrome tier, cookies, overlays), scroll it, and keep the bytes of every response
+//                              whose URL is one the dump names (media and fonts) — a WAF that refuses a navigation to the asset itself still serves
+//                              it to the page (canon, loop r10: `--browser` 0 files, a case asset-capture.mjs 23)
 //        node media-fetch.mjs <media-<W>.json> --fonts fonts   the font FILES: media-list's requested font URLs downloaded, and the @font-face
 //                                                             faces embedded as data: URIs written as files (`<family>-<weight>-<style>.woff2`;
 //                                                             a case font-dump.mjs did this — covermore, loop r6); then fonts.css declares them
@@ -15,14 +18,27 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync } from '
 import { join, extname } from 'node:path';
 import { arg, launch, contextOptions } from './common.mjs';
 let browserPage = null; // --browser: one context, one page, every URL a navigation
+const fromPage = new Map(); // --from-page: url → { status, type, buf } captured from the page's own responses
+async function captureFromPage(pageUrl, wanted) {
+  const { openPage, settle, overlayOpts } = await import('./common.mjs'); const b = await launch(); const ctx = await b.newContext(contextOptions({ width: 1440, height: 900, locale: overlayOpts().locale }));
+  const want = new Set(wanted.map((u) => u.split('#')[0])); const bare = (u) => u.split('#')[0].split('?')[0];
+  const wantBare = new Set([...want].map(bare));
+  const pending = [];
+  const page = await openPage(ctx, pageUrl, { width: 1440, height: 900, ...overlayOpts(), before: (p) => p.on('response', (r) => { const u = r.url(); if (!(want.has(u) || wantBare.has(bare(u)))) return; pending.push(r.body().then((buf) => { if (r.ok() && buf?.length) fromPage.set(want.has(u) ? u : [...want].find((w) => bare(w) === bare(u)) || u, { ok: true, status: r.status(), type: (r.headers()['content-type'] || '').split(';')[0].trim(), buf }); }).catch(() => {})); }) });
+  await settle(page); await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 600) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 120)); } window.scrollTo(0, 0); }); await page.waitForTimeout(1500);
+  await Promise.all(pending); await b.close();
+  console.log(`media-fetch: ${fromPage.size} of ${want.size} URL(s) captured from the page's own responses`);
+}
 const getBytes = async (url) => {
+  if (fromPage.has(url)) return fromPage.get(url);
+  if (typeof arg('--from-page', null) === 'string' && !process.argv.includes('--browser')) return { ok: false, status: 'not in the page\'s responses', type: '', buf: null };
   if (!process.argv.includes('--browser')) { const r = await fetch(url).catch(() => null); if (!r) return null; return { ok: r.ok, status: r.status, type: (r.headers.get('content-type') || '').split(';')[0].trim(), buf: r.ok ? Buffer.from(await r.arrayBuffer()) : null }; }
   if (!browserPage) { const b = await launch(); const ctx = await b.newContext(contextOptions({ width: 1280, height: 800 })); browserPage = await ctx.newPage(); process.on('exit', () => b.close().catch(() => {})); }
   const r = await browserPage.goto(url, { waitUntil: 'commit', timeout: 60000 }).catch(() => null); if (!r) return null;
   return { ok: r.ok(), status: r.status(), type: (r.headers()['content-type'] || '').split(';')[0].trim(), buf: r.ok() ? await r.body().catch(() => null) : null };
 };
 
-const OPTS = ['--out', '--base', '--extra', '--extra-file', '--fonts']; // --browser is a bare flag
+const OPTS = ['--out', '--base', '--extra', '--extra-file', '--fonts', '--from-page']; // --browser is a bare flag
 if (typeof arg('--fonts', null) === 'string') {
   const dir = arg('--fonts'); mkdirSync(dir, { recursive: true }); let n = 0;
   const safe = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -60,6 +76,7 @@ const nameOf = (u) => {
   return `${stem || 'media'}${m[2] || ''}`;
 };
 mkdirSync(out, { recursive: true });
+if (typeof arg('--from-page', null) === 'string') await captureFromPage(arg('--from-page'), [...new Set(urls)].map((u) => { try { return new URL(u, base || undefined).href.replace(/ /g, '%20'); } catch { return null; } }).filter(Boolean));
 const manifest = existsSync(join(out, 'manifest.json')) ? JSON.parse(readFileSync(join(out, 'manifest.json'), 'utf8')) : {};
 const taken = new Set(Object.values(manifest)); let n = 0; let failed = 0;
 for (const u of [...new Set(urls)]) {

@@ -106,7 +106,9 @@ async function measure(W) {
   const structure = await page.evaluate(collectStructure, { root: root.path, depth, pierce: false });
   write(`structure-${W}.txt`, structure);
   // the unassigned bands of the first look are content roots too (keys = their selector, before main in the file order)
-  const extraRoots = (results[W]?.first?.unassigned || []).map((s) => s.split(' [')[0]).filter((s) => /^[a-z][a-z0-9-]*(#[\w-]+)?(\.[\w-]+)*$/i.test(s));
+  // bands between the chrome and the CONTENT ROOT (a 40 px promo bar inside main's wrapper, above the root — in no table, canon): extra roots too
+  const rootBands = await page.evaluate(([rootPath, hdr, ftr]) => { const root = document.querySelector(rootPath); if (!root) return []; const chrome = [root, document.querySelector(hdr), document.querySelector(ftr)].filter(Boolean); const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height >= 8 && r.left + r.width > 0 && r.left < innerWidth && cs.visibility !== 'hidden' && cs.display !== 'none' && cs.position !== 'fixed'; }; const sel = (el) => `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${[...el.classList].slice(0, 3).map((c) => '.' + c).join('')}`; const c = [...document.querySelectorAll('body *')].filter((el) => !chrome.some((r) => r.contains(el) || el.contains(r)) && vis(el) && !/^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|IFRAME)$/.test(el.tagName) && !/onetrust|consent|cookie|modal|dialog/i.test(`${el.id} ${el.className}`) && [...el.querySelectorAll('*')].some((e) => [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()))); return c.filter((el) => !c.some((o) => o !== el && o.contains(el))).slice(0, 8).map(sel); }, [root.path, header, footer]).catch(() => []);
+  const extraRoots = [...new Set([...(results[W]?.first?.unassigned || []).map((s) => s.split(' [')[0]), ...rootBands])].filter((s) => /^[a-z][a-z0-9-]*(#[\w-]+)?(\.[\w-]+)*$/i.test(s));
   const pierce = process.argv.includes('--pierce') || (results[W]?.first?.shadowHosts || 0) > 0; // a web-components origin: the composed tree (loop r7)
   const content = await page.evaluate(collectContent, [[header, ...extraRoots, explicit || root.tag === 'main' ? contentMain : root.path, footer], hidden, sections, pierce]); // `sec` marks: the dump splits as the spec does
   if (!explicit && root.tag !== 'main' && root.path !== contentMain) { const o = {}; for (const [k, v] of Object.entries(content)) o[k === root.path ? contentMain : k] = v; Object.assign(content, o); for (const k of Object.keys(content)) if (!(k in o)) delete content[k]; }
@@ -135,7 +137,8 @@ async function measure(W) {
     const y0 = Math.round(first.getBoundingClientRect().top + scrollY); const at0 = pinned();
     window.scrollTo(0, vh); await new Promise((r) => setTimeout(r, 500)); const at1 = pinned(); const y1 = Math.round(first.getBoundingClientRect().top + scrollY);
     window.scrollTo(0, 0); await new Promise((r) => setTimeout(r, 400));
-    return { at0, at1, shift: y1 - y0, newlyPinned: at1.filter((x) => !at0.includes(x)), gone: at0.filter((x) => !at1.includes(x)) };
+    const key = (s) => s.replace(/ h\d+$/, ''); // a header that shrinks when it pins is the same layer (a compact 64 px state read as GONE — canon)
+    return { at0, at1, shift: y1 - y0, newlyPinned: at1.filter((x) => !at0.map(key).includes(key(x))), gone: at0.filter((x) => !at1.map(key).includes(key(x))) };
   }, [vh, root.path]).catch(() => null);
   if (sectionsGuess && sectionsGuess.n >= 2 && typeof arg('--sections', null) !== 'string') { // the default matched nothing: measure with the guess now, from this same page
     usedSections = sectionsGuess.sel; log(`--sections default matched nothing — measuring with the guess '${usedSections}' (${sectionsGuess.n} sections)`);
