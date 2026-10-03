@@ -38,14 +38,17 @@ order; blocks hold only what default content cannot.
 1. **Measure the source at three widths** (360, 1440, probe): `measure-page` is the single-session reading of this step's instruments — one load per width,
    then the first look, the structure dump, the content dump, the media list, the spec with its DOM and the deep-probe set from that same settled page; the
    single instruments are for targeted re-reads. `probe-load` at **every gated width** (status, overlays, fixed layers, shadow roots — a header
-   fixed at the base width may scroll at 360), `probe-structure` (the section selector for `live-spec --sections`), `content-dump` read through `content-view`
+   fixed at the base width may scroll at 360 — and the **unassigned bands**: painted boxes outside header / main / footer that no default root
+   dumps; a 49 px mega-menu bar after `header` held 255 texts, scotiabank-personal; `measure-page` dumps them as extra roots and `--noise`
+   writes the noise floor from the same run), `probe-structure` (the section selector for `live-spec --sections`), `content-dump` read through `content-view`
    (the authoring input: full texts in reading order with inline markup, links, media, boxes, and the font string with `text-transform` — the dump holds DOM
    text, the page may render it uppercase and no table shows the case), `media-list`, `live-spec`. The dump is the **authoring set, not the painted set**: a
    carousel's cards beyond the viewport come from their lazy attributes (`content-dump` marks them `lazy`), and a paragraph a text-reveal library split into one
    element per rendered line is one text (`lines`; `live-spec` merges the run, `pair` reads a stray line as ⤷). A carousel track's height is a rule, not a box:
    read which slide sets it at each width (Swiper's `autoHeight` counts the slides in view plus the next). Content a click reveals — a caption that exists only
-   for the active slide, a tab panel behind its tab, a drawer's sub-menu — is hidden *content*, not hidden DOM: `click-dump` (a click sequence, the panel's
-   texts after each) holds it, and `harness --content` takes its JSON as a second source. Every run is one session: on a page with session-variable composition
+   for the active slide, a tab panel behind its tab, a drawer's sub-menu — is hidden *content*, not hidden DOM: a panel in the DOM at rest (tabs, accordions) is
+   `content-dump --hidden <panel root>` (full markup, one run); a panel injected on click is `click-dump` (a click sequence, the panel's
+   texts after each), and `harness --content` takes either JSON as a second source. Every run is one session: on a page with session-variable composition
    each takes `--require`. Also measure the scrolled states: which fixed layers change, when, by what function (`scroll-probe --paint` for a bar whose paint
    lives in a child sheet or the glyph colour). A scroll-entrance library (AOS, "animate once") re-arms every element that leaves the viewport: a settled read
    at the top holds tiles and cards parked at their entrance translate and opacity while the capture shows them at rest — `live-spec` flags them (`ent`, `rest`;
@@ -130,12 +133,13 @@ order; blocks hold only what default content cannot.
    loses its `<p>`; a list item that also holds a nested list keeps its own text in `<p>` — the fold applies both, and a decorate that reads an item's
    own text reads its `p` child; a picture in a link in a list item is split into its own `<p><a><picture>` (author an icon token instead). Three
    normalisations show on the served page only: `<p><a><strong>` becomes a bold link (a button to the boilerplate's `decorateButtons`), a trailing
-   `&nbsp;` is trimmed while an inner one stays, and an empty paragraph (`<p>&nbsp;</p>`, `<p><br></p>`) is dropped — `author` reports the source's
-   spacers with their height instead of writing them (a zero-width spacer is the anti-pattern below). The harness
+   `&nbsp;` is trimmed while an inner one stays, and an empty paragraph (`<p>&nbsp;</p>`, `<p><br></p>`) or a paragraph's leading `<br>` is dropped — the fold applies these
+   too (24 px served-only, two rounds, scotiabank-personal); `author` reports the source's spacers with their height instead of writing
+   them (a zero-width spacer is the anti-pattern below). The harness
    also requests every remote media URL once (the branch host renders a rendition on first request). **The gated prototype is the runtime page the
    harness serves**, not the serialised file: JS-driven state (fixed colour layers, header morph, autoplay, parallax) is part of the pixels; the
-   serialised file is the review artifact and the vocabulary-gate input. Serve the dir with `scripts/serve.mjs` (concurrent: parallel sessions on a
-   single-threaded server measured half-styled pages).
+   serialised file is the review artifact and the vocabulary-gate input. The harness creates the serve dir and starts `scripts/serve.mjs` when the
+   port is silent (concurrent: parallel sessions on a single-threaded server measured half-styled pages).
 
 6. **Gate at all three widths** against the cached origin: pixel, Δh, cap-probe compare, clip, content-presence; motion-compare at the base width plus
    `click-state` for the panels the frame sampler is blind to and `hover-diff` for the hovers it reads as dead. Read the section-height table and the pairing

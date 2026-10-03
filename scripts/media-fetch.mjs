@@ -28,6 +28,10 @@ const EXT = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 
 const nameOf = (u) => {
   const path = decodeURIComponent(new URL(u).pathname); const parts = path.split('/').filter(Boolean); let name = (parts[parts.length - 1] || 'media').toLowerCase();
   if (/^img\.(jpe?g|png|webp)$/.test(name)) { const asset = parts.find((p) => /\.(jpe?g|png|webp|gif|svg)/i.test(p)); if (asset) name = asset.toLowerCase().split('.transform')[0]; } // AEM transform rendition: the asset's name
+  // an AEM DAM rendition (`<asset>.png/_jcr_content/renditions/cq5dam.web.1280.1280.png`): the asset's name with the rendition's width —
+  // `cq5dam-web-1280-1280.png` named four assets alike and collided by suffix (scotiabank-personal)
+  const jcr = parts.findIndex((p) => /^_?jcr[:_]content$/.test(p));
+  if (jcr > 0 && parts[jcr + 1] === 'renditions') { const asset = parts[jcr - 1].toLowerCase(); const size = (name.match(/\.(\d{2,4})\.\d{2,4}\./) || [])[1]; name = `${asset.replace(/\.[a-z0-9]+$/, '')}${size ? `-${size}` : ''}${extname(name) || extname(asset)}`; }
   // the branch host previews `musee_hp-2.jpg` and `a.b.jpg` 404 after a 201 upload (audemarspiguet-home), `kids--x.jpg` too (usta2-home):
   // the stem keeps a-z0-9 and single hyphens only, the extension stays
   const m = /^(.*?)(\.[a-z0-9]+)?$/.exec(name); const stem = (m[1] || 'media').replace(/[^a-z0-9]+/g, '-').replace(/-{2,}/g, '-').replace(/^-|-$/g, '');

@@ -21,6 +21,7 @@ console.log('status', r.status(), 'url', p.url()); await p.waitForTimeout(5000);
 const info = await p.evaluate(firstLook);
 console.log(JSON.stringify(info, null, 1));
 if (!info.fixed.length) console.log(`no fixed or sticky layer at ${W}`);
+if (info.unassigned?.length) console.log(`UNASSIGNED painted band(s) outside header / main / footer at ${W} — content no default root dumps; add them to --roots: ${info.unassigned.join(' ; ')}`);
 // the known controls (flags or the site profile): does each still resolve on this first look? (`site-profile check` does the same per width)
 for (const sel of [consent, ...dismiss].filter(Boolean)) { const n = await p.evaluate((s) => { try { return document.querySelectorAll(s).length; } catch { return -1; } }, sel); console.log(`overlay control ${sel}: ${n < 0 ? 'invalid selector' : n ? `${n} match${n > 1 ? 'es' : ''}` : 'ABSENT'}`); }
 if (arg('--shot', null)) await p.screenshot({ path: widths.length > 1 ? arg('--shot').replace(/(\.\w+)?$/, `-${W}$1`) : arg('--shot') });

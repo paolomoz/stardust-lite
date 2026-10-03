@@ -5,7 +5,8 @@
 //   npx stardust-lite <instrument> [args]  run scripts/<instrument>.mjs or tools/replica/<instrument>.mjs (lint → tools/lint)
 //   npx stardust-lite method               print the path of METHOD.md (the template run reads it first)
 //   npx stardust-lite rollout              print the path of ROLLOUT.md (a page after the template reads this instead)
-//   npx stardust-lite list                 list instruments
+//   npx stardust-lite list [--usage]       list instruments (--usage: every usage line in one call — 25 single prints cost 3 min, scotiabank-personal)
+//   npx stardust-lite init --foundation --force   overwrite the boilerplate's styles.css / fonts.css with the skeletons (a fresh boilerplate is not a measurement)
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, readdirSync, copyFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -23,7 +24,16 @@ if (!cmd || cmd === 'help' || cmd === '--help') {
 }
 if (cmd === 'method') { console.log(join(ROOT, 'METHOD.md')); process.exit(0); }
 if (cmd === 'rollout') { console.log(join(ROOT, 'ROLLOUT.md')); process.exit(0); }
-if (cmd === 'list') { console.log(list().join('\n')); process.exit(0); }
+if (cmd === 'list') {
+  if (!rest.includes('--usage')) { console.log(list().join('\n')); process.exit(0); }
+  for (const [k, d] of Object.entries(dirs)) for (const f of readdirSync(d).filter((x) => x.endsWith('.mjs') && !x.endsWith('.test.mjs') && !['common.mjs', 'run-capped.mjs'].includes(x))) {
+    const head = readFileSync(join(d, f), 'utf8').split('\n').slice(0, 80); let i = head.findIndex((l) => /^\/\/.*\busage:/i.test(l)); const out = [];
+    if (i < 0) i = head.findIndex((l) => /^\/\/ *(node |npx )/.test(l));
+    if (i >= 0) { out.push(head[i]); for (let j = i + 1; j < head.length && out.length < 4 && /^\/\/\s{6,}\S/.test(head[j]); j++) out.push(head[j]); }
+    console.log(`${f.replace(/\.mjs$/, '')} (${k})\n${out.length ? out.map((l) => '  ' + l.replace(/^\/\/ ?/, '').replace(/^\s*Usage:\s*/i, '')).join('\n') : '  (no usage line; run it without arguments)'}`);
+  }
+  process.exit(0);
+}
 if (cmd === 'init') {
   const cwd = process.cwd();
   const rel = existsSync(join(cwd, 'node_modules', 'stardust-lite', 'METHOD.md')) ? 'node_modules/stardust-lite' : ROOT;
@@ -43,11 +53,11 @@ if (cmd === 'init') {
     const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(dir, e.name)) : [join(dir, e.name)]));
     for (const f of walk(src)) {
       const relPath = relative(src, f); const dest = join(cwd, relPath === 'README.md' ? join('migration', 'foundation-README.md') : relPath);
-      if (existsSync(dest)) { skipped.push(relative(cwd, dest)); continue; }
+      if (existsSync(dest) && !rest.includes('--force')) { skipped.push(relative(cwd, dest)); continue; }
       mkdirSync(dirname(dest), { recursive: true }); copyFileSync(f, dest); wrote.push(relative(cwd, dest));
     }
     console.log(`stardust-lite foundation: wrote ${wrote.length ? wrote.join(', ') : 'nothing'}${skipped.length ? `; skipped (exists) ${skipped.join(', ')}` : ''}`);
-    if (skipped.includes('styles/styles.css')) console.log(`stardust-lite foundation: styles/styles.css exists — the skeleton is at ${rel}/templates/foundation/styles/styles.css to compare by hand`);
+    if (skipped.includes('styles/styles.css')) console.log(`stardust-lite foundation: styles/styles.css exists — \`init --foundation --force\` overwrites it with the skeleton (the boilerplate's rules are not measurements, METHOD step 4)`);
   }
   process.exit(0);
 }

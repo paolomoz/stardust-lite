@@ -2,7 +2,9 @@
 // harness.mjs — lint → fold → runtime → serialise (step 5). The served harness page IS the gated prototype; the serialised file is
 // the review artifact. Refuses to fold a document with a David's Model 🔴 (deploy skill lint) unless --no-lint.
 // Usage: node harness.mjs <authored.html> --serve <dir> --name <slug> [--port 8930] [--width 1440] [--no-lint] [--fragments <branch-host>]
-//        [--content <content.json>[,<click-dump.json>…]]
+//        [--content <content.json>[,<click-dump.json>…]] [--site <repo>]
+//   The serve dir is created, and when nothing answers on the port `serve <dir> --port <n> --site <repo>` is started detached (--site
+//   defaults to the cwd) — three runs crashed on a missing dir / silent port before the two-step was clear (scotiabank-personal).
 //        node harness.mjs --pages <pages.json> [--doc-dir doc] --serve <dir> [--port 8930] [--fragments <branch-host>] [--no-lint] [--content-dir <dir>]
 //   --pages (batch-7 rollout, pass 5): one harness per page of a `roster pick` list — `<doc-dir>/<slug>.html` → `<serve>/<slug>.harness.html`
 //   on the one port — the page's own output first, then one summary line per page (blocks loaded, doc height, texts not in the capture,
@@ -54,6 +56,7 @@ if (typeof arg('--pages', null) === 'string') {
 const src = process.argv[2]; const serveDir = arg('--serve'); const name = arg('--name');
 if (!src || !serveDir || !name) { console.error('usage: harness.mjs <authored.html> --serve <dir> --name <slug> [--port 8930] [--width 1440] [--no-lint]'); process.exit(1); }
 const port = Number(arg('--port', 8930)); const W = Number(arg('--width', 1440));
+mkdirSync(serveDir, { recursive: true });
 
 if (!arg('--no-lint', false)) {
   const lint = davidsLint();
@@ -78,6 +81,9 @@ const folded = await p0.evaluate(() => {
   document.querySelectorAll('main > div > div > div > div').forEach((cell) => { const k = cell.children; if (k.length === 1 && k[0].tagName === 'P' && ![...cell.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) k[0].replaceWith(...k[0].childNodes); });
   // the pipeline's list rule: a list item that also holds a nested list keeps its own text (and inline markup) in <p> (`<li><p>Software</p><ul>`);
   // a decorate that read the label from the li's first node worked on the prototype and left the served drawer's buttons empty (audemarspiguet-home)
+  // pipeline parity: a paragraph's leading <br>s and an empty paragraph (`<p></p>`, `<p>&nbsp;</p>`, `<p><br></p>`) are dropped by the
+  // pipeline — the served page was 24 px shorter than the prototype at 360, two gate rounds (scotiabank-personal)
+  document.querySelectorAll('main p').forEach((p) => { while (p.firstChild && ((p.firstChild.nodeType === 1 && p.firstChild.tagName === 'BR') || (p.firstChild.nodeType === 3 && !p.firstChild.textContent.trim() && p.firstChild.nextSibling?.nodeType === 1 && p.firstChild.nextSibling.tagName === 'BR'))) p.firstChild.remove(); if (!p.textContent.replace(/\u00a0/g, ' ').trim() && !p.querySelector(':scope > :not(br)')) p.remove(); });
   document.querySelectorAll('main li').forEach((li) => { if (!li.querySelector(':scope > ul, :scope > ol')) return; const own = [...li.childNodes].filter((n) => !(n.nodeType === 1 && /^(UL|OL|P|DIV)$/.test(n.tagName)) && !(n.nodeType === 3 && !n.textContent.trim())); if (!own.length) return; const p = document.createElement('p'); li.insertBefore(p, own[0]); own.forEach((n) => p.appendChild(n)); });
   // every authored text (an element's own text and inline children, nested lists/blocks excluded) for the capture check
   const texts = [...document.querySelectorAll('main h1,main h2,main h3,main h4,main h5,main h6,main p,main li')].map((e) => [...e.childNodes].filter((n) => n.nodeType === 3 || (n.nodeType === 1 && !/^(UL|OL|DIV|P|TABLE)$/.test(n.tagName))).map((n) => n.textContent).join('').replace(/:[a-z0-9-]+:/g, ' ').replace(/\s+/g, ' ').trim()).filter((t) => t.length >= 3 && !/^https?:/.test(t));
@@ -97,6 +103,11 @@ if (arg('--content', null)) {
   missing.forEach((t) => console.log(`harness: text not in the capture — "${t.slice(0, 100)}${t.length > 100 ? '…' : ''}"`));
   console.log(`harness: content check ${folded.texts.length} texts, ${missing.length} not in ${files.join(' + ')}${missing.length ? ' (typed from memory? read the JSON, not a viewer)' : ''}`);
 }
+// the runtime loads the header and footer from the metadata block's `nav` / `footer` rows (else /nav and /footer): without the rows or
+// without --fragments the serve dir holds no plain.html and the chrome renders blank — a 3-minute crop-and-grep hunt (scotiabank-personal)
+const chromeRows = ['nav', 'footer'].filter((k) => metas.some(([m]) => m === k));
+if (chromeRows.length < 2) console.log(`harness: the metadata block names no ${['nav', 'footer'].filter((k) => !chromeRows.includes(k)).join(' / ')} row — the runtime loads /${['nav', 'footer'].filter((k) => !chromeRows.includes(k)).join(' and /')}.plain.html from the serve dir; the header / footer render blank unless the row(s) are authored`);
+if (!arg('--fragments', null)) console.log(`harness: no --fragments — the chrome fragments are read from ${serveDir}/ (preview nav + footer on the branch and pass --fragments <branch-host> for the pipeline's markup)`);
 if (arg('--fragments', null)) {
   const host = String(arg('--fragments')).replace(/\/$/, '');
   for (const [k, v] of metas.filter(([k]) => ['nav', 'footer'].includes(k))) {
@@ -119,6 +130,13 @@ writeFileSync(`${serveDir}/${name}.harness.html`, `${head}<body><header></header
 // the served file must be the one just written (a server on this port from another case gates the wrong site — recorded twice)
 const written = `${head}<body><header></header>${folded.main}<footer></footer></body></html>`;
 const md5 = (s) => createHash('md5').update(s).digest('hex');
+const serving = () => fetch(`http://localhost:${port}/`).then(() => true).catch(() => false);
+if (!(await serving())) { // start serve detached (page-run's rule); it stays up for the next runs
+  const { spawn } = await import('node:child_process'); const site = String(arg('--site', '.'));
+  console.log(`harness: nothing answers on :${port} — starting \`serve ${serveDir} --port ${port} --site ${site}\` (detached)`);
+  const child = spawn(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'serve.mjs'), serveDir, '--port', String(port), '--site', site], { detached: true, stdio: 'ignore' }); child.unref();
+  const t0 = Date.now(); while (!(await serving()) && Date.now() - t0 < 10000) await new Promise((r) => setTimeout(r, 300));
+}
 try {
   const served = await (await fetch(`http://localhost:${port}/${name}.harness.html`)).text();
   if (md5(served) !== md5(written)) { console.error(`harness: http://localhost:${port}/${name}.harness.html is NOT the file just written (served md5 ${md5(served).slice(0, 8)}, written ${md5(written).slice(0, 8)}) — another server on :${port}? refusing`); process.exit(3); }

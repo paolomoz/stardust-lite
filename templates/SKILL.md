@@ -13,7 +13,7 @@ the **site** being migrated: blocks, styles and scripts are written here (`npx s
 `styles/reset.css` and the `styles.css` / `fonts.css` skeletons once — the site owns them); the evidence of every template run goes to
 `migration/cases/<template>/` (REPORT.md, REGISTER.md, LINT.md, tables — captures are not committed).
 
-Instruments run with `npx stardust-lite <name> [args]` (`npx stardust-lite list`; each prints usage without arguments):
+Instruments run with `npx stardust-lite <name> [args]` (`npx stardust-lite list --usage` prints every usage line in one call; `init --foundation --force` replaces the boilerplate's styles.css / fonts.css with the skeletons):
 `cap-probe`, `stitch-shot`, `pixel-compare`, `measure`, `motion-observe`, `motion-compare` (capture and compare),
 `measure-page` (step 1 in one session per width: `<url> --out measure --sections <css>` writes probe-load / structure / content / media / spec + dom / deep per width, the stitched live capture `live-<W>.png` the gate reads as its origin, the profile's per-width check (`profile check: PASS|WARN|FAIL`) and `summary.json` — one load per width, the profile's overlays; the single instruments are the targeted re-reads),
 `page-run` (`<slug> [--sections <css>] [--main <css>] [--hidden <css,…>] [--triage-sections …] [--accept-draft | --resume] [--no-da]` — ROLLOUT steps 1–7 in one call, each a child process of the instrument it names: measure-page → triage + block-inventory diff → STOP for the review (exit 5) → media-fetch → da-put → author → lint → harness → the section tables at the three widths with their verdict → pair ×3; one step table, `page-run.json`; exit 0 tables CLEAN, 1 rows off, 6 template candidate),

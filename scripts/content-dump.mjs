@@ -20,7 +20,7 @@ import { openPage, settle, arg, overlayOpts } from './common.mjs';
 import { collectContent } from './lib/content-collector.mjs';
 
 const url = process.argv[2]; const W = Number(process.argv[3] || 1440);
-if (!url) { console.error('usage: content-dump.mjs <url> [W] --roots <css,…> --out file.json [--require <css,…>]'); process.exit(1); }
+if (!url) { console.error('usage: content-dump.mjs <url> [W] --roots <css,…> --out file.json [--hidden <css,…>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>]'); process.exit(1); }
 const roots = String(arg('--roots', 'header,main,footer')).split(',').map((s) => s.trim());
 const hidden = String(arg('--hidden', '')).split(',').map((s) => s.trim()).filter(Boolean);
 const b = await chromium.launch(); const p = await openPage(b, url, { width: W, ...overlayOpts(), wait: 4000 });

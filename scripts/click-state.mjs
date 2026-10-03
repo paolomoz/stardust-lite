@@ -18,6 +18,10 @@ const hover = arg('--hover', null);
 if (!url || !wArg || !panel || (!clicks.length && typeof hover !== 'string')) { console.error('usage: click-state.mjs <url> <W> [--click <css> …] --panel <css> [--hover [<css>]] (--hover <css> alone: hover, no click) [--shot <out.png>] [--consent <css>] [--depth 7]'); process.exit(1); }
 const W = Number(wArg); const depth = Number(arg('--depth', 7)); const click = clicks.length ? clicks[clicks.length - 1] : hover;
 const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: 900, ...overlayOpts() });
+// what is visible before the clicks: when --panel matches nothing afterwards, the newly visible top-most boxes name the panel's root
+// (the mobile drawer's root was `header + div`-less and no table named it — scotiabank-personal)
+const visibleSet = () => page.evaluate(() => { const sel = (el) => `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${[...el.classList].slice(0, 3).map((c) => '.' + c).join('')}`; const path = (el) => { const p = []; let n = el; while (n && n !== document.body && p.length < 4) { p.unshift(sel(n)); n = n.parentElement; } return p.join(' > '); }; const out = {}; for (const el of document.querySelectorAll('body *')) { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); if (r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.opacity !== '0') out[path(el)] = `[${Math.round(r.left)},${Math.round(r.top + scrollY)},${Math.round(r.width)},${Math.round(r.height)}]`; } return out; });
+const before = await visibleSet();
 if (hover) { await page.hover(hover === true ? clicks[0] : hover); await page.waitForTimeout(600); }
 for (const c of clicks) {
   try { await page.click(c, { timeout: 8000 }); } catch (e) { console.log(`click-state: click ${c} failed — ${e.message.split('\n')[0]}`); }
@@ -34,4 +38,7 @@ console.log(await page.evaluate(([panel, depth, click, hovered]) => {
   const state = `control ${click}: aria-expanded=${exp}${!panels.length && exp === 'false' && !hovered ? ' — closed after the click: a hover-opened control toggles shut on click, run again with --hover' : ''}`;
   return (panels.length ? panels.map((p) => walk(p, 0).join('\n')).join('\n=====\n') : `(no visible panel for ${panel})`) + `\n${state}\nbody.overflow=${getComputedStyle(document.body).overflow} scrollHeight=${document.documentElement.scrollHeight}`;
 }, [panel, depth, click, !!hover]));
+const after = await visibleSet(); const appeared = Object.keys(after).filter((k) => !(k in before));
+const tops = appeared.filter((k) => !appeared.some((o) => o !== k && k.startsWith(o + ' > ')));
+if (tops.length && !(await page.evaluate((s) => [...document.querySelectorAll(s)].some((p) => p.getBoundingClientRect().height > 0), panel))) console.log(`click-state: ${appeared.length} element(s) became visible — top-most: ${tops.slice(0, 8).map((k) => `${k} ${after[k]}`).join(' ; ')} (pass one as --panel)`);
 await browser.close();
