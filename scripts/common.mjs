@@ -53,7 +53,7 @@ export const overlayOpts = () => {
   const pick = (name, key) => { const v = arg(name, null); return v === null ? (o[key] ?? null) : v; };
   const cookie = pick('--cookie', 'cookie') ?? process.env.STARDUST_COOKIE ?? null; if (cookie) process.env.STARDUST_COOKIE = String(cookie); // the children (gate → cap-probe …) read the env; the preload adds them to the vendored tools' contexts
   const hide = list(pick('--hide', 'hide')); if (hide.length) process.env.STARDUST_HIDE = hide.join(','); else if (process.env.STARDUST_HIDE) hide.push(...process.env.STARDUST_HIDE.split(',')); // the children inherit it
-  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')), cookie: cookie ? String(cookie) : null, hide };
+  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')), cookie: cookie ? String(cookie) : null, hide, chrome: !!o.chrome };
 };
 /** `--cookie 'name=value; name2=value2'` (or the profile's `overlays.cookie`, or STARDUST_COOKIE) as Playwright cookies for the page's host —
  * an attestation gate (HarbourVest: `HV.attestation`, `HV.country`, `HV.language`) forwarded every cookieless session to a persona page and

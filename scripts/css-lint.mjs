@@ -47,7 +47,7 @@ if (existsSync(blocksDir)) for (const name of readdirSync(blocksDir)) {
       if (/!important/.test(v)) F(file, r.line, `!important on ${p} — a specificity fight hides a reset or a foundation rule; fix the selector`);
       if (p === '-webkit-font-smoothing') F(file, r.line, `-webkit-font-smoothing from habit — the live page has no such rule unless the spec says so (manulife: headings rendered light)`);
       if (p === 'object-fit' && specFits && specFits.size && !specFits.has(v)) F(file, r.line, `object-fit: ${v} — every live image in the spec is ${[...specFits].join(' / ')} (mfs, bny: two gates on cover vs fill)`);
-      if (p === 'font-size' && specSizes && /^\d+(\.\d+)?px$/.test(v)) { const set = r.media ? sizes360 : specSizes; if (set) { const n = Math.round(parseFloat(v) * 2) / 2; if (!set.has(n) && ![...set].some((s) => Math.abs(s - n) <= 0.5)) F(file, r.line, `font-size ${v}${r.media ? ` in ${r.media.slice(0, 30)}` : ''} — no spec row at ${r.media ? 360 : 1440} has it (nearest ${[...set].sort((a, b) => Math.abs(a - n) - Math.abs(b - n))[0]}px): a value typed from habit, or the other width's`); } }
+      if (p === 'font-size' && specSizes && /^\d+(\.\d+)?px$/.test(v)) { const mobileQ = r.media && /max-width|<=|<\s*\d/.test(r.media) && !/min-width|>=/.test(r.media); const set = mobileQ ? sizes360 : specSizes; if (set) { const n = Math.round(parseFloat(v) * 2) / 2; if (!set.has(n) && ![...set].some((s) => Math.abs(s - n) <= 0.5)) F(file, r.line, `font-size ${v}${r.media ? ` in ${r.media.slice(0, 30)}` : ''} — no spec row at ${mobileQ ? 360 : 1440} has it (nearest ${[...set].sort((a, b) => Math.abs(a - n) - Math.abs(b - n))[0]}px): a value typed from habit, or the other width's`); } }
     }
   }
 }

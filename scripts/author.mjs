@@ -329,6 +329,16 @@ function containerSection(node, block, recipe, report) {
   if (recipe.controlsAreUnits && !unit) {
     const ctls = []; const rest = []; const collect = (n) => { const u = unwrap(n); const k = kindOf(u); if (k === 'button' || (k === 'a' && isDead(u.href) && u.text)) { ctls.push(u); return; } if (!(u.children || []).length) { rest.push(u); return; } if (u.text) rest.push({ ...u, children: undefined }); (u.children || []).forEach(collect); };
     (node.children || []).forEach(collect);
+    if (ctls.length >= 2 && block.name === 'tabs' && process.argv.includes('--tabs-as-sections')) {
+      // sections-as-panels (bny leadership): each panel is its own authored section with `section-metadata tab: <label>`; a panel holding a
+      // repeating unit is a cards block there, the rest default content — the tabs bar is built by the runtime from the metadata
+      report.notes.push(`${ctls.length} tabs as sections (section-metadata tab), panels from the hidden dump`);
+      const out = rest.flatMap((n) => defaultContent(n, report)); const sections = [];
+      for (const c of ctls) { const want = c.controls || (c.id ? c.id.replace(/-button$/, '') + '-panel' : null); const findId = (n) => n && (n.id === want ? n : (n.children || []).map(findId).find(Boolean)); let root = want ? hiddenRoots.map(findId).find(Boolean) : null; if (root) hiddenRoots.splice(hiddenRoots.findIndex((r) => findId(r)), 1); else { root = hiddenRoots[hiddenNext]; if (root) hiddenRoots.splice(hiddenNext, 1); }
+        const label = esc(c.text || c.aria || ''); const parts = []; if (root) { const a2 = analyzeSection(root); const u2 = pickUnit(a2).unit; if (u2) { const sub = { ...report, notes: [] }; parts.push(...containerSection(root, { name: 'cards', variant: null }, defaultRecipe(null, 'cards'), sub)); report.notes.push(`tab "${label.slice(0, 20)}": cards ${sub.rowsCols || ''}`); } else parts.push(...defaultContent(root, report)); } else report.notes.push(`tab "${label.slice(0, 20)}": no hidden root for its panel`);
+        parts.push(`<div class="section-metadata"><div><div>tab</div><div>${label}</div></div></div>`); sections.push(parts.join('\n')); }
+      report.rowsCols = `${ctls.length} sections`; report.tabSections = sections; return out;
+    }
     if (ctls.length >= 2) {
       report.notes.push(`${ctls.length} controls as rows (summary | hidden panel)`);
       const out = rest.flatMap((n) => defaultContent(n, report)); // the section's own heading / lede stay default content before the block
@@ -347,9 +357,12 @@ function containerSection(node, block, recipe, report) {
   const looksLikeUnit = (n) => { if (!unit || rowNodes.has(n)) return rowNodes.has(n); const k = kindOf(n); if (!['group', 'li', 'ul'].includes(k)) return false; const sub = analyzeSection(n); if (!sub.leaves.length || sub.repeats.some((r) => r.count >= 2 && r.unit.includes(' '))) return false; /* a composite repeat inside = a grid, not a row */ const sig = [...new Set(sub.leaves.map((l) => general(l.kind)))].sort().join('+'); return sub.pattern === unit.unit || (sig === unitSig && sub.leaves.length <= unit.leaves.length + 1); };
   const out = []; let dividerNext = false; let blocks = 0; let rows = 0; const cols = (recipe.cells || []).length;
   let lastBlockAt = -1; // index in `out` of the last table: a unit continued in the next row wrapper joins it (6 × 2 in 2 tables → one, natixis)
+  // an <hr> between every unit member is the unit's separator (a `divider` variant), not a split into tables (five list cards over two tables — canon)
+  const kidsAll = (node.children || []).map(unwrap); const hrCount = kidsAll.filter((c) => kindOf(c) === 'hr').length; const unitCount = kidsAll.filter((c) => rowNodes.has(c)).length; const hrBetweenUnits = hrCount >= 2 && unitCount >= 3 && hrCount >= unitCount - 1;
+  if (hrBetweenUnits) report.notes.push(`${hrCount} <hr> between ${unitCount} units: the unit's separator (divider variant), one table`);
   const emitBlock = (members) => {
     const variant = dividerNext ? dividerVariant(block.name, block.variant) || block.variant : block.variant; if (dividerNext && variant !== block.variant) report.notes.push(`<hr> before a unit → variant "${variant}"`); dividerNext = false;
-    const joining = lastBlockAt === out.length - 1 && out.length > 0 && !dividerNext;
+    const joining = lastBlockAt === out.length - 1 && out.length > 0 && (!dividerNext || hrBetweenUnits);
     const lines = joining ? [] : [blockOpen(block.name, variant)];
     if (recipe.headRow && !joining) { const head = fillCells(members[0], recipe.headRow, report); lines.push(rowHtml(head.cells)); }
     for (const mNode of members) { const f = fillCells(mNode, recipe.cells || [], report); lines.push(rowHtml(f.cells)); rows += 1; report.filled += f.filled; report.cellsTotal += cols; report.unfitted += f.unfitted.length; report.empty += f.empty.length; if (f.unfitted.length) report.notes.push(`row ${rows}: ${f.unfitted.map((l) => `${l.kind}${l.fallbackCell ? `→cell ${l.fallbackCell}` : ''}`).join(' ')} did not fit the recipe`); }
@@ -421,7 +434,7 @@ function keyValueSection(node, block, recipe, report) {
 
 // ───────────────────────────── the page ─────────────────────────────
 const sectionsHtml = []; const reports = []; let sawNew = false;
-mainSections.forEach((row, i) => { const node = split.sections[i]; const { html, report } = authorSection(node, row); sectionsHtml.push(html); reports.push(report); if (row.match.kind === 'new' && !(process.argv.includes('--draft-new') && row.match.block)) sawNew = true; });
+mainSections.forEach((row, i) => { const node = split.sections[i]; const { html, report } = authorSection(node, row); sectionsHtml.push(html); if (report.tabSections) sectionsHtml.push(...report.tabSections.map((p) => `<div>\n${p}\n</div>`)); reports.push(report); if (row.match.kind === 'new' && !(process.argv.includes('--draft-new') && row.match.block)) sawNew = true; });
 const meta = [['title', dump.__title || triage.page?.title || ''], ...(dump.__desc ? [['description', dump.__desc]] : []), ...(navPath ? [['nav', navPath]] : []), ...(footerPath ? [['footer', footerPath]] : [])];
 if (!navPath || !footerPath) warn('metadata: no nav / footer path (no profile `chrome.fragments`; pass --nav-path / --footer-path)');
 sectionsHtml.push(`<div>\n<div class="metadata">\n${meta.map(([k, v]) => `<div><div>${esc(k)}</div><div>${esc(v)}</div></div>`).join('\n')}\n</div>\n</div>`);
