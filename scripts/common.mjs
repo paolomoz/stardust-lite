@@ -14,7 +14,9 @@ export const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/5
 export async function launch(opts = {}) {
   const { chromium } = await import('playwright');
   const headed = process.argv.includes('--headed'); const chrome = headed || process.argv.includes('--chrome') || process.env.STARDUST_CHROME === '1' || !!siteDefaults()?.overlays?.chrome;
-  if (chrome && process.env.STARDUST_CHROME !== '1') { process.env.STARDUST_CHROME = '1'; const pre = `--import ${new URL('./lib/chrome-tier.mjs', import.meta.url).pathname}`; if (!(process.env.NODE_OPTIONS || '').includes('chrome-tier')) process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS || ''} ${pre}`.trim(); }
+  if (chrome) process.env.STARDUST_CHROME = '1';
+  const cookie = overlayOpts().cookie; // sets STARDUST_COOKIE
+  if ((chrome || cookie) && !(process.env.NODE_OPTIONS || '').includes('chrome-tier')) process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS || ''} --import ${new URL('./lib/chrome-tier.mjs', import.meta.url).pathname}`.trim(); // the vendored tools: channel and cookies
   return chromium.launch({ ...(chrome ? { channel: 'chrome' } : {}), ...(headed ? { headless: false, args: ['--disable-blink-features=AutomationControlled'] } : {}), ...opts });
 }
 export function arg(name, def) {
@@ -49,8 +51,13 @@ const list = (v) => String(v ?? '').split(',').map((s) => s.trim()).filter(Boole
 export const overlayOpts = () => {
   const o = siteDefaults()?.overlays || {};
   const pick = (name, key) => { const v = arg(name, null); return v === null ? (o[key] ?? null) : v; };
-  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')) };
+  const cookie = pick('--cookie', 'cookie') ?? process.env.STARDUST_COOKIE ?? null; if (cookie) process.env.STARDUST_COOKIE = String(cookie); // the children (gate → cap-probe …) read the env; the preload adds them to the vendored tools' contexts
+  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')), cookie: cookie ? String(cookie) : null };
 };
+/** `--cookie 'name=value; name2=value2'` (or the profile's `overlays.cookie`, or STARDUST_COOKIE) as Playwright cookies for the page's host —
+ * an attestation gate (HarbourVest: `HV.attestation`, `HV.country`, `HV.language`) forwarded every cookieless session to a persona page and
+ * loaded the chrome by AJAX after the check; a 35-line case preload did this (loop r5). */
+export const cookiesFor = (url, cookie) => { if (!cookie) return []; let host; try { host = new URL(url).hostname; } catch { return []; } return String(cookie).split(/;\s*/).map((kv) => kv.trim()).filter(Boolean).map((kv) => { const i = kv.indexOf('='); return { name: kv.slice(0, i).trim(), value: kv.slice(i + 1).trim(), domain: host.replace(/^www\./, '.'), path: '/' }; }).filter((c) => c.name); };
 /** The same options as argv for a vendored capture tool's live side (`stitch-shot`, `cap-probe`, `motion-observe`). */
 export const overlayArgs = () => { const o = overlayOpts(); return [...(o.consent ? ['--consent', o.consent] : []), ...(o.dismiss.length ? ['--dismiss', o.dismiss.join(',')] : []), ...(o.locale ? ['--locale', o.locale] : [])]; };
 
@@ -83,6 +90,7 @@ export async function openPage(browser, url, { width = 1440, height = 900, scale
   const page = isContext ? await browser.newPage() : await browser.newPage(contextOptions({ width, height, scale, locale }));
   if (isContext) await page.setViewportSize({ width, height });
   if (before) await before(page); // listeners that must exist before navigation (response log for font requests — media-list)
+  const cookies = cookiesFor(url, overlayOpts().cookie); if (cookies.length) await page.context().addCookies(cookies).catch((e) => console.error(`openPage: cookies not set — ${String(e.message).slice(0, 80)}`));
   try { await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 }); } catch (e) {
     // a protocol reset / connection refusal on headless Chromium is the origin's bot tier, not the page: name the next tier before dying
     if (/ERR_HTTP2|ERR_CONNECTION_RESET|ERR_SSL|ERR_FAILED/.test(String(e.message)) && process.env.STARDUST_CHROME !== '1') console.error(`openPage: ${String(e.message).split('\n')[0].slice(0, 120)} — the origin refuses headless Chromium; run every instrument with --chrome (installed Google Chrome, headless) or STARDUST_CHROME=1, --headed for a window`);
@@ -95,7 +103,10 @@ export async function openPage(browser, url, { width = 1440, height = 900, scale
   // fonts are a measurement precondition: the boilerplate loads fonts.css lazily and a table read before the swap measures fallback metrics
   // (sections / pair / deep-probe disagreed by 40–100 px between runs on one page — stryker-home)
   await page.evaluate(() => document.fonts.ready.then(() => document.fonts.status)).catch(() => {});
-  if (require.length) { // composition gate: the session must be the one the cached origin shows (retry the run otherwise)
+  if (page.url().split('#')[0] !== url.split('#')[0]) console.error(`openPage: URL changed ${url} → ${page.url()} (a redirect or a JS forward: an edition, a locale, an attestation page — measure the page you mean)`);
+  if (require.length) { // composition gate: the session must be the one the cached origin shows (retry the run otherwise); a marker a fragment
+    // loads by AJAX is WAITED for (10 s) before it counts as missing — a one-shot check exited 4 twice on the same fragment race (loop r5)
+    await page.waitForFunction((sels) => sels.every((s) => { try { return !!document.querySelector(s); } catch { return false; } }), require, { timeout: 10000 }).catch(() => {});
     const missing = await page.evaluate((sels) => sels.filter((s) => { try { return !document.querySelector(s); } catch { return true; } }), require);
     if (missing.length) { console.error(`composition mismatch — missing: ${missing.join(' | ')} (exit 4; run again until the session matches the origin)`); await browser.close(); process.exit(4); }
   }

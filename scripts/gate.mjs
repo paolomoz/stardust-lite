@@ -290,7 +290,7 @@ if (arg('--probes', null)) {
     writeFileSync(join(out, 'motion-compare.txt'), mc.stdout); motionLine = (mc.stdout.match(/motion summary: .*/) || [''])[0];
   } else motionLine = 'motion: every probe skipped or dropped';
 }
-console.log('\n| width | pixel % | Δh | bands |\n|---|---|---|---|');
+console.log(`\n| width | pixel %${chromeOn ? ' (header / footer bands MASKED — --no-chrome for the full page)' : ''} | Δh | bands |\n|---|---|---|---|`);
 rows.forEach((r) => console.log(`| ${r.W} | ${r.pct} | ${r.dh} | ${r.bands} |`));
 let budgetLine = '';
 if (budgetOn && Object.keys(sectionRuns).length) {

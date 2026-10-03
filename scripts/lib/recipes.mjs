@@ -183,7 +183,7 @@ const COLLECTION = {
   carousel: { rows: 'unit', cells: [{ name: 'image', from: ['picture', 'video'], take: 1 }, { name: 'body', from: ['rest'] }] },
   tabs: { rows: 'unit', cells: [{ name: 'label', from: ['heading', 'text', 'link'], take: 1 }, { name: 'panel', from: ['rest', 'hidden'] }], controlsAreUnits: true },
   accordion: { rows: 'unit', cells: [{ name: 'summary', from: ['heading', 'text', 'link'], take: 1 }, { name: 'body', from: ['rest', 'hidden'] }], controlsAreUnits: true },
-  columns: { rows: 'fixed', cells: [{ name: 'column', from: ['rest'] }], cellsFromChildren: true },
+  columns: { rows: 'fixed', cells: [{ name: 'column', from: ['rest'] }], cellsFromChildren: true, defaultContentAfter: [] },
   quote: { rows: 'leaf', cells: [{ name: 'quote', from: ['quote', 'text', 'rest'] }], defaultContentBefore: [], defaultContentAfter: [] },
   embed: { rows: 'leaf', cells: [{ name: 'link', from: ['link', 'embed', 'video', 'rest'] }], defaultContentBefore: [], defaultContentAfter: [] },
   video: { rows: 'leaf', cells: [{ name: 'link', from: ['video', 'link', 'picture', 'rest'] }], defaultContentBefore: [], defaultContentAfter: [] },
@@ -193,7 +193,7 @@ export function defaultRecipe(row, name = null) {
   const f = row?.sourceSignature?.fingerprint || null; const sig = f?.unitSig || f?.kinds || [];
   if (row?.shape === 'key-value') return { rows: 'key-value', cells: null, headRow: null, keys: [], sectionStyle: null, defaultContentBefore: [], defaultContentAfter: [], _notes: ['default recipe: no keys known'] };
   const col = COLLECTION[String(name || row?.name || '').toLowerCase()];
-  if (col && !f) return { headRow: null, keys: null, sectionStyle: null, defaultContentBefore: ['heading', 'text'], defaultContentAfter: ['link'], ...col, _collectionDefault: true, _notes: [`default recipe: the Block Collection's ${name || row?.name} shape (no recipe in blocks.json)`] };
+  if (col && !f) return { headRow: null, keys: null, sectionStyle: null, defaultContentBefore: ['heading', 'text', 'link'], defaultContentAfter: ['link'], ...col, _collectionDefault: true, _notes: [`default recipe: the Block Collection's ${name || row?.name} shape (no recipe in blocks.json)`] };
   const container = row?.shape === 'container' || (f && f.repeat >= 2);
   const cells = sig.includes('media') ? [{ name: 'image', from: ['picture', 'video'], take: 1 }, { name: 'body', from: ['rest'] }] : [{ name: 'body', from: ['rest'] }];
   return { rows: container ? 'unit' : 'fixed', cells, headRow: null, keys: null, sectionStyle: null, defaultContentBefore: ['heading', 'text'], defaultContentAfter: ['link'], _notes: ['default recipe (no recipe in blocks.json): picture + rest'] };

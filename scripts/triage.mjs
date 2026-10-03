@@ -81,7 +81,7 @@ fps.forEach((fp, i) => entries.push({ chrome: null, node: split.sections[i], fp 
 if (split.footer) entries.push({ chrome: 'footer', node: split.footer, fp: fingerprint(split.footer, { depth }) });
 
 const overlap = (a, b) => Math.max(0, Math.min(a[1] + a[3], b[1] + b[3]) - Math.max(a[1], b[1]));
-const specFor = (box) => { if (!spec?.secs || !box) return null; let best = null; for (const s of spec.secs) { if (!s.box) continue; const o = overlap(box, s.box); if (o > 0 && (!best || o > best.o)) best = { o, s }; } return best ? { id: best.s.id, box: best.s.box, overlap: Math.round(best.o) } : null; };
+const specFor = (box) => { if (!spec?.secs || !box) return null; let best = null; for (const s of spec.secs) { if (!s.box) continue; const o = overlap(box, s.box); if (o > 0 && (!best || o > best.o)) best = { o, s }; } return best ? { id: best.s.id, box: best.s.box, overlap: Math.round(best.o), inset: best.s.inset ? `top ${best.s.inset.first} (${best.s.inset.top.join(' → ')}) bottom ${best.s.inset.last} (${best.s.inset.bottom.join(' → ')})` : null } : null; };
 const structureFor = (box) => { if (!structure || !box) return null; const re = new RegExp(`\\sy${box[1]}\\s+w\\d+\\s+h${box[3]}\\b`); return structure.find((l) => re.test(l))?.trim() || null; };
 
 const sections = []; const counts = { inventory: 0, collection: 0, default: 0, new: 0 }; let mainCount = 0;
