@@ -16,7 +16,8 @@ const W = Number(wArg); const wait = Number(arg('--wait', 900)); const open = ar
 const browser = await launch(); const page = await openPage(browser, url, { width: W, height: 900, ...overlayOpts() });
 
 const dump = () => page.evaluate((s) => {
-  const roots = [...document.querySelectorAll(s)]; if (!roots.length) return { nodes: [], lines: [`NO PANEL ${s}`] };
+  const qsa = (sel) => { const out = []; const walk0 = (e) => { for (const c of (e.shadowRoot ? [...e.shadowRoot.children, ...e.children] : [...e.children])) { if (c.matches && c.matches(sel)) out.push(c); walk0(c); } }; walk0(document.documentElement); return [...new Set(out)]; }; // composed tree (a panel inside a shadow root — manulife)
+  const roots = qsa(s); if (!roots.length) return { nodes: [], lines: [`NO PANEL ${s}`] };
   const norm = (t) => t.replace(/\s+/g, ' ').trim(); const lines = [];
   const walk = (el, d) => {
     const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);
