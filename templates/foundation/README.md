@@ -21,3 +21,5 @@ only when it does not exist yet and prints what it wrote and what it skipped.
 
 Page 1 of a site pours measured values into this skeleton instead of stripping the boilerplate by hand (three of walgreens' four rounds);
 page N never touches these files unless a deviation names them.
+
+`blocks/header/` and `blocks/footer/` (JS + CSS skeletons, `--force` replaces the boilerplate's): each fragment section's CONTENT lands in one `div` (`nav > .nav-brand / .nav-sections / .nav-tools`, `.footer > .footer-N`) — the pipeline's `.default-content-wrapper` is flattened away, so the CSS styles one level; the hamburger, `.nav-drop` and icon inlining are structure, every size is the spec's.
