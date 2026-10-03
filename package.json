@@ -37,7 +37,8 @@
     "cases/*/doc/**",
     "cases/*/registers/**",
     "cases/*/authored/**",
-    "cases/*/scripts/**"
+    "cases/*/scripts/**",
+    "CHECKLIST.md"
   ],
   "repository": {
     "type": "git",

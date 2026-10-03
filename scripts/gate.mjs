@@ -54,7 +54,7 @@ import { arg, openPage, settle, overlayOpts, overlayArgs, siteProfile, stardustS
 import { liveSections, pairSections, triageRowFor } from './lib/section-pair.mjs';
 import { captureUrl } from './lib/stitch.mjs';
 
-const USAGE = 'usage: gate.mjs --live <url> --build <url> --out <dir> [--widths 360,1440,2560] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--main <live-content-root>] [--build-main main] [--probes <file>] [--origin <dir with live-<W>.png>] [--vh 900] [--capture-tool stitch|stitch-shot] [--skip-widths-when-clean <sections-verdict.json>] [--chrome|--no-chrome] [--budget|--no-budget] [--triage <triage.json>]\n       gate.mjs --pages <pages.json> --build-base http://localhost:<port> [--out gate]   |   gate.mjs --served-pages <pages.json> --branch-host <url> [--out gate-served] [--origin-base gate]';
+const USAGE = 'usage: gate.mjs --live <url> --build <url> --out <dir> [--round] [--widths 360,1440,2560] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--main <live-content-root>] [--build-main main] [--probes <file>] [--origin <dir with live-<W>.png>] [--vh 900] [--capture-tool stitch|stitch-shot] [--skip-widths-when-clean <sections-verdict.json>] [--chrome|--no-chrome] [--budget|--no-budget] [--triage <triage.json>]\n       gate.mjs --pages <pages.json> --build-base http://localhost:<port> [--out gate]   |   gate.mjs --served-pages <pages.json> --branch-host <url> [--out gate-served] [--origin-base gate]';
 const pngSize = (file) => { const b = readFileSync(file); return { width: b.readUInt32BE(16), height: b.readUInt32BE(20) }; };
 const atWidth = (map, W) => { if (!map) return null; if (map[W] !== undefined) return Number(map[W]); const ks = Object.keys(map).map(Number).filter((k) => Number.isFinite(k)); if (!ks.length) return null; const k = ks.sort((a, b) => Math.abs(a - W) - Math.abs(b - W))[0]; return Number(map[k]); };
 const slugOf = (url) => { let p = ''; try { p = new URL(url).pathname; } catch { p = String(url); } p = p.replace(/\.harness\.html$|\.html$/, '').replace(/\/+$/, ''); return { path: p, slug: basename(p) || 'index' }; };
@@ -100,6 +100,10 @@ if (typeof listFile === 'string') {
 const live = arg('--live'); const build = arg('--build'); const out = arg('--out');
 if (!live || !build || !out) { console.error(USAGE); process.exit(1); }
 let widths = String(arg('--widths', '360,1440,2560')).split(',').map(Number); const band = Number(arg('--band', 450)); const vh = Number(arg('--vh', 900));
+// --round (loop high-impact pass): the CSS round — the base width only, the per-section table, then a DIGEST against the previous round in this dir
+// (the sections that moved and the property each points at, pair's hot rows per section with the cascade removed) and a `stop:` line when the base is clean
+const roundMode = process.argv.includes('--round');
+if (roundMode) widths = [widths.includes(1440) ? 1440 : widths[Math.floor(widths.length / 2)]];
 const captureTool = String(arg('--capture-tool', 'stitch')); if (!['stitch', 'stitch-shot'].includes(captureTool)) { console.error(`${USAGE}\n  --capture-tool is stitch (in-process, default) or stitch-shot (the vendored tool)`); process.exit(1); }
 // overlays and locale reach the LIVE side of every capture tool (a geo modal or a marketing interstitial is not consent; a geo-redirecting
 // origin captures another locale per run without the pin); without the flags they come from the site profile (`--site`, migration/site.json),
@@ -129,7 +133,9 @@ let blocks = []; try { blocks = JSON.parse(readFileSync(blocksFile, 'utf8')).blo
 const hasBudgets = blocks.some((b) => b.budget && Object.keys(b.budget).length);
 const budgetOn = process.argv.includes('--budget') ? true : process.argv.includes('--no-budget') ? false : hasBudgets;
 if (budgetOn && !hasBudgets) console.log(`budget: --budget but ${blocksFile} has no budgets — every block reads as new`);
-const perSection = chromeOn || budgetOn || process.argv.includes('--per-section');
+const perSection = chromeOn || budgetOn || process.argv.includes('--per-section') || roundMode;
+const prevSections = {}; // --round: the previous round's per-section table per width, read before this run overwrites it
+if (roundMode) for (const W of widths) { try { prevSections[W] = JSON.parse(readFileSync(join(out, `sections-${W}.json`), 'utf8')).sections; } catch { prevSections[W] = null; } }
 const triage = typeof arg('--triage', null) === 'string' ? JSON.parse(readFileSync(arg('--triage'), 'utf8')) : null;
 if (process.argv.includes('--probes') && typeof arg('--probes', null) !== 'string') { console.error(`${USAGE}\n  --probes takes a file (one probe per line); a bare --probes crashed the cap-probe step (sdt-dentsu beyond-the-funnel)`); process.exit(1); }
 const secSel = String(arg('--build-sections', 'main > .section'));
@@ -308,5 +314,27 @@ if (specDir && /^https?:/.test(build)) { // the build is a URL: `sections <build
   const sr = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'sections.mjs'), build, '--widths', sw.join(','), '--spec-dir', specDir, ...(typeof arg('--triage', null) === 'string' ? ['--triage', arg('--triage')] : []), ...(blocks.length ? ['--blocks', blocksFile] : []), ...liveOpts.filter((x) => x !== '--require')], { encoding: 'utf8' });
   const ls = sr.stdout.split('\n'); sectionsLine = [...ls.filter((l) => /^rows at \d+:/.test(l)), ...ls.filter((l) => /^tables: /.test(l))].join('\n') || `sections: ${(sr.stderr || sr.stdout).trim().split('\n').pop()}`;
 }
-console.log(`\n${capLine}${sectionsLine ? `\n${sectionsLine}` : ''}${motionLine ? `\n${motionLine}` : ''}${budgetLine ? `\n${budgetLine}` : ''}\ntiming (${captureTool}${captureTool === 'stitch' ? ', live and build concurrent' : ''}): ${tLine}\nevidence: ${out}/`);
+let digest = '';
+if (roundMode) {
+  const W = widths[0]; let now = []; try { now = JSON.parse(readFileSync(join(out, `sections-${W}.json`), 'utf8')).sections || []; } catch { /* no table */ }
+  const prev = prevSections[W]; const lines = [];
+  // pair's hot rows per live section (Δy·loc = the section's own offset) when the spec is at hand
+  const pairRows = {}; if (specDir && existsSync(join(specDir, `spec-${W}.json`))) { const pr = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'pair.mjs'), join(specDir, `spec-${W}.json`), build, '--max', '400', ...liveOpts.filter((x) => x !== '--require')], { encoding: 'utf8' }); let sec = null; for (const l of pr.stdout.split('\n')) { const m = /^-- section (\d+)/.exec(l); if (m) { sec = Number(m[1]); continue; } if (sec !== null && /^.{30,32}\[/.test(l) && !/^anchor /.test(l)) { (pairRows[sec] ||= []).push(l.replace(/\s+\|.*$/, '').replace(/\s{2,}/g, ' ').trim()); } } }
+  const originPng = join(out, `live-${W}.png`); const buildPng = join(out, `build-${W}.png`); // the captures this run compared
+  const shiftOf = (s) => { if (!s.live || !existsSync(originPng) || !existsSync(buildPng)) return ''; const sp = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'shift-probe.mjs'), originPng, buildPng, '--x0', '0', '--x1', String(W), '--y0', String(s.live.y0), '--y1', String(s.live.y1), '--r', '8', '--step', '2'], { encoding: 'utf8' }); const m1 = /best shift build→live dx=(-?\d+) dy=(-?\d+) → ([\d.]+)(.*)$/m.exec(sp.stdout); const m2 = /ratio ([\d.]+)(.*)$/m.exec(sp.stdout); return `${m1 ? `shift dx ${m1[1]} dy ${m1[2]}${m1[4].trim().slice(0, 60)}` : ''}${m2 ? `; luminance ratio ${m2[1]}${m2[2].trim().slice(0, 50)}` : ''}`; };
+  const moved = []; let clean = true;
+  for (const s of now) {
+    const p = prev ? prev.find((x) => x.index === s.index) : null; const dPct = p && p.pct !== null && s.pct !== null ? Number((s.pct - p.pct).toFixed(2)) : null; const dDh = p && p.dh !== null && s.dh !== null ? s.dh - p.dh : null;
+    const off = (s.dh !== null && Math.abs(s.dh) > 2 && s.dhKind !== 'boundary') || (s.pct !== null && s.pct > (s.budget ?? 1.5)); if (off) clean = false;
+    if (!prev || off || (dPct !== null && Math.abs(dPct) >= 0.1) || (dDh !== null && dDh !== 0)) {
+      const points = s.dh !== null && Math.abs(s.dh) > 2 ? `Δh ${s.dh > 0 ? '+' : ''}${s.dh}: a height — padding, margin, line-height or a wrapped line in this section` : s.pct !== null && s.pct > 1 ? `Δh 0 but pixels — ${shiftOf(s) || 'paint or position (shift-probe the band)'}; the pair rows below name the child (a fractional height, a pinned link, a control's width)` : 'within tolerance';
+      const live = s.live?.indices || []; const hot = live.flatMap((i) => pairRows[i] || []).slice(0, 3);
+      moved.push(`  #${s.index} ${String(s.anchorText || s.classes || '').slice(0, 26).padEnd(28)} ${s.pct ?? '—'} %${dPct !== null ? ` (${dPct > 0 ? '+' : ''}${dPct})` : ''}  Δh ${s.dh ?? '—'}${dDh !== null && dDh !== 0 ? ` (was ${p.dh})` : ''}${s.block ? `  ${s.block}` : ''} — ${points}${hot.length ? `\n      ${hot.join('\n      ')}` : ''}`);
+    }
+  }
+  const basePct = rows.find((r) => r.W === W)?.pct;
+  digest = `\nround digest at ${W}${prev ? ' (vs the previous round in this dir)' : ' (first round here)'}: page ${basePct} %${moved.length ? `\n${moved.join('\n')}` : '\n  no section moved'}`;
+  digest += clean ? `\nstop: the base width is clean (every section within 2 px${budgetOn ? ' and budget' : ''}) — run the three widths with --probes, then name the residuals in the register` : `\nnext: one round, changing only what the rows above name`;
+}
+console.log(`\n${capLine}${sectionsLine ? `\n${sectionsLine}` : ''}${motionLine ? `\n${motionLine}` : ''}${budgetLine ? `\n${budgetLine}` : ''}${digest}\ntiming (${captureTool}${captureTool === 'stitch' ? ', live and build concurrent' : ''}): ${tLine}\nevidence: ${out}/`);
 writeFileSync(join(out, 'gate.json'), JSON.stringify({ _schema: 'stardust-lite/gate@1', _writtenAt: new Date().toISOString(), live, build, slug, widths, rows, timing, captureTool, origin: originFrom, chrome: { on: chromeOn, template: isTemplate, byWidth: chromeRuns }, cap: { verdict: capLine.split('\n')[0], failing: capLine.split('\n').slice(1) }, motion: motionLine || null, budget: { on: budgetOn, verdict: budgetOn ? (overAll.length ? 'FAIL' : 'PASS') : null, over: overAll, newSections: newCount, defaultSections: defaultCount, blocks: blocks.length ? blocksFile : null }, sections: sectionRuns }, null, 1));

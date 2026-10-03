@@ -28,7 +28,7 @@ order; blocks hold only what default content cannot.
 | hosted video | author the source's own player URL as the link and a **poster picture of the frame the live capture shows** (`scripts/video-frame.mjs`: a `<video>` paused at t = 0 at 2×, or — the common case, a Vimeo / YouTube **iframe** this page cannot pause — `--box` the player's section with `--hide` on the veil, text and controls over it; the entry thumbnail is usually another frame — check it against the live crop); the block renders `<video>` only for a file link | a hosted player's files may be protected or not decodable (Kaltura, ibm-home) or one API call away (Brightcove's playback API, under the player's policy key, lists a progressive MP4; uploaded to DA it was served `video/mp4` by the branch host where ibm-home's upload came back `application/octet-stream`, which `<video>` refuses): ask the player's API for a progressive source, then test the DA-served content-type and one `<video>` before settling for link + poster |
 | paint that is not on a node | `scripts/deep-probe.mjs <url> <W> --sels …` on the elements the spec shows without paint | `::before`/`::after` (curved edges, underlines, elevation shadows) are invisible to `live-spec` |
 
-## Procedure, per template
+## Procedure, per template (`CHECKLIST.md` runs it: one command per step and what to read after it; this is the reference)
 
 1. **Measure the source at three widths** (360, 1440, probe): `measure-page` is the single-session reading of this step's instruments — one load per width,
    then the first look, the structure dump, the content dump, the media list, the spec with its DOM and the deep-probe set from that same settled page; the

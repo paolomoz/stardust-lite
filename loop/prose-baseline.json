@@ -37,6 +37,11 @@
     "templates/foundation/README.md": {
       "bytes": 2305,
       "lines": 24
+    },
+    "CHECKLIST.md": {
+      "bytes": 0,
+      "lines": 0,
+      "_note": "added in the high-impact pass; counts fully against the cap"
     }
   },
   "totalBytes": 179864,

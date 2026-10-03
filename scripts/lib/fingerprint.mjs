@@ -195,8 +195,12 @@ export const allClasses = (fp) => [...new Set([...(fp.classes?.root || []), ...(
 export function splitSections(dump, { root = null, sections = null } = {}) {
   const keys = Object.keys(dump).filter((k) => !k.startsWith('__') && !k.startsWith('hidden '));
   const headerKey = keys.find((k) => /^header\b/.test(k)) || null; const footerKey = keys.find((k) => /^footer\b/.test(k)) || null;
-  const mainKey = root || keys.find((k) => k === 'main') || keys.find((k) => k !== headerKey && k !== footerKey) || null;
+  const tallest = (ks) => ks.map((k) => [k, Math.max(0, ...(Array.isArray(dump[k]) ? dump[k] : [dump[k]]).filter((n) => n?.box).map((n) => n.box[3]))]).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+  const mainKey = root || keys.find((k) => k === 'main') || tallest(keys.filter((k) => k !== headerKey && k !== footerKey)) || null; // a renamed content root (`#content`, `div.main-container`) is the tallest non-chrome root, not the first key
   const roots = mainKey ? (dump[mainKey] || []) : [];
+  // the extra roots measure-page dumped (unassigned bands: a breadcrumb bar, a promo bar outside main) are sections of their own, in the dump's order
+  const extraKeys = keys.filter((k) => k !== headerKey && k !== footerKey && k !== mainKey); const beforeMain = extraKeys.filter((k) => keys.indexOf(k) < keys.indexOf(mainKey)); const afterMain = extraKeys.filter((k) => keys.indexOf(k) > keys.indexOf(mainKey));
+  const extras = (ks) => ks.flatMap((k) => (Array.isArray(dump[k]) ? dump[k] : [dump[k]]).filter((n) => n && typeof n === 'object'));
   let secs = [];
   // nodes measure-page marked `sec: true` (its --sections selector) split the dump as the spec and the gate split the page (loop r3)
   const marked = []; const findMarked = (n) => { if (n.sec) { marked.push(n); return; } (n.children || []).forEach(findMarked); }; roots.forEach(findMarked);
@@ -219,7 +223,8 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
       if (flat) secs.push(...kids); else secs.push(c0);
     }
   }
-  return { header: headerKey ? dump[headerKey]?.[0] || null : null, footer: footerKey ? dump[footerKey]?.[0] || null : null, sections: secs, mainKey, headerKey, footerKey, marked: marked.length && secs === marked ? marked.length : 0 };
+  const extraCount = extras(beforeMain).length + extras(afterMain).length; if (extraCount) secs = [...extras(beforeMain), ...secs, ...extras(afterMain)];
+  return { header: headerKey ? dump[headerKey]?.[0] || null : null, footer: footerKey ? dump[footerKey]?.[0] || null : null, sections: secs, mainKey, headerKey, footerKey, marked: marked.length && secs.includes(marked[0]) ? marked.length : 0, extraRoots: extraCount };
 }
 
 /** The Block Collection shape a fingerprint suggests (null = default content or nothing recognisable); never more than a guess. */

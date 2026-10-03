@@ -3,7 +3,8 @@
 //   npx stardust-lite init                 scaffold the skill stub, AGENTS.md section and migration/ case dir in the current repo
 //   npx stardust-lite init --foundation    also copy templates/foundation/ (scripts/stardust.js, styles/reset.css, styles.css, fonts.css) — never overwrites
 //   npx stardust-lite <instrument> [args]  run scripts/<instrument>.mjs or tools/replica/<instrument>.mjs (lint → tools/lint)
-//   npx stardust-lite method               print the path of METHOD.md (the template run reads it first)
+//   npx stardust-lite checklist            print the path of CHECKLIST.md (the template run: twelve steps on one screen — read first)
+//   npx stardust-lite method               print the path of METHOD.md (the reference behind the checklist)
 //   npx stardust-lite rollout              print the path of ROLLOUT.md (a page after the template reads this instead)
 //   npx stardust-lite list [--usage]       list instruments (--usage: every usage line in one call — 25 single prints cost 3 min, scotiabank-personal)
 //   npx stardust-lite init --foundation --force   overwrite the boilerplate's styles.css / fonts.css with the skeletons (a fresh boilerplate is not a measurement)
@@ -23,6 +24,7 @@ if (!cmd || cmd === 'help' || cmd === '--help') {
   process.exit(0);
 }
 if (cmd === 'method') { console.log(join(ROOT, 'METHOD.md')); process.exit(0); }
+if (cmd === 'checklist') { console.log(join(ROOT, 'CHECKLIST.md')); process.exit(0); }
 if (cmd === 'rollout') { console.log(join(ROOT, 'ROLLOUT.md')); process.exit(0); }
 if (cmd === 'list') {
   if (!rest.includes('--usage')) { console.log(list().join('\n')); process.exit(0); }

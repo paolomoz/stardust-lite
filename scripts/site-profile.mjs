@@ -171,7 +171,11 @@ if (cmd === 'init') {
   if (!edition) note('edition', 'REGISTER.md\'s first paragraph');
 
   const profile = { _schema: 'stardust-lite/site-profile@1', _writtenAt: new Date().toISOString(), _source: { caseDir, siteRepo: repo }, origin, edition, widths, baseWidth, probeWidth, overlays: { consent, dismiss, locale, require, headed, reloadOnConsent }, firstLook, cap: capOut, fonts: { families, files: fontFiles, faces }, body, tokens, chrome, media, da, serve: { port }, noise: { floor1440, compositionMarkers: require }, pages, _notes: notes };
-  mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, JSON.stringify(profile, null, 1));
+  // an existing profile (probe-load --profile wrote the overlays at t0) is merged, never overwritten: a null here keeps the value there (consent and hide were wiped — takeda, V3)
+  let prev = null; try { prev = JSON.parse(readFileSync(out, 'utf8')); } catch { prev = null; }
+  const mergeInto = (a, b) => { if (!b || typeof b !== 'object' || Array.isArray(b)) return a == null || (Array.isArray(a) && !a.length) ? b : a; const o = { ...(a && typeof a === 'object' ? a : {}) }; for (const [k, v] of Object.entries(b)) o[k] = mergeInto(o[k], v); return o; };
+  const merged = prev ? mergeInto(profile, prev) : profile; if (prev) console.error(`site-profile: merged with the existing ${out} (its overlays and every value this init left null survive)`);
+  mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, JSON.stringify(merged, null, 1));
   const hb = chrome.header.heightsByWidth; const fb = chrome.footer.heightsByWidth; const perW = (o) => Object.entries(o).map(([w, v]) => `${w}:${v}`).join(' ') || '—';
   table([
     ['origin', origin], ['edition', edition ? `${edition.slice(0, 90)}…` : null], ['widths', `${widths.join(',')} (base ${baseWidth}, probe ${probeWidth})`],

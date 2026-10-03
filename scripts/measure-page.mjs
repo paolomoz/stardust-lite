@@ -210,6 +210,7 @@ const summary = {
   mainRoot: Object.fromEntries(rows.filter((r) => !r.error).map((r) => [r.W, { structure: r.root.name, path: r.root.path, content: r.contentMain }])),
   fixedLayers: Object.fromEntries(rows.filter((r) => r.first).map((r) => [r.W, r.first.fixed])),
   unassigned: Object.fromEntries(rows.filter((r) => r.first).map((r) => [r.W, r.first.unassigned || []])),
+  breakpoints: rows.find((r) => r.first?.breakpoints?.length)?.first.breakpoints || [],
   noise: Object.keys(noise).length ? noise : null,
   scrolled: Object.fromEntries(rows.filter((r) => r.scrolled).map((r) => [r.W, r.scrolled])),
   shadowRoots: Object.fromEntries(rows.filter((r) => r.first).map((r) => [r.W, r.first.shadowHosts])),
