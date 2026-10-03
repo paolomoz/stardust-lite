@@ -83,6 +83,7 @@ async function measure(W) {
         const info = await p.evaluate(firstLook);
         firstLines.push(`status ${status ?? '?'} url ${p.url()}`, JSON.stringify(info, null, 1));
         if (!info.fixed.length) firstLines.push(`no fixed or sticky layer at ${W}`);
+        if (info.tallHeader) firstLines.push(`NOTE: ${info.tallHeader}`);
         if (info.unassigned?.length) firstLines.push(`UNASSIGNED painted band(s) outside header / main / footer at ${W} — dumped as extra roots: ${info.unassigned.join(' ; ')}`);
         for (const sel of [overlays.consent, ...overlays.dismiss].filter(Boolean)) { const n = await p.evaluate((s) => { try { return document.querySelectorAll(s).length; } catch { return -1; } }, sel); firstLines.push(`overlay control ${sel}: ${n < 0 ? 'invalid selector' : n ? `${n} match${n > 1 ? 'es' : ''}` : 'ABSENT'}`); }
         results[W] = { first: info };
@@ -106,7 +107,7 @@ async function measure(W) {
   write(`structure-${W}.txt`, structure);
   // the unassigned bands of the first look are content roots too (keys = their selector, before main in the file order)
   const extraRoots = (results[W]?.first?.unassigned || []).map((s) => s.split(' [')[0]).filter((s) => /^[a-z][a-z0-9-]*(#[\w-]+)?(\.[\w-]+)*$/i.test(s));
-  const content = await page.evaluate(collectContent, [[header, ...extraRoots, explicit || root.tag === 'main' ? contentMain : root.path, footer], hidden]);
+  const content = await page.evaluate(collectContent, [[header, ...extraRoots, explicit || root.tag === 'main' ? contentMain : root.path, footer], hidden, sections]); // `sec` marks: the dump splits as the spec does
   if (!explicit && root.tag !== 'main' && root.path !== contentMain) { const o = {}; for (const [k, v] of Object.entries(content)) o[k === root.path ? contentMain : k] = v; Object.assign(content, o); for (const k of Object.keys(content)) if (!(k in o)) delete content[k]; }
   write(`content-${W}.json`, JSON.stringify(Object.fromEntries([header, ...extraRoots, contentMain, footer, ...hidden.map((h) => `hidden ${h}`), '__doc', '__title', '__desc'].filter((k) => k in content).map((k) => [k, content[k]])), null, 1));
   const media = await page.evaluate(collectMedia); media.lockBefore = lockBefore; media.fontRequests = [...new Set(fontReqs)];
@@ -167,6 +168,7 @@ for (const r of rows) {
   if (r.nSections < 0) notes.push(`${r.W}: --sections "${sections}" is not a valid selector`);
   if (r.root.tag !== 'main' && typeof arg('--main', null) !== 'string') notes.push(`${r.W}: content root ${r.root.name} (${r.hasMain ? 'the largest ancestor of main that adds no chrome' : 'no <main>'}) — dump key "${r.contentMain}"`);
   if (r.scrolled && (r.scrolled.newlyPinned.length || Math.abs(r.scrolled.shift) >= 2)) notes.push(`${r.W}: after one viewport of scroll ${r.scrolled.newlyPinned.length ? `${r.scrolled.newlyPinned.join(', ')} pin${r.scrolled.newlyPinned.length > 1 ? '' : 's'} fixed / sticky` : 'no new fixed layer'}${Math.abs(r.scrolled.shift) >= 2 ? ` and the first content box moved ${r.scrolled.shift} px — a layer that leaves the flow when it pins: reproduce it or every chunk after the first is offset in the capture` : ''}`);
+  if (r.first?.tallHeader) notes.push(`${r.W}: ${r.first.tallHeader}`);
   if (r.unassigned?.length) notes.push(`${r.W}: UNASSIGNED band(s) outside header / main / footer dumped as extra content roots — ${r.unassigned.join(', ')} (the first look names their boxes; triage them as chrome or content)`);
   if (r.spec?.entrance) notes.push(`${r.W}: ${r.spec.entrance} spec items read inside an entrance state (\`rest\` on the item; pair / sections compare at rest)`);
   if (r.spec?.running) notes.push(`${r.W}: ${r.spec.running} animations still running at read time (infinite ones)`);

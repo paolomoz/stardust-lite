@@ -11,7 +11,10 @@
 // picture on every page), `spacer: true` on an empty `<p>` / `<li>` that paints a line box (`<p>&nbsp;</p>`, `<p><br></p>`: a spacing
 // measurement author reports), a phrasing-only element without own text keeps its markup (`<p><strong>Title</strong>&nbsp;</p>` read as a
 // bare `strong` and lost its weight), and an inner U+00A0 survives `norm` (the dump is the authoring set; a trailing one is trimmed).
-export function collectContent([roots, hidden]) {
+// loop r3 (mfs-home): a third argument `sectionSel` — the live section selector measure-page measured with — marks every matching element's
+// node `sec: true` and keeps it from collapsing as a bare wrapper, so `triage` / `author` split the dump exactly as the spec and the gate
+// split the page (`triage --sections` could not take the CSS: the dump collapses wrappers; three triage runs and a hand-pruned dump, 5 min)
+export function collectContent([roots, hidden, sectionSel = null]) {
   const R = (e) => { const r = e.getBoundingClientRect(); return [Math.round(r.x), Math.round(r.y + scrollY), Math.round(r.width), Math.round(r.height)]; };
   let force = false; // --hidden roots: every element counts as visible
   const vis = (e) => { if (force) return true; const r = e.getBoundingClientRect(); const s = getComputedStyle(e); return (r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none') || e.tagName === 'PICTURE' || e.tagName === 'SOURCE'; };
@@ -35,6 +38,7 @@ export function collectContent([roots, hidden]) {
     }
     const s = getComputedStyle(e);
     const n = { tag: e.tagName.toLowerCase(), box: R(e) };
+    let isSec = false; if (sectionSel) { try { isSec = e.matches(sectionSel); } catch { /* invalid selector: no marks */ } } if (isSec) n.sec = true;
     if (e.id) n.id = e.id; const cls = [...e.classList].slice(0, 3).join(' '); if (cls) n.cls = cls;
     // text-transform and letter-spacing belong to the font string: the dump holds DOM text, the page renders `uppercase` eyebrows, titles
     // and pills — found in a pixel-diff crop after the first gate, three 1440 bands (usta2-home)
@@ -68,7 +72,8 @@ export function collectContent([roots, hidden]) {
     if (s.borderTopWidth !== '0px' && s.borderTopStyle !== 'none') n.border = `${s.borderTopWidth} ${s.borderTopStyle} ${s.borderTopColor}`;
     const kids = descend ? [...e.children].map(walk).filter(Boolean) : [];
     if (kids.length) n.children = kids;
-    if (kids.length === 1 && !n.text && !n.href && !n.src && !n.bg && !n.bgi && !n.border && !n.shadow && !n.id) return kids[0]; // bare wrapper
+    if (kids.length === 1 && !n.text && !n.href && !n.src && !n.bg && !n.bgi && !n.border && !n.shadow && !n.id && !isSec) return kids[0]; // bare wrapper (a marked section never collapses)
+    if (isSec && !kids.length && !n.text && !n.href && !n.src && !n.bg && !n.bgi) return n; // an empty marked section stays a (0-item) row — the spec counts it too
     // an empty paragraph that paints a line box is a spacing measurement (the pipeline drops `<p>&nbsp;</p>` and `<p><br></p>`; author reports it)
     if (!kids.length && !n.text && !n.href && !n.src && !n.bg && !n.bgi && !n.border && !n.icon && /^(P|LI)$/.test(e.tagName) && n.box[3] > 0 && !norm(e.textContent) && [...e.children].every((c) => c.tagName === 'BR')) { n.spacer = true; return n; }
     if (!kids.length && !n.text && !n.href && !n.src && !n.bg && !n.bgi && !n.border && !n.icon) return null;

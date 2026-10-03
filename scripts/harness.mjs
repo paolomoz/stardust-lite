@@ -2,9 +2,9 @@
 // harness.mjs — lint → fold → runtime → serialise (step 5). The served harness page IS the gated prototype; the serialised file is
 // the review artifact. Refuses to fold a document with a David's Model 🔴 (deploy skill lint) unless --no-lint.
 // Usage: node harness.mjs <authored.html> --serve <dir> --name <slug> [--port 8930] [--width 1440] [--no-lint] [--fragments <branch-host>]
-//        [--content <content.json>[,<click-dump.json>…]] [--site <repo>]
-//   The serve dir is created, and when nothing answers on the port `serve <dir> --port <n> --site <repo>` is started detached (--site
-//   defaults to the cwd) — three runs crashed on a missing dir / silent port before the two-step was clear (scotiabank-personal).
+//        [--content <content.json>[,<click-dump.json>…]] [--site-repo <repo>]
+//   The serve dir is created, and when nothing answers on the port `serve <dir> --port <n> --site <repo>` is started detached (--site-repo
+//   defaults to the cwd; `--site` is the profile file on every instrument — read as the repo it sent serve to `.` and 404'd, mfs-home) — three runs crashed on a missing dir / silent port before the two-step was clear (scotiabank-personal).
 //        node harness.mjs --pages <pages.json> [--doc-dir doc] --serve <dir> [--port 8930] [--fragments <branch-host>] [--no-lint] [--content-dir <dir>]
 //   --pages (batch-7 rollout, pass 5): one harness per page of a `roster pick` list — `<doc-dir>/<slug>.html` → `<serve>/<slug>.harness.html`
 //   on the one port — the page's own output first, then one summary line per page (blocks loaded, doc height, texts not in the capture,
@@ -131,7 +131,7 @@ const written = `${head}<body><header></header>${folded.main}<footer></footer></
 const md5 = (s) => createHash('md5').update(s).digest('hex');
 const serving = () => fetch(`http://localhost:${port}/`).then(() => true).catch(() => false);
 if (!(await serving())) { // start serve detached (page-run's rule); it stays up for the next runs
-  const { spawn } = await import('node:child_process'); const site = String(arg('--site', '.'));
+  const { spawn } = await import('node:child_process'); const site = String(arg('--site-repo', '.'));
   console.log(`harness: nothing answers on :${port} — starting \`serve ${serveDir} --port ${port} --site ${site}\` (detached)`);
   const child = spawn(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'serve.mjs'), serveDir, '--port', String(port), '--site', site], { detached: true, stdio: 'ignore' }); child.unref();
   const t0 = Date.now(); while (!(await serving()) && Date.now() - t0 < 10000) await new Promise((r) => setTimeout(r, 300));

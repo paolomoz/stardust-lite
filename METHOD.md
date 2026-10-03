@@ -70,7 +70,8 @@ order; blocks hold only what default content cannot.
      the site's look is a variant or the block's CSS. A site-specific name is for what the collection has no shape for. Match the site's own
      inventory first (`block-inventory` — `migration/blocks.json`: the blocks and variants earlier pages approved, with their source signatures
      and budgets), the collection second, a new name last; `triage` drafts the table from the content dump (fingerprint, repeat, inventory match
-     with its confidence, default content, rows × cols, the page's novelty) and the agent edits the draft — it never decides.
+     with its confidence, default content, rows × cols, the page's novelty), split as `measure-page --sections` marked the dump — the spec's
+     and the gate's split — and the agent edits the draft; it never decides.
    - **default content around it** — section heads, ledes and closing CTAs are default content; the block decorate may *move* them into its DOM but the
      document keeps them where an author expects them.
    - **embeds in repeating units** — a video that belongs to a card is a fully qualified link in that card's row; the block opens the player.

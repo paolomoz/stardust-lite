@@ -6,3 +6,4 @@ t0 = first instrument run on the page (repo setup excluded, reported apart). `<1
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | scotiabank.com /ca/en/personal.html | 2 | 41 | 54 (5.96 / 2.28 / 1.77) | 67 | 77 | 2.63 / 2.28 / 1.77 (served 2.84 / 2.35 / 1.80) | 1 / 11 | +1.6 % |
 | 2 | cibc.com /en/about-cibc/careers.html | 2.6 | 25 | 52 (5.95 / 2.39 / 1.51) | 54 | 59 | 5.95 / 2.39 / 1.51 (served 5.83 / 2.39 / 1.51) | 0 / 7 | +3.3 % |
+| 3 | mfs.com /corporate/en/home.html | 1.9 | 21 | 30 (2.23 / 4.54 / 1.36, first gate) | 30 | 37 | 1.19 / 2.29 / 1.33 (served 1.20 / 2.29 / 1.34) | 4 / 3 | +4.6 % |
