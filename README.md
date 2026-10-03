@@ -117,27 +117,9 @@ step 2, served page within the prototype's numbers, leak table identical.
 | `dentsu-home` | 2026-10-01 | 4.88 / 2.21 / 2.12 | 4.98 / 2.21 / 2.11 | 2 table rounds (r0–r1) to the first push + 5 gate rounds (r2–r6, none void, 1 regression) + 0 served fixes; 55 min wall, first shareable URL at 37 min; light-DOM Kentico origin serving its Switzerland edition by IP, OneTrust bottom bar, header absolute over a 100vh hero, rellax parallax on four elements, no video, noise floor 0.84 (the parallax band); leak table 0 lines; every block a Block Collection shape |
 | `marriottvacationsworldwide-home` | 2026-10-01 | 2.66 / 0.30 / 0.16 | 2.82 / 0.33 / 0.20 | 3 table rounds (r0–r2) to the first push + 6 gate rounds (r3–r8, none void, 2 cost by instrument readings: an entrance-state spec and a mis-attributed `background-size`) + 0 served fixes; 110 min wall, first shareable URL at 57 min; light-DOM WordPress / Kadence origin, Splide hero with a Brightcove player (its playback API's progressive MP4 served `video/mp4` by DA), AOS entrances parked in the spec, nine body modals as hidden-but-present content, OneTrust reload-on-accept, noise floor 0.00; leak table 0 lines; every block but `brand-bar` a Block Collection shape |
 
-Next: one static-CMS site, passing the lint at step 2 and holding its prototype number on the served page. ibm-home was the JS-heavy
-one (Carbon web components); the composed-tree tier it needed is in `common.mjs` (`DEEP_HELPERS`), `deep-probe` and `hover-diff`.
-walgreens-home was the session-variable one (three compositions per load); the composition gate it needed is `--require` on every
-instrument. stryker-home was the deterministic one (noise floor 0.00): what cost rounds there was the tooling — a consent that reloads,
-lazily loaded fonts, a single-threaded server, a truncated content viewer — and those are now `openPage`, `serve`, `harness --content`,
-`video-frame`, `da-put` and `sync-poll`. usta2-home was the `main`-less one: what cost rounds there was what no table showed — uppercase
-by CSS, a header fixed at one width, a 0-height spacing section, a toggle that closed on the probe's click — and those are now
-`text-transform` in `content-dump` / `pair`, `probe-load` per width, `live-spec`'s spacing flag, `click-state --hover`, plus
-`content-view` and `media-fetch` promoted after their second per-case rewrite. audemarspiguet-home was the one whose dump was not the page: a
-text-reveal library's one-element-per-line paragraphs, a carousel's cards beyond the viewport, boxes read while their entrance transition
-ran, a drawer whose served markup differed from the prototype's — and those are now `content-dump` / `live-spec` line runs and lazy `src`,
-`pair`'s ⤷ rows, `settle` waiting for images and finite animations, the harness folding the list-item rule and warming the media,
-`scroll-probe --paint`.
-dentsu-home was the one whose residuals were paint, not layout: a negative-z veil that paints only below 900 px, a gradient under a picture, a
-tile the capture caught mid-fade, a parallax torn at the chunk boundaries — read by no table and now by `shift-probe` (best shift, scale,
-luminance ratio), `crop --vs` and `deep-probe --props` / `--anim`; `gate --origin` keeps one origin for the prototype and served gates.
-hiltongrandvacations-home was the one whose content was not all at rest: a hero whose header sat under a 0-size wrapper, texts that count up
-while the capture runs, captions and tab panels that exist only after a click, an iframe player no `<video>` probe can pause — and those are now
-`content-dump` walking through 0-size wrappers, `text-ladder`, `click-dump` (a second `harness --content` source), `video-frame --box --hide`
-and a repeated `--click` in `click-state`; the body weight, `[hidden]`, `decorateIcons(block)` and the fragment runtime's wrapper are method text.
-marriottvacationsworldwide-home was the one whose spec was parked: an AOS library held every tile at its entrance translate while the capture showed
-it at rest, nine modals sat hidden in `<body>`, two sizes were settled by pixels and a click probe navigated — now `live-spec`'s entrance flag (`rest`,
-read by `pair` / `sections`), `content-dump --hidden`, `extent`, `gate` dropping a navigating click probe, `click-state --hover` alone and
-`deep-probe --sels` as a list; `inlineIcons()` for `currentColor` and the two specificity traps are method text.
+What each case taught is in its REPORT and in `BACKLOG.md` (the rows name the case): ibm-home the composed-tree tier for shadow-DOM origins,
+walgreens-home the composition gate (`--require`), stryker-home the tooling that cost rounds (consent that reloads, lazy fonts, a single-threaded
+server), usta2-home what no table showed (uppercase by CSS, a header fixed at one width, 0-height spacing), audemarspiguet-home the authoring set
+vs the painted set, dentsu-home residuals that are paint (`shift-probe`, `crop --vs`), hiltongrandvacations-home content not at rest (count-ups,
+click panels, iframe posters), marriottvacationsworldwide-home entrance states parked in the spec. The loop cases (`loop/`, from scotiabank-personal
+on) measure the minutes instead: what the agent read, what it typed by hand, and which instrument now does it.
