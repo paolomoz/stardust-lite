@@ -64,8 +64,12 @@ export const overlayArgs = () => { const o = overlayOpts(); return [...(o.consen
 /** Click the dismiss controls, then the first consent control that resolves; a consent accept may RELOAD the page (OneTrust "reload on
  * consent" — stryker-home): every instrument then ran `settle` in a destroyed context. Arm the navigation wait before the click; when it
  * fires, wait the page in again and re-dismiss the other overlays. Returns the control that was clicked (null when none resolved). */
+const OVERLAY_CENSUS = '[id*=onetrust],[class*=onetrust],[id*=consent],[class*=consent],[id*=cookie],[class*=cookie],[class*=truste],[id*=truste],[id*=privacy],[class*=privacy],[role=dialog],[aria-modal=true],[id*=survey],[class*=survey],[id*=feedback],[class*=feedback],[class*=modal],[id*=modal]';
+const overlayCensus = (page) => page.evaluate((q) => [...document.querySelectorAll(q)].filter((el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 40 && r.height > 40 && cs.visibility !== 'hidden' && cs.display !== 'none' && (cs.position === 'fixed' || cs.position === 'absolute'); }).map((el) => `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${[...el.classList].slice(0, 2).map((c) => '.' + c).join('')} [${Math.round(el.getBoundingClientRect().left)},${Math.round(el.getBoundingClientRect().top)},${Math.round(el.getBoundingClientRect().width)},${Math.round(el.getBoundingClientRect().height)}]`), OVERLAY_CENSUS).catch(() => []);
 export async function acceptOverlays(page, { consent = null, dismiss = [], wait = 2500 } = {}) {
   const dismissAll = async () => { for (const sel of dismiss) { try { await page.click(sel, { timeout: 1500 }); } catch { /* absent */ } } };
+  const before = (consent || dismiss.length) ? await overlayCensus(page) : [];
+  const after = async () => { if (!(consent || dismiss.length)) return; await page.waitForTimeout(400); const now = await overlayCensus(page); const fresh = now.filter((s) => !before.includes(s)); if (fresh.length) console.error(`openPage: NEW overlay after the overlay controls — ${fresh.slice(0, 3).join(' ; ')} — a --dismiss control that opens something (a feedback opener)? pass its close control instead; it sits in every capture otherwise`); };
   await dismissAll();
   const candidates = [consent, '#onetrust-accept-btn-handler', '.agree-button', 'button:has-text("Accept all")', 'button:has-text("Accept All")'].filter(Boolean);
   for (const sel of candidates) {
@@ -74,10 +78,10 @@ export async function acceptOverlays(page, { consent = null, dismiss = [], wait 
       await page.click(sel, { timeout: 1200 });
       if (await nav) { console.error(`openPage: consent control ${sel} reloaded the page — waited for it`); await page.waitForTimeout(wait); await dismissAll(); }
       else console.error(`openPage: consent control ${sel} clicked`);
-      return sel;
+      await after(); return sel;
     } catch { /* next */ }
   }
-  return null;
+  await after(); return null;
 }
 
 /** `browser` may also be a BrowserContext (no `newContext`): the caller owns UA, locale, scale and cookies — a consent accepted once holds

@@ -5,7 +5,14 @@
  * Nothing here is a measurement: no sizes, no colours, no selectors of a source site.
  */
 
-import { buildBlock } from './aem.js';
+import { buildBlock, decorateIcons } from './aem.js';
+
+/**
+ * A block's own icons in one call: the `.icon` spans the decorate created become `<img>` (decorateIcons) and then inline `<svg>`
+ * (inlineIcons) so they follow `currentColor`. `decorateIcons(main)` ran before the block existed — forgotten in r1 of two cases.
+ * @param {Element} block
+ */
+export async function decorateBlockIcons(block) { decorateIcons(block); await inlineIcons(block); }
 
 /**
  * `:name:` tokens in text become `<span class="icon icon-name">` for decorateIcons() (the pipeline does the same for a

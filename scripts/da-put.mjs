@@ -33,7 +33,7 @@ const token = process.env.DA_TOKEN; if (!token && !dry) { console.error('da-put:
 const MIME = { '.html': 'text/html', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.mp4': 'video/mp4', '.pdf': 'application/pdf', '.json': 'application/json' };
 let failed = 0;
 for (const it of items) {
-  const f = it.file; const { name } = it; const ext = extname(name).toLowerCase();
+  const f = it.file; let { name } = it; if (!extname(name) && extname(f).toLowerCase() === '.html') { name = `${name}.html`; console.error(`da-put: --as ${it.name} → ${name} (a document source needs .html; uploaded 201 and previewed 404 without it — manulife)`); } const ext = extname(name).toLowerCase();
   if (!existsSync(f)) { failed += 1; console.log(`${f} → (missing)  ${it.slug ? `page ${it.slug}: ` : ''}no such file`); continue; }
   if (name !== name.toLowerCase()) console.error(`da-put: ${name} has upper-case letters — the DA store is case-insensitive and the pipeline path is lower-case (BACKLOG #4)`);
   if (name.includes('--')) console.error(`da-put: ${name} has a double hyphen — the upload answers 200 and the branch host previews 404 (usta2-home); rename it`);

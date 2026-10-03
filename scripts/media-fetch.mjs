@@ -6,21 +6,30 @@
 // served Content-Type (`.jpg.thumb.585.1170.png` is a JPEG), names AEM `.transform/…/img.jpg` renditions after their asset, and writes
 // <out>/manifest.json (url → file) for the document generator. Written per case twice (stryker-home, usta2-home); this is the instrument.
 // Usage: node media-fetch.mjs <content.json…> --out media [--base https://www.site.com] [--extra <url,…>] [--extra-file <list>]
+//        … --browser   fetch every URL by navigating a browser page to it (common.launch: --chrome tier, cookies) and reading the response body —
+//                      the only path a WAF lets through when curl, node fetch and an in-page fetch() all 403 (manulife, loop r7); slower, use on a 403
 //        node media-fetch.mjs <media-<W>.json> --fonts fonts   the font FILES: media-list's requested font URLs downloaded, and the @font-face
 //                                                             faces embedded as data: URIs written as files (`<family>-<weight>-<style>.woff2`;
 //                                                             a case font-dump.mjs did this — covermore, loop r6); then fonts.css declares them
 import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync } from 'node:fs';
 import { join, extname } from 'node:path';
-import { arg } from './common.mjs';
+import { arg, launch, contextOptions } from './common.mjs';
+let browserPage = null; // --browser: one context, one page, every URL a navigation
+const getBytes = async (url) => {
+  if (!process.argv.includes('--browser')) { const r = await fetch(url).catch(() => null); if (!r) return null; return { ok: r.ok, status: r.status, type: (r.headers.get('content-type') || '').split(';')[0].trim(), buf: r.ok ? Buffer.from(await r.arrayBuffer()) : null }; }
+  if (!browserPage) { const b = await launch(); const ctx = await b.newContext(contextOptions({ width: 1280, height: 800 })); browserPage = await ctx.newPage(); process.on('exit', () => b.close().catch(() => {})); }
+  const r = await browserPage.goto(url, { waitUntil: 'commit', timeout: 60000 }).catch(() => null); if (!r) return null;
+  return { ok: r.ok(), status: r.status(), type: (r.headers()['content-type'] || '').split(';')[0].trim(), buf: r.ok() ? await r.body().catch(() => null) : null };
+};
 
-const OPTS = ['--out', '--base', '--extra', '--extra-file', '--fonts'];
+const OPTS = ['--out', '--base', '--extra', '--extra-file', '--fonts']; // --browser is a bare flag
 if (typeof arg('--fonts', null) === 'string') {
   const dir = arg('--fonts'); mkdirSync(dir, { recursive: true }); let n = 0;
   const safe = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   for (const f of process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && OPTS.includes(all[i - 1])))) {
     const m = JSON.parse(readFileSync(f, 'utf8'));
     for (const d of m.dataFaces || []) { const mm = /^data:([^;,]+)(;base64)?,(.*)$/s.exec(d.data); if (!mm) continue; const ext = /woff2/.test(mm[1]) ? '.woff2' : /woff/.test(mm[1]) ? '.woff' : /ttf|truetype/.test(mm[1]) ? '.ttf' : /otf|opentype/.test(mm[1]) ? '.otf' : '.bin'; const name = `${safe(d.family)}-${safe(d.weight)}-${safe(d.style)}${ext}`; writeFileSync(join(dir, name), mm[2] ? Buffer.from(mm[3], 'base64') : Buffer.from(decodeURIComponent(mm[3]), 'latin1')); console.log(`data: ${d.family} ${d.weight} ${d.style} → ${name}`); n += 1; }
-    for (const u of m.fontRequests || []) { const r = await fetch(u).catch(() => null); if (!r || !r.ok) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${u}`); continue; } const name = safe(new URL(u).pathname.split('/').pop().replace(/\.[a-z0-9]+$/, '')) + (extname(new URL(u).pathname) || '.woff2'); writeFileSync(join(dir, name), Buffer.from(await r.arrayBuffer())); console.log(`${r.status} ${u.slice(-70)} → ${name}`); n += 1; }
+    for (const u of m.fontRequests || []) { const r = await getBytes(u); if (!r || !r.ok || !r.buf) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${u}${!process.argv.includes('--browser') ? ' (a 403: --browser)' : ''}`); continue; } const name = safe(new URL(u).pathname.split('/').pop().replace(/\.[a-z0-9]+$/, '')) + (extname(new URL(u).pathname) || '.woff2'); writeFileSync(join(dir, name), r.buf); console.log(`${r.status} ${u.slice(-70)} → ${name}`); n += 1; }
   }
   console.log(`media-fetch: ${n} font file(s) in ${dir}/ — declare them in styles/fonts.css with the families the spec names`); process.exit(0);
 }
@@ -56,11 +65,11 @@ const taken = new Set(Object.values(manifest)); let n = 0; let failed = 0;
 for (const u of [...new Set(urls)]) {
   let full; try { full = new URL(u, base || undefined).href.replace(/ /g, '%20'); } catch { console.error(`media-fetch: skip ${u} (relative and no --base)`); failed += 1; continue; }
   if (manifest[full] && existsSync(join(out, manifest[full]))) continue;
-  let name = nameOf(full); const r = await fetch(full).catch(() => null);
-  if (!r || !r.ok) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${full}`); failed += 1; continue; }
-  const type = (r.headers.get('content-type') || '').split(';')[0].trim(); const ext = EXT[type];
+  let name = nameOf(full); const r = await getBytes(full);
+  if (!r || !r.ok || !r.buf) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${full}${!process.argv.includes('--browser') && r?.status === 403 ? ' — a WAF: run again with --browser' : ''}`); failed += 1; continue; }
+  const type = r.type; const ext = EXT[type];
   if (/^text\/|^application\/(json|javascript|xml|xhtml\+xml)$/.test(type)) { console.error(`media-fetch: skip ${full.slice(-80)} — ${type} is a document, not media`); continue; }
-  const buf = Buffer.from(await r.arrayBuffer());
+  const buf = r.buf;
   if (ext && extname(name) !== ext && !(ext === '.jpg' && extname(name) === '.jpeg')) name = `${name.replace(/\.[a-z0-9]+$/, '')}${ext}`; // the actual bytes name the extension
   const stem = name.replace(/\.[a-z0-9]+$/, ''); const e = extname(name); let k = 1; while (taken.has(name)) { name = `${stem}-${k}${e}`; k += 1; }
   writeFileSync(join(out, name), buf); taken.add(name); manifest[full] = name; n += 1;

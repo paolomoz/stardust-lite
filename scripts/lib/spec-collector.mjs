@@ -5,7 +5,9 @@
 // the same settled page as the other instruments (batch-7 rollout, pass 6); live-spec's CLI and output are unchanged. Self-contained:
 // Playwright serialises the function by source, nothing here may close over module scope. Call:
 // `page.evaluate(collectSpec, { sections, header, footer })` → { url, W, vh, doc, running, body, bodyBg, fonts, secs, html }.
-export const collectSpec = ({ sections, header, footer }) => {
+export const collectSpec = ({ sections, header, footer, pierce = false }) => {
+  // composed-tree query (loop r7): every element under `root` across shadow roots and slots that matches `sel`, in tree order
+  const qsa = (root, sel) => { if (!pierce) return [...root.querySelectorAll(sel)]; const out = []; const walk = (e) => { for (const c of (e.shadowRoot ? [...e.shadowRoot.children, ...e.children] : [...e.children])) { if (c.tagName === 'STYLE' || c.tagName === 'SCRIPT') continue; if (c.tagName === 'SLOT') { c.assignedElements({ flatten: true }).forEach((a) => { if (a.matches(sel)) out.push(a); walk(a); }); continue; } if (c.matches(sel)) out.push(c); walk(c); } }; walk(root); return [...new Set(out)]; };
   const R = (e) => { const b = e.getBoundingClientRect(); return [Math.round(b.x), Math.round(b.y + scrollY), Math.round(b.width), Math.round(b.height)]; };
   const vis = (e) => { const b = e.getBoundingClientRect(); const s = getComputedStyle(e); return b.width > 0 && b.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && parseFloat(s.opacity) > 0.05; };
   const F = (e) => { const s = getComputedStyle(e); return { ff: s.fontFamily.split(',')[0].replace(/"/g, ''), fs: s.fontSize, fw: s.fontWeight, lh: s.lineHeight, ls: s.letterSpacing, tt: s.textTransform, ta: s.textAlign, c: s.color, fst: s.fontStyle, td: s.textDecorationLine }; };
@@ -25,14 +27,14 @@ export const collectSpec = ({ sections, header, footer }) => {
   const outSecs = secs.map((sec) => {
     const cs = getComputedStyle(sec);
     const s = { id: `${sec.tagName} ${sec.className}`.trim().slice(0, 80), box: R(sec), pad: cs.padding, mar: cs.margin, pos: cs.position, ...BG(sec), items: [] };
-    sec.querySelectorAll('div,section,ul,li,a,button,span,article,aside,figure,nav,form,input,picture').forEach((e) => { if (!vis(e)) return; const bg = BG(e); const bx = R(e); if (Object.keys(bg).length && bx[2] >= 24 && bx[3] >= 16) s.items.push({ k: 'paint', tag: e.tagName.toLowerCase(), cls: (typeof e.className === 'string' ? e.className : '').slice(0, 60), box: bx, pad: getComputedStyle(e).padding, ...bg }); });
+    qsa(sec, 'div,section,ul,li,a,button,span,article,aside,figure,nav,form,input,picture').forEach((e) => { if (!vis(e)) return; const bg = BG(e); const bx = R(e); if (Object.keys(bg).length && bx[2] >= 24 && bx[3] >= 16) s.items.push({ k: 'paint', tag: e.tagName.toLowerCase(), cls: (typeof e.className === 'string' ? e.className : '').slice(0, 60), box: bx, pad: getComputedStyle(e).padding, ...bg }); });
     // a paragraph a text-reveal library split into one element per rendered line (`.js-reveal-effect-line`, SplitText) is ONE text: a run of
     // ≥ 2 sibling block children, same font, each one line tall and holding only text — recorded once on the parent with `lines`
     // (audemarspiguet-home read 20 one-line anchors and paired the continuation lines with nothing)
     const skip = new Set();
     // own text only, so sectioning and phrasing tags that carry text (`header`, `figcaption`, `small`, `time`…) are read once each — a hero's
     // `header` label was in no spec item (hiltongrandvacations-home)
-    sec.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,a,button,label,input,span,em,i,b,strong,u,td,th,div,header,footer,section,article,figcaption,blockquote,cite,small,time,dt,dd,legend,summary,address').forEach((e) => {
+    qsa(sec, 'h1,h2,h3,h4,h5,h6,p,li,a,button,label,input,span,em,i,b,strong,u,td,th,div,header,footer,section,article,figcaption,blockquote,cite,small,time,dt,dd,legend,summary,address').forEach((e) => {
       if (!vis(e) || skip.has(e)) return;
       const run = lineRun(e);
       if (run) { run.forEach((k) => skip.add(k)); s.items.push(withRest({ k: e.tagName.toLowerCase(), cls: (typeof e.className === 'string' ? e.className : '').slice(0, 60), box: R(e), t: run.map((k) => k.textContent.replace(/\s+/g, ' ').trim()).join(' ').slice(0, 400), lines: run.length, ...F(run[0]), ...BG(e) }, e, sec)); return; }
@@ -44,12 +46,12 @@ export const collectSpec = ({ sections, header, footer }) => {
       Object.assign(it, BG(e)); if (getComputedStyle(e).padding !== '0px') it.pad = getComputedStyle(e).padding;
       s.items.push(withRest(it, e, sec));
     });
-    sec.querySelectorAll('img,video,svg,iframe,canvas').forEach((e) => { if (!vis(e)) return; s.items.push(withRest({ k: e.tagName.toLowerCase(), cls: (typeof e.className === 'string' ? e.className : '').slice(0, 60), box: R(e), src: (e.currentSrc || e.getAttribute('src') || e.getAttribute('data-src') || e.getAttribute('poster') || '').slice(0, 240), alt: e.getAttribute('alt') || '', fit: getComputedStyle(e).objectFit }, e, sec)); });
+    qsa(sec, 'img,video,svg,iframe,canvas').forEach((e) => { if (!vis(e)) return; s.items.push(withRest({ k: e.tagName.toLowerCase(), cls: (typeof e.className === 'string' ? e.className : '').slice(0, 60), box: R(e), src: (e.currentSrc || e.getAttribute('src') || e.getAttribute('data-src') || e.getAttribute('poster') || '').slice(0, 240), alt: e.getAttribute('alt') || '', fit: getComputedStyle(e).objectFit }, e, sec)); });
     s.items.sort((a, b) => a.box[1] - b.box[1] || a.box[0] - b.box[0]);
     // who owns the gap: the ancestor chain from the section to its first (and last) text, each ancestor's non-zero margin / padding / border on
     // that side — the spacing model read from three deep-probe runs by hand (8 min, natixis about-article); `brief` prints it as the inset line
     const chain = (e, side) => { const out = []; for (let a = e; a && a !== sec; a = a.parentElement) { const c = getComputedStyle(a); const m = parseFloat(c[`margin${side}`]) || 0; const p = parseFloat(c[`padding${side}`]) || 0; const b = parseFloat(c[`border${side}Width`]) || 0; const sel = `${a.tagName.toLowerCase()}${(typeof a.className === 'string' ? a.className : '').trim().split(/\s+/).filter(Boolean).slice(0, 1).map((x) => '.' + x).join('')}`; if (m || p || b || a === e) out.unshift(`${sel}${m ? ` m${m}` : ''}${p ? ` p${p}` : ''}${b ? ` b${b}` : ''}`); } const c0 = getComputedStyle(sec); const p0 = parseFloat(c0[`padding${side}`]) || 0; const b0 = parseFloat(c0[`border${side}Width`]) || 0; return [`section${p0 ? ` p${p0}` : ''}${b0 ? ` b${b0}` : ''}`, ...out]; };
-    const texts = [...sec.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,a,button,span,label,summary,td')].filter((e) => vis(e) && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && e.getBoundingClientRect().height >= 8);
+    const texts = qsa(sec, 'h1,h2,h3,h4,h5,h6,p,li,a,button,span,label,summary,td').filter((e) => vis(e) && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && e.getBoundingClientRect().height >= 8);
     if (texts.length) { const byY = texts.map((e) => [e, R(e)]).sort((a, b) => a[1][1] - b[1][1] || a[1][0] - b[1][0]); s.inset = { top: chain(byY[0][0], 'Top'), bottom: chain(byY[byY.length - 1][0], 'Bottom').reverse(), first: byY[0][1][1] - s.box[1], last: s.box[1] + s.box[3] - (byY[byY.length - 1][1][1] + byY[byY.length - 1][1][3]) }; }
     return s;
   });

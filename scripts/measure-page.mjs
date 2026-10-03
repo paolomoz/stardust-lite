@@ -107,14 +107,15 @@ async function measure(W) {
   write(`structure-${W}.txt`, structure);
   // the unassigned bands of the first look are content roots too (keys = their selector, before main in the file order)
   const extraRoots = (results[W]?.first?.unassigned || []).map((s) => s.split(' [')[0]).filter((s) => /^[a-z][a-z0-9-]*(#[\w-]+)?(\.[\w-]+)*$/i.test(s));
-  const content = await page.evaluate(collectContent, [[header, ...extraRoots, explicit || root.tag === 'main' ? contentMain : root.path, footer], hidden, sections]); // `sec` marks: the dump splits as the spec does
+  const pierce = process.argv.includes('--pierce') || (results[W]?.first?.shadowHosts || 0) > 0; // a web-components origin: the composed tree (loop r7)
+  const content = await page.evaluate(collectContent, [[header, ...extraRoots, explicit || root.tag === 'main' ? contentMain : root.path, footer], hidden, sections, pierce]); // `sec` marks: the dump splits as the spec does
   if (!explicit && root.tag !== 'main' && root.path !== contentMain) { const o = {}; for (const [k, v] of Object.entries(content)) o[k === root.path ? contentMain : k] = v; Object.assign(content, o); for (const k of Object.keys(content)) if (!(k in o)) delete content[k]; }
   write(`content-${W}.json`, JSON.stringify(Object.fromEntries([header, ...extraRoots, contentMain, footer, ...hidden.map((h) => `hidden ${h}`), '__doc', '__title', '__desc'].filter((k) => k in content).map((k) => [k, content[k]])), null, 1));
   const media = await page.evaluate(collectMedia); media.lockBefore = lockBefore; media.fontRequests = [...new Set(fontReqs)];
   write(`media-${W}.json`, JSON.stringify(media, null, 1));
   let spec = null;
   if (!noSpec) {
-    const full = await page.evaluate(collectSpec, { sections, header, footer }); const { html, ...rest } = full; spec = rest;
+    const full = await page.evaluate(collectSpec, { sections, header, footer, pierce }); const { html, ...rest } = full; spec = rest;
     write(`spec-${W}.json`, JSON.stringify(rest, null, 1)); write(`dom-${W}.html`, html);
   }
   const sels = deepSels || [header, sections, footer];
@@ -124,7 +125,7 @@ async function measure(W) {
   let usedSections = sections;
   // the default --sections matches nothing on a source page: guess it — the first node down from the content root (single-child chains
   // descended) with ≥ 3 children taller than 100 px, as their common `tag.class` — the second run then takes `--sections <guess>` (natixis: an extra probe-structure)
-  const sectionsGuess = nSections === 0 ? await page.evaluate((rootPath) => { const root = document.querySelector(rootPath) || document.querySelector('main') || document.body; const H = root.getBoundingClientRect().height || 1; const kidsOf = (el) => [...el.children].filter((c) => c.getBoundingClientRect().height >= 10 && !/^(SCRIPT|STYLE|TEMPLATE)$/.test(c.tagName)); let best = null; const queue = [[root, 0]]; while (queue.length && !best) { const [n, d] = queue.shift(); if (d > 6) break; const t = kidsOf(n); const cover = t.reduce((a, c) => a + c.getBoundingClientRect().height, 0) / H; if (t.length >= 2 && cover >= 0.6) best = { n, t }; else t.forEach((c) => queue.push([c, d + 1])); } if (!best) return null; const { n, t } = best; /* the shallowest node whose ≥ 2 children cover ≥ 60 % of the root: the source's section row */ const cls = [...t[0].classList].find((c) => t.every((x) => x.classList.contains(c))); const sel = `${n.tagName.toLowerCase()}${n.id ? '#' + n.id : [...n.classList].slice(0, 1).map((c) => '.' + c).join('')} > ${t[0].tagName.toLowerCase()}${cls ? '.' + cls : ''}`; return { sel, n: document.querySelectorAll(sel).length, heights: t.map((x) => Math.round(x.getBoundingClientRect().height)) }; }, root.path).catch(() => null) : null;
+  const sectionsGuess = nSections === 0 ? await page.evaluate((rootPath) => { const root = document.querySelector(rootPath) || document.querySelector('main') || document.body; const H = root.getBoundingClientRect().height || 1; const kidsOf = (el) => [...el.children].filter((c) => c.getBoundingClientRect().height >= 10 && !/^(SCRIPT|STYLE|TEMPLATE)$/.test(c.tagName)); let best = null; const queue = [[root, 0]]; while (queue.length && !best) { const [n, d] = queue.shift(); if (d > 6) break; const t = kidsOf(n); const cover = t.reduce((a, c) => a + c.getBoundingClientRect().height, 0) / H; if (t.length >= 2 && cover >= 0.6) best = { n, t }; else t.forEach((c) => queue.push([c, d + 1])); } if (!best) return null; const { n, t } = best; /* the shallowest node whose ≥ 2 children cover ≥ 60 % of the root: the source's section row */ const cls = [...t[0].classList].find((c) => t.every((x) => x.classList.contains(c))); let sel = `${n.tagName.toLowerCase()}${n.id ? '#' + n.id : [...n.classList].slice(0, 1).map((c) => '.' + c).join('')} > ${t[0].tagName.toLowerCase()}${cls ? '.' + cls : ''}`; if (document.querySelectorAll(sel).length !== t.length) { const path = []; for (let a = n; a && a !== root && a !== document.body; a = a.parentElement) path.unshift(a.id ? `#${a.id}` : `${a.tagName.toLowerCase()}:nth-child(${[...a.parentElement.children].indexOf(a) + 1})`); sel = `${rootPath} > ${path.join(' > ')} > ${t[0].tagName.toLowerCase()}${cls ? '.' + cls : ''}`; } /* nested grids of the same class matched 12 elements for 7 sections (manulife): anchor the selector to the row's path */ return { sel, n: document.querySelectorAll(sel).length, heights: t.map((x) => Math.round(x.getBoundingClientRect().height)) }; }, root.path).catch(() => null) : null;
   // the scrolled state: which layers are fixed / sticky after one viewport and how far the first content box moved — a mobile bar that pins on
   // scroll took 50 px out of the flow from chunk 2 on and no table at rest showed it (360 at 15 % for three rounds, cibc-careers, loop r2)
   const scrolled = await page.evaluate(async ([vh, rootPath]) => {
@@ -138,10 +139,10 @@ async function measure(W) {
   }, [vh, root.path]).catch(() => null);
   if (sectionsGuess && sectionsGuess.n >= 2 && typeof arg('--sections', null) !== 'string') { // the default matched nothing: measure with the guess now, from this same page
     usedSections = sectionsGuess.sel; log(`--sections default matched nothing — measuring with the guess '${usedSections}' (${sectionsGuess.n} sections)`);
-    const content2 = await page.evaluate(collectContent, [[header, ...extraRoots, explicit || root.tag === 'main' ? contentMain : root.path, footer], hidden, usedSections]);
+    const content2 = await page.evaluate(collectContent, [[header, ...extraRoots, explicit || root.tag === 'main' ? contentMain : root.path, footer], hidden, usedSections, pierce]);
     if (!explicit && root.tag !== 'main' && root.path !== contentMain) { const o = {}; for (const [k, v] of Object.entries(content2)) o[k === root.path ? contentMain : k] = v; Object.assign(content2, o); for (const k of Object.keys(content2)) if (!(k in o)) delete content2[k]; }
     write(`content-${W}.json`, JSON.stringify(Object.fromEntries([header, ...extraRoots, contentMain, footer, ...hidden.map((h) => `hidden ${h}`), '__doc', '__title', '__desc'].filter((k) => k in content2).map((k) => [k, content2[k]])), null, 1));
-    if (!noSpec) { const full = await page.evaluate(collectSpec, { sections: usedSections, header, footer }); const { html, ...rest } = full; spec = rest; write(`spec-${W}.json`, JSON.stringify(rest, null, 1)); write(`dom-${W}.html`, html); }
+    if (!noSpec) { const full = await page.evaluate(collectSpec, { sections: usedSections, header, footer, pierce }); const { html, ...rest } = full; spec = rest; write(`spec-${W}.json`, JSON.stringify(rest, null, 1)); write(`dom-${W}.html`, html); }
     if (!deepSels) { const deep2 = await page.evaluate(new Function('args', `${DEEP_HELPERS}\n return (${String(deepProbe)})(args);`), [[header, usedSections, footer], DEEP_MAX, false, [], false]); write(`deep-${W}.txt`, deep2 + '\n'); }
     nSections = sectionsGuess.n;
   }
@@ -153,7 +154,7 @@ async function measure(W) {
   await ctx.close();
   const elapsed = Number(((Date.now() - t0) / 1000).toFixed(1));
   log(`done in ${elapsed} s`);
-  return { W, elapsed, status, files, root, contentMain, hasMain, cap, checkRows, first: results[W]?.first || null, doc: content.__doc, unassigned: extraRoots, scrolled, sectionsGuess, usedSections, contentRoots: [header, ...extraRoots, contentMain, footer].map((r) => `${r}: ${(content[r] || []).length}`), hiddenRoots: hidden.map((r) => `${r}: ${(content[`hidden ${r}`] || []).length}`), media: { imgs: media.imgs.length, videos: media.videos.length, bgs: media.bgs.length, svgs: media.svgs.length, faces: media.faces.length, fontRequests: media.fontRequests.length }, spec: spec ? { secs: spec.secs.length, items: spec.secs.reduce((n, s) => n + s.items.length, 0), running: spec.running, entrance: spec.secs.reduce((n, s) => n + s.items.filter((it) => it.ent).length, 0) } : null, nSections, deepLines: deep.split('\n').length };
+  return { W, elapsed, status, files, root, contentMain, hasMain, cap, checkRows, first: results[W]?.first || null, doc: content.__doc, unassigned: extraRoots, scrolled, sectionsGuess, usedSections, pierce, contentRoots: [header, ...extraRoots, contentMain, footer].map((r) => `${r}: ${(content[r] || []).length}`), hiddenRoots: hidden.map((r) => `${r}: ${(content[`hidden ${r}`] || []).length}`), media: { imgs: media.imgs.length, videos: media.videos.length, bgs: media.bgs.length, svgs: media.svgs.length, faces: media.faces.length, fontRequests: media.fontRequests.length }, spec: spec ? { secs: spec.secs.length, items: spec.secs.reduce((n, s) => n + s.items.length, 0), running: spec.running, entrance: spec.secs.reduce((n, s) => n + s.items.filter((it) => it.ent).length, 0) } : null, nSections, deepLines: deep.split('\n').length };
 }
 
 // up to `parallel` widths at once, in order
@@ -179,6 +180,7 @@ for (const r of rows) {
   if (r.error) { notes.push(`${r.W}: ${r.error}`); continue; }
   if (r.usedSections && r.usedSections !== sections) notes.push(`${r.W}: --sections "${sections}" matched nothing — measured with the guess '${r.usedSections}' (${r.nSections} sections, heights ${r.sectionsGuess.heights.slice(0, 8).join('/')}); pass it as --sections to keep it`);
   else if (r.nSections === 0) notes.push(`${r.W}: --sections "${sections}" matches nothing — the spec has header/footer only; ${r.sectionsGuess ? `guess: --sections '${r.sectionsGuess.sel}' (${r.sectionsGuess.n} matches, heights ${r.sectionsGuess.heights.slice(0, 8).join('/')}) — run again with it` : `read structure-${r.W}.txt for the section selector`}`);
+  if (r.pierce) notes.push(`${r.W}: ${r.first?.shadowHosts || 0} shadow hosts — the content dump and the spec read the COMPOSED tree (shadow roots and slots); deep-probe / hover-diff take \` >> \` selectors`);
   if (r.first?.breakpoints?.length) notes.push(`${r.W}: breakpoints (media queries by count) ${r.first.breakpoints.slice(0, 6).join(', ')}`);
   if (r.nSections < 0) notes.push(`${r.W}: --sections "${sections}" is not a valid selector`);
   if (r.root.tag !== 'main' && typeof arg('--main', null) !== 'string') notes.push(`${r.W}: content root ${r.root.name} (${r.hasMain ? 'the largest ancestor of main that adds no chrome' : 'no <main>'}) — dump key "${r.contentMain}"`);

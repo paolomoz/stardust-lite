@@ -10,3 +10,4 @@ t0 = first instrument run on the page (repo setup excluded, reported apart). `<1
 | 4 | im.natixis.com /en-intl/about/diversity-equity-and-inclusion | 2 | 32 | 43 (1440 7.57 / 2560 4.82 at 33; 360 10.92 → <10 at 43) | 46 | 52 | 1.39 / 0.15 / 0.09 (served 1.06 / 0.17 / 0.09) | 2 / 5 | +4.1 % |
 | 5 | harbourvest.com /it/en/about-harbourvest (attestation cookie gate) | 2.4 | 48 | 66 at 1440 / 2560 only (16.7 / 3.5 / 5.1); 360 never (trailing-nbsp wrap, −42 px) | 83 | 83 | 15.73 / 3.56 / 3.57 (served 15.55 / 3.53 / 3.55) | 2 / 8 | +4.9 % |
 | 6 | covermore.com /travel-assistance | 2.1 | 22 | 27 (3.65 / 1.95 / 1.07, round 2) | 27 | 32 | 3.65 / 1.95 / 1.07 (served identical) | 1 / 2 | +5.8 % |
+| 7 | manulife.com /ca/en/business (web components, --chrome) | 2.2 | 31 | 43 (9.06 / 1.33 / 0.74) | 58 | 62 | 2.01 / 0.67 / 0.37 (served 2.02 / 0.67 / 0.38) | 2 / 7 | +6.4 % |

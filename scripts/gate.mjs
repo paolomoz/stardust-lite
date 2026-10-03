@@ -274,7 +274,7 @@ if (arg('--probes', null)) {
     await br.close();
     if (nav.length) { console.error(`gate: ${nav.length} click probe(s) target a link that navigates on the live side — dropped (the click destroys the live context and the motion run; hover the item or use click-state --hover):\n  ${nav.join('\n  ')}`); for (const m of parsed) if (m[1] === 'click' && nav.includes(m[2])) m.drop = true; }
   }
-  if (chromeOn && parsed.some((m) => !m.drop && !m.forced)) {
+  if (chromeOn && hasChrome && parsed.some((m) => !m.drop && !m.forced)) { // nothing masked (no chrome heights) → every probe runs (6 header probes skipped on a template run, manulife)
     // the chrome is approved: a probe whose build target sits in header/footer is skipped (prefix the line `chrome:` to keep it)
     const br = await launch(); const pg = await openPage(br, build, { width: 1440 });
     const inChrome = await pg.evaluate((sels) => sels.map((s) => { try { const e = document.querySelector(s); return !!(e && e.closest('header, footer')); } catch { return false; } }), parsed.map((m) => m[3]));
@@ -298,7 +298,7 @@ if (budgetOn && Object.keys(sectionRuns).length) {
   for (const o of overAll) budgetLine += `\n  ✗ ${o.W} #${o.index} "${o.anchorText.slice(0, 24)}" ${o.block}: ${o.over.includes('pct') ? `${o.pct} % > budget ${o.budget}` : ''}${o.over === 'pct+Δh' ? ', ' : ''}${o.over.includes('Δh') ? `Δh ${o.dh} px > 2` : ''}`;
 }
 const tLine = widths.map((W) => { const t = timing[W] || {}; const f = (v) => (v === null || v === undefined ? '—' : `${v} s`); return `${W}: live ${t.live === 0 ? `cached${t.liveOpen ? ` (opened ${t.liveOpen} s)` : ''}` : f(t.live)}, build ${f(t.build)}, compare ${f(t.compare)}, sections ${f(t.sections)}`; }).join(' | ');
-const specDir = [originFrom, arg('--origin', null), arg('--spec-dir', null)].filter((d) => typeof d === 'string').map((d) => resolve(d)).find((d) => widths.some((W) => existsSync(join(d, `spec-${W}.json`))));
+const specDir = [originFrom, arg('--origin', null), arg('--spec-dir', null), join(out, '..', 'measure'), 'measure'].filter((d) => typeof d === 'string').map((d) => resolve(d)).find((d) => widths.some((W) => existsSync(join(d, `spec-${W}.json`))));
 let sectionsLine = '';
 if (specDir && /^https?:/.test(build)) { // the build is a URL: `sections <build> --widths … --spec-dir <dir>` in one browser — its verdict and the rows off
   const sw = widths.filter((W) => existsSync(join(specDir, `spec-${W}.json`)));
