@@ -130,7 +130,7 @@ async function measure(W) {
   // scroll took 50 px out of the flow from chunk 2 on and no table at rest showed it (360 at 15 % for three rounds, cibc-careers, loop r2)
   const scrolled = await page.evaluate(async ([vh, rootPath]) => {
     const sel = (el) => `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${[...el.classList].slice(0, 3).map((c) => '.' + c).join('')}`;
-    const pinned = () => [...document.querySelectorAll('body *')].filter((el) => { const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); return (cs.position === 'fixed' || (cs.position === 'sticky' && r.top <= 1)) && r.width > 0 && r.height > 0 && cs.visibility !== 'hidden'; }).map((el) => `${sel(el)} h${Math.round(el.getBoundingClientRect().height)}`);
+    const pinned = () => [...document.querySelectorAll('body *')].filter((el) => { const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); return (cs.position === 'fixed' || (cs.position === 'sticky' && r.top <= 1)) && r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && r.bottom > 0 && r.top < innerHeight; }) /* a layer slid out of the viewport (top −74) is gone */.map((el) => `${sel(el)} h${Math.round(el.getBoundingClientRect().height)}`);
     const root = document.querySelector(rootPath) || document.querySelector('main') || document.body; const first = [...root.children].find((c) => c.getBoundingClientRect().height > 0) || root;
     const y0 = Math.round(first.getBoundingClientRect().top + scrollY); const at0 = pinned();
     window.scrollTo(0, vh); await new Promise((r) => setTimeout(r, 500)); const at1 = pinned(); const y1 = Math.round(first.getBoundingClientRect().top + scrollY);
