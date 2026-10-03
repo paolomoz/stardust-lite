@@ -50,7 +50,7 @@ export function collectContent([roots, hidden, sectionSel = null]) {
     const phrasingOnly = e.children.length && [...e.children].every((c) => PHRASING.includes(c.tagName) && !c.querySelector('img,picture,svg,video'));
     // a phrasing-only element with no own text is still one text when it holds no link (`<p><strong>Title</strong></p>`, `<p><em><strong>`):
     // descending to the `strong` read the title as a bare paragraph; a lone link child keeps descending so the link is a node of its own
-    const phrasingText = phrasingOnly && (own(e) || (!e.querySelector('a') && norm(e.textContent)));
+    const phrasingText = phrasingOnly && (own(e) || ((!e.querySelector('a') || /^H[1-6]$/.test(e.tagName)) && norm(e.textContent))); // a heading holding a link stays one heading with its markup (an `<h3><strong>Email:</strong> <a mailto>` was lost — covermore, loop r6)
     let descend = true;
     const run = lineRun();
     if (run) { n.text = run.map((k) => norm(k.textContent)).join(' '); n.lines = run.length; n.font = font(run[0]); descend = false; } else if (phrasingText) { n.text = norm(e.textContent); const full = norm(e.innerHTML); n.markup = full.slice(0, 600); if (full.length > 600) n.markupFull = full; n.font = font(); descend = false; } else { const t = own(e); if (t) { n.text = t; n.font = font(); } }

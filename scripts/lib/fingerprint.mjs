@@ -232,7 +232,7 @@ export function collectionGuess(fp) {
     if (u.has('media') && u.size === 1) return { collection: 'cards', alternatives: [], reason: `media-only unit ×${fp.repeat} (logos)` };
     if (u.has('media')) return { collection: 'cards', alternatives: ['carousel'], reason: `media unit ×${fp.repeat}` };
     if (!u.has('media') && (u.has('heading') || u.has('link')) && !u.has('text')) return { collection: 'accordion', alternatives: ['tabs', 'columns'], reason: `heading/link-only unit ×${fp.repeat} (hidden panels are not in the dump)` };
-    if (!u.has('media') && u.has('text')) return { collection: 'columns', alternatives: ['cards'], reason: `text unit ×${fp.repeat}` };
+    if (!u.has('media') && u.has('text')) return fp.repeat >= 3 && u.has('heading') ? { collection: 'columns', alternatives: ['cards'], reason: `text unit ×${fp.repeat}` } : { collection: null, alternatives: ['columns'], reason: `text run ×${fp.repeat} without media: default content (a columns block needs ≥ 3 headed units)` }; // two paragraphs read as "columns? weak" on an article page (covermore, loop r6)
     return r;
   }
   if (k.has('quote') || (fp.texts === 1 && fp.media === 0 && !k.has('heading') && fp.bigText >= 32)) return { collection: 'quote', alternatives: [], reason: k.has('quote') ? 'blockquote' : `one paragraph at ${fp.bigText}px` };

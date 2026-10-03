@@ -68,7 +68,7 @@ S.secs.forEach((s, i) => {
   const seq = items.filter((it) => isText(it) ? it.t && !it.inline : ['img', 'video', 'svg', 'iframe'].includes(it.k)).sort((a, b) => a.box[1] - b.box[1] || a.box[0] - b.box[0]);
   if (seq.length) { const g = []; let prevBottom = s.box[1]; let col = null; for (const it of seq) { const top = it.box[1]; if (top >= prevBottom - 2) { const gap = top - prevBottom; g.push(`${gap >= 0 ? gap : 0} → ${it.k}(${it.box[3]})`); prevBottom = top + it.box[3]; col = it.box[0]; } else if (col !== null && Math.abs(it.box[0] - col) > 8) { /* a second column at the same y: skipped */ } }
     const bottom = s.box[1] + s.box[3] - prevBottom; console.log(`   rhythm ${g.slice(0, 14).join('  ')}${g.length > 14 ? `  … +${g.length - 14}` : ''}  → bottom ${bottom}`); }
-  if (s.inset) console.log(`   inset top ${s.inset.first}: ${s.inset.top.join(' → ')} | bottom ${s.inset.last}: ${s.inset.bottom.join(' → ')}   (m margin, p padding, b border, px; who owns the gap to the first / last text)`);
+  if (s.inset) console.log(`   inset top ${s.inset.first}: ${s.inset.top.join(' → ')} | bottom ${s.inset.last}: ${s.inset.bottom.join(' → ')}   (m margin, p padding, b border, px; who owns the gap to the first / last text — a margin on the text itself collapses into the section unless the chain holds a padding / border)`);
   const ents = s.items.filter((it) => it.ent).length; if (ents) console.log(`   note  ${ents} items read in an entrance state (rest boxes used by pair / sections)`);
 });
 console.log(`\nre-read a row with: spec-view ${dir}/spec-<W>.json <i>; paint not on a node: deep-probe <url> <W> --sels …`);
