@@ -31,7 +31,6 @@ async function captureFromPage(pageUrl, wanted) {
 }
 const getBytes = async (url) => {
   if (fromPage.has(url)) return fromPage.get(url);
-  if (typeof arg('--from-page', null) === 'string' && !process.argv.includes('--browser')) return { ok: false, status: 'not in the page\'s responses', type: '', buf: null };
   if (!process.argv.includes('--browser')) { const r = await fetch(url).catch(() => null); if (!r) return null; return { ok: r.ok, status: r.status, type: (r.headers.get('content-type') || '').split(';')[0].trim(), buf: r.ok ? Buffer.from(await r.arrayBuffer()) : null }; }
   if (!browserPage) { const b = await launch(); const ctx = await b.newContext(contextOptions({ width: 1280, height: 800 })); browserPage = await ctx.newPage(); process.on('exit', () => b.close().catch(() => {})); }
   const r = await browserPage.goto(url, { waitUntil: 'commit', timeout: 60000 }).catch(() => null); if (!r) return null;
