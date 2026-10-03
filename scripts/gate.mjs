@@ -189,6 +189,10 @@ for (const W of widths) {
   }
   const px = run([join(S, 'pixel-compare.mjs'), origin, eds, '--out', join(out, `diff-${W}.png`), '--band', String(W === 360 ? 900 : band), '--json', ...(mask.length ? ['--mask', mask.join(',')] : [])], true);
   try { const j = JSON.parse(px.stdout.slice(px.stdout.indexOf('{'))); writeFileSync(join(out, `pixel-${W}.json`), JSON.stringify(j, null, 1)); rows.push({ W, pct: j.pct, dh: j.heightDelta, bands: j.bands.map((b) => `${b.y0}:${b.pct}`).join(' '), masked: j.maskedRows || 0 }); } catch { rows.push({ W, pct: 'ERR', dh: '', bands: px.stdout.slice(-200) }); }
+  // the hottest band, read as pixels: shift-probe's best shift and luminance ratio name a displacement, a scale or paint over a picture — a
+  // letterboxed hero was a 62 % band no table named (cibc-careers); one reading per width, over the band's full width
+  try { const j = JSON.parse(readFileSync(join(out, `pixel-${W}.json`), 'utf8')); const hot = (j.bands || []).filter((b) => b.pct > 0.5).sort((a, b) => b.pct - a.pct)[0];
+    if (hot) { const sp = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'shift-probe.mjs'), origin, eds, '--x0', '0', '--x1', String(W), '--y0', String(hot.y0), '--y1', String(hot.y1), '--r', '8', '--step', '2'], { encoding: 'utf8' }); const lines = sp.stdout.trim().split('\n'); console.log(`hottest band at ${W}: y ${hot.y0}–${hot.y1} ${hot.pct} % — ${lines.map((l) => l.replace(/^region [^:]*: /, '')).join(' · ').slice(0, 300)}`); } } catch { /* no bands */ }
   try { // the top band of the diff as its own file: look at the chrome, do not read it as a number
     const src = PNG.sync.read(readFileSync(join(out, `diff-${W}.png`))); const H = Math.min(Number(arg('--top', 120)), src.height); const dst = new PNG({ width: src.width, height: H });
     src.data.copy(dst.data, 0, 0, src.width * H * 4); writeFileSync(join(out, `diff-${W}-top.png`), PNG.sync.write(dst));
