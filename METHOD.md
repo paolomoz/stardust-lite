@@ -1,13 +1,8 @@
 # Blocks-first prototyping, v2 — the replica procedure that transfers to EDS without loss
 
-One case per version (pixel diff at 360 / 1440 / probe; served page = prototype from v2.1 on; numbers in README.md's cases table, lessons in each REPORT). v1
-usta — only "author rows → block → runtime prototype" transferred. v2 baincapital — pixel-faithful, **failed David's Model**. v2.1 travelers — shell rule, round
-discipline, deep probes. v2.2 ibm — shadow DOM, overlays, hosted video, stop rule. v2.3 walgreens — composition gate, cap placements, boilerplate rules as
-measurements. v2.4 stryker — consent that reloads, fonts first, percent geometry, margin collapse. v2.5 usta2 — text-transform, fixed layers per width, 0-height
-spacing. v2.6 audemarspiguet — authoring set vs painted set, boxes read mid-flight, media names. v2.7 dentsu — paint read as pixels, a red band's four causes,
-torn scroll-linked transforms, geo editions by IP. v2.8 hiltongrandvacations — an iframe player's poster, texts that change with time, content a click reveals,
-the runtime's own wrapper, one authored section per source section. v2.9 marriottvacationsworldwide — entrance states parked in the spec, hidden-but-present
-content, painted extents, a click probe that navigates.
+One case per version (pixel diff at 360 / 1440 / probe; served page = prototype from v2.1 on): the cases table in README.md holds the numbers, each
+case's REPORT the lessons, BACKLOG.md the rows they closed — from v1 usta (author rows → block → runtime prototype) through v2 baincapital (pixel-faithful,
+**failed David's Model**) to the loop cases (`loop/`), which measure the minutes.
 
 ## The rule
 
