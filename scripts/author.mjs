@@ -286,7 +286,7 @@ function authorSection(node, row) {
   const t0 = stats.texts; const parts = [];
   const m = row.match;
   const draftNew = process.argv.includes('--draft-new') && m.kind === 'new' && m.block;
-  const block = m.kind === 'inventory' ? { name: m.block, variant: m.variant || null } : (m.kind === 'collection' || draftNew) && m.block ? { name: m.block, variant: null } : null;
+  const block = m.kind === 'inventory' ? { name: m.block, variant: m.variant || null } : (m.kind === 'collection' || draftNew) && m.block ? { name: m.block, variant: m.variant || null } : null;
   if (draftNew) report.notes.push(`NEW drafted through the collection's ${m.block} shape (--draft-new): approve the model in the triage before the block`);
   if (m.kind === 'new' && !draftNew) { parts.push(`<!-- NEW: ${row.fingerprint}${row.collection ? ` (${row.collection}?)` : ''} — model this block -->`); report.notes.push('NEW section: emitted as default content; triage it first (exit 3)'); }
   if (!block) { parts.push(...defaultContent(node, report)); }
