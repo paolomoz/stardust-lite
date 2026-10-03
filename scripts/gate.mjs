@@ -255,6 +255,7 @@ let capLine = [(cap.stdout.match(/cap-probe: .*/) || ['cap-probe: (no verdict li
 // a page whose content root holds one module (a banner + one article) gives cap-probe the module's own columns as "modules" (a 472 text
 // column read as a content cap, the build asked for a 472 wrapper): its row verdict is advisory there — 7 of 10 sdt-dentsu pages FAILed at
 // 2560 with Δh 0 on every section; the section table is the reading
+if (liveSectionCount > 0) capLine = capLine.replace(/^(cap-probe: [^\n]*)/, `$1 (gate's live split: ${liveSectionCount} sections — a cap-probe count that differs between runs is its own split, #162: compare the rows, not the verdict)`);
 if (liveSectionCount > 0 && liveSectionCount <= 2 && /FAIL/.test(capLine)) capLine = capLine.replace(/^(cap-probe: [^\n]*)/, `$1 — advisory: a ${liveSectionCount}-section page, the probe's modules are one module's own columns; read the section table`);
 let motionLine = '';
 if (arg('--probes', null)) {

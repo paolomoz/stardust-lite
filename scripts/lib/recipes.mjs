@@ -175,9 +175,25 @@ function cellsFor(rows) {
 
 /** The fallback when a block has no recipe: by shape and the stored fingerprint — a container with media is picture + rest, a simple
  * block one row of rest; the report says the default was used. */
-export function defaultRecipe(row) {
+// the Block Collection's authoring shapes, for a template page whose inventory is empty (every section stopped `author` and the case wrote
+// its own generator — scotiabank-personal, loop r1): a collection match drafts through these; the approved document then derives the real recipe
+const COLLECTION = {
+  hero: { rows: 'fixed', cells: [{ name: 'body', from: ['rest'] }], defaultContentBefore: [], defaultContentAfter: [] },
+  cards: { rows: 'unit', cells: [{ name: 'image', from: ['picture', 'video', 'icon'], take: 1 }, { name: 'body', from: ['rest'] }] },
+  carousel: { rows: 'unit', cells: [{ name: 'image', from: ['picture', 'video'], take: 1 }, { name: 'body', from: ['rest'] }] },
+  tabs: { rows: 'unit', cells: [{ name: 'label', from: ['heading', 'text', 'link'], take: 1 }, { name: 'panel', from: ['rest'] }] },
+  accordion: { rows: 'unit', cells: [{ name: 'summary', from: ['heading', 'text'], take: 1 }, { name: 'body', from: ['rest'] }] },
+  columns: { rows: 'fixed', cells: [{ name: 'column', from: ['rest'] }] },
+  quote: { rows: 'leaf', cells: [{ name: 'quote', from: ['quote', 'text', 'rest'] }], defaultContentBefore: [], defaultContentAfter: [] },
+  embed: { rows: 'leaf', cells: [{ name: 'link', from: ['link', 'embed', 'video', 'rest'] }], defaultContentBefore: [], defaultContentAfter: [] },
+  video: { rows: 'leaf', cells: [{ name: 'link', from: ['video', 'link', 'picture', 'rest'] }], defaultContentBefore: [], defaultContentAfter: [] },
+  table: { rows: 'unit', cells: [{ name: 'cells', from: ['rest'] }] },
+};
+export function defaultRecipe(row, name = null) {
   const f = row?.sourceSignature?.fingerprint || null; const sig = f?.unitSig || f?.kinds || [];
   if (row?.shape === 'key-value') return { rows: 'key-value', cells: null, headRow: null, keys: [], sectionStyle: null, defaultContentBefore: [], defaultContentAfter: [], _notes: ['default recipe: no keys known'] };
+  const col = COLLECTION[String(name || row?.name || '').toLowerCase()];
+  if (col && !f) return { headRow: null, keys: null, sectionStyle: null, defaultContentBefore: ['heading', 'text'], defaultContentAfter: ['link'], ...col, _notes: [`default recipe: the Block Collection's ${name || row?.name} shape (no recipe in blocks.json)`] };
   const container = row?.shape === 'container' || (f && f.repeat >= 2);
   const cells = sig.includes('media') ? [{ name: 'image', from: ['picture', 'video'], take: 1 }, { name: 'body', from: ['rest'] }] : [{ name: 'body', from: ['rest'] }];
   return { rows: container ? 'unit' : 'fixed', cells, headRow: null, keys: null, sectionStyle: null, defaultContentBefore: ['heading', 'text'], defaultContentAfter: ['link'], _notes: ['default recipe (no recipe in blocks.json): picture + rest'] };

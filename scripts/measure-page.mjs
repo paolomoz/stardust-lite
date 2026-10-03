@@ -193,5 +193,6 @@ for (const r of rows) {
 for (const [W, nz] of Object.entries(noise)) console.log(`noise floor: ${W} ${nz.error ? `FAILED — ${nz.error}` : `${nz.pct} % (Δh ${nz.dh}, ${nz.seconds} s) — live-${W}.png vs live-${W}-b.png`}`);
 for (const n of notes) console.log(`note: ${n}`);
 if (check) console.log(`profile check: ${check.line}${check.fails ? ' — run `site-profile check migration/site.json` on its own; a FAIL is site work, not this page\'s round' : ''}`);
+console.log(`next: node scripts/brief.mjs ${out} [--triage triage.json] — the one-screen CSS brief (text styles, media, paint, cap per section and width); read it before the specs`);
 console.log(`files per width: probe-load-<W>.txt structure-<W>.txt content-<W>.json media-<W>.json${noSpec ? '' : ' spec-<W>.json dom-<W>.html'} deep-<W>.txt${capture ? ' live-<W>.png' : ''}; summary.json`);
 process.exit(rows.some((r) => r.error) ? 2 : 0);

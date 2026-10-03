@@ -19,7 +19,10 @@
 // (block / default / new), cells filled, texts, with the warnings: unknown media, empty cells, leaves that did not fit the recipe.
 // Usage: node author.mjs <triage.json> --content content.json[,clicks.json,hidden.json] --blocks migration/blocks.json --out doc/<slug>.html
 //        [--media media/manifest.json] [--media-host https://<branch-host>/drafts/media] [--nav doc/nav.html --footer doc/footer.html]
-//        [--site migration/site.json] [--nav-path /drafts/nav --footer-path /drafts/footer] [--url <page url>] [--no-lint] [--keep-spacers]
+//        [--site migration/site.json] [--nav-path /drafts/nav --footer-path /drafts/footer] [--url <page url>] [--no-lint] [--keep-spacers] [--draft-new]
+//   --draft-new   a template page on an empty inventory: a NEW section whose triage row names a Block Collection shape (hero, cards, tabs, …)
+//                 is drafted through that shape's default recipe (lib/recipes.mjs COLLECTION) instead of stopping the run — the model is
+//                 still the triage's to approve; every case had written its own generator here (scotiabank-personal, loop r1)
 //   --keep-spacers  write the source's empty paragraphs (`<p>&nbsp;</p>`, `<p><br></p>` — the collector marks them `spacer`) as a
 //               zero-width-space paragraph, the only empty line box the pipeline keeps; by default they are DROPPED and counted on
 //               stderr with their height (METHOD names the zero-width spacer an anti-pattern: model the rhythm, or file the Δh)
@@ -269,15 +272,17 @@ const rowHtml = (cells) => `<div>${cells.map((c) => `<div>${c}</div>`).join('')}
 
 // ───────────────────────────── per section ─────────────────────────────
 const rowFor = (name, variant) => inventory.find((b) => b.name === name && (b.variant || null) === (variant || null)) || inventory.find((b) => b.name === name && !b.variant) || inventory.find((b) => b.name === name) || null;
-const recipeFor = (name, variant, report) => { const row = rowFor(name, variant); if (row?.recipe) return { recipe: row.recipe, row }; report.notes.push(`no recipe for ${name}${variant ? ` (${variant})` : ''} in blocks.json — default recipe (block-inventory scan --cases, or write one)`); return { recipe: defaultRecipe(row), row }; };
+const recipeFor = (name, variant, report) => { const row = rowFor(name, variant); if (row?.recipe) return { recipe: row.recipe, row }; report.notes.push(`no recipe for ${name}${variant ? ` (${variant})` : ''} in blocks.json — default recipe (block-inventory scan --cases, or write one)`); return { recipe: defaultRecipe(row, name), row }; };
 const dividerVariant = (name, variant) => { const v = `${variant ? `${variant} ` : ''}divider`; return inventory.some((b) => b.name === name && b.variant === v) ? v : null; };
 
 function authorSection(node, row) {
   const report = { index: row.index, kind: row.match.kind, block: null, rowsCols: null, filled: 0, cellsTotal: 0, texts: 0, notes: [], controls: 0, unfitted: 0, empty: 0 };
   const t0 = stats.texts; const parts = [];
   const m = row.match;
-  const block = m.kind === 'inventory' ? { name: m.block, variant: m.variant || null } : m.kind === 'collection' && m.block ? { name: m.block, variant: null } : null;
-  if (m.kind === 'new') { parts.push(`<!-- NEW: ${row.fingerprint}${row.collection ? ` (${row.collection}?)` : ''} — model this block -->`); report.notes.push('NEW section: emitted as default content; triage it first (exit 3)'); }
+  const draftNew = process.argv.includes('--draft-new') && m.kind === 'new' && m.block;
+  const block = m.kind === 'inventory' ? { name: m.block, variant: m.variant || null } : (m.kind === 'collection' || draftNew) && m.block ? { name: m.block, variant: null } : null;
+  if (draftNew) report.notes.push(`NEW drafted through the collection's ${m.block} shape (--draft-new): approve the model in the triage before the block`);
+  if (m.kind === 'new' && !draftNew) { parts.push(`<!-- NEW: ${row.fingerprint}${row.collection ? ` (${row.collection}?)` : ''} — model this block -->`); report.notes.push('NEW section: emitted as default content; triage it first (exit 3)'); }
   if (!block) { parts.push(...defaultContent(node, report)); }
   else {
     const { recipe } = recipeFor(block.name, block.variant, report);
@@ -373,7 +378,7 @@ function keyValueSection(node, block, recipe, report) {
 
 // ───────────────────────────── the page ─────────────────────────────
 const sectionsHtml = []; const reports = []; let sawNew = false;
-mainSections.forEach((row, i) => { const node = split.sections[i]; const { html, report } = authorSection(node, row); sectionsHtml.push(html); reports.push(report); if (row.match.kind === 'new') sawNew = true; });
+mainSections.forEach((row, i) => { const node = split.sections[i]; const { html, report } = authorSection(node, row); sectionsHtml.push(html); reports.push(report); if (row.match.kind === 'new' && !(process.argv.includes('--draft-new') && row.match.block)) sawNew = true; });
 const meta = [['title', dump.__title || triage.page?.title || ''], ...(dump.__desc ? [['description', dump.__desc]] : []), ...(navPath ? [['nav', navPath]] : []), ...(footerPath ? [['footer', footerPath]] : [])];
 if (!navPath || !footerPath) warn('metadata: no nav / footer path (no profile `chrome.fragments`; pass --nav-path / --footer-path)');
 sectionsHtml.push(`<div>\n<div class="metadata">\n${meta.map(([k, v]) => `<div><div>${esc(k)}</div><div>${esc(v)}</div></div>`).join('\n')}\n</div>\n</div>`);

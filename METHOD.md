@@ -57,7 +57,8 @@ order; blocks hold only what default content cannot.
    roots, opt-in, for `harness --content`; hidden DOM stays not content. A 406 on an asset fetched outside the browser is a WAF header rule, not a block on
    headless; a dump that reads "no root" once ran before the page's JS — run it again. `measure-page` also writes `live-<W>.png` from the same settled
    session (the stitched capture, in the shape `stitch-shot` writes; `gate` reads it as the origin by default) and the profile's per-width checks when a
-   profile exists. Record tables, not screenshots.
+   profile exists. Read `brief <measure-dir>` first — one screen per page: text styles, media, paint and the content x-range per section at the three
+   widths, the families' roles, the colours, the cap — and the specs only for a row (13 min of reading replaced, loop r1). Record tables, not screenshots.
 
 2. **Triage every section into a content model — before any block exists.** Walk each measured section top to bottom and write what an author would
    type: heading, paragraph, image, link. Whatever is left is a block. Then, per block, decide and write down:
@@ -87,7 +88,8 @@ order; blocks hold only what default content cannot.
 
 3. **Author the document** from the triage table. `author` writes it from the triage and the dump through the inventory's recipes (`blocks.json`: how a
    source unit becomes a block row, derived once from the case document that approved the block); the agent reviews the draft, its stderr table and the
-   lint, never types a text, and a NEW section stops the run until the block is named and its recipe written. Section styles for the source's spacing (authored, not by position), section-metadata for
+   lint, never types a text, and a NEW section stops the run until the block is named and its recipe written — on a template page (empty inventory)
+   `--draft-new` drafts a NEW section whose triage row names a collection shape through that shape's default recipe; nobody writes a generator. Section styles for the source's spacing (authored, not by position), section-metadata for
    configuration, `<em>` for accents, bold/italic links for button weight (the block decides the variant). A picture on its own line is a paragraph:
    author it in `<p>` (the pipeline emits `<p><picture>`; the runtime wraps a bare picture-first cell into one `<p>` with whatever follows). Type every
    text from the capture (`content-view`, never a truncating viewer; `harness --content` names each authored text the dumps do not hold). Write the

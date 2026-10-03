@@ -38,7 +38,7 @@ import { UA, arg, acceptOverlays } from './common.mjs';
 import { statusRow, overlayRows, chromeRows, verdictOf } from './lib/profile-check.mjs';
 
 const [,, cmd, target] = process.argv;
-const usage = () => { console.error('usage: site-profile.mjs init <case-dir> --out migration/site.json [--site-repo <dir>] [--live <url>] [--served <url>]\n       site-profile.mjs check <site.json> [--tol 2]\n       site-profile.mjs print <site.json>'); process.exit(1); };
+const usage = () => { console.error('usage: site-profile.mjs init <case-dir> --out migration/site.json [--site-repo <dir>] [--live <url>] [--served <url>]\n       site-profile.mjs check <site.json> [--tol 2]\n       site-profile.mjs print <site.json>\n  init reads: <case>/measure/spec-<W>.json, summary.json, probe-load*.txt (or probe-load-<W>.txt), cap.json (measure/ or gate/), gate*/noise-1440.json or noise*.log (`= x%`), serve*.log (port), and the case prose (README / REPORT / REGISTER: served URL, --consent / --dismiss / --locale / --main flags); a null carries its _note'); process.exit(1); };
 if (!cmd || !target || !['init', 'check', 'print'].includes(cmd)) usage();
 
 const read = (f) => (existsSync(f) ? readFileSync(f, 'utf8') : null);

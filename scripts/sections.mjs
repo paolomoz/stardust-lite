@@ -64,21 +64,25 @@ async function runWidth(browser, spec) {
   await ctx.close();
   log(`doc height  live ${spec.doc}  build ${r.doc}  Δ ${r.doc - spec.doc}   (spec measured at vh ${spec.vh || '?'}; ${spec.secs.length} live sections → ${r.count} build sections, paired by first text anchor)`);
   log('idx  live y      h   | build#  y      h   | anchor Δy | anchor live → build | section');
-  const shared = {}; r.rows.forEach((t) => { if (t.idx >= 0) shared[t.idx] = (shared[t.idx] || 0) + 1; });
+  // a 0-height live section is a spacing measurement (METHOD step 2), not a row to pair: counted in no group, its span never judged —
+  // two such sections folded into one build section read Δh −4843 on every round and the verdict never reached CLEAN (scotiabank-personal)
+  const judged = (s) => s.box[3] > 0;
+  const shared = {}; r.rows.forEach((t, i) => { if (t.idx >= 0 && judged(live[i])) shared[t.idx] = (shared[t.idx] || 0) + 1; });
   live.forEach((s, i) => {
     const t = r.rows[i]; const dy = t.abox && s.anchor ? t.abox[1] - s.anchor.box[1] : null;
     log(String(i).padStart(2), String(s.box[1]).padStart(6), String(s.box[3]).padStart(6), ' |', t.box ? `${String(t.idx).padStart(3)}${shared[t.idx] > 1 ? '*' : ' '}` : '  - ', t.box ? String(t.box[1]).padStart(6) : '   -  ', t.box ? String(t.box[3]).padStart(6) : '   -  ', ' |', dy === null ? '    -' : String(dy).padStart(5), '    |', s.anchor ? `"${s.anchor.t.slice(0, 20)}" ${JSON.stringify(s.anchor.box)}` : '-', '→', t.abox ? JSON.stringify(t.abox) : (s.anchor ? 'NOT FOUND' : '-'), '|', t.cls);
   });
   const groups = Object.entries(shared).filter(([, n]) => n > 1);
   if (groups.length) log(`* build sections holding several live sections: ${groups.map(([k, n]) => `#${k} (${n})`).join(', ')} — compare their summed live heights with the build height`);
-  groups.forEach(([k]) => { const rows = live.filter((s, i) => r.rows[i].idx === Number(k)); const sum = rows.reduce((a, s) => a + s.box[3], 0); const first = rows[0]; const last = rows[rows.length - 1]; const span = last.box[1] + last.box[3] - first.box[1]; const b = r.rows.find((t) => t.idx === Number(k)).box; log(`  build #${k}: h ${b[3]}  vs live span ${span} (sections summed ${sum})  Δ ${b[3] - span}`); });
+  groups.forEach(([k]) => { const rows = live.filter((s, i) => r.rows[i].idx === Number(k) && judged(s)); const sum = rows.reduce((a, s) => a + s.box[3], 0); const first = rows[0]; const last = rows[rows.length - 1]; const span = last.box[1] + last.box[3] - first.box[1]; const b = r.rows.find((t) => t.idx === Number(k)).box; log(`  build #${k}: h ${b[3]}  vs live span ${span} (sections summed ${sum})  Δ ${b[3] - span}`); });
   // the verdict rows: one per live section (a shared build section judged once, on its first live row, against the live span)
   const seen = new Set();
   const rows = live.map((s, i) => {
     const t = r.rows[i]; const chrome = /^(HEADER|FOOTER)\b/.test(s.id) || (t.idx >= 0 && r.chromeIdx.includes(t.idx));
     let dh = null; let kind = 'section';
-    if (t.idx < 0 || !t.box) kind = 'not located';
-    else if (shared[t.idx] > 1) { if (seen.has(t.idx)) kind = 'in group'; else { seen.add(t.idx); const grp = live.filter((x, j) => r.rows[j].idx === t.idx); const span = grp[grp.length - 1].box[1] + grp[grp.length - 1].box[3] - grp[0].box[1]; dh = t.box[3] - span; kind = `group of ${grp.length}`; } }
+    if (!judged(s)) kind = 'spacing (0-height live section)';
+    else if (t.idx < 0 || !t.box) kind = 'not located';
+    else if (shared[t.idx] > 1) { if (seen.has(t.idx)) kind = 'in group'; else { seen.add(t.idx); const grp = live.filter((x, j) => r.rows[j].idx === t.idx && judged(x)); const span = grp[grp.length - 1].box[1] + grp[grp.length - 1].box[3] - grp[0].box[1]; dh = t.box[3] - span; kind = `group of ${grp.length}`; } }
     else dh = t.box[3] - s.box[3];
     return { index: i, anchorText: s.anchor ? s.anchor.t : '', liveId: s.id.slice(0, 60), live: { y: s.box[1], h: s.box[3] }, build: t.box ? { idx: t.idx, y: t.box[1], h: t.box[3], classes: t.cls } : null, dh, kind, chrome };
   });
@@ -124,9 +128,9 @@ for (const res of results) {
     if (row.status === 'new') { nNew += 1; newRows.set(`${row.index}`, `#${row.index} "${row.anchorText || row.liveId}"${row.block ? ` (${row.block})` : ''}`); }
   }
   maxNew = Math.max(maxNew, nNew);
-  for (const row of res.rows) { if (row.chrome || row.kind === 'in group') continue; if (row.dh === null || Math.abs(row.dh) > 2) off.push({ W, index: row.index, anchorText: row.anchorText, dh: row.dh, kind: row.kind, block: row.block || null, status: row.status || null }); }
+  for (const row of res.rows) { if (row.chrome || row.kind === 'in group' || row.kind.startsWith('spacing')) continue; if (row.dh === null || Math.abs(row.dh) > 2) off.push({ W, index: row.index, anchorText: row.anchorText, dh: row.dh, kind: row.kind, block: row.block || null, status: row.status || null }); }
   perWidth[W] = { W: res.W, doc: res.doc, rows: res.rows };
-  const marks = res.rows.filter((r) => !r.chrome && r.kind !== 'in group').map((r) => `#${r.index} ${r.dh === null ? r.kind : `Δh ${r.dh > 0 ? '+' : ''}${r.dh}`}${r.status && r.status !== 'chrome' ? ` ${r.status}` : ''}`);
+  const marks = res.rows.filter((r) => !r.chrome && r.kind !== 'in group' && !r.kind.startsWith('spacing')).map((r) => `#${r.index} ${r.dh === null ? r.kind : `Δh ${r.dh > 0 ? '+' : ''}${r.dh}`}${r.status && r.status !== 'chrome' ? ` ${r.status}` : ''}`);
   console.log(`rows at ${W}: ${marks.join('; ') || 'none'}${res.rows.some((r) => r.chrome) ? ` (chrome: ${res.rows.filter((r) => r.chrome).map((r) => `#${r.index} Δh ${r.dh === null ? '—' : r.dh}`).join(', ')} — not judged)` : ''}`);
 }
 await browser.close();
