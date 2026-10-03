@@ -18,8 +18,8 @@ if (!host || !repo || !paths.length) { console.error('usage: sync-poll.mjs <bran
 const every = Number(arg('--every', 10)) * 1000; const timeout = Number(arg('--timeout', 900)) * 1000; const base = String(host).replace(/\/$/, '');
 const md5 = (b) => createHash('md5').update(b).digest('hex');
 if (arg('--trigger', null)) {
-  const token = process.env.DA_TOKEN; if (!token) { console.error('sync-poll: --trigger needs DA_TOKEN'); process.exit(1); }
-  const r = await fetch(`https://admin.hlx.page/code/${arg('--trigger')}/*`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch((e) => ({ status: String(e.message) }));
+  const token = process.env.DA_TOKEN; if (!token) console.error('sync-poll: --trigger needs DA_TOKEN — not set: polling WITHOUT the trigger (the push usually syncs on its own; source .env for the trigger)');
+  const r = token ? await fetch(`https://admin.hlx.page/code/${arg('--trigger')}/*`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } }).catch((e) => ({ status: String(e.message) })) : { status: 'skipped' };
   console.log(`sync-poll: code sync triggered → ${r.status}`);
 }
 const ref = arg('--ref', 'HEAD');

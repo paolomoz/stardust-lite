@@ -198,7 +198,10 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
   const mainKey = root || keys.find((k) => k === 'main') || keys.find((k) => k !== headerKey && k !== footerKey) || null;
   const roots = mainKey ? (dump[mainKey] || []) : [];
   let secs = [];
-  if (sections && sections.length) {
+  // nodes measure-page marked `sec: true` (its --sections selector) split the dump as the spec and the gate split the page (loop r3)
+  const marked = []; const findMarked = (n) => { if (n.sec) { marked.push(n); return; } (n.children || []).forEach(findMarked); }; roots.forEach(findMarked);
+  if (marked.length && !(sections && sections.length)) secs = marked;
+  else if (sections && sections.length) {
     const match = (n, sel) => { const m = sel.match(/^([a-z][\w-]*)?((?:\.[\w-]+)*)(#[\w-]+)?$/i); if (!m) return false; const [, tag, cls, id] = m; const have = String(n.cls || '').split(/\s+/); return (!tag || tagOf(n) === tag.toLowerCase()) && (!id || n.id === id.slice(1)) && cls.split('.').filter(Boolean).every((c) => have.includes(c)); };
     const walk = (n) => { if (sections.some((s) => match(n, s))) { secs.push(n); return; } (n.children || []).forEach(walk); };
     roots.forEach(walk);
@@ -216,7 +219,7 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
       if (flat) secs.push(...kids); else secs.push(c0);
     }
   }
-  return { header: headerKey ? dump[headerKey]?.[0] || null : null, footer: footerKey ? dump[footerKey]?.[0] || null : null, sections: secs, mainKey, headerKey, footerKey };
+  return { header: headerKey ? dump[headerKey]?.[0] || null : null, footer: footerKey ? dump[footerKey]?.[0] || null : null, sections: secs, mainKey, headerKey, footerKey, marked: marked.length && secs === marked ? marked.length : 0 };
 }
 
 /** The Block Collection shape a fingerprint suggests (null = default content or nothing recognisable); never more than a guess. */
@@ -229,7 +232,7 @@ export function collectionGuess(fp) {
     if (u.has('media') && u.size === 1) return { collection: 'cards', alternatives: [], reason: `media-only unit ×${fp.repeat} (logos)` };
     if (u.has('media')) return { collection: 'cards', alternatives: ['carousel'], reason: `media unit ×${fp.repeat}` };
     if (!u.has('media') && (u.has('heading') || u.has('link')) && !u.has('text')) return { collection: 'accordion', alternatives: ['tabs', 'columns'], reason: `heading/link-only unit ×${fp.repeat} (hidden panels are not in the dump)` };
-    if (!u.has('media') && u.has('text')) return { collection: 'columns', alternatives: ['cards'], reason: `text unit ×${fp.repeat}` };
+    if (!u.has('media') && u.has('text')) return fp.repeat >= 3 && u.has('heading') ? { collection: 'columns', alternatives: ['cards'], reason: `text unit ×${fp.repeat}` } : { collection: null, alternatives: ['columns'], reason: `text run ×${fp.repeat} without media: default content (a columns block needs ≥ 3 headed units)` }; // two paragraphs read as "columns? weak" on an article page (covermore, loop r6)
     return r;
   }
   if (k.has('quote') || (fp.texts === 1 && fp.media === 0 && !k.has('heading') && fp.bigText >= 32)) return { collection: 'quote', alternatives: [], reason: k.has('quote') ? 'blockquote' : `one paragraph at ${fp.bigText}px` };

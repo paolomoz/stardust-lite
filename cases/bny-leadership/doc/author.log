@@ -1,0 +1,9 @@
+author: /Users/paolo/stardust/2026-10/sdt-bny/migration/blocks.json has no blocks — every inventory match falls back to the default recipe
+author: --nav: the dump has no nav root — nothing written
+author: migration/cases/leadership/doc/footer.html written from the dump's footer root (simplest shape: review it)
+#   emitted   block (variant) · rows × cols            cells    texts  notes
+0   default   —                                        —        1      
+1   NEW       tabs · 1 × 2                             2/2      65     default recipe: the Block Collection's tabs shape (no recipe in blocks.json); NEW drafted through the collecti
+2 sections → /Users/paolo/stardust/2026-10/sdt-bny/migration/cases/leadership/doc/leadership.html (82 texts, 1 block sections, 1 default, 1 new)
+author: 22 empty spacer paragraph(s) in the source (24 px at y 312, 24 px at y 352, 24 px at y 962, 24 px at y 1010, 24 px at y 962, 24 px at y 962, 24 px at y 1470, 24 px at y 1422, 24 px at y 1422, 24 px at y 1446, 24 px at y 1882, 24 px at y 1906, 24 px at y 1882, 24 px at y 1882, 24 px at y 2318, 24 px at y 2366, 24 px at y 2342, 24 px at y 2342, 24 px at y 2778, 24 px at y 2802, 24 px at y 2778, 24 px at y 2778) dropped — the pipeline drops <p>&nbsp;</p> and <p><br></p> too; a section table Δh of that size is this: model the rhythm in the section style or file it as a deviation (--keep-spacers writes a zero-width-space paragraph, an anti-pattern METHOD names)
+PASS — 0 🔴, 0 🟡 (rules: ../davids-model.md)

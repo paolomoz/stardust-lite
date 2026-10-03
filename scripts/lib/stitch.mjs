@@ -30,7 +30,7 @@ export async function freezeMotion(page) {
 }
 
 /** Declared font faces whose load failed (status `error`): the capture renders fallback type. Returns the family names. */
-export const failedFonts = (page) => page.evaluate(async () => { await document.fonts.ready; return [...new Set([...document.fonts].filter((f) => f.status === 'error').map((f) => f.family))]; }).catch(() => []);
+export const failedFonts = (page) => page.evaluate(async () => { await document.fonts.ready; const loaded = new Set([...document.fonts].filter((f) => f.status === 'loaded').map((f) => f.family)); return [...new Set([...document.fonts].filter((f) => f.status === 'error' && !loaded.has(f.family)).map((f) => f.family))]; }).catch(() => []); // a family with a loaded face is not a failure (a variable TTF 404s beside its static duplicate — natixis)
 
 /** Browser side: wait until the viewport is ready to be photographed — fonts ready, every in-viewport image complete (or errored: a
  * broken image is a state), no finite animation still running, two consecutive animation frames with the same scrollHeight — or the

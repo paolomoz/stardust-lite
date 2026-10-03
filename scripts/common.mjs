@@ -7,6 +7,18 @@ import { fileURLToPath } from 'node:url';
 
 export const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
 
+/** The browser every instrument opens. Chrome tier (`--chrome`, or STARDUST_CHROME=1 in the env, or the profile's `overlays.chrome`): the
+ * installed Google Chrome, headless — an origin that resets headless Chromium's HTTP/2 (`net::ERR_HTTP2_PROTOCOL_ERROR`) accepts it
+ * (cibc-careers, loop r2; BACKLOG #1). `--headed`: real Chrome with a window (the bot-managed tier). The tier is exported to the env so the
+ * children an instrument spawns (gate → cap-probe, motion-observe; harness → serve) inherit it, the vendored tools through lib/chrome-tier.mjs. */
+export async function launch(opts = {}) {
+  const { chromium } = await import('playwright');
+  const headed = process.argv.includes('--headed'); const chrome = headed || process.argv.includes('--chrome') || process.env.STARDUST_CHROME === '1' || !!siteDefaults()?.overlays?.chrome;
+  if (chrome) process.env.STARDUST_CHROME = '1';
+  const cookie = overlayOpts().cookie; // sets STARDUST_COOKIE
+  if ((chrome || cookie) && !(process.env.NODE_OPTIONS || '').includes('chrome-tier')) process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS || ''} --import ${new URL('./lib/chrome-tier.mjs', import.meta.url).pathname}`.trim(); // the vendored tools: channel and cookies
+  return chromium.launch({ ...(chrome ? { channel: 'chrome' } : {}), ...(headed ? { headless: false, args: ['--disable-blink-features=AutomationControlled'] } : {}), ...opts });
+}
 export function arg(name, def) {
   const i = process.argv.indexOf(name);
   if (i === -1) return def;
@@ -39,16 +51,26 @@ const list = (v) => String(v ?? '').split(',').map((s) => s.trim()).filter(Boole
 export const overlayOpts = () => {
   const o = siteDefaults()?.overlays || {};
   const pick = (name, key) => { const v = arg(name, null); return v === null ? (o[key] ?? null) : v; };
-  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')) };
+  const cookie = pick('--cookie', 'cookie') ?? process.env.STARDUST_COOKIE ?? null; if (cookie) process.env.STARDUST_COOKIE = String(cookie); // the children (gate → cap-probe …) read the env; the preload adds them to the vendored tools' contexts
+  const hide = list(pick('--hide', 'hide')); if (hide.length) process.env.STARDUST_HIDE = hide.join(','); else if (process.env.STARDUST_HIDE) hide.push(...process.env.STARDUST_HIDE.split(',')); // the children inherit it
+  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')), cookie: cookie ? String(cookie) : null, hide };
 };
+/** `--cookie 'name=value; name2=value2'` (or the profile's `overlays.cookie`, or STARDUST_COOKIE) as Playwright cookies for the page's host —
+ * an attestation gate (HarbourVest: `HV.attestation`, `HV.country`, `HV.language`) forwarded every cookieless session to a persona page and
+ * loaded the chrome by AJAX after the check; a 35-line case preload did this (loop r5). */
+export const cookiesFor = (url, cookie) => { if (!cookie) return []; let host; try { host = new URL(url).hostname; } catch { return []; } return String(cookie).split(/;\s*/).map((kv) => kv.trim()).filter(Boolean).map((kv) => { const i = kv.indexOf('='); return { name: kv.slice(0, i).trim(), value: kv.slice(i + 1).trim(), domain: host.replace(/^www\./, '.'), path: '/' }; }).filter((c) => c.name); };
 /** The same options as argv for a vendored capture tool's live side (`stitch-shot`, `cap-probe`, `motion-observe`). */
 export const overlayArgs = () => { const o = overlayOpts(); return [...(o.consent ? ['--consent', o.consent] : []), ...(o.dismiss.length ? ['--dismiss', o.dismiss.join(',')] : []), ...(o.locale ? ['--locale', o.locale] : [])]; };
 
 /** Click the dismiss controls, then the first consent control that resolves; a consent accept may RELOAD the page (OneTrust "reload on
  * consent" — stryker-home): every instrument then ran `settle` in a destroyed context. Arm the navigation wait before the click; when it
  * fires, wait the page in again and re-dismiss the other overlays. Returns the control that was clicked (null when none resolved). */
+const OVERLAY_CENSUS = '[id*=onetrust],[class*=onetrust],[id*=consent],[class*=consent],[id*=cookie],[class*=cookie],[class*=truste],[id*=truste],[id*=privacy],[class*=privacy],[role=dialog],[aria-modal=true],[id*=survey],[class*=survey],[id*=feedback],[class*=feedback],[class*=modal],[id*=modal]';
+const overlayCensus = (page) => page.evaluate((q) => [...document.querySelectorAll(q)].filter((el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 40 && r.height > 40 && cs.visibility !== 'hidden' && cs.display !== 'none' && (cs.position === 'fixed' || cs.position === 'absolute'); }).map((el) => `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${[...el.classList].slice(0, 2).map((c) => '.' + c).join('')} [${Math.round(el.getBoundingClientRect().left)},${Math.round(el.getBoundingClientRect().top)},${Math.round(el.getBoundingClientRect().width)},${Math.round(el.getBoundingClientRect().height)}]`), OVERLAY_CENSUS).catch(() => []);
 export async function acceptOverlays(page, { consent = null, dismiss = [], wait = 2500 } = {}) {
   const dismissAll = async () => { for (const sel of dismiss) { try { await page.click(sel, { timeout: 1500 }); } catch { /* absent */ } } };
+  const before = (consent || dismiss.length) ? await overlayCensus(page) : [];
+  const after = async () => { if (!(consent || dismiss.length)) return; await page.waitForTimeout(400); const now = await overlayCensus(page); const fresh = now.filter((s) => !before.includes(s)); if (fresh.length) console.error(`openPage: NEW overlay after the overlay controls — ${fresh.slice(0, 3).join(' ; ')} — a --dismiss control that opens something (a feedback opener)? pass its close control instead; it sits in every capture otherwise`); };
   await dismissAll();
   const candidates = [consent, '#onetrust-accept-btn-handler', '.agree-button', 'button:has-text("Accept all")', 'button:has-text("Accept All")'].filter(Boolean);
   for (const sel of candidates) {
@@ -57,10 +79,10 @@ export async function acceptOverlays(page, { consent = null, dismiss = [], wait 
       await page.click(sel, { timeout: 1200 });
       if (await nav) { console.error(`openPage: consent control ${sel} reloaded the page — waited for it`); await page.waitForTimeout(wait); await dismissAll(); }
       else console.error(`openPage: consent control ${sel} clicked`);
-      return sel;
+      await after(); return sel;
     } catch { /* next */ }
   }
-  return null;
+  await after(); return null;
 }
 
 /** `browser` may also be a BrowserContext (no `newContext`): the caller owns UA, locale, scale and cookies — a consent accepted once holds
@@ -73,7 +95,12 @@ export async function openPage(browser, url, { width = 1440, height = 900, scale
   const page = isContext ? await browser.newPage() : await browser.newPage(contextOptions({ width, height, scale, locale }));
   if (isContext) await page.setViewportSize({ width, height });
   if (before) await before(page); // listeners that must exist before navigation (response log for font requests — media-list)
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
+  const cookies = cookiesFor(url, overlayOpts().cookie); if (cookies.length) await page.context().addCookies(cookies).catch((e) => console.error(`openPage: cookies not set — ${String(e.message).slice(0, 80)}`));
+  try { await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 }); } catch (e) {
+    // a protocol reset / connection refusal on headless Chromium is the origin's bot tier, not the page: name the next tier before dying
+    if (/ERR_HTTP2|ERR_CONNECTION_RESET|ERR_SSL|ERR_FAILED/.test(String(e.message)) && process.env.STARDUST_CHROME !== '1') console.error(`openPage: ${String(e.message).split('\n')[0].slice(0, 120)} — the origin refuses headless Chromium; run every instrument with --chrome (installed Google Chrome, headless) or STARDUST_CHROME=1, --headed for a window`);
+    throw e;
+  }
   await page.waitForTimeout(wait);
   if (afterLoad) await afterLoad(page);
   await acceptOverlays(page, { consent, dismiss, wait });
@@ -81,7 +108,13 @@ export async function openPage(browser, url, { width = 1440, height = 900, scale
   // fonts are a measurement precondition: the boilerplate loads fonts.css lazily and a table read before the swap measures fallback metrics
   // (sections / pair / deep-probe disagreed by 40–100 px between runs on one page — stryker-home)
   await page.evaluate(() => document.fonts.ready.then(() => document.fonts.status)).catch(() => {});
-  if (require.length) { // composition gate: the session must be the one the cached origin shows (retry the run otherwise)
+  // --hide <css,…> (profile `overlays.hide`): a third-party fixed widget (an accessibility launcher, a chat bubble) is not the page — hidden on every
+  // live reading and capture, and registered (Userway was the whole 360 residue, 2.6 %, bny-leadership, loop r9)
+  const hide = overlayOpts().hide; if (hide.length) await page.addStyleTag({ content: hide.map((s) => `${s} { display: none !important; visibility: hidden !important; }`).join('\n') }).catch(() => {});
+  if (page.url().split('#')[0] !== url.split('#')[0]) console.error(`openPage: URL changed ${url} → ${page.url()} (a redirect or a JS forward: an edition, a locale, an attestation page — measure the page you mean)`);
+  if (require.length) { // composition gate: the session must be the one the cached origin shows (retry the run otherwise); a marker a fragment
+    // loads by AJAX is WAITED for (10 s) before it counts as missing — a one-shot check exited 4 twice on the same fragment race (loop r5)
+    await page.waitForFunction((sels) => sels.every((s) => { try { return !!document.querySelector(s); } catch { return false; } }), require, { timeout: 10000 }).catch(() => {});
     const missing = await page.evaluate((sels) => sels.filter((s) => { try { return !document.querySelector(s); } catch { return true; } }), require);
     if (missing.length) { console.error(`composition mismatch — missing: ${missing.join(' | ')} (exit 4; run again until the session matches the origin)`); await browser.close(); process.exit(4); }
   }

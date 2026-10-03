@@ -37,6 +37,7 @@ if (arg('--from-md', null)) {
   let changed = 0;
   for (let i = head + 2; i < lines.length && /^\|/.test(lines[i]); i++) {
     const c = cells(lines[i]); const row = json.sections.find((s) => String(s.index) === c[0]); if (!row) continue;
+    if (c.length !== cols.length) console.error(`triage: row ${c[0]} has ${c.length} cells, the header ${cols.length} — an unescaped \`|\` in a cell shifts the block / style columns (escape it as \\|)`);
     const style = iStyle >= 0 ? c[iStyle].replace(/`/g, '').trim() : ''; const newStyle = style && style !== '—' ? style : null;
     if ((row.sectionStyle || null) !== newStyle) { row.sectionStyle = newStyle; changed += 1; }
     if (iBlock >= 0 && !row.chrome) {
@@ -68,6 +69,7 @@ const depth = Number(arg('--depth', 6));
 const sectionSels = arg('--sections', null) ? String(arg('--sections')).split(',').map((s) => s.trim()).filter(Boolean) : null;
 
 const split = splitSections(dump, { root: arg('--root', null), sections: sectionSels });
+if (split.marked) console.error(`triage: ${split.marked} sections split as measure-page's --sections marked them (the spec's and the gate's split)`);
 if (!split.sections.length) { console.error(`triage: no sections under "${split.mainKey}" (keys: ${Object.keys(dump).filter((k) => !k.startsWith('__')).join(', ')}) — pass --root or --sections`); process.exit(2); }
 const width = (() => { const m = basename(file).match(/-(\d+)\.json$/); if (m) return Number(m[1]); const r = dump[split.mainKey]?.[0]; return r?.box ? r.box[2] : null; })();
 
@@ -79,7 +81,7 @@ fps.forEach((fp, i) => entries.push({ chrome: null, node: split.sections[i], fp 
 if (split.footer) entries.push({ chrome: 'footer', node: split.footer, fp: fingerprint(split.footer, { depth }) });
 
 const overlap = (a, b) => Math.max(0, Math.min(a[1] + a[3], b[1] + b[3]) - Math.max(a[1], b[1]));
-const specFor = (box) => { if (!spec?.secs || !box) return null; let best = null; for (const s of spec.secs) { if (!s.box) continue; const o = overlap(box, s.box); if (o > 0 && (!best || o > best.o)) best = { o, s }; } return best ? { id: best.s.id, box: best.s.box, overlap: Math.round(best.o) } : null; };
+const specFor = (box) => { if (!spec?.secs || !box) return null; let best = null; for (const s of spec.secs) { if (!s.box) continue; const o = overlap(box, s.box); if (o > 0 && (!best || o > best.o)) best = { o, s }; } return best ? { id: best.s.id, box: best.s.box, overlap: Math.round(best.o), inset: best.s.inset ? `top ${best.s.inset.first} (${best.s.inset.top.join(' → ')}) bottom ${best.s.inset.last} (${best.s.inset.bottom.join(' → ')})` : null } : null; };
 const structureFor = (box) => { if (!structure || !box) return null; const re = new RegExp(`\\sy${box[1]}\\s+w\\d+\\s+h${box[3]}\\b`); return structure.find((l) => re.test(l))?.trim() || null; };
 
 const sections = []; const counts = { inventory: 0, collection: 0, default: 0, new: 0 }; let mainCount = 0;

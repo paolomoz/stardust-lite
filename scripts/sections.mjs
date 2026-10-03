@@ -12,10 +12,9 @@
 //   triage block has a budget in the inventory) / new / default, and the verdict names the new rows apart (`CLEAN, 1 new section`: a new
 //   section still takes the full gate at the three widths). --out writes `sections-verdict.json` (a dir, or a .json path) — `gate
 //   --skip-widths-when-clean <that file>` gates the prototype at the base width only when it is CLEAN with 0 new (sdt-dentsu speed).
-import { chromium } from 'playwright';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
-import { arg, openPage, settle, overlayOpts, siteProfile, contextOptions } from './common.mjs';
+import { arg, openPage, settle, overlayOpts, siteProfile, contextOptions, launch } from './common.mjs';
 import { triageRowFor } from './lib/section-pair.mjs';
 
 const VALUED = ['--sections', '--header', '--footer', '--consent', '--dismiss', '--locale', '--require', '--widths', '--spec-dir', '--blocks', '--triage', '--out', '--site'];
@@ -34,9 +33,13 @@ const readBuild = ({ sections, header, footer, live }) => {
   const norm = (s) => s.replace(/\s+/g, ' ').trim().toLowerCase();
   // visible text only: a `visibility: hidden` build anchor paired a live section with the wrong build section every round (walgreens-home)
   const texts = [...document.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,a,span,strong,em,button,div')].filter((e) => { const b = e.getBoundingClientRect(); const s = getComputedStyle(e); return b.width > 0 && b.height > 0 && s.visibility !== 'hidden' && parseFloat(s.opacity) > 0.05 && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); });
+  // the live and build counts agree → pair by INDEX (the anchor only locates the row's box): one build section without a located anchor shifted every
+  // later row's pairing on every round (cibc-careers, loop r2); counts apart → by first anchor, as before
+  const byIndex = live.length === secs.length;
   const rows = live.map((l, i) => {
     let sec = null; let abox = null;
-    if (l.anchor) {
+    if (byIndex) { sec = secs[i]; if (l.anchor) { const lc = l.anchor.t.toLowerCase(); const e = texts.find((x) => sec.contains(x) && norm(x.textContent).startsWith(lc)); if (e) abox = R(e); } }
+    else if (l.anchor) {
       const lc = l.anchor.t.toLowerCase();
       // among the elements starting with the anchor text, the one nearest the live y (the same words recur in nav, cards and footer)
       const e = texts.filter((x) => norm(x.textContent).startsWith(lc)).sort((x, y) => Math.abs(x.getBoundingClientRect().top + scrollY - l.anchor.box[1]) - Math.abs(y.getBoundingClientRect().top + scrollY - l.anchor.box[1]) || x.textContent.length - y.textContent.length)[0];
@@ -62,30 +65,34 @@ async function runWidth(browser, spec) {
   await settle(page, 800, 50, 400);
   const r = await page.evaluate(readBuild, { sections, header, footer, live });
   await ctx.close();
-  log(`doc height  live ${spec.doc}  build ${r.doc}  Δ ${r.doc - spec.doc}   (spec measured at vh ${spec.vh || '?'}; ${spec.secs.length} live sections → ${r.count} build sections, paired by first text anchor)`);
+  log(`doc height  live ${spec.doc}  build ${r.doc}  Δ ${r.doc - spec.doc}   (spec measured at vh ${spec.vh || '?'}; ${spec.secs.length} live sections → ${r.count} build sections, paired ${spec.secs.length === r.count ? 'by index (counts agree; the anchor locates the row)' : 'by first text anchor (counts differ: one authored section per live section, METHOD step 2)'})`);
   log('idx  live y      h   | build#  y      h   | anchor Δy | anchor live → build | section');
-  const shared = {}; r.rows.forEach((t) => { if (t.idx >= 0) shared[t.idx] = (shared[t.idx] || 0) + 1; });
+  // a 0-height live section is a spacing measurement (METHOD step 2), not a row to pair: counted in no group, its span never judged —
+  // two such sections folded into one build section read Δh −4843 on every round and the verdict never reached CLEAN (scotiabank-personal)
+  const judged = (s) => s.box[3] > 0;
+  const shared = {}; r.rows.forEach((t, i) => { if (t.idx >= 0 && judged(live[i])) shared[t.idx] = (shared[t.idx] || 0) + 1; });
   live.forEach((s, i) => {
     const t = r.rows[i]; const dy = t.abox && s.anchor ? t.abox[1] - s.anchor.box[1] : null;
     log(String(i).padStart(2), String(s.box[1]).padStart(6), String(s.box[3]).padStart(6), ' |', t.box ? `${String(t.idx).padStart(3)}${shared[t.idx] > 1 ? '*' : ' '}` : '  - ', t.box ? String(t.box[1]).padStart(6) : '   -  ', t.box ? String(t.box[3]).padStart(6) : '   -  ', ' |', dy === null ? '    -' : String(dy).padStart(5), '    |', s.anchor ? `"${s.anchor.t.slice(0, 20)}" ${JSON.stringify(s.anchor.box)}` : '-', '→', t.abox ? JSON.stringify(t.abox) : (s.anchor ? 'NOT FOUND' : '-'), '|', t.cls);
   });
   const groups = Object.entries(shared).filter(([, n]) => n > 1);
   if (groups.length) log(`* build sections holding several live sections: ${groups.map(([k, n]) => `#${k} (${n})`).join(', ')} — compare their summed live heights with the build height`);
-  groups.forEach(([k]) => { const rows = live.filter((s, i) => r.rows[i].idx === Number(k)); const sum = rows.reduce((a, s) => a + s.box[3], 0); const first = rows[0]; const last = rows[rows.length - 1]; const span = last.box[1] + last.box[3] - first.box[1]; const b = r.rows.find((t) => t.idx === Number(k)).box; log(`  build #${k}: h ${b[3]}  vs live span ${span} (sections summed ${sum})  Δ ${b[3] - span}`); });
+  groups.forEach(([k]) => { const rows = live.filter((s, i) => r.rows[i].idx === Number(k) && judged(s)); const sum = rows.reduce((a, s) => a + s.box[3], 0); const first = rows[0]; const last = rows[rows.length - 1]; const span = last.box[1] + last.box[3] - first.box[1]; const b = r.rows.find((t) => t.idx === Number(k)).box; log(`  build #${k}: h ${b[3]}  vs live span ${span} (sections summed ${sum})  Δ ${b[3] - span}`); });
   // the verdict rows: one per live section (a shared build section judged once, on its first live row, against the live span)
   const seen = new Set();
   const rows = live.map((s, i) => {
     const t = r.rows[i]; const chrome = /^(HEADER|FOOTER)\b/.test(s.id) || (t.idx >= 0 && r.chromeIdx.includes(t.idx));
     let dh = null; let kind = 'section';
-    if (t.idx < 0 || !t.box) kind = 'not located';
-    else if (shared[t.idx] > 1) { if (seen.has(t.idx)) kind = 'in group'; else { seen.add(t.idx); const grp = live.filter((x, j) => r.rows[j].idx === t.idx); const span = grp[grp.length - 1].box[1] + grp[grp.length - 1].box[3] - grp[0].box[1]; dh = t.box[3] - span; kind = `group of ${grp.length}`; } }
+    if (!judged(s)) kind = 'spacing (0-height live section)';
+    else if (t.idx < 0 || !t.box) kind = 'not located';
+    else if (shared[t.idx] > 1) { if (seen.has(t.idx)) kind = 'in group'; else { seen.add(t.idx); const grp = live.filter((x, j) => r.rows[j].idx === t.idx && judged(x)); const span = grp[grp.length - 1].box[1] + grp[grp.length - 1].box[3] - grp[0].box[1]; dh = t.box[3] - span; kind = `group of ${grp.length}`; } }
     else dh = t.box[3] - s.box[3];
     return { index: i, anchorText: s.anchor ? s.anchor.t : '', liveId: s.id.slice(0, 60), live: { y: s.box[1], h: s.box[3] }, build: t.box ? { idx: t.idx, y: t.box[1], h: t.box[3], classes: t.cls } : null, dh, kind, chrome };
   });
   return { W: spec.W, doc: { live: spec.doc, build: r.doc, delta: r.doc - spec.doc }, rows, lines: out };
 }
 
-const browser = await chromium.launch();
+const browser = await launch();
 if (!multi) { // the single-width table, as before
   const spec = JSON.parse(readFileSync(positional[0], 'utf8'));
   const r = await runWidth(browser, spec); console.log(r.lines.join('\n')); await browser.close(); process.exit(0);
@@ -124,9 +131,9 @@ for (const res of results) {
     if (row.status === 'new') { nNew += 1; newRows.set(`${row.index}`, `#${row.index} "${row.anchorText || row.liveId}"${row.block ? ` (${row.block})` : ''}`); }
   }
   maxNew = Math.max(maxNew, nNew);
-  for (const row of res.rows) { if (row.chrome || row.kind === 'in group') continue; if (row.dh === null || Math.abs(row.dh) > 2) off.push({ W, index: row.index, anchorText: row.anchorText, dh: row.dh, kind: row.kind, block: row.block || null, status: row.status || null }); }
+  for (const row of res.rows) { if (row.chrome || row.kind === 'in group' || row.kind.startsWith('spacing')) continue; if (row.dh === null || Math.abs(row.dh) > 2) off.push({ W, index: row.index, anchorText: row.anchorText, dh: row.dh, kind: row.kind, block: row.block || null, status: row.status || null }); }
   perWidth[W] = { W: res.W, doc: res.doc, rows: res.rows };
-  const marks = res.rows.filter((r) => !r.chrome && r.kind !== 'in group').map((r) => `#${r.index} ${r.dh === null ? r.kind : `Δh ${r.dh > 0 ? '+' : ''}${r.dh}`}${r.status && r.status !== 'chrome' ? ` ${r.status}` : ''}`);
+  const marks = res.rows.filter((r) => !r.chrome && r.kind !== 'in group' && !r.kind.startsWith('spacing')).map((r) => `#${r.index} ${r.dh === null ? r.kind : `Δh ${r.dh > 0 ? '+' : ''}${r.dh}`}${r.status && r.status !== 'chrome' ? ` ${r.status}` : ''}`);
   console.log(`rows at ${W}: ${marks.join('; ') || 'none'}${res.rows.some((r) => r.chrome) ? ` (chrome: ${res.rows.filter((r) => r.chrome).map((r) => `#${r.index} Δh ${r.dh === null ? '—' : r.dh}`).join(', ')} — not judged)` : ''}`);
 }
 await browser.close();

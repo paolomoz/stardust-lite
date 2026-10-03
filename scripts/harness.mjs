@@ -2,7 +2,9 @@
 // harness.mjs — lint → fold → runtime → serialise (step 5). The served harness page IS the gated prototype; the serialised file is
 // the review artifact. Refuses to fold a document with a David's Model 🔴 (deploy skill lint) unless --no-lint.
 // Usage: node harness.mjs <authored.html> --serve <dir> --name <slug> [--port 8930] [--width 1440] [--no-lint] [--fragments <branch-host>]
-//        [--content <content.json>[,<click-dump.json>…]]
+//        [--content <content.json>[,<click-dump.json>…]] [--site-repo <repo>]
+//   The serve dir is created, and when nothing answers on the port `serve <dir> --port <n> --site <repo>` is started detached (--site-repo
+//   defaults to the cwd; `--site` is the profile file on every instrument — read as the repo it sent serve to `.` and 404'd, mfs-home) — three runs crashed on a missing dir / silent port before the two-step was clear (scotiabank-personal).
 //        node harness.mjs --pages <pages.json> [--doc-dir doc] --serve <dir> [--port 8930] [--fragments <branch-host>] [--no-lint] [--content-dir <dir>]
 //   --pages (batch-7 rollout, pass 5): one harness per page of a `roster pick` list — `<doc-dir>/<slug>.html` → `<serve>/<slug>.harness.html`
 //   on the one port — the page's own output first, then one summary line per page (blocks loaded, doc height, texts not in the capture,
@@ -23,10 +25,9 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { chromium } from 'playwright';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
-import { arg, davidsLint } from './common.mjs';
+import { arg, davidsLint, launch } from './common.mjs';
 
 if (typeof arg('--pages', null) === 'string') {
   const list = JSON.parse(readFileSync(arg('--pages'), 'utf8')); const pages = list.pages || []; const docDir = String(arg('--doc-dir', 'doc')); const serveDir0 = arg('--serve');
@@ -54,6 +55,7 @@ if (typeof arg('--pages', null) === 'string') {
 const src = process.argv[2]; const serveDir = arg('--serve'); const name = arg('--name');
 if (!src || !serveDir || !name) { console.error('usage: harness.mjs <authored.html> --serve <dir> --name <slug> [--port 8930] [--width 1440] [--no-lint]'); process.exit(1); }
 const port = Number(arg('--port', 8930)); const W = Number(arg('--width', 1440));
+mkdirSync(serveDir, { recursive: true });
 
 if (!arg('--no-lint', false)) {
   const lint = davidsLint();
@@ -65,11 +67,13 @@ if (!arg('--no-lint', false)) {
 }
 
 const raw = readFileSync(src, 'utf8');
-const b0 = await chromium.launch(); const p0 = await b0.newPage();
+// an unbalanced inline tag swallows everything after it (the metadata block parsed inside a <strong>: `closest('main > div')` null, natixis): count before folding
+for (const tag of ['strong', 'b', 'em', 'i', 'a', 'span']) { const o = (raw.match(new RegExp(`<${tag}\\b`, 'gi')) || []).length; const c = (raw.match(new RegExp(`</${tag}>`, 'gi')) || []).length; if (o !== c) console.log(`harness: <${tag}> opened ${o} times, closed ${c} — an unbalanced inline tag shifts every later node (the browser re-parents it); fix the document`); }
+const b0 = await launch(); const p0 = await b0.newPage();
 await p0.setContent(raw);
 const folded = await p0.evaluate(() => {
   const metas = [];
-  document.querySelectorAll('main .metadata').forEach((m) => { m.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (k && v) metas.push([k.textContent.trim().toLowerCase(), v.textContent.trim()]); }); m.closest('main > div').remove(); });
+  document.querySelectorAll('main .metadata').forEach((m) => { m.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (k && v) metas.push([k.textContent.trim().toLowerCase(), v.textContent.trim()]); }); const sec = m.closest('main > div'); if (sec && sec.children.length === 1) sec.remove(); else m.remove(); });
   document.querySelectorAll('main .section-metadata').forEach((sm) => { const section = sm.parentElement; sm.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (!k || !v) return; const key = k.textContent.trim().toLowerCase(); if (key === 'style') v.textContent.split(',').map((x) => x.trim().toLowerCase().replace(/[^0-9a-z]+/g, '-').replace(/^-|-$/g, '')).filter(Boolean).forEach((c) => section.classList.add(c)); else if (key === 'id') section.id = v.textContent.trim(); else section.dataset[key.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = (v.querySelector('a, img') ? (v.querySelector('a')?.href || v.querySelector('img')?.src) : v.textContent.trim()); }); sm.remove(); });
   // a section style is a class the way aem.js's toClassName writes it (`Brands Divider` → `brands-divider`); the raw token crashed the fold on a space (pass 5)
   document.querySelectorAll('main > div').forEach((d) => { if (!d.textContent.trim() && !d.querySelector('img,picture')) d.remove(); });
@@ -78,7 +82,15 @@ const folded = await p0.evaluate(() => {
   document.querySelectorAll('main > div > div > div > div').forEach((cell) => { const k = cell.children; if (k.length === 1 && k[0].tagName === 'P' && ![...cell.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) k[0].replaceWith(...k[0].childNodes); });
   // the pipeline's list rule: a list item that also holds a nested list keeps its own text (and inline markup) in <p> (`<li><p>Software</p><ul>`);
   // a decorate that read the label from the li's first node worked on the prototype and left the served drawer's buttons empty (audemarspiguet-home)
+  // pipeline parity: a paragraph's leading <br>s and an empty paragraph (`<p></p>`, `<p>&nbsp;</p>`, `<p><br></p>`) are dropped by the
+  // pipeline — the served page was 24 px shorter than the prototype at 360, two gate rounds (scotiabank-personal)
+  document.querySelectorAll('main p').forEach((p) => { while (p.firstChild && ((p.firstChild.nodeType === 1 && p.firstChild.tagName === 'BR') || (p.firstChild.nodeType === 3 && !p.firstChild.textContent.trim() && p.firstChild.nextSibling?.nodeType === 1 && p.firstChild.nextSibling.tagName === 'BR'))) p.firstChild.remove(); if (!p.textContent.replace(/\u00a0/g, ' ').trim() && !p.querySelector(':scope > :not(br)')) p.remove(); });
   document.querySelectorAll('main li').forEach((li) => { if (!li.querySelector(':scope > ul, :scope > ol')) return; const own = [...li.childNodes].filter((n) => !(n.nodeType === 1 && /^(UL|OL|P|DIV)$/.test(n.tagName)) && !(n.nodeType === 3 && !n.textContent.trim())); if (!own.length) return; const p = document.createElement('p'); li.insertBefore(p, own[0]); own.forEach((n) => p.appendChild(n)); });
+  // pipeline parity: a <br> that ends a <strong> / <em> is dropped and the edge spaces inside them are trimmed (served −72 at 1440, one round — take2games)
+  document.querySelectorAll('main strong, main em, main b, main i').forEach((el) => { while (el.lastChild && el.lastChild.nodeType === 1 && el.lastChild.tagName === 'BR') el.lastChild.remove(); const f = el.firstChild; if (f && f.nodeType === 3 && /^\s/.test(f.textContent)) { f.textContent = f.textContent.replace(/^\s+/, ''); el.before(document.createTextNode(' ')); } const l = el.lastChild; if (l && l.nodeType === 3 && /\s$/.test(l.textContent)) { l.textContent = l.textContent.replace(/\s+$/, ''); el.after(document.createTextNode(' ')); } });
+  // the pipeline turns `:name:` into `<span class="icon icon-name"></span>` (decorateIcons then loads the SVG): the fold does the same (#5, harbourvest-about)
+  const tw = document.createTreeWalker(document.querySelector('main'), NodeFilter.SHOW_TEXT); const nodes = []; while (tw.nextNode()) if (/:[a-z0-9][a-z0-9-]*:/i.test(tw.currentNode.textContent)) nodes.push(tw.currentNode);
+  for (const tn of nodes) { const frag = document.createDocumentFragment(); const parts = tn.textContent.split(/(:[a-z0-9][a-z0-9-]*:)/i); for (const part of parts) { const m = /^:([a-z0-9][a-z0-9-]*):$/i.exec(part); if (m) { const sp = document.createElement('span'); sp.className = `icon icon-${m[1].toLowerCase()}`; frag.appendChild(sp); } else if (part) frag.appendChild(document.createTextNode(part)); } tn.replaceWith(frag); }
   // every authored text (an element's own text and inline children, nested lists/blocks excluded) for the capture check
   const texts = [...document.querySelectorAll('main h1,main h2,main h3,main h4,main h5,main h6,main p,main li')].map((e) => [...e.childNodes].filter((n) => n.nodeType === 3 || (n.nodeType === 1 && !/^(UL|OL|DIV|P|TABLE)$/.test(n.tagName))).map((n) => n.textContent).join('').replace(/:[a-z0-9-]+:/g, ' ').replace(/\s+/g, ' ').trim()).filter((t) => t.length >= 3 && !/^https?:/.test(t));
   return { metas, main: document.querySelector('main').outerHTML, texts };
@@ -97,6 +109,11 @@ if (arg('--content', null)) {
   missing.forEach((t) => console.log(`harness: text not in the capture — "${t.slice(0, 100)}${t.length > 100 ? '…' : ''}"`));
   console.log(`harness: content check ${folded.texts.length} texts, ${missing.length} not in ${files.join(' + ')}${missing.length ? ' (typed from memory? read the JSON, not a viewer)' : ''}`);
 }
+// the runtime loads the header and footer from the metadata block's `nav` / `footer` rows (else /nav and /footer): without the rows or
+// without --fragments the serve dir holds no plain.html and the chrome renders blank — a 3-minute crop-and-grep hunt (scotiabank-personal)
+const chromeRows = ['nav', 'footer'].filter((k) => metas.some(([m]) => m === k));
+if (chromeRows.length < 2) console.log(`harness: the metadata block names no ${['nav', 'footer'].filter((k) => !chromeRows.includes(k)).join(' / ')} row — the runtime loads /${['nav', 'footer'].filter((k) => !chromeRows.includes(k)).join(' and /')}.plain.html from the serve dir; the header / footer render blank unless the row(s) are authored`);
+if (!arg('--fragments', null)) console.log(`harness: no --fragments — the chrome fragments are read from ${serveDir}/ (preview nav + footer on the branch and pass --fragments <branch-host> for the pipeline's markup)`);
 if (arg('--fragments', null)) {
   const host = String(arg('--fragments')).replace(/\/$/, '');
   for (const [k, v] of metas.filter(([k]) => ['nav', 'footer'].includes(k))) {
@@ -119,13 +136,20 @@ writeFileSync(`${serveDir}/${name}.harness.html`, `${head}<body><header></header
 // the served file must be the one just written (a server on this port from another case gates the wrong site — recorded twice)
 const written = `${head}<body><header></header>${folded.main}<footer></footer></body></html>`;
 const md5 = (s) => createHash('md5').update(s).digest('hex');
+const serving = () => fetch(`http://localhost:${port}/`).then(() => true).catch(() => false);
+if (!(await serving())) { // start serve detached (page-run's rule); it stays up for the next runs
+  const { spawn } = await import('node:child_process'); const site = String(arg('--site-repo', '.'));
+  console.log(`harness: nothing answers on :${port} — starting \`serve ${serveDir} --port ${port} --site ${site}\` (detached)`);
+  const child = spawn(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'serve.mjs'), serveDir, '--port', String(port), '--site', site], { detached: true, stdio: 'ignore' }); child.unref();
+  const t0 = Date.now(); while (!(await serving()) && Date.now() - t0 < 10000) await new Promise((r) => setTimeout(r, 300));
+}
 try {
   const served = await (await fetch(`http://localhost:${port}/${name}.harness.html`)).text();
-  if (md5(served) !== md5(written)) { console.error(`harness: http://localhost:${port}/${name}.harness.html is NOT the file just written (served md5 ${md5(served).slice(0, 8)}, written ${md5(written).slice(0, 8)}) — another server on :${port}? refusing`); process.exit(3); }
+  if (md5(served) !== md5(written)) { const owner = spawnSync('lsof', ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN'], { encoding: 'utf8' }).stdout.split('\n').slice(1).map((l) => l.split(/\s+/).slice(0, 2).join(' ')).filter(Boolean).join(', '); console.error(`harness: http://localhost:${port}/${name}.harness.html is NOT the file just written (served md5 ${md5(served).slice(0, 8)}, written ${md5(written).slice(0, 8)}) — another server on :${port}${owner ? ` (${owner})` : ''}: kill it or pass another --port; refusing`); process.exit(3); }
   console.log(`harness: served file verified (md5 ${md5(written).slice(0, 8)})`);
 } catch (e) { console.error(`harness: nothing answers on http://localhost:${port}/ — start \`node scripts/serve.mjs ${serveDir} --port ${port} --site <repo>\` first (${String(e).slice(0, 80)})`); process.exit(3); }
 
-const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: W, height: 900 } });
+const b = await launch(); const p = await b.newPage({ viewport: { width: W, height: 900 } });
 p.on('console', (m) => { if (m.type() === 'error') console.log('console:', m.text().slice(0, 200)); });
 p.on('pageerror', (e) => console.log('pageerror:', String(e).slice(0, 200)));
 p.on('requestfailed', (r) => console.log('reqfailed:', r.url().slice(0, 120)));

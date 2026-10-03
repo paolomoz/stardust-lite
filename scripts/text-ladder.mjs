@@ -5,13 +5,12 @@
 // not a text's value; the chunked capture catches such a text at an intermediate value, deterministically, and the block must run the
 // same function (hiltongrandvacations-home: two count-ups, the register kind "live entrance caught mid-flight").
 // Usage: node text-ladder.mjs <url> <W> --sels <css,…> [--every 100] [--for 6000] [--no-scroll] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>]
-import { chromium } from 'playwright';
-import { arg, openPage, overlayOpts } from './common.mjs';
+import { arg, openPage, overlayOpts, launch } from './common.mjs';
 
 const [url, wArg] = process.argv.slice(2); const sels = String(arg('--sels', '')).split(',').map((s) => s.trim()).filter(Boolean);
 if (!url || !wArg || !sels.length) { console.error('usage: text-ladder.mjs <url> <W> --sels <css,…> [--every 100] [--for 6000] [--no-scroll]'); process.exit(1); }
 const W = Number(wArg); const every = Number(arg('--every', 100)); const span = Number(arg('--for', 6000));
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: 900, ...overlayOpts() });
+const browser = await launch(); const page = await openPage(browser, url, { width: W, height: 900, ...overlayOpts() });
 const missing = await page.evaluate((ss) => ss.filter((s) => !document.querySelector(s)), sels);
 if (missing.length) { console.error(`text-ladder: no match for ${missing.join(' | ')}`); await browser.close(); process.exit(2); }
 if (!arg('--no-scroll', false)) await page.evaluate((s) => document.querySelector(s).scrollIntoView({ block: 'center' }), sels[0]);

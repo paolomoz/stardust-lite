@@ -50,8 +50,7 @@ import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { chromium } from 'playwright';
-import { arg, openPage, settle, overlayOpts, overlayArgs, siteProfile, stardustScripts, contextOptions } from './common.mjs';
+import { arg, openPage, settle, overlayOpts, overlayArgs, siteProfile, stardustScripts, contextOptions, launch } from './common.mjs';
 import { liveSections, pairSections, triageRowFor } from './lib/section-pair.mjs';
 import { captureUrl } from './lib/stitch.mjs';
 
@@ -149,7 +148,7 @@ const rows = []; const sectionRuns = {}; const chromeRuns = {}; const overAll = 
 const originDir = typeof arg('--origin', null) === 'string' ? resolve(arg('--origin')) : null; const measureDir = join(process.cwd(), 'migration', 'pages', slug, 'measure');
 const findOrigin = (W) => [originDir, originDir ? null : measureDir].filter(Boolean).map((d) => join(d, `live-${W}.png`)).find(existsSync) || null;
 const recapture = !!arg('--recapture-origin', false);
-const browser = captureTool === 'stitch' ? await chromium.launch() : null;
+const browser = captureTool === 'stitch' ? await launch() : null;
 const secs = (t0) => Number(((Date.now() - t0) / 1000).toFixed(1));
 for (const W of widths) {
   const origin = join(out, `live-${W}.png`); const eds = join(out, `build-${W}.png`); const t = { live: null, build: null, compare: null, sections: null }; timing[W] = t;
@@ -190,6 +189,13 @@ for (const W of widths) {
   }
   const px = run([join(S, 'pixel-compare.mjs'), origin, eds, '--out', join(out, `diff-${W}.png`), '--band', String(W === 360 ? 900 : band), '--json', ...(mask.length ? ['--mask', mask.join(',')] : [])], true);
   try { const j = JSON.parse(px.stdout.slice(px.stdout.indexOf('{'))); writeFileSync(join(out, `pixel-${W}.json`), JSON.stringify(j, null, 1)); rows.push({ W, pct: j.pct, dh: j.heightDelta, bands: j.bands.map((b) => `${b.y0}:${b.pct}`).join(' '), masked: j.maskedRows || 0 }); } catch { rows.push({ W, pct: 'ERR', dh: '', bands: px.stdout.slice(-200) }); }
+  // the hottest band, read as pixels: shift-probe's best shift and luminance ratio name a displacement, a scale or paint over a picture — a
+  // letterboxed hero was a 62 % band no table named (cibc-careers); one reading per width, over the band's full width
+  try { const j = JSON.parse(readFileSync(join(out, `pixel-${W}.json`), 'utf8')); const hot = (j.bands || []).filter((b) => b.pct > 0.5).sort((a, b) => b.pct - a.pct)[0];
+    if (hot) { const sp = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'shift-probe.mjs'), origin, eds, '--x0', '0', '--x1', String(W), '--y0', String(hot.y0), '--y1', String(hot.y1), '--r', '8', '--step', '2'], { encoding: 'utf8' }); const lines = sp.stdout.trim().split('\n');
+      // the last band under a fixed / sticky layer (the measure summary's first look) is the chrome's copy in the bottom-aligned last chunk, offset by Δh: a capture property (take2games, 1.5 min of crops)
+      let fixedNote = ''; try { const sm = JSON.parse(readFileSync(join(dirname(origin), 'summary.json'), 'utf8')); const fl = sm.fixedLayers?.[String(W)] || []; if (fl.length && hot === (j.bands || []).slice(-1)[0] && Math.abs(j.heightDelta || 0) > 2) fixedNote = ` — the LAST chunk under a fixed / sticky layer (${fl[0].split(' [')[0]}): the chrome's copy offset by Δh ${j.heightDelta}, a capture property, not layout`; } catch { /* no summary */ }
+      console.log(`hottest band at ${W}: y ${hot.y0}–${hot.y1} ${hot.pct} % — ${lines.map((l) => l.replace(/^region [^:]*: /, '')).join(' · ').slice(0, 300)}${fixedNote}`); } } catch { /* no bands */ }
   try { // the top band of the diff as its own file: look at the chrome, do not read it as a number
     const src = PNG.sync.read(readFileSync(join(out, `diff-${W}.png`))); const H = Math.min(Number(arg('--top', 120)), src.height); const dst = new PNG({ width: src.width, height: H });
     src.data.copy(dst.data, 0, 0, src.width * H * 4); writeFileSync(join(out, `diff-${W}-top.png`), PNG.sync.write(dst));
@@ -204,7 +210,7 @@ for (const W of widths) {
   try {
     let br = null;
     if (!lp || !bp) { // the stitch-shot path, or a capture that failed on one side: open what is missing
-      br = await chromium.launch();
+      br = await launch();
       if (!lp) { lp = await openPage(br, live, { width: W, height: vh, ...overlays }); await settle(lp, 800, 50, 400); }
       if (!bp) { bp = await openPage(br, build, { width: W, height: vh }); await settle(bp, 800, 50, 400); }
     }
@@ -255,6 +261,7 @@ let capLine = [(cap.stdout.match(/cap-probe: .*/) || ['cap-probe: (no verdict li
 // a page whose content root holds one module (a banner + one article) gives cap-probe the module's own columns as "modules" (a 472 text
 // column read as a content cap, the build asked for a 472 wrapper): its row verdict is advisory there — 7 of 10 sdt-dentsu pages FAILed at
 // 2560 with Δh 0 on every section; the section table is the reading
+if (liveSectionCount > 0) capLine = capLine.replace(/^(cap-probe: [^\n]*)/, `$1 (gate's live split: ${liveSectionCount} sections — a cap-probe count that differs between runs is its own split, #162: compare the rows, not the verdict)`);
 if (liveSectionCount > 0 && liveSectionCount <= 2 && /FAIL/.test(capLine)) capLine = capLine.replace(/^(cap-probe: [^\n]*)/, `$1 — advisory: a ${liveSectionCount}-section page, the probe's modules are one module's own columns; read the section table`);
 let motionLine = '';
 if (arg('--probes', null)) {
@@ -265,14 +272,14 @@ if (arg('--probes', null)) {
   const parsed = lines.map((l) => { const forced = /^chrome:\s*/i.test(l); const m = l.replace(/^chrome:\s*/i, '').match(/^(hover|click)\s+(.+?)\s*=>\s*(.+)$/); if (m) m.forced = forced; return m; }).filter(Boolean);
   const clicks = parsed.filter((m) => m[1] === 'click').map((m) => m[2]);
   if (clicks.length) {
-    const br = await chromium.launch(); const pg = await openPage(br, live, { width: 1440, ...overlayOpts() });
+    const br = await launch(); const pg = await openPage(br, live, { width: 1440, ...overlayOpts() });
     const nav = await pg.evaluate((sels) => sels.filter((s) => { let e; try { e = document.querySelector(s); } catch { return false; } const a = e && e.closest('a[href]'); if (!a) return false; const h = a.getAttribute('href') || ''; return h && !h.startsWith('#') && !/^javascript:/i.test(h) && a.getAttribute('target') !== '_blank' && !(a.getAttribute('role') === 'button') && a.href.split('#')[0] !== location.href.split('#')[0]; }), clicks);
     await br.close();
     if (nav.length) { console.error(`gate: ${nav.length} click probe(s) target a link that navigates on the live side — dropped (the click destroys the live context and the motion run; hover the item or use click-state --hover):\n  ${nav.join('\n  ')}`); for (const m of parsed) if (m[1] === 'click' && nav.includes(m[2])) m.drop = true; }
   }
-  if (chromeOn && parsed.some((m) => !m.drop && !m.forced)) {
+  if (chromeOn && hasChrome && parsed.some((m) => !m.drop && !m.forced)) { // nothing masked (no chrome heights) → every probe runs (6 header probes skipped on a template run, manulife)
     // the chrome is approved: a probe whose build target sits in header/footer is skipped (prefix the line `chrome:` to keep it)
-    const br = await chromium.launch(); const pg = await openPage(br, build, { width: 1440 });
+    const br = await launch(); const pg = await openPage(br, build, { width: 1440 });
     const inChrome = await pg.evaluate((sels) => sels.map((s) => { try { const e = document.querySelector(s); return !!(e && e.closest('header, footer')); } catch { return false; } }), parsed.map((m) => m[3]));
     await br.close();
     const skipped = parsed.filter((m, i) => !m.drop && !m.forced && inChrome[i]); skipped.forEach((m) => { m.drop = true; m.chrome = true; });
@@ -286,7 +293,7 @@ if (arg('--probes', null)) {
     writeFileSync(join(out, 'motion-compare.txt'), mc.stdout); motionLine = (mc.stdout.match(/motion summary: .*/) || [''])[0];
   } else motionLine = 'motion: every probe skipped or dropped';
 }
-console.log('\n| width | pixel % | Δh | bands |\n|---|---|---|---|');
+console.log(`\n| width | pixel %${chromeOn ? ' (header / footer bands MASKED — --no-chrome for the full page)' : ''} | Δh | bands |\n|---|---|---|---|`);
 rows.forEach((r) => console.log(`| ${r.W} | ${r.pct} | ${r.dh} | ${r.bands} |`));
 let budgetLine = '';
 if (budgetOn && Object.keys(sectionRuns).length) {
@@ -294,5 +301,12 @@ if (budgetOn && Object.keys(sectionRuns).length) {
   for (const o of overAll) budgetLine += `\n  ✗ ${o.W} #${o.index} "${o.anchorText.slice(0, 24)}" ${o.block}: ${o.over.includes('pct') ? `${o.pct} % > budget ${o.budget}` : ''}${o.over === 'pct+Δh' ? ', ' : ''}${o.over.includes('Δh') ? `Δh ${o.dh} px > 2` : ''}`;
 }
 const tLine = widths.map((W) => { const t = timing[W] || {}; const f = (v) => (v === null || v === undefined ? '—' : `${v} s`); return `${W}: live ${t.live === 0 ? `cached${t.liveOpen ? ` (opened ${t.liveOpen} s)` : ''}` : f(t.live)}, build ${f(t.build)}, compare ${f(t.compare)}, sections ${f(t.sections)}`; }).join(' | ');
-console.log(`\n${capLine}${motionLine ? `\n${motionLine}` : ''}${budgetLine ? `\n${budgetLine}` : ''}\ntiming (${captureTool}${captureTool === 'stitch' ? ', live and build concurrent' : ''}): ${tLine}\nevidence: ${out}/`);
+const specDir = [originFrom, arg('--origin', null), arg('--spec-dir', null), join(out, '..', 'measure'), 'measure'].filter((d) => typeof d === 'string').map((d) => resolve(d)).find((d) => widths.some((W) => existsSync(join(d, `spec-${W}.json`))));
+let sectionsLine = '';
+if (specDir && /^https?:/.test(build)) { // the build is a URL: `sections <build> --widths … --spec-dir <dir>` in one browser — its verdict and the rows off
+  const sw = widths.filter((W) => existsSync(join(specDir, `spec-${W}.json`)));
+  const sr = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'sections.mjs'), build, '--widths', sw.join(','), '--spec-dir', specDir, ...(typeof arg('--triage', null) === 'string' ? ['--triage', arg('--triage')] : []), ...(blocks.length ? ['--blocks', blocksFile] : []), ...liveOpts.filter((x) => x !== '--require')], { encoding: 'utf8' });
+  const ls = sr.stdout.split('\n'); sectionsLine = [...ls.filter((l) => /^rows at \d+:/.test(l)), ...ls.filter((l) => /^tables: /.test(l))].join('\n') || `sections: ${(sr.stderr || sr.stdout).trim().split('\n').pop()}`;
+}
+console.log(`\n${capLine}${sectionsLine ? `\n${sectionsLine}` : ''}${motionLine ? `\n${motionLine}` : ''}${budgetLine ? `\n${budgetLine}` : ''}\ntiming (${captureTool}${captureTool === 'stitch' ? ', live and build concurrent' : ''}): ${tLine}\nevidence: ${out}/`);
 writeFileSync(join(out, 'gate.json'), JSON.stringify({ _schema: 'stardust-lite/gate@1', _writtenAt: new Date().toISOString(), live, build, slug, widths, rows, timing, captureTool, origin: originFrom, chrome: { on: chromeOn, template: isTemplate, byWidth: chromeRuns }, cap: { verdict: capLine.split('\n')[0], failing: capLine.split('\n').slice(1) }, motion: motionLine || null, budget: { on: budgetOn, verdict: budgetOn ? (overAll.length ? 'FAIL' : 'PASS') : null, over: overAll, newSections: newCount, defaultSections: defaultCount, blocks: blocks.length ? blocksFile : null }, sections: sectionRuns }, null, 1));
