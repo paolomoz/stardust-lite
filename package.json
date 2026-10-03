@@ -6,7 +6,8 @@
   "description": "High-fidelity page migration to AEM Edge Delivery Services, blocks-first: one method document, a dozen instruments, cases as evidence.",
   "scripts": {
     "check": "for f in scripts/*.mjs scripts/lib/*.mjs tools/*/*.mjs; do node --check $f || exit 1; done",
-    "test": "node --test tools/replica/test/"
+    "test": "node --test tools/replica/test/",
+    "prose": "node scripts/prose-check.mjs"
   },
   "bin": {
     "stardust-lite": "bin/stardust-lite.mjs"

@@ -1,0 +1,44 @@
+{
+  "_writtenAt": "2026-10-03T08:49:58.167Z",
+  "commit": "24d1d36",
+  "files": {
+    "METHOD.md": {
+      "bytes": 38628,
+      "lines": 260
+    },
+    "ROLLOUT.md": {
+      "bytes": 10788,
+      "lines": 86
+    },
+    "README.md": {
+      "bytes": 25598,
+      "lines": 143
+    },
+    "BACKLOG.md": {
+      "bytes": 93329,
+      "lines": 188
+    },
+    "AGENTS.md": {
+      "bytes": 1763,
+      "lines": 21
+    },
+    "templates/SKILL.md": {
+      "bytes": 6579,
+      "lines": 34
+    },
+    "templates/AGENTS.md": {
+      "bytes": 547,
+      "lines": 7
+    },
+    "templates/migration-README.md": {
+      "bytes": 327,
+      "lines": 6
+    },
+    "templates/foundation/README.md": {
+      "bytes": 2305,
+      "lines": 24
+    }
+  },
+  "totalBytes": 179864,
+  "capBytes": 197850
+}
