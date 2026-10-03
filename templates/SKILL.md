@@ -5,7 +5,7 @@ description: Migrate one web page to AEM Edge Delivery Services with high fideli
 
 # stardust-lite (installed in this site repo)
 
-The procedure for a **template** (the first page of its kind on this site) is `{{ROOT}}/METHOD.md`. Read it in full before doing anything,
+The procedure for a **template** (the first page of its kind on this site) is `{{ROOT}}/CHECKLIST.md` — twelve steps on one screen, read it first and follow it; `{{ROOT}}/METHOD.md` is the reference behind every step, read for a row, not in full (3–9 min per run before, loop r1–r10). Then
 then the **open** rows of `{{ROOT}}/BACKLOG.md` (`grep -n '| open' BACKLOG.md`; the done rows are history — reading all 93 KB cost 9 min, cibc-careers; cite, do not re-solve). A **page after the template** reads `{{ROOT}}/ROLLOUT.md` instead (one screen:
 the per-page commands in order, the stop rule, the escalation rule) together with `migration/site.json` and `migration/blocks.json`; its
 evidence is one row in `migration/site-report.json` and `migration/pages/<slug>.md` (`page-report`), not a case folder. This repository is

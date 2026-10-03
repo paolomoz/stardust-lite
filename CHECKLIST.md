@@ -1,0 +1,21 @@
+# Template run — the checklist (one screen; METHOD.md is the reference, read it for a row)
+
+From the site repo's root. `<url>` the page, `<slug>` its name, `<host>` = `https://<branch>--<site>--<org>.aem.page`. Record `date -u +%FT%TZ` at t0.
+
+| # | step | command | read this, then decide |
+|---|---|---|---|
+| 0 | setup | `npm i -D github:paolomoz/stardust-lite#<sha> && npx stardust-lite init --foundation --force`; branch, push once | — |
+| 1 | first look | `npx stardust-lite probe-load <url> 360,1440,2560 --profile migration/site.json` | the **tier line** at the end: the flags every later instrument needs (`--chrome`, `--cookie`, `--locale`, `--consent`, `--dismiss`, `--hide`); it writes them to the profile so nothing is typed again. URL changed? measure the page you mean |
+| 2 | measure | `npx stardust-lite measure-page <url> --out migration/cases/<slug>/measure --noise` | the notes: unassigned bands, a tall header, shadow hosts (composed tree is automatic), a layer that pins or hides on scroll, broken images, the `--sections` guess it measured with |
+| 3 | brief | `npx stardust-lite brief migration/cases/<slug>/measure` | one screen: fonts and fallbacks, colours, cap, per section the text styles, media, unit, paint, rhythm and **inset** (who owns the gap). Never open a spec for this |
+| 4 | triage | `npx stardust-lite triage …/measure/content-1440.json --blocks migration/blocks.json --spec …/measure/spec-1440.json --out …/triage.json --md …/triage.md` | edit `triage.md` (block label, variant, section style — the inset note names the spacing), then `triage --from-md`. Collection shapes first, a new name last (METHOD step 2) |
+| 5 | media | `npx stardust-lite media-fetch …/measure/content-1440.json --out …/media` (`--from-page <url>` on a 403), `media-fetch …/measure/media-1440.json --fonts fonts`; `npx stardust-lite da-put <org>/<site>/<branch> …/media/* --to drafts/media` | the manifest; fonts.css declares the families the brief names as loaded, none for a fallback family |
+| 6 | author | `npx stardust-lite author …/triage.json --content …/measure/content-1440.json[,hidden-1440.json] --blocks migration/blocks.json --media …/media/manifest.json --out …/doc/<slug>.html --nav …/doc/nav.html --footer …/doc/footer.html --draft-new` | the stderr table (empty cells, did-not-fit, NEW); edit the triage or the document, never a script. `npx stardust-lite lint …/doc/`; `da-put … …/doc/*.html --to drafts` |
+| 7 | CSS draft | `npx stardust-lite spec-to-css …/measure --triage …/triage.json --doc …/doc/<slug>.html --out blocks` | drafts per block + `styles/sections-draft.css`, every value annotated with its spec row; write the decorate, merge the section styles; `npx stardust-lite css-lint .` before the first harness |
+| 8 | prototype | `npx stardust-lite harness …/doc/<slug>.html --serve proto --name <slug> --port <port> --fragments <host> --content …/measure/content-1440.json --site-repo .` | texts not in the capture, blocks not loaded, unbalanced tags |
+| 9 | round | `npx stardust-lite gate --live <url> --build http://localhost:<port>/<slug>.harness.html --out …/gate --round` | the digest: the sections that moved since the last round and the property each names; `stop:` when the base is clean → step 10. One round changes only what the digest names |
+| 10 | gate | the same with `--widths 360,1440,2560 --probes …/probes.txt`; `hover-diff` / `click-state` for the panels | the stop rule: every row within 2 px at the three widths, residuals named in the register |
+| 11 | deploy | push; `npx stardust-lite sync-poll <host> . blocks/x/x.css … --trigger <org>/<site>/<branch>`; `gate --live <url> --build <host>/drafts/<slug> --out …/gate-served --widths 360,1440,2560`; `leak` on both | served = prototype; a gap is a runtime difference, found in the leak table |
+| 12 | close | `site-profile init …/ --out migration/site.json`; `block-inventory scan --case … --cases --out migration/blocks.json`; README, REPORT, REGISTER, LINT in the case folder | the register: triage table, deviations with pixel cost, motion |
+
+Stop rule: every section row within 2 px at the three widths and every residual named (a third-party layer, a frame, anti-aliasing, a rendition, a source quirk the pipeline cannot carry). Escalation: a section the collection cannot name is a modelling question, not a CSS round.
