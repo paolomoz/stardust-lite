@@ -9,15 +9,14 @@
 // toggle is visually hidden to mouse users, takes `--hover <css>` with no `--click`: the probe hovers and dumps (it waited the 8 s click
 // timeout before printing the panel it had already opened — marriottvacationsworldwide-home).
 // Usage: node click-state.mjs <url> <W> [--click <css> [--click <css> …]] --panel <css> [--hover [<css>]] [--shot <out.png>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--depth 7]
-import { chromium } from 'playwright';
-import { arg, openPage, overlayOpts } from './common.mjs';
+import { arg, openPage, overlayOpts, launch } from './common.mjs';
 
 const [,, url, wArg] = process.argv; const panel = arg('--panel');
 const clicks = process.argv.map((a, i, all) => (a === '--click' ? all[i + 1] : null)).filter((v) => v && !v.startsWith('--'));
 const hover = arg('--hover', null);
 if (!url || !wArg || !panel || (!clicks.length && typeof hover !== 'string')) { console.error('usage: click-state.mjs <url> <W> [--click <css> …] --panel <css> [--hover [<css>]] (--hover <css> alone: hover, no click) [--shot <out.png>] [--consent <css>] [--depth 7]'); process.exit(1); }
 const W = Number(wArg); const depth = Number(arg('--depth', 7)); const click = clicks.length ? clicks[clicks.length - 1] : hover;
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: 900, ...overlayOpts() });
+const browser = await launch(); const page = await openPage(browser, url, { width: W, height: 900, ...overlayOpts() });
 // what is visible before the clicks: when --panel matches nothing afterwards, the newly visible top-most boxes name the panel's root
 // (the mobile drawer's root was `header + div`-less and no table named it — scotiabank-personal)
 const visibleSet = () => page.evaluate(() => { const sel = (el) => `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${[...el.classList].slice(0, 3).map((c) => '.' + c).join('')}`; const path = (el) => { const p = []; let n = el; while (n && n !== document.body && p.length < 4) { p.unshift(sel(n)); n = n.parentElement; } return p.join(' > '); }; const out = {}; for (const el of document.querySelectorAll('body *')) { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); if (r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.opacity !== '0') out[path(el)] = `[${Math.round(r.left)},${Math.round(r.top + scrollY)},${Math.round(r.width)},${Math.round(r.height)}]`; } return out; });

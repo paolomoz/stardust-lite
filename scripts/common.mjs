@@ -7,6 +7,16 @@ import { fileURLToPath } from 'node:url';
 
 export const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
 
+/** The browser every instrument opens. Chrome tier (`--chrome`, or STARDUST_CHROME=1 in the env, or the profile's `overlays.chrome`): the
+ * installed Google Chrome, headless — an origin that resets headless Chromium's HTTP/2 (`net::ERR_HTTP2_PROTOCOL_ERROR`) accepts it
+ * (cibc-careers, loop r2; BACKLOG #1). `--headed`: real Chrome with a window (the bot-managed tier). The tier is exported to the env so the
+ * children an instrument spawns (gate → cap-probe, motion-observe; harness → serve) inherit it, the vendored tools through lib/chrome-tier.mjs. */
+export async function launch(opts = {}) {
+  const { chromium } = await import('playwright');
+  const headed = process.argv.includes('--headed'); const chrome = headed || process.argv.includes('--chrome') || process.env.STARDUST_CHROME === '1' || !!siteDefaults()?.overlays?.chrome;
+  if (chrome && process.env.STARDUST_CHROME !== '1') { process.env.STARDUST_CHROME = '1'; const pre = `--import ${new URL('./lib/chrome-tier.mjs', import.meta.url).pathname}`; if (!(process.env.NODE_OPTIONS || '').includes('chrome-tier')) process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS || ''} ${pre}`.trim(); }
+  return chromium.launch({ ...(chrome ? { channel: 'chrome' } : {}), ...(headed ? { headless: false, args: ['--disable-blink-features=AutomationControlled'] } : {}), ...opts });
+}
 export function arg(name, def) {
   const i = process.argv.indexOf(name);
   if (i === -1) return def;
@@ -73,7 +83,11 @@ export async function openPage(browser, url, { width = 1440, height = 900, scale
   const page = isContext ? await browser.newPage() : await browser.newPage(contextOptions({ width, height, scale, locale }));
   if (isContext) await page.setViewportSize({ width, height });
   if (before) await before(page); // listeners that must exist before navigation (response log for font requests — media-list)
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
+  try { await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 }); } catch (e) {
+    // a protocol reset / connection refusal on headless Chromium is the origin's bot tier, not the page: name the next tier before dying
+    if (/ERR_HTTP2|ERR_CONNECTION_RESET|ERR_SSL|ERR_FAILED/.test(String(e.message)) && process.env.STARDUST_CHROME !== '1') console.error(`openPage: ${String(e.message).split('\n')[0].slice(0, 120)} — the origin refuses headless Chromium; run every instrument with --chrome (installed Google Chrome, headless) or STARDUST_CHROME=1, --headed for a window`);
+    throw e;
+  }
   await page.waitForTimeout(wait);
   if (afterLoad) await afterLoad(page);
   await acceptOverlays(page, { consent, dismiss, wait });

@@ -12,10 +12,9 @@
 //   triage block has a budget in the inventory) / new / default, and the verdict names the new rows apart (`CLEAN, 1 new section`: a new
 //   section still takes the full gate at the three widths). --out writes `sections-verdict.json` (a dir, or a .json path) — `gate
 //   --skip-widths-when-clean <that file>` gates the prototype at the base width only when it is CLEAN with 0 new (sdt-dentsu speed).
-import { chromium } from 'playwright';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
-import { arg, openPage, settle, overlayOpts, siteProfile, contextOptions } from './common.mjs';
+import { arg, openPage, settle, overlayOpts, siteProfile, contextOptions, launch } from './common.mjs';
 import { triageRowFor } from './lib/section-pair.mjs';
 
 const VALUED = ['--sections', '--header', '--footer', '--consent', '--dismiss', '--locale', '--require', '--widths', '--spec-dir', '--blocks', '--triage', '--out', '--site'];
@@ -34,9 +33,13 @@ const readBuild = ({ sections, header, footer, live }) => {
   const norm = (s) => s.replace(/\s+/g, ' ').trim().toLowerCase();
   // visible text only: a `visibility: hidden` build anchor paired a live section with the wrong build section every round (walgreens-home)
   const texts = [...document.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,a,span,strong,em,button,div')].filter((e) => { const b = e.getBoundingClientRect(); const s = getComputedStyle(e); return b.width > 0 && b.height > 0 && s.visibility !== 'hidden' && parseFloat(s.opacity) > 0.05 && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); });
+  // the live and build counts agree → pair by INDEX (the anchor only locates the row's box): one build section without a located anchor shifted every
+  // later row's pairing on every round (cibc-careers, loop r2); counts apart → by first anchor, as before
+  const byIndex = live.length === secs.length;
   const rows = live.map((l, i) => {
     let sec = null; let abox = null;
-    if (l.anchor) {
+    if (byIndex) { sec = secs[i]; if (l.anchor) { const lc = l.anchor.t.toLowerCase(); const e = texts.find((x) => sec.contains(x) && norm(x.textContent).startsWith(lc)); if (e) abox = R(e); } }
+    else if (l.anchor) {
       const lc = l.anchor.t.toLowerCase();
       // among the elements starting with the anchor text, the one nearest the live y (the same words recur in nav, cards and footer)
       const e = texts.filter((x) => norm(x.textContent).startsWith(lc)).sort((x, y) => Math.abs(x.getBoundingClientRect().top + scrollY - l.anchor.box[1]) - Math.abs(y.getBoundingClientRect().top + scrollY - l.anchor.box[1]) || x.textContent.length - y.textContent.length)[0];
@@ -62,7 +65,7 @@ async function runWidth(browser, spec) {
   await settle(page, 800, 50, 400);
   const r = await page.evaluate(readBuild, { sections, header, footer, live });
   await ctx.close();
-  log(`doc height  live ${spec.doc}  build ${r.doc}  Δ ${r.doc - spec.doc}   (spec measured at vh ${spec.vh || '?'}; ${spec.secs.length} live sections → ${r.count} build sections, paired by first text anchor)`);
+  log(`doc height  live ${spec.doc}  build ${r.doc}  Δ ${r.doc - spec.doc}   (spec measured at vh ${spec.vh || '?'}; ${spec.secs.length} live sections → ${r.count} build sections, paired ${spec.secs.length === r.count ? 'by index (counts agree; the anchor locates the row)' : 'by first text anchor (counts differ: one authored section per live section, METHOD step 2)'})`);
   log('idx  live y      h   | build#  y      h   | anchor Δy | anchor live → build | section');
   // a 0-height live section is a spacing measurement (METHOD step 2), not a row to pair: counted in no group, its span never judged —
   // two such sections folded into one build section read Δh −4843 on every round and the verdict never reached CLEAN (scotiabank-personal)
@@ -89,7 +92,7 @@ async function runWidth(browser, spec) {
   return { W: spec.W, doc: { live: spec.doc, build: r.doc, delta: r.doc - spec.doc }, rows, lines: out };
 }
 
-const browser = await chromium.launch();
+const browser = await launch();
 if (!multi) { // the single-width table, as before
   const spec = JSON.parse(readFileSync(positional[0], 'utf8'));
   const r = await runWidth(browser, spec); console.log(r.lines.join('\n')); await browser.close(); process.exit(0);

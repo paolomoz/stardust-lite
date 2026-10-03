@@ -13,9 +13,8 @@
 // its box is its contents' range box, and it counts as a block. A live anchor the spec read inside an entrance state (`rest` on the item:
 // an AOS wrapper at translateY/opacity 0 — step 1) is compared at its rest box.
 // Usage: node pair.mjs <spec.json> <build-url> [--max 120] [--filter <regex>] [--all]   (--all also prints rows within tolerance) [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>]
-import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
-import { arg, openPage, settle, overlayOpts } from './common.mjs';
+import { arg, openPage, settle, overlayOpts, launch } from './common.mjs';
 
 const [,, specPath, url] = process.argv;
 if (!specPath || !url) { console.error('usage: pair.mjs <spec.json> <build-url> [--max 120] [--filter <regex>] [--all]'); process.exit(1); }
@@ -28,7 +27,7 @@ for (const s of spec.secs) for (const it of s.items) {
   const key = it.t.slice(0, 28); if (seen.has(key)) continue; if (filter && !filter.test(it.t)) continue;
   seen.add(key); anchors.push({ t: key, box: it.rest || it.box, cbox: it.cbox || null, pad: it.pad || null, fs: it.fs, lh: it.lh, fw: it.fw, ff: it.ff, c: it.c, tt: it.tt, inline: !!it.inline || it.k === 'a' || it.k === 'span' });
 }
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800, ...overlayOpts() });
+const browser = await launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800, ...overlayOpts() });
 await settle(page, 800, 50, 400);
 const out = await page.evaluate((anchors) => {
   // `display: contents` paints its children and has a 0×0 rect: its box is the range box of its contents

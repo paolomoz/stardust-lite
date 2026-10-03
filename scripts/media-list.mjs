@@ -5,15 +5,14 @@
 // overlays (a scroll lock left behind). The list is what gets downloaded byte-for-byte and uploaded to the draft media folder.
 // Written for ibm-home, reused by walgreens-home.
 // Usage: node media-list.mjs <url> [W] [--out file.json] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>]
-import { chromium } from 'playwright';
 import { writeFileSync } from 'node:fs';
-import { openPage, settle, arg, overlayOpts } from './common.mjs';
+import { openPage, settle, arg, overlayOpts, launch } from './common.mjs';
 import { collectMedia, fontResponse } from './lib/probe-collectors.mjs'; // the in-page inventory + the font-request test (shared with measure-page)
 
 const url = process.argv[2]; const W = Number(process.argv[3] || 1440);
 if (!url) { console.error('usage: media-list.mjs <url> [W] [--out file.json] [--consent <css>] [--dismiss <css,…>]'); process.exit(1); }
 const fontReqs = []; let lockBefore = '';
-const b = await chromium.launch();
+const b = await launch();
 const p = await openPage(b, url, { width: W, ...overlayOpts(), wait: 4000, before: (page) => {
   page.on('response', (r) => { const u = fontResponse(r); if (u) fontReqs.push(u); });
   page.on('domcontentloaded', async () => { lockBefore = await page.evaluate(() => `${getComputedStyle(document.body).overflow}/${getComputedStyle(document.documentElement).overflow}`).catch(() => ''); });

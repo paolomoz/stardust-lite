@@ -50,8 +50,7 @@ import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { chromium } from 'playwright';
-import { arg, openPage, settle, overlayOpts, overlayArgs, siteProfile, stardustScripts, contextOptions } from './common.mjs';
+import { arg, openPage, settle, overlayOpts, overlayArgs, siteProfile, stardustScripts, contextOptions, launch } from './common.mjs';
 import { liveSections, pairSections, triageRowFor } from './lib/section-pair.mjs';
 import { captureUrl } from './lib/stitch.mjs';
 
@@ -149,7 +148,7 @@ const rows = []; const sectionRuns = {}; const chromeRuns = {}; const overAll = 
 const originDir = typeof arg('--origin', null) === 'string' ? resolve(arg('--origin')) : null; const measureDir = join(process.cwd(), 'migration', 'pages', slug, 'measure');
 const findOrigin = (W) => [originDir, originDir ? null : measureDir].filter(Boolean).map((d) => join(d, `live-${W}.png`)).find(existsSync) || null;
 const recapture = !!arg('--recapture-origin', false);
-const browser = captureTool === 'stitch' ? await chromium.launch() : null;
+const browser = captureTool === 'stitch' ? await launch() : null;
 const secs = (t0) => Number(((Date.now() - t0) / 1000).toFixed(1));
 for (const W of widths) {
   const origin = join(out, `live-${W}.png`); const eds = join(out, `build-${W}.png`); const t = { live: null, build: null, compare: null, sections: null }; timing[W] = t;
@@ -204,7 +203,7 @@ for (const W of widths) {
   try {
     let br = null;
     if (!lp || !bp) { // the stitch-shot path, or a capture that failed on one side: open what is missing
-      br = await chromium.launch();
+      br = await launch();
       if (!lp) { lp = await openPage(br, live, { width: W, height: vh, ...overlays }); await settle(lp, 800, 50, 400); }
       if (!bp) { bp = await openPage(br, build, { width: W, height: vh }); await settle(bp, 800, 50, 400); }
     }
@@ -266,14 +265,14 @@ if (arg('--probes', null)) {
   const parsed = lines.map((l) => { const forced = /^chrome:\s*/i.test(l); const m = l.replace(/^chrome:\s*/i, '').match(/^(hover|click)\s+(.+?)\s*=>\s*(.+)$/); if (m) m.forced = forced; return m; }).filter(Boolean);
   const clicks = parsed.filter((m) => m[1] === 'click').map((m) => m[2]);
   if (clicks.length) {
-    const br = await chromium.launch(); const pg = await openPage(br, live, { width: 1440, ...overlayOpts() });
+    const br = await launch(); const pg = await openPage(br, live, { width: 1440, ...overlayOpts() });
     const nav = await pg.evaluate((sels) => sels.filter((s) => { let e; try { e = document.querySelector(s); } catch { return false; } const a = e && e.closest('a[href]'); if (!a) return false; const h = a.getAttribute('href') || ''; return h && !h.startsWith('#') && !/^javascript:/i.test(h) && a.getAttribute('target') !== '_blank' && !(a.getAttribute('role') === 'button') && a.href.split('#')[0] !== location.href.split('#')[0]; }), clicks);
     await br.close();
     if (nav.length) { console.error(`gate: ${nav.length} click probe(s) target a link that navigates on the live side — dropped (the click destroys the live context and the motion run; hover the item or use click-state --hover):\n  ${nav.join('\n  ')}`); for (const m of parsed) if (m[1] === 'click' && nav.includes(m[2])) m.drop = true; }
   }
   if (chromeOn && parsed.some((m) => !m.drop && !m.forced)) {
     // the chrome is approved: a probe whose build target sits in header/footer is skipped (prefix the line `chrome:` to keep it)
-    const br = await chromium.launch(); const pg = await openPage(br, build, { width: 1440 });
+    const br = await launch(); const pg = await openPage(br, build, { width: 1440 });
     const inChrome = await pg.evaluate((sels) => sels.map((s) => { try { const e = document.querySelector(s); return !!(e && e.closest('header, footer')); } catch { return false; } }), parsed.map((m) => m[3]));
     await br.close();
     const skipped = parsed.filter((m, i) => !m.drop && !m.forced && inChrome[i]); skipped.forEach((m) => { m.drop = true; m.chrome = true; });

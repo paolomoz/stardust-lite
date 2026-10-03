@@ -31,10 +31,9 @@
 //   --parallel   widths read at once, never more than 3 (three contexts on one browser)
 // Writes per width: probe-load-<W>.txt, structure-<W>.txt, content-<W>.json, media-<W>.json, spec-<W>.json + dom-<W>.html, deep-<W>.txt, live-<W>.png;
 // and summary.json { url, widths, elapsedByWidth, files, captures, profileCheck, sectionsSelector, mainRoot, fixedLayers, shadowRoots, notes }. Prints one table.
-import { chromium } from 'playwright';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { arg, openPage, settle, overlayOpts, contextOptions, siteProfile, DEEP_HELPERS } from './common.mjs';
+import { arg, openPage, settle, overlayOpts, contextOptions, siteProfile, DEEP_HELPERS, launch } from './common.mjs';
 import { collectContent } from './lib/content-collector.mjs';
 import { collectSpec } from './lib/spec-collector.mjs';
 import { firstLook, collectStructure, collectMedia, fontResponse, deepProbe } from './lib/probe-collectors.mjs';
@@ -65,7 +64,7 @@ const notes = [];
 if (profile) notes.push(`profile ${profile._file}${mainSel && typeof arg('--main', null) !== 'string' ? ` (cap main ${mainSel})` : ''}`);
 if (noSpec) notes.push('--no-spec: no spec / dom written');
 if (!capture) notes.push('--no-capture: no live-<W>.png written (the gate captures its own origin)');
-const browser = await chromium.launch();
+const browser = await launch();
 const results = {};
 
 async function measure(W) {
@@ -121,6 +120,17 @@ async function measure(W) {
   const deep = await page.evaluate(new Function('args', `${DEEP_HELPERS}\n return (${String(deepProbe)})(args);`), [sels, DEEP_MAX, false, [], false]);
   write(`deep-${W}.txt`, deep + '\n');
   const nSections = await page.evaluate((s) => { try { return document.querySelectorAll(s).length; } catch { return -1; } }, sections);
+  // the scrolled state: which layers are fixed / sticky after one viewport and how far the first content box moved — a mobile bar that pins on
+  // scroll took 50 px out of the flow from chunk 2 on and no table at rest showed it (360 at 15 % for three rounds, cibc-careers, loop r2)
+  const scrolled = await page.evaluate(async ([vh, rootPath]) => {
+    const sel = (el) => `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${[...el.classList].slice(0, 3).map((c) => '.' + c).join('')}`;
+    const pinned = () => [...document.querySelectorAll('body *')].filter((el) => { const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); return (cs.position === 'fixed' || (cs.position === 'sticky' && r.top <= 1)) && r.width > 0 && r.height > 0 && cs.visibility !== 'hidden'; }).map((el) => `${sel(el)} h${Math.round(el.getBoundingClientRect().height)}`);
+    const root = document.querySelector(rootPath) || document.querySelector('main') || document.body; const first = [...root.children].find((c) => c.getBoundingClientRect().height > 0) || root;
+    const y0 = Math.round(first.getBoundingClientRect().top + scrollY); const at0 = pinned();
+    window.scrollTo(0, vh); await new Promise((r) => setTimeout(r, 500)); const at1 = pinned(); const y1 = Math.round(first.getBoundingClientRect().top + scrollY);
+    window.scrollTo(0, 0); await new Promise((r) => setTimeout(r, 400));
+    return { at0, at1, shift: y1 - y0, newlyPinned: at1.filter((x) => !at0.includes(x)) };
+  }, [vh, root.path]).catch(() => null);
   let cap = null;
   if (capture) { // last: the freeze changes the page (animations paused, timers cleared) — every reading above is done
     const tc = Date.now();
@@ -129,7 +139,7 @@ async function measure(W) {
   await ctx.close();
   const elapsed = Number(((Date.now() - t0) / 1000).toFixed(1));
   log(`done in ${elapsed} s`);
-  return { W, elapsed, status, files, root, contentMain, hasMain, cap, checkRows, first: results[W]?.first || null, doc: content.__doc, unassigned: extraRoots, contentRoots: [header, ...extraRoots, contentMain, footer].map((r) => `${r}: ${(content[r] || []).length}`), hiddenRoots: hidden.map((r) => `${r}: ${(content[`hidden ${r}`] || []).length}`), media: { imgs: media.imgs.length, videos: media.videos.length, bgs: media.bgs.length, svgs: media.svgs.length, faces: media.faces.length, fontRequests: media.fontRequests.length }, spec: spec ? { secs: spec.secs.length, items: spec.secs.reduce((n, s) => n + s.items.length, 0), running: spec.running, entrance: spec.secs.reduce((n, s) => n + s.items.filter((it) => it.ent).length, 0) } : null, nSections, deepLines: deep.split('\n').length };
+  return { W, elapsed, status, files, root, contentMain, hasMain, cap, checkRows, first: results[W]?.first || null, doc: content.__doc, unassigned: extraRoots, scrolled, contentRoots: [header, ...extraRoots, contentMain, footer].map((r) => `${r}: ${(content[r] || []).length}`), hiddenRoots: hidden.map((r) => `${r}: ${(content[`hidden ${r}`] || []).length}`), media: { imgs: media.imgs.length, videos: media.videos.length, bgs: media.bgs.length, svgs: media.svgs.length, faces: media.faces.length, fontRequests: media.fontRequests.length }, spec: spec ? { secs: spec.secs.length, items: spec.secs.reduce((n, s) => n + s.items.length, 0), running: spec.running, entrance: spec.secs.reduce((n, s) => n + s.items.filter((it) => it.ent).length, 0) } : null, nSections, deepLines: deep.split('\n').length };
 }
 
 // up to `parallel` widths at once, in order
@@ -156,6 +166,7 @@ for (const r of rows) {
   if (r.nSections === 0) notes.push(`${r.W}: --sections "${sections}" matches nothing — the spec has header/footer only; read structure-${r.W}.txt for the section selector`);
   if (r.nSections < 0) notes.push(`${r.W}: --sections "${sections}" is not a valid selector`);
   if (r.root.tag !== 'main' && typeof arg('--main', null) !== 'string') notes.push(`${r.W}: content root ${r.root.name} (${r.hasMain ? 'the largest ancestor of main that adds no chrome' : 'no <main>'}) — dump key "${r.contentMain}"`);
+  if (r.scrolled && (r.scrolled.newlyPinned.length || Math.abs(r.scrolled.shift) >= 2)) notes.push(`${r.W}: after one viewport of scroll ${r.scrolled.newlyPinned.length ? `${r.scrolled.newlyPinned.join(', ')} pin${r.scrolled.newlyPinned.length > 1 ? '' : 's'} fixed / sticky` : 'no new fixed layer'}${Math.abs(r.scrolled.shift) >= 2 ? ` and the first content box moved ${r.scrolled.shift} px — a layer that leaves the flow when it pins: reproduce it or every chunk after the first is offset in the capture` : ''}`);
   if (r.unassigned?.length) notes.push(`${r.W}: UNASSIGNED band(s) outside header / main / footer dumped as extra content roots — ${r.unassigned.join(', ')} (the first look names their boxes; triage them as chrome or content)`);
   if (r.spec?.entrance) notes.push(`${r.W}: ${r.spec.entrance} spec items read inside an entrance state (\`rest\` on the item; pair / sections compare at rest)`);
   if (r.spec?.running) notes.push(`${r.W}: ${r.spec.running} animations still running at read time (infinite ones)`);
@@ -176,6 +187,7 @@ const summary = {
   fixedLayers: Object.fromEntries(rows.filter((r) => r.first).map((r) => [r.W, r.first.fixed])),
   unassigned: Object.fromEntries(rows.filter((r) => r.first).map((r) => [r.W, r.first.unassigned || []])),
   noise: Object.keys(noise).length ? noise : null,
+  scrolled: Object.fromEntries(rows.filter((r) => r.scrolled).map((r) => [r.W, r.scrolled])),
   shadowRoots: Object.fromEntries(rows.filter((r) => r.first).map((r) => [r.W, r.first.shadowHosts])),
   status: Object.fromEntries(rows.map((r) => [r.W, r.status ?? null])),
   overlays: { consent: overlays.consent, dismiss: overlays.dismiss, locale: overlays.locale, require: overlays.require },

@@ -25,10 +25,9 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { chromium } from 'playwright';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
-import { arg, davidsLint } from './common.mjs';
+import { arg, davidsLint, launch } from './common.mjs';
 
 if (typeof arg('--pages', null) === 'string') {
   const list = JSON.parse(readFileSync(arg('--pages'), 'utf8')); const pages = list.pages || []; const docDir = String(arg('--doc-dir', 'doc')); const serveDir0 = arg('--serve');
@@ -68,7 +67,7 @@ if (!arg('--no-lint', false)) {
 }
 
 const raw = readFileSync(src, 'utf8');
-const b0 = await chromium.launch(); const p0 = await b0.newPage();
+const b0 = await launch(); const p0 = await b0.newPage();
 await p0.setContent(raw);
 const folded = await p0.evaluate(() => {
   const metas = [];
@@ -139,11 +138,11 @@ if (!(await serving())) { // start serve detached (page-run's rule); it stays up
 }
 try {
   const served = await (await fetch(`http://localhost:${port}/${name}.harness.html`)).text();
-  if (md5(served) !== md5(written)) { console.error(`harness: http://localhost:${port}/${name}.harness.html is NOT the file just written (served md5 ${md5(served).slice(0, 8)}, written ${md5(written).slice(0, 8)}) — another server on :${port}? refusing`); process.exit(3); }
+  if (md5(served) !== md5(written)) { const owner = spawnSync('lsof', ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN'], { encoding: 'utf8' }).stdout.split('\n').slice(1).map((l) => l.split(/\s+/).slice(0, 2).join(' ')).filter(Boolean).join(', '); console.error(`harness: http://localhost:${port}/${name}.harness.html is NOT the file just written (served md5 ${md5(served).slice(0, 8)}, written ${md5(written).slice(0, 8)}) — another server on :${port}${owner ? ` (${owner})` : ''}: kill it or pass another --port; refusing`); process.exit(3); }
   console.log(`harness: served file verified (md5 ${md5(written).slice(0, 8)})`);
 } catch (e) { console.error(`harness: nothing answers on http://localhost:${port}/ — start \`node scripts/serve.mjs ${serveDir} --port ${port} --site <repo>\` first (${String(e).slice(0, 80)})`); process.exit(3); }
 
-const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: W, height: 900 } });
+const b = await launch(); const p = await b.newPage({ viewport: { width: W, height: 900 } });
 p.on('console', (m) => { if (m.type() === 'error') console.log('console:', m.text().slice(0, 200)); });
 p.on('pageerror', (e) => console.log('pageerror:', String(e).slice(0, 200)));
 p.on('requestfailed', (r) => console.log('reqfailed:', r.url().slice(0, 120)));

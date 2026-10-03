@@ -5,14 +5,13 @@
 // shadow roots, so `c4d-card-group-item div.cds--tile` hovers the inner tile of a web component (ibm-home). Run it on live and on the
 // build with paired selectors.
 // Usage: node hover-diff.mjs <url> <out.json> [--width 1440] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] --sel <css> [--sel <css> …]
-import { chromium } from 'playwright';
 import { writeFileSync } from 'node:fs';
-import { arg, openPage, overlayOpts, DEEP_HELPERS } from './common.mjs';
+import { arg, openPage, overlayOpts, DEEP_HELPERS, launch } from './common.mjs';
 
 const [,, url, out] = process.argv; const W = Number(arg('--width', 1440));
 const sels = process.argv.flatMap((a, i) => (a === '--sel' ? [process.argv[i + 1]] : []));
 if (!url || !out || !sels.length) { console.error('usage: hover-diff.mjs <url> <out.json> [--width 1440] [--consent <css>] --sel <css> [--sel <css> …]'); process.exit(1); }
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: 900, ...overlayOpts() });
+const browser = await launch(); const page = await openPage(browser, url, { width: W, height: 900, ...overlayOpts() });
 await page.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}' });
 const PROPS = ['color', 'background-color', 'background-image', 'border-color', 'border-top-color', 'border-bottom-color', 'box-shadow', 'text-decoration-line', 'text-decoration-color', 'opacity', 'transform', 'scale', 'outline-color', 'outline-width', 'fill', 'stroke', 'visibility', 'display', 'width', 'height'];
 const snap = (el) => el.evaluate(new Function('root', 'PROPS', `${DEEP_HELPERS}

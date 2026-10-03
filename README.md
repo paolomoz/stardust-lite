@@ -54,7 +54,7 @@ npm run check              # syntax of every script and tool
 
 Bot-managed origins need the tools' `--headed` tier (real Chrome installed). DA / aem.page calls need an IMS bearer token in `DA_TOKEN`.
 Every instrument takes `--consent <css>` (a consent control that reloads the page is waited out), `--dismiss <css,…>` (any other overlay:
-geo modal, interstitial), `--locale <tag>` and `--require <css,…>` (composition gate: exit 4 when the session is not the one the origin
+geo modal, interstitial), `--locale <tag>`, `--chrome` / `--headed` (the installed Chrome, headless or with a window — inherited by every child process) and `--require <css,…>` (composition gate: exit 4 when the session is not the one the origin
 was captured in); every measurement waits for `document.fonts.ready`.
 
 ## Use from a site repo (the normal way)

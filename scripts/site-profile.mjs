@@ -33,8 +33,7 @@
 // }
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync, statSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
-import { chromium } from 'playwright';
-import { UA, arg, acceptOverlays } from './common.mjs';
+import { UA, arg, acceptOverlays, launch } from './common.mjs';
 import { statusRow, overlayRows, chromeRows, verdictOf } from './lib/profile-check.mjs';
 
 const [,, cmd, target] = process.argv;
@@ -225,7 +224,7 @@ if (cmd === 'print') {
 const tol = Number(arg('--tol', 2)); const o = P.overlays || {}; const H = P.chrome?.header || {};
 const widths = [...new Set([...(P.widths || []), ...Object.keys(H.heightsByWidth || {}).map(Number)])].sort((a, b) => a - b);
 if (!P.origin || !widths.length) { console.error('site-profile check: the profile has no origin or no widths'); process.exit(1); }
-const b = await chromium.launch(o.headed ? { headless: false, channel: 'chrome', args: ['--disable-blink-features=AutomationControlled'] } : {});
+const b = await launch();
 const rows = [];
 for (const W of widths) {
   const page = await b.newPage({ viewport: { width: W, height: 900 }, userAgent: UA, ...(o.locale ? { locale: o.locale, extraHTTPHeaders: { 'Accept-Language': `${o.locale},${o.locale.split('-')[0]};q=0.9` } } : {}) });

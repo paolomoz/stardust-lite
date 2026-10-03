@@ -9,9 +9,8 @@
 //   --props names computed properties outside the fixed set (`min-height,flex,background-size,object-fit,letter-spacing`…) — flex bases,
 //   fixed heights and background-size were read with a case script until dentsu-home; --anim prints each match's running animations with
 //   their keyframes (`getAnimations()` + `effect.getKeyframes()`; stitch-shot pauses them, so the 0 % frame is the capture state).
-import { chromium } from 'playwright';
 import { existsSync, readFileSync } from 'node:fs';
-import { arg, openPage, settle, overlayOpts, DEEP_HELPERS } from './common.mjs';
+import { arg, openPage, settle, overlayOpts, DEEP_HELPERS, launch } from './common.mjs';
 import { deepProbe } from './lib/probe-collectors.mjs'; // the in-page reading (shared with measure-page)
 
 const [,, url, wArg] = process.argv; const selsFile = arg('--sels');
@@ -22,7 +21,7 @@ const W = Number(wArg); const MAX = Number(arg('--max', 3));
 // (ENAMETOOLONG, then ENOENT — marriottvacationsworldwide-home); a selector with a comma inside goes in a file
 const sels = (existsSync(selsFile) ? readFileSync(selsFile, 'utf8').split('\n') : String(selsFile).split(',')).map((s) => s.trim()).filter((s) => s && !/^(#\s|#$|\/\/)/.test(s));
 const CHILDREN = arg('--children', false); const PROPS = String(arg('--props', '')).split(',').map((s) => s.trim()).filter(Boolean); const ANIM = Boolean(arg('--anim', false));
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: Number(arg('--vh', 900)), ...overlayOpts() });
+const browser = await launch(); const page = await openPage(browser, url, { width: W, height: Number(arg('--vh', 900)), ...overlayOpts() });
 await settle(page, 600, 100, 1200);
 const out = await page.evaluate(new Function('args', `${DEEP_HELPERS}
  return (${String(deepProbe)})(args);`), [sels, MAX, CHILDREN, PROPS, ANIM]);

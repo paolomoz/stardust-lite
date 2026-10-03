@@ -10,7 +10,7 @@ import { PNG } from 'pngjs';
 const argv = process.argv; const opt = (n, d) => { const i = argv.indexOf(n); return i === -1 ? d : argv[i + 1]; };
 const pos = argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && all[i - 1].startsWith('--')));
 const [inp, outp, y0s, y1s, sc] = pos;
-if (!inp || !outp || !y0s || !y1s) { console.error('usage: crop.mjs <in.png> <out.png> <y0> <y1> [scale] [--x0 <px> --x1 <px>] [--vs <other.png>]'); process.exit(1); }
+if (!inp || !outp || !y0s || !y1s) { console.error('usage: crop.mjs <in.png> <out.png> <y0> <y1> [divisor] [--x0 <px> --x1 <px>] [--vs <other.png>]  (divisor: 2 halves the output, 1 = 1:1 — not a scale factor)'); process.exit(1); }
 const y0 = +y0s; const y1 = +y1s; const scale = +(sc || 1); const vs = opt('--vs', null);
 const src = PNG.sync.read(readFileSync(inp)); const x0 = +opt('--x0', 0); const x1 = +opt('--x1', src.width);
 const h = Math.min(y1, src.height) - y0; const W = Math.round((x1 - x0) / scale); const H = Math.round(h / scale);

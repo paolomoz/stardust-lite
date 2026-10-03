@@ -14,16 +14,15 @@
 // click the probes make fires — modals appended to `<body>` with `aria-hidden` at rest (nine brand modals; `harness --content` listed
 // every authored modal text as "not in the capture" — marriottvacationsworldwide-home). Opt-in and per root: hidden DOM stays NOT content.
 // Usage: node content-dump.mjs <url> [W] --roots <css,…> [--hidden <css,…>] --out file.json [--require <css,…>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>]
-import { chromium } from 'playwright';
 import { writeFileSync } from 'node:fs';
-import { openPage, settle, arg, overlayOpts } from './common.mjs';
+import { openPage, settle, arg, overlayOpts, launch } from './common.mjs';
 import { collectContent } from './lib/content-collector.mjs';
 
 const url = process.argv[2]; const W = Number(process.argv[3] || 1440);
 if (!url) { console.error('usage: content-dump.mjs <url> [W] --roots <css,…> --out file.json [--hidden <css,…>] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>]'); process.exit(1); }
 const roots = String(arg('--roots', 'header,main,footer')).split(',').map((s) => s.trim());
 const hidden = String(arg('--hidden', '')).split(',').map((s) => s.trim()).filter(Boolean);
-const b = await chromium.launch(); const p = await openPage(b, url, { width: W, ...overlayOpts(), wait: 4000 });
+const b = await launch(); const p = await openPage(b, url, { width: W, ...overlayOpts(), wait: 4000 });
 await settle(p);
 const tree = await p.evaluate(collectContent, [roots, hidden]); // the walker lives in lib/content-collector.mjs (shared with roster's light pass)
 writeFileSync(arg('--out', 'content.json'), JSON.stringify(tree, null, 1));

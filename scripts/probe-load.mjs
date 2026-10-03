@@ -5,14 +5,13 @@
 // W may be a list (`360,1440,2560`): a layer fixed at the base width may scroll at 360 (a 244 px header, fixed at ≥ 900 only, was
 // built fixed at 360 too — 20 % of the 360 number for two rounds, usta2-home). Run it at every gated width.
 // Usage: node probe-load.mjs <url> [W[,W…]] [--headed] [--locale <tag>] [--shot out.png]
-import { chromium } from 'playwright';
-import { UA, arg, overlayOpts } from './common.mjs';
+import { UA, arg, overlayOpts, launch } from './common.mjs';
 import { firstLook } from './lib/probe-collectors.mjs'; // the in-page reading (shared with measure-page)
 
 const url = process.argv[2]; const widths = String(process.argv[3] && !process.argv[3].startsWith('--') ? process.argv[3] : 1440).split(',').map(Number);
 if (!url) { console.error('usage: probe-load.mjs <url> [W[,W…]] [--headed] [--locale <tag>] [--shot out.png]'); process.exit(1); }
 const headed = process.argv.includes('--headed'); const { locale, consent, dismiss } = overlayOpts(); // the profile's overlays, when one is in use (nothing is clicked here)
-const b = await chromium.launch(headed ? { headless: false, channel: 'chrome', args: ['--disable-blink-features=AutomationControlled'] } : {});
+const b = await launch();
 for (const W of widths) {
 if (widths.length > 1) console.log(`\n=== W ${W}`);
 const p = await b.newPage({ viewport: { width: W, height: 900 }, userAgent: UA, ...(locale ? { locale, extraHTTPHeaders: { 'Accept-Language': `${locale},${locale.split('-')[0]};q=0.9` } } : {}) });
