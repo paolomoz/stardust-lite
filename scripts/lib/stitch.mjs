@@ -18,7 +18,9 @@ import { openPage, settle, acceptOverlays } from '../common.mjs';
 /** Freeze motion for stable chunks — AFTER the settle: CSS animations paused, transitions off, carets hidden, smooth scroll off; every
  * <video> paused at t=0; every pending timeout / interval cleared; the first slick dot clicked (then the timers cleared again). */
 export async function freezeMotion(page) {
-  await page.addStyleTag({ content: '*,*::before,*::after{animation-play-state:paused!important;transition:none!important;caret-color:transparent!important;scroll-behavior:auto!important;}html{scroll-behavior:auto!important}' }).catch(() => {});
+  // no blanket `animation-play-state: paused`: an entrance that starts when a chunk scrolls into view was frozen at its first frame (si-home:
+  // half the 360 cards captured faded) — restMotion() runs every finite animation to its end and pauses the infinite ones, per chunk
+  await page.addStyleTag({ content: '*,*::before,*::after{transition:none!important;caret-color:transparent!important;scroll-behavior:auto!important;}html{scroll-behavior:auto!important}' }).catch(() => {});
   await page.evaluate(async () => {
     const vids = [...document.querySelectorAll('video')];
     await Promise.all(vids.map((v) => new Promise((res) => { try { v.pause(); v.removeAttribute('autoplay'); if (v.readyState >= 1) v.currentTime = 0; if (v.seeking) { v.addEventListener('seeked', () => res(), { once: true }); setTimeout(res, 1500); } else setTimeout(res, 200); } catch { res(); } })));
@@ -28,6 +30,21 @@ export async function freezeMotion(page) {
     window.scrollTo(0, 0);
   }).catch(() => {});
 }
+
+/** Browser side, before every chunk: the page AT REST — every finite animation (an entrance, a reveal) finished at its end state, every
+ * infinite one (a marquee, a spinner) paused where it is. Returns the counts. */
+const restMotion = () => { let finished = 0; let paused = 0; for (const a of document.getAnimations({ subtree: true })) { try { const t = a.effect.getComputedTiming(); if (Number.isFinite(t.iterations) && Number.isFinite(t.endTime) && t.endTime < 60000) { if (a.playState !== 'finished') { a.finish(); finished += 1; } } else if (a.playState === 'running') { a.pause(); paused += 1; } } catch { /* a detached effect */ } } return { finished, paused }; };
+
+/** Browser side, before every chunk: wait until the in-viewport elements a SCRIPT animates (inline style: GSAP / ScrollTrigger, anime,
+ * Motion — tweens that are not Web Animations, so restMotion cannot finish them) hold the same opacity and transform for two reads 100 ms
+ * apart, bounded (si-home: GSAP card entrances started as each chunk scrolled in and were captured mid-tween, half the 360 page faded). */
+const quietInViewport = async (bound) => {
+  const t0 = Date.now(); const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const sig = () => { let out = ''; let n = 0; for (const e of document.querySelectorAll('[style]')) { const r = e.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight || r.width < 2) continue; const cs = getComputedStyle(e); out += `${cs.opacity}|${cs.transform}|${cs.visibility};`; n += 1; } return [out, n]; };
+  let [prev, n] = sig(); let steady = 0;
+  while (Date.now() - t0 < bound) { await sleep(100); const [now] = sig(); if (now === prev) { steady += 1; if (steady >= 2) return { ms: Date.now() - t0, n, quiet: true }; } else steady = 0; prev = now; }
+  return { ms: Date.now() - t0, n, quiet: false };
+};
 
 /** Declared font faces whose load failed (status `error`): the capture renders fallback type. Returns the family names. */
 export const failedFonts = (page) => page.evaluate(async () => { await document.fonts.ready; const loaded = new Set([...document.fonts].filter((f) => f.status === 'loaded').map((f) => f.family)); return [...new Set([...document.fonts].filter((f) => f.status === 'error' && !loaded.has(f.family)).map((f) => f.family))]; }).catch(() => []); // a family with a loaded face is not a failure (a variable TTF 404s beside its static duplicate — natixis)
@@ -45,8 +62,8 @@ const readyInViewport = async (bound) => {
   let imgs = 0; let anims = 0; let frames = 0;
   while (left() > 0) {
     const p = pendingImgs(); const a = runningFinite(); imgs = p.length; anims = a.length;
-    if (!p.length && !a.length) { const h1 = await raf(); const h2 = await raf(); frames += 2; if (h1 === h2) return { ms: Date.now() - t0, imgs, anims, frames, timedOut: false }; continue; }
-    await Promise.race([Promise.all([...p.map((i) => new Promise((r) => { i.addEventListener('load', r, { once: true }); i.addEventListener('error', r, { once: true }); })), ...a.map((x) => x.finished.catch(() => {}))]), sleep(Math.min(150, Math.max(0, left())))]);
+    if (!p.length) { const h1 = await raf(); const h2 = await raf(); frames += 2; if (h1 === h2) return { ms: Date.now() - t0, imgs, anims, frames, timedOut: false }; continue; }
+    await Promise.race([Promise.all(p.map((i) => new Promise((r) => { i.addEventListener('load', r, { once: true }); i.addEventListener('error', r, { once: true }); }))), sleep(Math.min(150, Math.max(0, left())))]);
   }
   return { ms: Date.now() - t0, imgs, anims, frames, timedOut: true };
 };
@@ -62,11 +79,12 @@ export async function stitchCapture(page, outFile, { vh = 900, freeze = true, ch
   const totalH = await page.evaluate(() => Math.max(document.body.scrollHeight, document.documentElement.scrollHeight));
   if (!totalH || totalH < 10) throw new Error(`page height ${totalH}px — blank render? (bot challenge / hidden body)`);
   const width = (page.viewportSize() || { width: 1440 }).width;
-  const chunks = []; const waited = []; let timedOut = 0; let prevActualY = null;
+  const chunks = []; const waited = []; let timedOut = 0; let prevActualY = null; const rested = { finished: 0, paused: 0, restless: 0, waitedMs: 0 };
   for (let y = 0; y < totalH; y += vh) {
     const target = Math.max(0, Math.min(y, totalH - vh));
     await page.evaluate((ty) => window.scrollTo(0, ty), target);
     const r = await page.evaluate(readyInViewport, chunkTimeout).catch(() => ({ ms: 0, timedOut: true }));
+    if (freeze) { const q = await page.evaluate(quietInViewport, Math.min(1500, chunkTimeout)).catch(() => null); if (q && !q.quiet) rested.restless += 1; if (q && q.ms > 250) rested.waitedMs += q.ms; const m = await page.evaluate(restMotion).catch(() => null); if (m) { rested.finished += m.finished; rested.paused += m.paused; } await page.evaluate(() => new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res)))).catch(() => {}); }
     waited.push(r.ms); if (r.timedOut) timedOut += 1;
     const actualY = await page.evaluate(() => window.scrollY);
     // scroll-stall guard (stitch-shot): the window does not advance while the document reports more height — an inner scroller; fail loud
@@ -81,7 +99,7 @@ export async function stitchCapture(page, outFile, { vh = 900, freeze = true, ch
   }
   mkdirSync(dirname(outFile), { recursive: true });
   writeFileSync(outFile, PNG.sync.write(outPng));
-  return { width, height: totalH, chunks: chunks.length, waited, timedOut, failedFonts: fonts };
+  return { width, height: totalH, chunks: chunks.length, waited, timedOut, failedFonts: fonts, rested };
 }
 
 /** Open `url` on `browser` (a Browser or a BrowserContext — openPage's rule) at `width` × `vh`, settle it (common's slow scroll, fonts,
@@ -94,6 +112,6 @@ export async function captureUrl(browser, url, outFile, { width = 1440, vh = 900
   await settle(page);
   if (consent || dismiss.length) await acceptOverlays(page, { consent, dismiss, wait: 800 });
   const r = await stitchCapture(page, outFile, { vh, chunkTimeout });
-  if (log) log(`stitched ${outFile}: ${r.width}x${r.height} from ${r.chunks} chunks in ${((Date.now() - t0) / 1000).toFixed(1)} s${r.timedOut ? ` (${r.timedOut} chunk waits hit the ${chunkTimeout} ms bound)` : ''}`);
+  if (log) log(`stitched ${outFile}: ${r.width}x${r.height} from ${r.chunks} chunks in ${((Date.now() - t0) / 1000).toFixed(1)} s${r.timedOut ? ` (${r.timedOut} chunk waits hit the ${chunkTimeout} ms bound)` : ''}${r.rested?.finished ? ` · ${r.rested.finished} entrance(s) run to rest` : ''}${r.rested?.waitedMs ? ` · ${(r.rested.waitedMs / 1000).toFixed(1)} s waiting for scripted motion to settle${r.rested.restless ? ` (${r.rested.restless} chunk(s) never quiet)` : ''}` : ''}`);
   return { page, seconds: (Date.now() - t0) / 1000, ...r };
 }
