@@ -234,8 +234,13 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
       if (flat) secs.push(...kids); else secs.push(c0);
     }
   }
-  const extraCount = extras(beforeMain).length + extras(afterMain, true).length; if (extraCount) secs = [...extras(beforeMain), ...secs, ...extras(afterMain, true)];
-  return { header: headerKey ? dump[headerKey]?.[0] || null : null, footer: footerKey ? dump[footerKey]?.[0] || null : null, sections: secs, mainKey, headerKey, footerKey, marked: marked.length && secs.includes(marked[0]) ? marked.length : 0, extraRoots: extraCount };
+  // no footer root, and the last band after main reaches the document's bottom and is mostly links: that band IS the footer (canon: an
+  // experience fragment with a "Footer" h2, five link columns and the legal line was authored as an accordion section)
+  let after = extras(afterMain, true); let footerNode = footerKey ? dump[footerKey]?.[0] || null : null;
+  const docH = Number(dump.__doc) || 0; const last = after[after.length - 1];
+  if (!footerNode && last?.box && docH && last.box[1] + last.box[3] >= docH - 24) { const l = leaves(last).filter((x) => x.text); const links = l.filter((x) => ['a', 'button'].includes(tagOf(x))).length; if (links >= 10 && links >= l.length * 0.6) { footerNode = last; after = after.slice(0, -1); } }
+  const extraCount = extras(beforeMain).length + after.length; if (extraCount) secs = [...extras(beforeMain), ...secs, ...after];
+  return { header: headerKey ? dump[headerKey]?.[0] || null : null, footer: footerNode, sections: secs, mainKey, headerKey, footerKey, marked: marked.length && secs.includes(marked[0]) ? marked.length : 0, extraRoots: extraCount };
 }
 
 /** The Block Collection shape a fingerprint suggests (null = default content or nothing recognisable); never more than a guess. */

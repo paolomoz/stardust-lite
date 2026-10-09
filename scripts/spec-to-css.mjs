@@ -63,13 +63,28 @@ function textRules(items, W, sel, prev) {
   return out;
 }
 function unitOf(items, W, contentW) {
-  const cands = count(items.filter((it) => it.k === 'paint' && onPage(it, W) && it.box[2] < (contentW || W) * 0.8 && it.box[3] >= 40 && it.box[2] >= 80).map((it) => `${it.box[2]}×${it.box[3]}`)).filter(([, n]) => n >= 2);
-  if (!cands.length) return null;
-  const [wh] = cands.sort((a, b) => b[1] - a[1] || (Number(b[0].split('×')[1]) - Number(a[0].split('×')[1])))[0];
-  const m = items.filter((it) => it.k === 'paint' && `${it.box[2]}×${it.box[3]}` === wh).sort((a, b) => a.box[1] - b.box[1] || a.box[0] - b.box[0]);
-  const xs = [...new Set(m.filter((it) => it.box[1] === m[0].box[1]).map((it) => it.box[0]))].sort((a, b) => a - b);
-  const gap = xs.length > 1 ? xs[1] - xs[0] - m[0].box[2] : null;
-  return { w: m[0].box[2], h: m[0].box[3], n: m.length, perRow: xs.length, gap, first: m[0], rowGap: (() => { const ys = [...new Set(m.map((it) => it.box[1]))].sort((a, b) => a - b); return ys.length > 1 ? ys[1] - ys[0] - m[0].box[3] : null; })() };
+  // the repeating unit: a painted CONTAINER (it holds ≥ 2 other items) repeated at one size — never a control (canon: the three cards had no
+  // paint of their own and the unit read as their 319×42 buttons: padding, border and a 92 px gap on the card). Without a painted container the
+  // unit is the column of a repeated image (same size, ≥ 2): its x-range from the image's top to the next row (exp/five-min replay)
+  const inBox = (o, b) => o.box[0] >= b[0] - 1 && o.box[0] + o.box[2] <= b[0] + b[2] + 1 && o.box[1] >= b[1] - 1 && o.box[1] + o.box[3] <= b[1] + b[3] + 1;
+  const isCtl = (it) => /^(a|button)$/.test(it.tag) || /\b(btn|button)\b/i.test(String(it.cls || ''));
+  const holds = (it) => items.filter((o) => o !== it && o.k !== 'paint' && onPage(o, W) && inBox(o, it.box)).length >= 2;
+  const shape = (m, synth) => {
+    const xs = [...new Set(m.filter((it) => it.box[1] === m[0].box[1]).map((it) => it.box[0]))].sort((a, b) => a - b);
+    const gap = xs.length > 1 ? xs[1] - xs[0] - m[0].box[2] : null; const ys = [...new Set(m.map((it) => it.box[1]))].sort((a, b) => a - b);
+    let first = m[0]; let h = m[0].box[3];
+    if (synth) { const b = m[0].box; const nextY = ys.length > 1 ? ys[1] : Infinity; const col = items.filter((o) => o.k !== 'paint' && onPage(o, W) && o.box[0] >= b[0] - 1 && o.box[0] + o.box[2] <= b[0] + b[2] + 1 && o.box[1] >= b[1] && o.box[1] < nextY); h = Math.max(...col.map((o) => o.box[1] + o.box[3])) - b[1]; first = { tag: 'div', cls: '(image column)', box: [b[0], b[1], b[2], h] }; }
+    return { w: m[0].box[2], h, n: m.length, perRow: xs.length, gap, first, rowGap: ys.length > 1 ? ys[1] - ys[0] - h : null };
+  };
+  const cands = count(items.filter((it) => it.k === 'paint' && onPage(it, W) && !isCtl(it) && it.box[2] < (contentW || W) * 0.8 && it.box[3] >= 40 && it.box[2] >= 80 && holds(it)).map((it) => `${it.box[2]}×${it.box[3]}`)).filter(([, n]) => n >= 2);
+  if (cands.length) {
+    const [wh] = cands.sort((a, b) => b[1] - a[1] || (Number(b[0].split('×')[1]) - Number(a[0].split('×')[1])))[0];
+    return shape(items.filter((it) => it.k === 'paint' && `${it.box[2]}×${it.box[3]}` === wh).sort((a, b) => a.box[1] - b.box[1] || a.box[0] - b.box[0]), false);
+  }
+  const imgs = count(items.filter((it) => ['img', 'video'].includes(it.k) && onPage(it, W) && it.box[2] >= 80 && it.box[2] < (contentW || W) * 0.8).map((it) => `${it.box[2]}×${it.box[3]}`)).filter(([, n]) => n >= 2);
+  if (!imgs.length) return null;
+  const [wh] = imgs.sort((a, b) => b[1] - a[1])[0];
+  return shape(items.filter((it) => ['img', 'video'].includes(it.k) && `${it.box[2]}×${it.box[3]}` === wh).sort((a, b) => a.box[1] - b.box[1] || a.box[0] - b.box[0]), true);
 }
 function controls(items, W, sel) {
   const ctl = items.filter((it) => it.k === 'paint' && /^(a|button)$/.test(it.tag) && onPage(it, W) && it.pad && it.pad !== '0px');
@@ -99,10 +114,12 @@ rows.forEach((row, i) => {
   const sel = classes ? `.${classes.join('.')}` : `main .section${style ? `.${style.split(/[,\s]+/).filter(Boolean).map((t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-')).join('.')}` : `:nth-of-type(${i + 1})`}`;
   const inset = live.inset; const padTop = inset ? inset.first : null; const padBottom = inset ? inset.last : null;
   const bg = live.bg && live.bg !== 'rgba(0, 0, 0, 0)' ? live.bg : (items.find((it) => it.k === 'paint' && it.box[2] >= base - 2 && it.bg) || {}).bg;
-  const sectionSel = classes ? `main .section${style ? `.${style.split(/[,\s]+/).filter(Boolean).map((t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-')).join('.')}` : ''}` : sel;
-  const secDecl = [...(padTop !== null ? [`padding: ${px(padTop)} 0 ${px(padBottom)}`] : []), ...(bg ? [`background: ${rgb(bg)}`] : []), ...(live.bgi ? [`background-image: ${live.bgi.slice(0, 120)}${live.bgs ? `; background-size: ${live.bgs.split(' ')[0]}; background-position: ${live.bgs.split(' ').slice(1, 3).join(' ')}` : ''}`] : [])];
+  // without a section style the block's section is scoped to ITSELF (as a default-content section is): an unscoped `main .section` put the
+  // last block section's padding and navy background on every section of the page (exp/five-min replay: manulife 85–94 %)
+  const sectionSel = classes ? `main .section${style ? `.${style.split(/[,\s]+/).filter(Boolean).map((t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-')).join('.')}` : `:nth-of-type(${i + 1})`}` : sel;
+  const secDecl = [...(padTop !== null ? [`padding: ${px(Math.max(0, padTop))} 0 ${px(Math.max(0, padBottom))}`] : []), ...(bg ? [`background: ${rgb(bg)}`] : []), ...(live.bgi ? [`background-image: ${live.bgi.slice(0, 120)}${live.bgs ? `; background-size: ${live.bgs.split(' ')[0]}; background-position: ${live.bgs.split(' ').slice(1, 3).join(' ')}` : ''}`] : [])];
   const insetNote = inset ? ` /* inset top ${inset.first}: ${inset.top.join(' → ')}; bottom ${inset.last}: ${inset.bottom.join(' → ')} */` : '';
-  if (secDecl.length) (classes ? sectionsDraft : lines).push(`${sectionSel} { ${secDecl.join('; ')}; }${insetNote}${classes && !style ? '  /* the block\'s section: name a section style for it, or move the padding onto the block */' : ''}`);
+  if (secDecl.length) (classes ? sectionsDraft : lines).push(`${sectionSel} { ${secDecl.join('; ')}; }${insetNote}${classes && !style ? '  /* this section only: name a section style to share it across pages */' : ''}`);
   if (classes) {
     if (contentW && pageCap && Math.abs(contentW - pageCap) > 8) lines.push(`${sel} { max-width: ${px(contentW)}; margin: 0 auto; }  /* content x ${r[0]}..${r[1]} (the page cap is ${pageCap}) */`);
     const u = unitOf(items, base, contentW);
@@ -135,7 +152,7 @@ rows.forEach((row, i) => {
       const mi = m.items.filter((it) => onPage(it, mobile)); const mr = xr(mi, mobile); const mu = unitOf(mi, mobile, mr ? mr[1] - mr[0] : null);
       const prevSigs = new Map(textRules(items, base, sel).map((t) => [t.tag, t.sig])); const mt = textRules(mi, mobile, `  ${sel}`, prevSigs);
       const mob = [];
-      if (m.inset && (m.inset.first !== padTop || m.inset.last !== padBottom)) mob.push(`  ${sectionSel} { padding: ${px(m.inset.first)} 0 ${px(m.inset.last)}; }  /* inset ${m.inset.first} / ${m.inset.last} at ${mobile} */`);
+      if (m.inset && (m.inset.first !== padTop || m.inset.last !== padBottom)) mob.push(`  ${sectionSel} { padding: ${px(Math.max(0, m.inset.first))} 0 ${px(Math.max(0, m.inset.last))}; }  /* inset ${m.inset.first} / ${m.inset.last} at ${mobile} */`);
       if (u && (!mu || mu.perRow !== u.perRow)) mob.push(`  ${sel} { grid-template-columns: ${mu ? `repeat(${mu.perRow}, minmax(0, 1fr))` : '1fr'};${mu && mu.rowGap !== null ? ` row-gap: ${px(mu.rowGap)};` : ''} }  /* unit ${mu ? `${mu.n} × ${mu.w}×${mu.h}, ${mu.perRow} per row` : 'stacked'} at ${mobile} */`);
       mob.push(...mt.map((t) => t.css)); mob.push(...mediaRules(mi, mobile, `  ${sel}`).filter((x) => !mediaRules(items, base, sel).map((y) => y.replace(sel, '')).includes(x.replace(`  ${sel}`, ''))));
       if (mob.length) lines.push(`@media (max-width: ${bp - 1}px) {  /* the source's breakpoint ${bp} (media queries by count: ${(summary.breakpoints || []).slice(0, 3).join(', ') || 'unknown — 900 assumed'}) */\n${mob.join('\n')}\n}`);
