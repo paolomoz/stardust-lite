@@ -28,7 +28,7 @@ function caseOf(repo) {
   const cases = join(repo, 'migration', 'cases'); const name = existsSync(cases) ? readdirSync(cases).find((d) => existsSync(join(cases, d, 'measure', 'summary.json'))) : null;
   if (!name) return null; const dir = join(cases, name); const measure = join(dir, 'measure');
   const url = JSON.parse(readFileSync(join(measure, 'summary.json'), 'utf8')).url;
-  const slug = readdirSync(join(dir, 'doc')).filter((f) => f.endsWith('.html') && !/^(nav|footer)\.html$/.test(f) && !/\.(author|raw|draft)\./.test(f)).map((f) => f.replace(/\.html$/, ''))[0];
+  const slug = readdirSync(join(dir, 'doc')).filter((f) => /^[^.]+\.html$/.test(f) && !/^(nav|footer)\.html$/.test(f)).map((f) => f.replace(/\.html$/, ''))[0];
   const m = /content\.da\.live\/([^/]+)\/([^/\s]+)/.exec(readFileSync(join(repo, 'fstab.yaml'), 'utf8')); const branch = sh('git', ['-C', repo, 'rev-parse', '--abbrev-ref', 'HEAD']).stdout.trim();
   return { name, dir, measure, url, slug, host: m ? `https://${branch}--${m[2]}--${m[1]}.aem.page` : null };
 }
@@ -42,7 +42,7 @@ for (const [i, repo0] of repos.entries()) {
   if (!c?.slug || !c.host) { row.error = 'no case with a measure dir, a doc and an fstab mount'; console.log(`bench: ${row.error}`); continue; }
   const scratch = join(work, `${site}-${mode}${mode === 'machine' ? `-${triageMode}` : ''}`); rmSync(scratch, { recursive: true, force: true }); mkdirSync(scratch, { recursive: true });
   const step = (name, script, args, { cwd = scratch, ok = (r) => !r.status } = {}) => {
-    const t0 = Date.now(); const r = sh(process.execPath, [script, ...args], { cwd }); const s = Number(((Date.now() - t0) / 1000).toFixed(1));
+    const t0 = Date.now(); const r = sh(process.execPath, [script, ...args], { cwd, timeout: 600000, killSignal: 'SIGKILL' }); if (r.error?.code === 'ETIMEDOUT') r.status = 'timeout'; const s = Number(((Date.now() - t0) / 1000).toFixed(1));
     const good = ok(r); row.steps.push({ step: name, seconds: s, exit: r.status, ok: good, out: tail(`${r.stdout}\n${r.stderr}`, 4) });
     console.log(`── ${name} ${s}s exit ${r.status}${good ? '' : ' ✗'}\n${tail(`${r.stdout}\n${r.stderr}`, 4).replace(/^/gm, '   ')}`); return r;
   };
