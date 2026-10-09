@@ -15,7 +15,7 @@
 //                                                             faces embedded as data: URIs written as files (`<family>-<weight>-<style>.woff2`;
 //                                                             a case font-dump.mjs did this — covermore, loop r6); then fonts.css declares them
 import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync } from 'node:fs';
-import { join, extname } from 'node:path';
+import { join, extname, dirname, relative, resolve } from 'node:path';
 import { arg, launch, contextOptions } from './common.mjs';
 let browserPage = null; // --browser: one context, one page, every URL a navigation
 const fromPage = new Map(); // --from-page: url → { status, type, buf } captured from the page's own responses
@@ -37,16 +37,33 @@ const getBytes = async (url) => {
   return { ok: r.ok(), status: r.status(), type: (r.headers()['content-type'] || '').split(';')[0].trim(), buf: r.ok() ? await r.body().catch(() => null) : null };
 };
 
-const OPTS = ['--out', '--base', '--extra', '--extra-file', '--fonts', '--from-page']; // --browser is a bare flag
+const OPTS = ['--out', '--base', '--extra', '--extra-file', '--fonts', '--from-page', '--css']; // --browser is a bare flag
 if (typeof arg('--fonts', null) === 'string') {
-  const dir = arg('--fonts'); mkdirSync(dir, { recursive: true }); let n = 0;
+  const dir = arg('--fonts'); mkdirSync(dir, { recursive: true }); let n = 0; const cssFaces = []; const fetchedUrls = new Set();
   const safe = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   for (const f of process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && OPTS.includes(all[i - 1])))) {
     const m = JSON.parse(readFileSync(f, 'utf8'));
     for (const d of m.dataFaces || []) { const mm = /^data:([^;,]+)(;base64)?,(.*)$/s.exec(d.data); if (!mm) continue; const ext = /woff2/.test(mm[1]) ? '.woff2' : /woff/.test(mm[1]) ? '.woff' : /ttf|truetype/.test(mm[1]) ? '.ttf' : /otf|opentype/.test(mm[1]) ? '.otf' : '.bin'; const name = `${safe(d.family)}-${safe(d.weight)}-${safe(d.style)}${ext}`; writeFileSync(join(dir, name), mm[2] ? Buffer.from(mm[3], 'base64') : Buffer.from(decodeURIComponent(mm[3]), 'latin1')); console.log(`data: ${d.family} ${d.weight} ${d.style} → ${name}`); n += 1; }
-    for (const u of m.fontRequests || []) { const r = await getBytes(u); if (!r || !r.ok || !r.buf) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${u}${!process.argv.includes('--browser') ? ' (a 403: --browser)' : ''}`); continue; } const name = safe(new URL(u).pathname.split('/').pop().replace(/\.[a-z0-9]+$/, '')) + (extname(new URL(u).pathname) || '.woff2'); writeFileSync(join(dir, name), r.buf); console.log(`${r.status} ${u.slice(-70)} → ${name}`); n += 1; }
+    // the faces the page LOADED, each matched to its @font-face rule (media.fontFaceRules) → one file per face named by it, and the
+    // fonts.css lines (--css): a URL's last segment named si-home's four Typekit faces `l.woff2`, and every run wrote fonts.css by hand
+    const rules = m.fontFaceRules || []; const done = new Set();
+    for (const lf of [...new Set(m.loaded || [])]) {
+      const t = lf.split(' '); const style = t.pop(); const weight = t.pop(); const family = t.join(' ').replace(/^["']|["']$/g, '');
+      const inW = (w) => { const r = String(w).split(/\s+/).map(Number); return r.length > 1 ? Number(weight) >= r[0] && Number(weight) <= r[1] : String(r[0]) === String(Number(weight)); };
+      const rule = rules.find((r) => r.family.toLowerCase() === family.toLowerCase() && r.style === style && inW(r.weight) && r.srcs.some((x) => !x.url.startsWith('data:')));
+      if (!rule) continue;
+      const src = ['woff2', 'woff', 'truetype', 'opentype', null].map((f) => rule.srcs.find((x) => !x.url.startsWith('data:') && (x.format === f || (f === 'woff2' && /\.woff2(\?|$)/.test(x.url))))).find(Boolean) || rule.srcs[0];
+      const ext = src.format === 'woff2' || /\.woff2/.test(src.url) ? '.woff2' : src.format === 'woff' || /\.woff(\?|$)/.test(src.url) ? '.woff' : /\.otf/.test(src.url) || src.format === 'opentype' ? '.otf' : /\.ttf/.test(src.url) || src.format === 'truetype' ? '.ttf' : '.woff2';
+      const name = `${safe(family)}-${safe(weight)}-${safe(style)}${ext}`; if (done.has(name)) continue;
+      const r = await getBytes(src.url); if (!r || !r.ok || !r.buf) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${src.url} (${lf})`); continue; }
+      writeFileSync(join(dir, name), r.buf); done.add(name); n += 1; fetchedUrls.add(src.url);
+      cssFaces.push({ family, weight, style, file: name, format: ext === '.woff2' ? 'woff2' : ext === '.woff' ? 'woff' : ext === '.otf' ? 'opentype' : 'truetype' });
+    }
+    for (const u of (m.fontRequests || []).filter((x) => !fetchedUrls.has(x))) { const r = await getBytes(u); if (!r || !r.ok || !r.buf) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${u}${!process.argv.includes('--browser') ? ' (a 403: --browser)' : ''}`); continue; } const name = safe(new URL(u).pathname.split('/').pop().replace(/\.[a-z0-9]+$/, '')) + (extname(new URL(u).pathname) || '.woff2'); writeFileSync(join(dir, name), r.buf); console.log(`${r.status} ${u.slice(-70)} → ${name}`); n += 1; }
   }
-  console.log(`media-fetch: ${n} font file(s) in ${dir}/ — declare them in styles/fonts.css with the families the spec names`); process.exit(0);
+  const cssOut = typeof arg('--css', null) === 'string' ? arg('--css') : null;
+  if (cssOut && cssFaces.length) { const rel = relative(dirname(resolve(cssOut)), resolve(dir)).split('\\').join('/'); mkdirSync(dirname(resolve(cssOut)), { recursive: true }); writeFileSync(cssOut, `/* fonts.css — the faces the source loaded, from media-*.json fontFaceRules (media-fetch --fonts --css) */\n${cssFaces.map((f) => `@font-face { font-family: '${f.family}'; font-style: ${f.style}; font-weight: ${f.weight}; font-display: swap; src: url('${rel}/${f.file}') format('${f.format}'); }`).join('\n')}\n`); console.log(`media-fetch: ${cssFaces.length} face(s) declared in ${cssOut}`); }
+  console.log(`media-fetch: ${n} font file(s) in ${dir}/${cssFaces.length ? '' : ' — declare them in styles/fonts.css with the families the spec names (no fontFaceRules in the media JSON: re-measure, then --css styles/fonts.css writes it)'}`); process.exit(0);
 }
 const files = process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && OPTS.includes(all[i - 1])));
 if (!files.length) { console.error('usage: media-fetch.mjs <content.json…> --out media [--base <origin>] [--extra <url,…>] [--extra-file <list>]'); process.exit(1); }

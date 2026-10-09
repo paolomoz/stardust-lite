@@ -118,11 +118,15 @@ rows.forEach((row, i) => {
     lines.push(...mediaRules(items, base, sel));
     lines.push(...controls(items, base, sel));
     // rhythm: the gaps between consecutive boxes (the brief's line), as a comment the margins come from
-    const seq = items.filter((it) => (isText(it) ? it.t && !it.inline : ['img', 'video', 'svg'].includes(it.k))).sort((a, b) => a.box[1] - b.box[1] || a.box[0] - b.box[0]);
+    // with a repeating unit the rhythm is read INSIDE the first unit: across a grid row it jumped from one card's heading to the next row's
+    // image and wrote `.cards h3 { margin: 0 0 244px }` into every card (exp/five-min replay: takeda, ten grids each ~250 px a card too tall)
+    const within = (it, b) => it.box[0] >= b[0] - 1 && it.box[0] + it.box[2] <= b[0] + b[2] + 1 && it.box[1] >= b[1] - 1 && it.box[1] + it.box[3] <= b[1] + b[3] + 1;
+    const scopeBox = u ? u.first.box : live.box;
+    const seq = items.filter((it) => (isText(it) ? it.t && !it.inline : ['img', 'video', 'svg'].includes(it.k)) && (!u || within(it, scopeBox))).sort((a, b) => a.box[1] - b.box[1] || a.box[0] - b.box[0]);
     if (seq.length) {
-      const g = []; const after = new Map(); let prevBottom = live.box[1]; let prevTag = null;
+      const g = []; const after = new Map(); let prevBottom = scopeBox[1]; let prevTag = null;
       for (const it of seq) { if (it.box[1] >= prevBottom - 2) { const gap = Math.max(0, it.box[1] - prevBottom); g.push(`${gap} → ${it.k}(${it.box[3]})`); if (prevTag) { if (!after.has(prevTag)) after.set(prevTag, []); after.get(prevTag).push(gap); } prevBottom = it.box[1] + it.box[3]; prevTag = it.k; } }
-      lines.push(`/* rhythm at ${base}: ${g.slice(0, 12).join('  ')}  → bottom ${live.box[1] + live.box[3] - prevBottom} */`);
+      lines.push(`/* rhythm at ${base}${u ? ' inside the first unit' : ''}: ${g.slice(0, 12).join('  ')}  → bottom ${scopeBox[1] + scopeBox[3] - prevBottom} */`);
       const med = (a) => a.slice().sort((x, y) => x - y)[Math.floor(a.length / 2)];
       for (const [tag, gaps] of after) if (/^(h[1-6]|p|ul|ol|img|picture)$/.test(tag) && gaps.length) lines.push(`${sel} ${tag} { margin: 0 0 ${px(med(gaps))}; }  /* the gap after ${tag} ×${gaps.length}${gaps.length > 1 ? ` (${gaps.join('/')})` : ''} — a margin, or the next child's padding */`);
     }

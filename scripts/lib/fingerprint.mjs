@@ -36,7 +36,9 @@ export function kindOf(n) {
   if (tag === 'svg') return 'icon';
   if (HEAD.test(tag)) return tag;
   if (tag === 'blockquote') return 'blockquote';
-  if (tag === 'a') return 'a';
+  // a card-wide link (no text of its own, wrapping a picture / heading / paragraph) is a container, as author reads it (35f9b73): read as a
+  // leaf, takeda's ten card grids were `a×4` link lists and the draft triage named them accordions (exp/five-min replay)
+  if (tag === 'a') return !n.text && (n.children || []).some((c) => { const k = kindOf(c); return k === 'picture' || k === 'video' || HEAD.test(k) || k === 'p' || k === 'group'; }) ? 'group' : 'a';
   if (tag === 'button') return 'button';
   if (['input', 'select', 'textarea', 'form'].includes(tag)) return 'input';
   if (tag === 'hr') return 'hr';

@@ -61,6 +61,20 @@ export const collectMedia = () => {
   return { doc: document.documentElement.scrollHeight, imgs, videos, bgs, svgs, faces: [...new Set(faces)], dataFaces, loaded, bodyFont: getComputedStyle(document.body).fontFamily, lock: `${getComputedStyle(document.body).overflow}/${getComputedStyle(document.documentElement).overflow}` };
 };
 
+/** The @font-face rules of a stylesheet's TEXT (a CSS response, cross-origin included — Typekit, Google Fonts): family, weight, style
+ * and the absolute src URLs, so `media-fetch --fonts --css` can name each file by its face and write fonts.css (exp/five-min: every run
+ * wrote fonts.css by hand; si-home's four Typekit faces all downloaded as `l.woff2`). */
+export const fontFaceRulesFrom = (css, base) => {
+  const out = []; const norm = (v) => String(v || '').trim().replace(/^["']|["']$/g, '');
+  for (const m of String(css).matchAll(/@font-face\s*\{([^}]*)\}/g)) {
+    const body = m[1]; const prop = (k) => { const r = new RegExp(`(?:^|;)\\s*${k}\\s*:\\s*([^;]+)`, 'i').exec(body); return r ? r[1].trim() : null; };
+    const family = norm(prop('font-family')); if (!family) continue;
+    const srcs = [...String(prop('src') || '').matchAll(/url\(\s*(['"]?)([^'")]+)\1\s*\)\s*(?:format\(\s*['"]?([\w-]+)['"]?\s*\))?/g)].map((x) => { let u = x[2]; try { u = new URL(u, base).href; } catch { /* data: or odd */ } return { url: u, format: x[3] || null }; });
+    out.push({ family, weight: norm(prop('font-weight') || '400').replace(/^normal$/i, '400').replace(/^bold$/i, '700'), style: norm(prop('font-style') || 'normal'), srcs, unicodeRange: prop('unicode-range') });
+  }
+  return out;
+};
+
 export const fontResponse = (r) => { const u = r.url(); if (r.status() >= 400) return null; return /\.(woff2?|ttf|otf)(\?|$)/i.test(u) || (r.headers()['content-type'] || '').includes('font') ? u : null; }; // a 404 font file is not a file to fetch (brief listed one twice — natixis)
 
 export const deepProbe = ([sels, MAX, CHILDREN, PROPS, ANIM]) => {
