@@ -59,13 +59,18 @@ const readyInViewport = async (bound) => {
   const pendingImgs = () => [...document.images].filter((i) => { const r = i.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight && r.width > 10 && !i.complete; });
   const finite = (a) => { try { const t = a.effect.getComputedTiming(); return Number.isFinite(t.iterations) && Number.isFinite(t.endTime) && t.endTime < 10000; } catch { return false; } };
   const runningFinite = () => document.getAnimations().filter((a) => a.playState === 'running' && finite(a));
-  let imgs = 0; let anims = 0; let frames = 0;
+  let imgs = 0; let anims = 0; let frames = 0; let retried = 0;
+  // a broken in-viewport image (complete, naturalWidth 0) is retried twice before it counts as a state: a burst of rendition requests to a
+  // preview host failed some of them (exp/five-min: three widths at once, half the build's pictures as alt text), and a live load can lose
+  // one image the next load has (si-home: the "American Music" picture)
+  const retryBroken = () => { for (const i of document.images) { const r = i.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight || r.width < 10 || !i.complete || i.naturalWidth > 0 || !(i.currentSrc || i.src)) continue; const n = Number(i.dataset.sdRetry || 0); if (n >= 2) continue; i.dataset.sdRetry = String(n + 1); retried += 1; const pic = i.closest('picture'); if (pic) pic.querySelectorAll('source').forEach((so) => { const v = so.srcset; so.srcset = ''; so.srcset = v; }); if (i.srcset) { const v = i.srcset; i.srcset = ''; i.srcset = v; } const src = i.getAttribute('src'); if (src) { i.removeAttribute('src'); i.setAttribute('src', src); } } };
   while (left() > 0) {
+    retryBroken();
     const p = pendingImgs(); const a = runningFinite(); imgs = p.length; anims = a.length;
-    if (!p.length) { const h1 = await raf(); const h2 = await raf(); frames += 2; if (h1 === h2) return { ms: Date.now() - t0, imgs, anims, frames, timedOut: false }; continue; }
+    if (!p.length) { const h1 = await raf(); const h2 = await raf(); frames += 2; if (h1 === h2) { if (retried && [...document.images].some((i) => i.complete && i.naturalWidth === 0 && Number(i.dataset.sdRetry || 0) < 2 && i.getBoundingClientRect().bottom > 0 && i.getBoundingClientRect().top < innerHeight)) continue; return { ms: Date.now() - t0, imgs, anims, frames, retried, timedOut: false }; } continue; }
     await Promise.race([Promise.all(p.map((i) => new Promise((r) => { i.addEventListener('load', r, { once: true }); i.addEventListener('error', r, { once: true }); }))), sleep(Math.min(150, Math.max(0, left())))]);
   }
-  return { ms: Date.now() - t0, imgs, anims, frames, timedOut: true };
+  return { ms: Date.now() - t0, imgs, anims, frames, retried, timedOut: true };
 };
 
 /** Stitch an already-open, already-settled page into `outFile`: the document's width × its height now (read AFTER the settle), one
@@ -85,13 +90,14 @@ export async function stitchCapture(page, outFile, { vh = 900, freeze = true, ch
     await page.evaluate((ty) => window.scrollTo(0, ty), target);
     const r = await page.evaluate(readyInViewport, chunkTimeout).catch(() => ({ ms: 0, timedOut: true }));
     if (freeze) { const q = await page.evaluate(quietInViewport, Math.min(1500, chunkTimeout)).catch(() => null); if (q && !q.quiet) rested.restless += 1; if (q && q.ms > 250) rested.waitedMs += q.ms; const m = await page.evaluate(restMotion).catch(() => null); if (m) { rested.finished += m.finished; rested.paused += m.paused; } await page.evaluate(() => new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res)))).catch(() => {}); }
-    waited.push(r.ms); if (r.timedOut) timedOut += 1;
+    waited.push(r.ms); if (r.timedOut) timedOut += 1; rested.retried = (rested.retried || 0) + (r.retried || 0);
     const actualY = await page.evaluate(() => window.scrollY);
     // scroll-stall guard (stitch-shot): the window does not advance while the document reports more height — an inner scroller; fail loud
     if (prevActualY !== null && actualY <= prevActualY && target - actualY > 4) throw new Error(`scroll stall at chunk target ${target}px: window.scrollY stuck at ${actualY}px while the document reports ${totalH}px — an inner scroll container / scroll-jacked layout; the stitched capture cannot measure this page class`);
     prevActualY = actualY;
     chunks.push({ y: actualY, buf: await page.screenshot() });
   }
+  rested.broken = await page.evaluate(() => [...document.images].filter((i) => i.complete && i.naturalWidth === 0 && i.getBoundingClientRect().width > 10).length).catch(() => 0);
   const outPng = new PNG({ width, height: totalH });
   for (const { y: cy, buf } of chunks) {
     const img = PNG.sync.read(buf);
@@ -106,12 +112,12 @@ export async function stitchCapture(page, outFile, { vh = 900, freeze = true, ch
  * images, finite animations), sweep the overlays once more (a timed modal fires during the settle), then stitch to `outFile`. Returns
  * { page, ...stitch }: the page stays OPEN (frozen, at rest, scrolled to 0) so the caller reads its tables from the same load; the caller
  * closes it. `overlays` are openPage's consent / dismiss / locale / require. */
-export async function captureUrl(browser, url, outFile, { width = 1440, vh = 900, wait = 2500, consent = null, dismiss = [], locale = null, require = [], chunkTimeout = 3000, log = null } = {}) {
+export async function captureUrl(browser, url, outFile, { width = 1440, vh = 900, wait = 2500, consent = null, dismiss = [], locale = null, require = [], chunkTimeout = Number(process.env.STARDUST_CHUNK_TIMEOUT || 3000), log = null } = {}) {
   const t0 = Date.now();
   const page = await openPage(browser, url, { width, height: vh, consent, dismiss, locale, require, wait });
   await settle(page);
   if (consent || dismiss.length) await acceptOverlays(page, { consent, dismiss, wait: 800 });
   const r = await stitchCapture(page, outFile, { vh, chunkTimeout });
-  if (log) log(`stitched ${outFile}: ${r.width}x${r.height} from ${r.chunks} chunks in ${((Date.now() - t0) / 1000).toFixed(1)} s${r.timedOut ? ` (${r.timedOut} chunk waits hit the ${chunkTimeout} ms bound)` : ''}${r.rested?.finished ? ` · ${r.rested.finished} entrance(s) run to rest` : ''}${r.rested?.waitedMs ? ` · ${(r.rested.waitedMs / 1000).toFixed(1)} s waiting for scripted motion to settle${r.rested.restless ? ` (${r.rested.restless} chunk(s) never quiet)` : ''}` : ''}`);
+  if (log) log(`stitched ${outFile}: ${r.width}x${r.height} from ${r.chunks} chunks in ${((Date.now() - t0) / 1000).toFixed(1)} s${r.timedOut ? ` (${r.timedOut} chunk waits hit the ${chunkTimeout} ms bound)` : ''}${r.rested?.finished ? ` · ${r.rested.finished} entrance(s) run to rest` : ''}${r.rested?.retried ? ` · ${r.rested.retried} broken image load(s) retried` : ''}${r.rested?.broken ? ` · ${r.rested.broken} image(s) still BROKEN` : ''}${r.rested?.waitedMs ? ` · ${(r.rested.waitedMs / 1000).toFixed(1)} s waiting for scripted motion to settle${r.rested.restless ? ` (${r.rested.restless} chunk(s) never quiet)` : ''}` : ''}`);
   return { page, seconds: (Date.now() - t0) / 1000, ...r };
 }

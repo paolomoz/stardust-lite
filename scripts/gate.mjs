@@ -159,9 +159,9 @@ const findOrigin = (W) => [originDir, originDir ? null : measureDir].filter(Bool
 const recapture = !!arg('--recapture-origin', false);
 const browser = captureTool === 'stitch' ? await launch() : null;
 const secs = (t0) => Number(((Date.now() - t0) / 1000).toFixed(1));
-// the captures of every width at once (exp/five-min: a width was 12–14 s of build capture, three in a row were most of a round), then the
+// the widths at once (exp/five-min: the live opens, ≈ 10–27 s a width, overlap the build captures, which stay in a queue), then the
 // compare and the pairing per width on the pages they left open; --serial-widths keeps one width at a time
-const capt = {};
+const capt = {}; let buildQueue = Promise.resolve(); // the BUILD captures one at a time: three at once made the preview host refuse a burst of rendition requests (si-home replay: 24 pictures as alt text at 2560, retries did not recover them); the live opens overlap
 const captureW = async (W) => {
   const origin = join(out, `live-${W}.png`); const eds = join(out, `build-${W}.png`); const t = { live: null, build: null, compare: null, sections: null }; timing[W] = t;
   const shared = findOrigin(W);
@@ -192,7 +192,7 @@ const captureW = async (W) => {
       const t0 = Date.now(); console.log(`build ${W}…`);
       try { const r = await captureUrl(buildCtx, build, eds, { width: W, vh, log: console.log }); bp = r.page; t.build = secs(t0); } catch (e) { console.log(`build ${W}: capture failed — ${String(e.message || e).split('\n')[0].slice(0, 160)}`); bp = null; }
     };
-    await Promise.all([liveTask(), buildTask()]);
+    const lt = liveTask(); buildQueue = buildQueue.then(buildTask); await Promise.all([lt, buildQueue]);
   }
   capt[W] = { origin, eds, t, lp, bp, liveCtx, buildCtx, lsCached };
 };

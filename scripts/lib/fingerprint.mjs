@@ -200,7 +200,16 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
   const roots = mainKey ? (dump[mainKey] || []) : [];
   // the extra roots measure-page dumped (unassigned bands: a breadcrumb bar, a promo bar outside main) are sections of their own, in the dump's order
   const extraKeys = keys.filter((k) => k !== headerKey && k !== footerKey && k !== mainKey); const beforeMain = extraKeys.filter((k) => keys.indexOf(k) < keys.indexOf(mainKey)); const afterMain = extraKeys.filter((k) => keys.indexOf(k) > keys.indexOf(mainKey));
-  const extras = (ks) => ks.flatMap((k) => (Array.isArray(dump[k]) ? dump[k] : [dump[k]]).filter((n) => n && typeof n === 'object'));
+  // …except the chrome dumped twice (exp/five-min, wellsfargo replay: the utility nav INSIDE the header box, the legal links inside the footer,
+  // a link-only mega-menu bar under the header read as four accordion sections and tripled the page): a band inside a header / footer
+  // node's box, or a link-only band touching the header's bottom / after main, belongs to the chrome
+  const chromeBoxes = [headerKey, footerKey].filter(Boolean).flatMap((k) => (Array.isArray(dump[k]) ? dump[k] : [dump[k]])).filter((n) => n?.box && n.box[3] > 0).map((n) => n.box);
+  const inside = (b, c) => { const ix = Math.max(0, Math.min(b[0] + b[2], c[0] + c[2]) - Math.max(b[0], c[0])); const iy = Math.max(0, Math.min(b[1] + b[3], c[1] + c[3]) - Math.max(b[1], c[1])); return b[2] * b[3] > 0 && (ix * iy) / (b[2] * b[3]) >= 0.8; };
+  const leaves = (n, out = []) => { if (n.text || !(n.children || []).length) out.push(n); else n.children.forEach((c) => (['a', 'button'].includes(tagOf(c)) ? out.push(c) : leaves(c, out))); return out; };
+  const linkOnly = (n) => { const l = leaves(n).filter((x) => x.text || ['img', 'picture', 'svg', 'video'].includes(tagOf(x))); return l.length > 0 && l.every((x) => ['a', 'button'].includes(tagOf(x))); };
+  const headerBottom = Math.max(0, ...chromeBoxes.filter((b) => b[1] < 400).map((b) => b[1] + b[3]));
+  const isChrome = (n, after) => !!n.box && (chromeBoxes.some((c) => inside(n.box, c)) || (linkOnly(n) && (after || (headerBottom && n.box[1] <= headerBottom + 8))));
+  const extras = (ks, after = false) => ks.flatMap((k) => (Array.isArray(dump[k]) ? dump[k] : [dump[k]]).filter((n) => n && typeof n === 'object' && !isChrome(n, after)));
   let secs = [];
   // nodes measure-page marked `sec: true` (its --sections selector) split the dump as the spec and the gate split the page (loop r3)
   const marked = []; const findMarked = (n) => { if (n.sec) { marked.push(n); return; } (n.children || []).forEach(findMarked); }; roots.forEach(findMarked);
@@ -223,7 +232,7 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
       if (flat) secs.push(...kids); else secs.push(c0);
     }
   }
-  const extraCount = extras(beforeMain).length + extras(afterMain).length; if (extraCount) secs = [...extras(beforeMain), ...secs, ...extras(afterMain)];
+  const extraCount = extras(beforeMain).length + extras(afterMain, true).length; if (extraCount) secs = [...extras(beforeMain), ...secs, ...extras(afterMain, true)];
   return { header: headerKey ? dump[headerKey]?.[0] || null : null, footer: footerKey ? dump[footerKey]?.[0] || null : null, sections: secs, mainKey, headerKey, footerKey, marked: marked.length && secs.includes(marked[0]) ? marked.length : 0, extraRoots: extraCount };
 }
 
