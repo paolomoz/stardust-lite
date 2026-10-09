@@ -36,7 +36,7 @@ import { join, resolve } from 'node:path';
 import { arg, openPage, settle, overlayOpts, contextOptions, siteProfile, DEEP_HELPERS, launch } from './common.mjs';
 import { collectContent } from './lib/content-collector.mjs';
 import { collectSpec } from './lib/spec-collector.mjs';
-import { firstLook, collectStructure, collectMedia, fontResponse, deepProbe } from './lib/probe-collectors.mjs';
+import { firstLook, collectStructure, collectMedia, fontResponse, fontFaceRulesFrom, deepProbe } from './lib/probe-collectors.mjs';
 import { contentRootPath } from './lib/section-pair.mjs';
 import { stitchCapture, captureUrl } from './lib/stitch.mjs';
 import { PNG } from 'pngjs';
@@ -70,13 +70,13 @@ const results = {};
 async function measure(W) {
   const t0 = Date.now(); const log = (m) => console.error(`[${W}] ${m}`);
   const ctx = await browser.newContext(contextOptions({ width: W, height: vh, locale: overlays.locale }));
-  const fontReqs = []; let lockBefore = ''; let status = null; const firstLines = []; const checkRows = [];
+  const fontReqs = []; const cssFaces = []; let lockBefore = ''; let status = null; const firstLines = []; const checkRows = [];
   let page;
   try {
     page = await openPage(ctx, url, {
       width: W, height: vh, consent: overlays.consent, dismiss: overlays.dismiss, locale: overlays.locale, require: overlays.require, wait,
       before: (p) => { // armed before navigation: the font files requested (media-list) and the navigation status (probe-load)
-        p.on('response', (r) => { const u = fontResponse(r); if (u) fontReqs.push(u); try { if (r.request().isNavigationRequest() && r.frame() === p.mainFrame()) status = r.status(); } catch { /* detached */ } });
+        p.on('response', (r) => { const u = fontResponse(r); if (u) fontReqs.push(u); if (r.status() < 400 && /text\/css/.test(r.headers()['content-type'] || '')) cssFaces.push(r.text().then((t) => fontFaceRulesFrom(t, r.url())).catch(() => [])); try { if (r.request().isNavigationRequest() && r.frame() === p.mainFrame()) status = r.status(); } catch { /* detached */ } });
         p.on('domcontentloaded', async () => { lockBefore = await p.evaluate(() => `${getComputedStyle(document.body).overflow}/${getComputedStyle(document.documentElement).overflow}`).catch(() => ''); });
       },
       afterLoad: async (p) => { // probe-load's first look: before any overlay is dismissed
@@ -114,6 +114,9 @@ async function measure(W) {
   if (!explicit && root.tag !== 'main' && root.path !== contentMain) { const o = {}; for (const [k, v] of Object.entries(content)) o[k === root.path ? contentMain : k] = v; Object.assign(content, o); for (const k of Object.keys(content)) if (!(k in o)) delete content[k]; }
   write(`content-${W}.json`, JSON.stringify(Object.fromEntries([header, ...extraRoots, contentMain, footer, ...hidden.map((h) => `hidden ${h}`), '__doc', '__title', '__desc'].filter((k) => k in content).map((k) => [k, content[k]])), null, 1));
   const media = await page.evaluate(collectMedia); media.lockBefore = lockBefore; media.fontRequests = [...new Set(fontReqs)];
+  // the @font-face rules: every CSS response's text plus the inline <style> sheets (fonts.css is then written, not typed)
+  const inlineCss = await page.evaluate(() => [...document.querySelectorAll('style')].map((s) => s.textContent).join('\n')).catch(() => '');
+  const faceRules = [...(await Promise.all(cssFaces)).flat(), ...fontFaceRulesFrom(inlineCss, url)]; const seenFace = new Set(); media.fontFaceRules = faceRules.filter((f) => { const k = `${f.family}|${f.weight}|${f.style}|${f.srcs.map((x) => x.url).join(',')}`; if (seenFace.has(k)) return false; seenFace.add(k); return true; });
   write(`media-${W}.json`, JSON.stringify(media, null, 1));
   let spec = null;
   if (!noSpec) {

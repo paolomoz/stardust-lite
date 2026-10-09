@@ -58,6 +58,9 @@ if (cmd === 'init') {
       if (existsSync(dest) && !rest.includes('--force')) { skipped.push(relative(cwd, dest)); continue; }
       mkdirSync(dirname(dest), { recursive: true }); copyFileSync(f, dest); wrote.push(relative(cwd, dest));
     }
+    // scripts.js imports the foundation helpers and runs decorateIconTokens(main) before decorateIcons (every run wired it by hand — si-home)
+    const sj = join(cwd, 'scripts', 'scripts.js');
+    if (existsSync(sj)) { let js = readFileSync(sj, 'utf8'); if (!js.includes('./stardust.js')) { js = js.replace(/(} from '\.\/aem\.js';\n)/, "$1import { decorateIconTokens } from './stardust.js';\n").replace(/(export function decorateMain\(main\) \{\n)/, '$1  decorateIconTokens(main);\n'); writeFileSync(sj, js); wrote.push('scripts/scripts.js (stardust.js wired)'); } }
     console.log(`stardust-lite foundation: wrote ${wrote.length ? wrote.join(', ') : 'nothing'}${skipped.length ? `; skipped (exists) ${skipped.join(', ')}` : ''}`);
     if (skipped.includes('styles/styles.css')) console.log(`stardust-lite foundation: styles/styles.css exists — \`init --foundation --force\` overwrites it with the skeleton (the boilerplate's rules are not measurements, METHOD step 4)`);
   }
