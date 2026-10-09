@@ -22,3 +22,9 @@ t0 = first instrument run on the page (repo setup excluded, reported apart). `<1
 | V1 | wellsfargo.com /about/inclusion/ | 10.7 (3 min a pin not yet pushed) | 26 | 47 (base width under 10 % at the first round, 28) | 50 | 60 | 2.89 / 0.31 / 0.18 (served 2.86 / 0.30 / 0.17) | 2 / 6 + 2 | ≈ 35 % |
 | V2 | citizensbank.com /about-us/sustainability-impact.aspx (--chrome) | 7.3 (3 min the pin) | 28 | 44 at 1440 / 2560; 360 never (six broken live images, a register row) | 61 | 56 | 14.82 / 2.42 / 1.36 (served 14.98 / 2.61 / 1.47) | 2 / 2 + 2 | ≈ 10 % overall, ≈ 30 % of the content blocks (no chrome drafts yet) |
 | V3 | takeda.com /about/corporate-responsibility/corporate-giving/ | 4 | 36 | 66 (base width under 10 % at round 2; 36 of the 77 min were instruments running under three parallel agents) | 66 | 77 | 1.41 / 0.50 / 0.40 (served 1.48 / 0.45 / 0.39) | 1 / 5 + 1 | ≈ 35 % |
+
+## Inspection round (branch `loop/high-impact` @ 35f9b73, one agent alone, every command timed)
+
+| round | site / page | setup min | t0 → first prototype | t0 → <10 % (3 widths) | t0 → probes pass | t0 → served gate | final 360 / 1440 / probe | rounds (gate) | model / tools (t0 → close) |
+|---|---|---|---|---|---|---|---|---|---|
+| I1 | si.edu / (home) | 1.9 | 17.3 | never at 360; 1440 at 27.6, 1440 + 2560 at 32.1 | 50.9 (0 out of tolerance, 9 missing) | 56.8 | 27.76 / 3.44 / 4.51 (served identical) | 10 | 37.9 min, 119 turns / 26.6 min (gate 15.6) |
