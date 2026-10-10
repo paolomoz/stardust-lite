@@ -8,10 +8,11 @@
 // Usage: node first.mjs <url> --slug <slug> [--template <name>] [--port 8990] [--no-da] [--sections <css>] [--main <css>] [--skip <step,…>]
 //   From the site repo root (fstab.yaml names the DA org / site; the git branch is the preview branch). Writes migration/cases/<template>/
 //   (measure/, media/, doc/, triage.json/.md, gate/) and first.json { steps: [{ step, seconds, exit, note }], harnessUrl, target }.
-//   --skip probe,measure,media,author,css re-runs from where the case dir already has the outputs (e.g. after editing triage.md: --skip probe,measure).
+//   --skip probe,measure,triage,media,author,css re-runs from where the case dir already has the outputs; after editing triage.md (`drop` in the block
+//   column removes a row) `--skip probe,measure,media` applies the edit (triage --from-md) and re-authors.
 // Exit: 0 the round ran (its own target line says whether it is under) · 1 a step failed before the round.
 import { spawnSync, spawn } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import net from 'node:net';
@@ -60,7 +61,10 @@ if (!skip.has('measure')) {
   if (!existsSync(content)) finish(1, 'first: measure-page wrote no content dump — read its output above');
 }
 // 3 triage: the draft, accepted (edit triage.md and re-run with --skip probe,measure after `triage --from-md` to change it)
-if (!skip.has('author')) step('triage', S('triage'), [content, '--blocks', join('migration', 'blocks.json'), '--spec', join(measure, 'spec-1440.json'), '--out', triage, '--md', join(dir, 'triage.md')], { show: 0, note: (r) => (/^novelty .*/m.exec(r.stdout) || [''])[0].split(' →')[0] });
+// an EDITED triage.md (newer than triage.json) is applied, not drafted over — `first --skip probe,measure` re-ran triage over the agent's edit (deloitte)
+const tmd = join(dir, 'triage.md'); const edited = existsSync(tmd) && existsSync(triage) && statSync(tmd).mtimeMs > statSync(triage).mtimeMs + 500;
+if (edited && !skip.has('triage')) step('triage --from-md', S('triage'), ['--from-md', tmd, '--out', triage], { show: 1 });
+else if (!skip.has('triage') && !skip.has('author')) step('triage', S('triage'), [content, '--blocks', join('migration', 'blocks.json'), '--spec', join(measure, 'spec-1440.json'), '--out', triage, '--md', tmd], { show: 0, note: (r) => (/^novelty .*/m.exec(r.stdout) || [''])[0].split(' →')[0] });
 // 4 media + fonts (fonts.css written from the measured @font-face rules; a WAF answer goes through the page by itself)
 let daMedia = null;
 if (!skip.has('media')) {

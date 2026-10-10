@@ -442,7 +442,7 @@ function keyValueSection(node, block, recipe, report) {
 
 // ───────────────────────────── the page ─────────────────────────────
 const sectionsHtml = []; const reports = []; let sawNew = false;
-mainSections.forEach((row, i) => { const node = split.sections[i]; const { html, report } = authorSection(node, row); sectionsHtml.push(html); if (report.tabSections) sectionsHtml.push(...report.tabSections.map((p) => `<div>\n${p}\n</div>`)); reports.push(report); if (row.match.kind === 'new' && !(process.argv.includes('--draft-new') && row.match.block)) sawNew = true; });
+mainSections.forEach((row, i) => { if (row.drop) { console.error(`author: row ${row.index} dropped in the triage — not authored`); return; } const node = split.sections[i]; const { html, report } = authorSection(node, row); sectionsHtml.push(html); if (report.tabSections) sectionsHtml.push(...report.tabSections.map((p) => `<div>\n${p}\n</div>`)); reports.push(report); if (row.match.kind === 'new' && !(process.argv.includes('--draft-new') && row.match.block)) sawNew = true; });
 const meta = [['title', dump.__title || triage.page?.title || ''], ...(dump.__desc ? [['description', dump.__desc]] : []), ...(navPath ? [['nav', navPath]] : []), ...(footerPath ? [['footer', footerPath]] : [])];
 if (!navPath || !footerPath) warn('metadata: no nav / footer path (no profile `chrome.fragments`; pass --nav-path / --footer-path)');
 sectionsHtml.push(`<div>\n<div class="metadata">\n${meta.map(([k, v]) => `<div><div>${esc(k)}</div><div>${esc(v)}</div></div>`).join('\n')}\n</div>\n</div>`);

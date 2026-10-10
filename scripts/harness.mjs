@@ -22,7 +22,7 @@
 //   fetches the media the fragments reference. The fold applies the pipeline's single-paragraph cell rule and its list-item rule (see
 //   below) and requests every remote media URL of the document once (the branch host renders a rendition on its first request).
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { basename, dirname, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -76,7 +76,9 @@ const folded = await p0.evaluate(() => {
   document.querySelectorAll('main .metadata').forEach((m) => { m.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (k && v) metas.push([k.textContent.trim().toLowerCase(), v.textContent.trim()]); }); const sec = m.closest('main > div'); if (sec && sec.children.length === 1) sec.remove(); else m.remove(); });
   document.querySelectorAll('main .section-metadata').forEach((sm) => { const section = sm.parentElement; sm.querySelectorAll(':scope > div').forEach((r) => { const [k, v] = r.children; if (!k || !v) return; const key = k.textContent.trim().toLowerCase(); if (key === 'style') v.textContent.split(',').map((x) => x.trim().toLowerCase().replace(/[^0-9a-z]+/g, '-').replace(/^-|-$/g, '')).filter(Boolean).forEach((c) => section.classList.add(c)); else if (key === 'id') section.id = v.textContent.trim(); else section.dataset[key.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = (v.querySelector('a, img') ? (v.querySelector('a')?.href || v.querySelector('img')?.src) : v.textContent.trim()); }); sm.remove(); });
   // a section style is a class the way aem.js's toClassName writes it (`Brands Divider` → `brands-divider`); the raw token crashed the fold on a space (pass 5)
-  document.querySelectorAll('main > div').forEach((d) => { if (!d.textContent.trim() && !d.querySelector('img,picture')) d.remove(); });
+  // a section holding a BLOCK stays even with no text or picture (an embed whose video has no URL in the capture — deloitte: the section vanished
+  // and the gate paired the hero against hero + video); a truly empty one goes, and is counted
+  document.querySelectorAll('main > div').forEach((d) => { if (!d.textContent.trim() && !d.querySelector('img,picture,iframe,video,div[class]')) { d.remove(); window.__sdDropped = (window.__sdDropped || 0) + 1; } });
   // the pipeline's cell rule: a block cell holding ONE paragraph and nothing else loses its <p> (`<div><p><a>x</a></p></div>` → `<div><a>x</a></div>`,
   // verified on the served plain.html — walgreens-home); a decorate that read `:scope > p` worked on the prototype only
   document.querySelectorAll('main > div > div > div > div').forEach((cell) => { const k = cell.children; if (k.length === 1 && k[0].tagName === 'P' && ![...cell.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) k[0].replaceWith(...k[0].childNodes); });
@@ -117,7 +119,17 @@ if (!arg('--fragments', null)) console.log(`harness: no --fragments — the chro
 if (arg('--fragments', null)) {
   const host = String(arg('--fragments')).replace(/\/$/, '');
   for (const [k, v] of metas.filter(([k]) => ['nav', 'footer'].includes(k))) {
-    const path = new URL(v, host).pathname; const r = await fetch(`${host}${path}.plain.html`).catch(() => null);
+    const path = new URL(v, host).pathname; let r = await fetch(`${host}${path}.plain.html`).catch(() => null);
+    // the LOCAL chrome document wins: a nav.html edited next to the page document is uploaded and previewed again when its text differs from the
+    // served fragment (deloitte: the harness showed the previewed nav, not the edited one); needs DA_TOKEN, else a warning
+    const local = join(dirname(resolve(src)), `${basename(path)}.html`); const hm = /^https:\/\/([^-]+(?:-[^-]+)*?)--([^-]+(?:-[^-]+)*?)--([^.]+)\.aem\.page/.exec(host);
+    if (existsSync(local) && r && r.ok) {
+      const served = await r.clone().text(); const norm = (t) => t.replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim(); const lt = readFileSync(local, 'utf8'); const lm = lt.slice(lt.indexOf('<main'), lt.lastIndexOf('</main>'));
+      if (norm(lm.replace(/^<main>/, '')) !== norm(served)) {
+        if (process.env.DA_TOKEN && hm) { const up = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'da-put.mjs'), `${hm[3]}/${hm[2]}/${hm[1]}`, local, '--to', dirname(path).replace(/^\//, '')], { encoding: 'utf8' }); console.log(`harness: ${k} document changed locally — uploaded and previewed again (${up.status ? `da-put exit ${up.status}` : 'ok'})`); r = await fetch(`${host}${path}.plain.html`, { cache: 'no-store' }).catch(() => null); }
+        else console.log(`harness: ${k} document changed locally but the prototype shows the previewed one — da-put ${local} (no DA_TOKEN here)`);
+      }
+    }
     if (!r || !r.ok) { console.error(`harness: ${host}${path}.plain.html → ${r ? r.status : 'unreachable'} — preview the ${k} document first`); process.exit(4); }
     const html = await r.text(); const file = `${serveDir}${path}.plain.html`; mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, html); console.log(`harness: ${k} fragment ← pipeline ${path}.plain.html`);
     // the fragment's pictures are relative (`./media_<hash>.<ext>?width=…`): fetch each once next to the plain.html (the prototype 404'd them — walgreens-home)

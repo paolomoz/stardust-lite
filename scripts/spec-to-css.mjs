@@ -41,7 +41,7 @@ const isContentSection = (h) => !/^<div>\s*<div class="metadata">[\s\S]*<\/div>\
 const docSectionsAll = docSections.slice(); docSections.length = 0; docSections.push(...docSectionsAll.filter(isContentSection));
 const blockOf = (secHtml) => { const m = secHtml.match(/<div class="((?!section-metadata|metadata)[a-z][a-z0-9-]*(?: [a-z0-9-]+)*)">/); return m ? m[1].split(/\s+/) : null; };
 const styleOf = (secHtml) => { const m = secHtml.match(/<div class="section-metadata">[\s\S]*?<div>\s*style\s*<\/div>\s*<div>([^<]*)<\/div>/i); return m ? m[1].trim() : null; };
-const rows = triage ? triage.sections.filter((r) => !r.chrome) : [];
+const rows = triage ? triage.sections.filter((r) => !r.chrome && !r.drop) : []; // a dropped row has no document section: counting it shifted every nth-of-type by one (deloitte)
 const liveIndexFor = (row) => { if (!row?.spec?.box) return -1; return S.secs.findIndex((s) => Math.abs(s.box[1] - row.spec.box[1]) <= 2 && Math.abs(s.box[3] - row.spec.box[3]) <= 2) ?? -1; };
 if (docSections.length && rows.length && docSections.length !== rows.length) console.error(`spec-to-css: the document has ${docSections.length} sections, the triage ${rows.length} non-chrome rows — paired by order up to the shorter (the authored order is the triage's)`);
 

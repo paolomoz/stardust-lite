@@ -41,7 +41,11 @@ if (arg('--from-md', null)) {
     const style = iStyle >= 0 ? c[iStyle].replace(/`/g, '').trim() : ''; const newStyle = style && style !== '—' ? style : null;
     if ((row.sectionStyle || null) !== newStyle) { row.sectionStyle = newStyle; changed += 1; }
     if (iBlock >= 0 && !row.chrome) {
-      const cell = c[iBlock]; const isDefault = cell.trim() === '—';
+      const cell = c[iBlock];
+      // `drop` (or `header` / `footer`) in the block column: the row is not authored — a header band inside main, a skip-link strip (deloitte:
+      // the header row could not leave the page; si: the skip links authored and removed by a case script). It keeps its index so the split aligns
+      const dropNow = /^`?(drop|header|footer)`?$/i.test(cell.trim()); if (dropNow !== !!row.drop) { row.drop = dropNow || undefined; changed += 1; row.notes = [...(row.notes || []), dropNow ? `dropped in ${basename(mdFile)}` : `restored in ${basename(mdFile)}`]; } if (dropNow) continue;
+      const isDefault = cell.trim() === '—';
       const m = cell.match(/`([a-z][a-z0-9-]*)(?:\s*\(([^)]*)\))?`/); const isNew = /\*\*new\*\*/.test(cell);
       const kind = isDefault ? 'default' : isNew ? 'new' : m ? 'inventory' : row.match.kind;
       const block = isDefault ? null : m ? m[1] : row.match.block; const variant = isDefault ? null : m && m[2] && m[2] !== '?' ? m[2].trim() : m ? null : row.match.variant;
