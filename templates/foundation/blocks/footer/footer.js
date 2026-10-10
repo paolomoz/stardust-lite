@@ -13,8 +13,9 @@ export default async function decorate(block) {
   const fragment = await loadFragment(footerPath);
   if (!fragment) return;
 
-  const footer = document.createElement('div');
-  footer.className = 'footer';
+  // no inner `.footer` wrapper: the block element IS div.footer, and reset.css hides `footer .footer` until the block loads — an inner
+  // div.footer never got data-block-status and stayed hidden (si-home, acs-about renamed it by hand). The sections sit on the block itself
+  const footer = document.createDocumentFragment();
   readFragmentSections(fragment).forEach(({ wrapper, blocks, classes }, i) => {
     const div = document.createElement('div');
     div.className = `footer-${i + 1}${classes.length ? ` ${classes.join(' ')}` : ''}`;
@@ -24,5 +25,5 @@ export default async function decorate(block) {
   });
   block.textContent = '';
   block.append(footer);
-  await decorateBlockIcons(footer);
+  await decorateBlockIcons(block);
 }

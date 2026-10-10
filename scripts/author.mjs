@@ -40,7 +40,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { basename, dirname, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { arg, siteProfile, davidsLint } from './common.mjs';
-import { splitSections, analyzeSection, pickUnit, kindOf, unwrap, general } from './lib/fingerprint.mjs';
+import { splitSections, analyzeSection, pickUnit, kindOf, unwrap, general, linkLabel } from './lib/fingerprint.mjs';
 import { defaultRecipe, recipeKind } from './lib/recipes.mjs';
 
 const triageFile = process.argv[2];
@@ -151,6 +151,7 @@ function leavesOf(root) {
     if (hasBg(n) && !kids.map(unwrap).some((c) => MEDIA(kindOf(c)))) out.push({ kind: 'picture', raw: 'picture', node: n, bg: true, top, parent });
     else if (bgCut(n) && !kids.map(unwrap).some((c) => MEDIA(kindOf(c)))) bgCutWarn(n);
     if (k === 'ul') { if (isControlList(n)) { out.push({ kind: 'control', raw: 'ul', node: n, top, parent }); return; } if (isTextList(n)) { out.push({ kind: 'list', raw: 'ul', node: n, top, parent }); return; } kids.forEach((c, i) => walk(c, n === start ? i : top, n, depth + 1)); return; }
+    if (k === 'a' && !n.text && linkLabel(n)) { out.push({ kind: 'link', raw: 'a', node: { ...n, children: undefined, text: linkLabel(n) }, top, parent }); return; } // a button's label in a span (acs-about)
     if (k === 'a' && kids.map(unwrap).some((c) => { const ck = kindOf(c); return MEDIA(ck) || /^h[1-6]$/.test(ck) || ck === 'p' || ck === 'group'; }) && !n.text) {
       // a card-wide link: the <a> wraps the heading, the picture and the paragraphs — its children are the leaves, the href one link leaf at the end
       // (every card read as one flattened text, the picture in the wrong cell, a .gif card dropped — takeda, validation V3)

@@ -49,7 +49,9 @@ const out = resolve(arg('--out')); mkdirSync(out, { recursive: true });
 const profile = siteProfile(); const overlays = overlayOpts();
 const widths = String(arg('--widths', (profile?.widths || [360, 1440, 2560]).join(','))).split(',').map(Number).filter((w) => Number.isFinite(w) && w > 0);
 const vh = Number(arg('--vh', 900)); const wait = Number(arg('--wait', 4000)); const depth = Number(arg('--depth', 3));
-const sections = String(arg('--sections', 'main > .section')); const header = String(arg('--header', 'header')); const footer = String(arg('--footer', 'footer'));
+const sections = String(arg('--sections', 'main > .section')); // the default header / footer is the PAGE's: a `<header>` inside main / article / section / aside is a section title (acs-about: nine in-section
+// headers read as ten HEADER rows and ten header drafts; si-home: the page title doubled the chrome rows — BACKLOG 206, 207)
+const header = String(arg('--header', 'header:not(main header, article header, section header, aside header)')); const footer = String(arg('--footer', 'footer:not(main footer, article footer, section footer, aside footer)'));
 const mainSel = typeof arg('--main', null) === 'string' ? arg('--main') : (profile?.cap?.contentRoot && profile.cap.contentRoot !== 'main' ? profile.cap.contentRoot : profile?.cap?.contentRoot === 'main' ? 'main' : profile?.cap?.mainSelector || null); // the content root (site-profile init records it from this summary), else the cap shell
 const hidden = String(arg('--hidden', '')).split(',').map((s) => s.trim()).filter(Boolean);
 const noSpec = process.argv.includes('--no-spec');

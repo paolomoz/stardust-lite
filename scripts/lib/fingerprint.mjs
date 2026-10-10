@@ -27,6 +27,14 @@ const MEDIA_TAGS = new Set(['img', 'picture', 'video', 'video-js', 'source', 'au
 const hasBg = (n) => !!(n.bgi && /url\(/.test(n.bgi));
 const tagOf = (n) => String(n.tag || '').toLowerCase();
 
+/** A link whose content is ONE text (through spans / wrappers, an icon beside it allowed) and no picture or heading: its label — a button
+ * `a.acsbutton > span.acsbutton-label` is a link with that text, not a card-wide wrapper (acs-about: every button lost its href). Else null. */
+export function linkLabel(n) {
+  if (String(n.tag || '').toLowerCase() !== 'a' || n.text) return null; const texts = []; let block = false;
+  const walk = (x) => { const t = String(x.tag || '').toLowerCase(); if (MEDIA_TAGS.has(t) || x.src || HEAD.test(t)) { block = true; return; } if (x.text) texts.push(x.text); (x.children || []).forEach(walk); };
+  (n.children || []).forEach(walk); return !block && texts.length === 1 ? texts[0] : null;
+}
+
 /** The leaf kind of a node (see the header). */
 export function kindOf(n) {
   const tag = tagOf(n);
@@ -38,7 +46,7 @@ export function kindOf(n) {
   if (tag === 'blockquote') return 'blockquote';
   // a card-wide link (no text of its own, wrapping a picture / heading / paragraph) is a container, as author reads it (35f9b73): read as a
   // leaf, takeda's ten card grids were `a×4` link lists and the draft triage named them accordions (exp/five-min replay)
-  if (tag === 'a') return !n.text && (n.children || []).some((c) => { const k = kindOf(c); return k === 'picture' || k === 'video' || HEAD.test(k) || k === 'p' || k === 'group'; }) ? 'group' : 'a';
+  if (tag === 'a') return !n.text && !linkLabel(n) && (n.children || []).some((c) => { const k = kindOf(c); return k === 'picture' || k === 'video' || HEAD.test(k) || k === 'p' || k === 'group'; }) ? 'group' : 'a';
   if (tag === 'button') return 'button';
   if (['input', 'select', 'textarea', 'form'].includes(tag)) return 'input';
   if (tag === 'hr') return 'hr';
@@ -168,11 +176,15 @@ export function fingerprint(root, { depth = 6 } = {}) {
   const anchorText = (firstHead ? textOf(firstHead.node) : textOf(root)).replace(/\s+/g, ' ').trim().slice(0, 60);
   const mediaArea = media.reduce((s, l) => s + area(l.node), 0);
   const kinds = sigOf(a.leaves);
+  // the unit is PAINTED (a background, a border, a shadow or a radius on it or down its single-child chain): a link-only list of painted
+  // boxes is cards, not an accordion (acs-about: white rounded shadowed link cards drafted as `accordion (?)`)
+  const painted = (n) => { let x = n; for (let d = 0; x && d < 4; d += 1) { if ((x.bg && !/rgba\(0, 0, 0, 0\)/.test(x.bg)) || x.shadow || x.border || (x.br && x.br !== '0px')) return true; x = x.children?.length === 1 ? x.children[0] : null; } return false; };
+  const unitPainted = !!u && u.nodes.filter(painted).length * 2 >= u.nodes.length; const unitH = u ? u.nodes.map((n) => (n.box ? n.box[3] : 0)).sort((x, z) => x - z)[Math.floor(u.nodes.length / 2)] : 0;
   return {
     anchorText, box: root.box || null, pattern: a.pattern, repeat: u ? (groups ? groups.reduce((s, g) => s + g, 0) : u.count) : 0, groups, unit: u ? unit.unit : null, unitSig: u ? unit.sig : [], unitCols: u ? cells(unit.unitNode) : null,
     cols: u ? cells(unit.unitNode) : cells(root), media: media.length, texts: texts.length, links: links.length,
     mediaRatio: media.length + texts.length ? Number((media.length / (media.length + texts.length)).toFixed(2)) : 0,
-    headingBefore, linkAfter, controls, sliderHint, classes: { root: chainClasses(root), unit: unitClasses, context }, kinds,
+    headingBefore, linkAfter, unitPainted, unitH, controls, sliderHint, classes: { root: chainClasses(root), unit: unitClasses, context }, kinds,
     defaultContent: def.slice(0, 12).map((l) => ({ tag: l.kind, text: textOf(l.node).replace(/\s+/g, ' ').trim().slice(0, 80) })), defaultCount: def.length,
     bigText: Math.max(0, ...texts.map((l) => fontPx(l.node))), mediaArea: root.box ? Number(Math.min(1, mediaArea / Math.max(1, area(root))).toFixed(2)) : 0, leafCount: a.leaves.length,
   };
@@ -201,7 +213,13 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
   const mainKey = root || keys.find((k) => k === 'main') || tallest(keys.filter((k) => k !== headerKey && k !== footerKey)) || null; // a renamed content root (`#content`, `div.main-container`) is the tallest non-chrome root, not the first key
   const roots = mainKey ? (dump[mainKey] || []) : [];
   // the extra roots measure-page dumped (unassigned bands: a breadcrumb bar, a promo bar outside main) are sections of their own, in the dump's order
-  const extraKeys = keys.filter((k) => k !== headerKey && k !== footerKey && k !== mainKey); const beforeMain = extraKeys.filter((k) => keys.indexOf(k) < keys.indexOf(mainKey)); const afterMain = extraKeys.filter((k) => keys.indexOf(k) > keys.indexOf(mainKey));
+  const extraKeys = keys.filter((k) => k !== headerKey && k !== footerKey && k !== mainKey);
+  // before / after main by the PAGE's geometry, the dump's key order only when a band has no box (acs-about: the footer band was dumped before
+  // main and triage made it the first content row)
+  const mainBox = (Array.isArray(roots) ? roots : [roots]).find((n) => n?.box)?.box || null; const firstBox = (k) => (Array.isArray(dump[k]) ? dump[k] : [dump[k]]).find((n) => n?.box)?.box || null;
+  const isAfter = (k) => { const b = firstBox(k); return b && mainBox ? b[1] >= mainBox[1] + mainBox[3] - 8 : keys.indexOf(k) > keys.indexOf(mainKey); };
+  const byY = (a, b) => (firstBox(a)?.[1] ?? 0) - (firstBox(b)?.[1] ?? 0);
+  const beforeMain = extraKeys.filter((k) => !isAfter(k)).sort(byY); const afterMain = extraKeys.filter(isAfter).sort(byY);
   // …except the chrome dumped twice (exp/five-min, wellsfargo replay: the utility nav INSIDE the header box, the legal links inside the footer,
   // a link-only mega-menu bar under the header read as four accordion sections and tripled the page): a band inside a header / footer
   // node's box, or a link-only band touching the header's bottom / after main, belongs to the chrome
@@ -252,6 +270,8 @@ export function collectionGuess(fp) {
     if (u.has('media') && (u.has('heading') || u.has('text') || u.has('link'))) return fp.repeat >= 3 ? { collection: 'cards', alternatives: ['columns'], reason: `media + text unit ×${fp.repeat}` } : { collection: 'columns', alternatives: ['cards'], reason: `media + text unit ×${fp.repeat}` };
     if (u.has('media') && u.size === 1) return { collection: 'cards', alternatives: [], reason: `media-only unit ×${fp.repeat} (logos)` };
     if (u.has('media')) return { collection: 'cards', alternatives: ['carousel'], reason: `media unit ×${fp.repeat}` };
+    if (!u.has('media') && !u.has('heading') && !u.has('text') && fp.unitPainted && fp.unitH < 64) return { collection: null, alternatives: [], reason: `painted link unit ×${fp.repeat} under 64 px: buttons — default content (closing links)` }; // acs: pill CTAs read as accordions
+    if (!u.has('media') && (u.has('heading') || u.has('link')) && !u.has('text') && fp.unitPainted) return { collection: 'cards', alternatives: ['accordion'], reason: `painted heading/link unit ×${fp.repeat} (link cards)` };
     if (!u.has('media') && (u.has('heading') || u.has('link')) && !u.has('text')) return { collection: 'accordion', alternatives: ['tabs', 'columns'], reason: `heading/link-only unit ×${fp.repeat} (hidden panels are not in the dump)` };
     if (!u.has('media') && u.has('text')) return fp.repeat >= 3 && u.has('heading') ? { collection: 'columns', alternatives: ['cards'], reason: `text unit ×${fp.repeat}` } : { collection: null, alternatives: ['columns'], reason: `text run ×${fp.repeat} without media: default content (a columns block needs ≥ 3 headed units)` }; // two paragraphs read as "columns? weak" on an article page (covermore, loop r6)
     return r;

@@ -112,7 +112,12 @@ rows.forEach((row, i) => {
   const head = `/* ${classes ? classes.join(' ') : `section ${i} (default content${style ? `, style "${style}"` : ''})`} — document section #${i} ← live section #${k} "${live.id.slice(0, 40)}" y${live.box[1]} h${live.box[3]} at ${base}${m ? `; ${mobile}: h${m.box[3]}` : ''}${p ? `; ${probe}: h${p.box[3]}` : ''}\n   DRAFT from the spec: structure is the pipeline's (.block > div = row, > div > div = cell); every value is the live page's, annotated. Edit; the decorate's own DOM takes these values. */`;
   const lines = [head];
   const sel = classes ? `.${classes.join('.')}` : `main .section${style ? `.${style.split(/[,\s]+/).filter(Boolean).map((t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-')).join('.')}` : `:nth-of-type(${i + 1})`}`;
-  const inset = live.inset; const padTop = inset ? inset.first : null; const padBottom = inset ? inset.last : null;
+  // the section's padding: from its edge to the first / last CONTENT box of any kind (text, picture, unit paint, control) — the inset chain
+  // reads to the last TEXT, and a section ending in cards or a button read `bottom 615` (acs-about: no drafted padding was usable)
+  const inset = live.inset;
+  const content = items.filter((it) => !(it.k === 'paint' && it.box[2] >= live.box[2] - 4) && it.box[3] > 0);
+  const padOf = (sec, its) => { const c = its.filter((it) => !(it.k === 'paint' && it.box[2] >= sec.box[2] - 4) && it.box[3] > 0); if (!c.length) return [inset ? inset.first : null, inset ? inset.last : null]; return [Math.max(0, Math.min(...c.map((it) => it.box[1])) - sec.box[1]), Math.max(0, sec.box[1] + sec.box[3] - Math.max(...c.map((it) => it.box[1] + it.box[3])))]; };
+  const [padTop, padBottom] = content.length ? padOf(live, items) : [inset ? inset.first : null, inset ? inset.last : null];
   const bg = live.bg && live.bg !== 'rgba(0, 0, 0, 0)' ? live.bg : (items.find((it) => it.k === 'paint' && it.box[2] >= base - 2 && it.bg) || {}).bg;
   // without a section style the block's section is scoped to ITSELF (as a default-content section is): an unscoped `main .section` put the
   // last block section's padding and navy background on every section of the page (exp/five-min replay: manulife 85–94 %)
@@ -152,7 +157,7 @@ rows.forEach((row, i) => {
       const mi = m.items.filter((it) => onPage(it, mobile)); const mr = xr(mi, mobile); const mu = unitOf(mi, mobile, mr ? mr[1] - mr[0] : null);
       const prevSigs = new Map(textRules(items, base, sel).map((t) => [t.tag, t.sig])); const mt = textRules(mi, mobile, `  ${sel}`, prevSigs);
       const mob = [];
-      if (m.inset && (m.inset.first !== padTop || m.inset.last !== padBottom)) mob.push(`  ${sectionSel} { padding: ${px(Math.max(0, m.inset.first))} 0 ${px(Math.max(0, m.inset.last))}; }  /* inset ${m.inset.first} / ${m.inset.last} at ${mobile} */`);
+      const [mTop, mBottom] = padOf(m, m.items.filter((it) => onPage(it, mobile))); if (mTop !== null && (mTop !== padTop || mBottom !== padBottom)) mob.push(`  ${sectionSel} { padding: ${px(mTop)} 0 ${px(mBottom)}; }  /* edge → first / last content at ${mobile} */`);
       if (u && (!mu || mu.perRow !== u.perRow)) mob.push(`  ${sel} { grid-template-columns: ${mu ? `repeat(${mu.perRow}, minmax(0, 1fr))` : '1fr'};${mu && mu.rowGap !== null ? ` row-gap: ${px(mu.rowGap)};` : ''} }  /* unit ${mu ? `${mu.n} × ${mu.w}×${mu.h}, ${mu.perRow} per row` : 'stacked'} at ${mobile} */`);
       mob.push(...mt.map((t) => t.css)); mob.push(...mediaRules(mi, mobile, `  ${sel}`).filter((x) => !mediaRules(items, base, sel).map((y) => y.replace(sel, '')).includes(x.replace(`  ${sel}`, ''))));
       if (mob.length) lines.push(`@media (max-width: ${bp - 1}px) {  /* the source's breakpoint ${bp} (media queries by count: ${(summary.breakpoints || []).slice(0, 3).join(', ') || 'unknown — 900 assumed'}) */\n${mob.join('\n')}\n}`);

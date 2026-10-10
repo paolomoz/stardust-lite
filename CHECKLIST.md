@@ -4,7 +4,7 @@ From the site repo's root. `<url>` the page, `<slug>` its name, `<host>` = `http
 
 | # | step | command | read this, then decide |
 |---|---|---|---|
-| 0 | setup | `npm i -D github:paolomoz/stardust-lite#<sha> && npx stardust-lite init --foundation --force`; branch, push once | — |
+| 0 | setup | `npm i -D --legacy-peer-deps github:paolomoz/stardust-lite#<sha> && npx stardust-lite init --foundation --force`; branch, push once | — |
 | 1 | first look | `npx stardust-lite probe-load <url> 360,1440,2560 --profile migration/site.json` | the **tier line** at the end: the flags every later instrument needs (`--chrome`, `--cookie`, `--locale`, `--consent`, `--dismiss`, `--hide`); it writes them to the profile so nothing is typed again. URL changed? measure the page you mean |
 | 2 | measure | `npx stardust-lite measure-page <url> --out migration/cases/<slug>/measure --noise` | the notes: unassigned bands, a tall header, shadow hosts (composed tree is automatic), a layer that pins or hides on scroll, broken images, the `--sections` guess it measured with |
 | 3 | brief | `npx stardust-lite brief migration/cases/<slug>/measure` | one screen: fonts and fallbacks, colours, cap, per section the text styles, media, unit, paint, rhythm and **inset** (who owns the gap). Never open a spec for this |
