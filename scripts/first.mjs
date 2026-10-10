@@ -22,7 +22,7 @@ if (!url || url.startsWith('--') || typeof slug !== 'string') { console.error('u
 const here = dirname(fileURLToPath(import.meta.url)); const S = (n) => join(here, `${n}.mjs`);
 const template = String(arg('--template', 'home')); const noDa = process.argv.includes('--no-da');
 // a free port: a busy 8990 (another serve left running) cost marriott a whole `first` re-run — the harness refuses a port another dir owns
-const free = (p) => new Promise((res) => { const srv = net.createServer(); srv.once('error', () => res(false)); srv.once('listening', () => srv.close(() => res(true))); srv.listen(p, '127.0.0.1'); });
+const free = (p) => new Promise((res) => { const srv = net.createServer(); srv.once('error', () => res(false)); srv.once('listening', () => srv.close(() => res(true))); srv.listen(p); }); // no host: the dual-stack bind sees a serve listening on :: (publicis: 8990 read free on 127.0.0.1, busy on ::)
 let port = Number(arg('--port', 8990)); const ownServe = () => { const pid = spawnSync('lsof', ['-nP', '-t', `-iTCP:${port}`, '-sTCP:LISTEN'], { encoding: 'utf8' }).stdout.trim().split('\n')[0]; if (!pid) return false; const cwd = (spawnSync('lsof', ['-a', '-p', pid, '-d', 'cwd', '-Fn'], { encoding: 'utf8' }).stdout.split('\n').find((l) => l.startsWith('n')) || '').slice(1); return !!cwd && resolve(cwd) === resolve(process.cwd()); }; // our own serve from an earlier `first`
 if (!(await free(port)) && !ownServe()) { for (let p = port + 1; p < port + 40; p += 1) if (await free(p)) { console.log(`first: port ${port} is busy — using ${p}`); port = p; break; } }
 const skip = new Set(String(arg('--skip', '') || '').split(',').filter(Boolean));
