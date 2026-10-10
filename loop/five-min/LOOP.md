@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L5 | bms.com | 54f7deb (triage drop, edited triage applied, block sections kept, nav by position) | 2.5 (34 / 30 / 17 %) | 18.8 | 20.8 | 4 | 35–37 | own ≈ 13.8 min, tools 5.0 to stop | one `first`, a better first round; the agent's CSS pass ≈ 12 min (4.5 reading spec rows at three widths, 3 writing); a lost DA_TOKEN in a new shell, 360 paddings in block files, a 49.6 MB gif |
 | L4 | deloitte.com us | c9bd927 (modals hidden, videos at frame 0) | 6.9 after 3 × `first` (81 / 91 / 91 %) | 21.2 | 23.8 | 3 | 40–46 | own ≈ 13.6 min, tools 7.6 to stop | the split: a nested grid picked, a header row in main that triage.md could not drop, `first --skip` re-running triage over the edit, the harness silently dropping an empty video section (≈ 8 min together); reading + writing the CSS ≈ 7.5 min |
 | L3 | toryburch.com en-us | 16f69d6 (unroll, section coverage, empty chrome, fast local captures) | 9.6 after 3 × `first` (62 / 83 / 79 %) | 32.6 | 35.1 | 4 | 67–69 | own ≈ 17 min, tools 15.3 to stop | two popups (locale, a delayed welcome modal) measured as sections — two extra `first` runs, ≈ 9 min; a hero video frozen on a different frame per width ≈ 4 min; the CSS pass on a 5-section commerce page ≈ 10 min |
 | L2 | publicisgroupe.com en | eb6b282 (one-shot capture, chrome guess, free port, scoped blocks) | 4.6 (72 / 60 / 48 %) | **9.8** | 11.8 | 2 | 40 | ≈ 5 min own + 4.9 min tools to stop | 3.5 of the 9.8 min were `first` failing: a page scrolling inside main (captures 900 px tall), the hero missing from the split, no footer (author wrote none, da-put / harness exit), a busy port (IPv6 listener) |
@@ -50,3 +51,10 @@ Change: modal layers hidden (z-index ≥ 10, ≥ 30 % of the viewport, or an ope
 tier line; videos held at frame 0 on every live open; `first` clears the last round when it re-measures. Result on deloitte: no popup, no video
 drift; stop at 21.2 after three `first` runs and three rounds. Keep. Next: the split and the triage round trip (drop a row, `first` honouring
 an edited triage.md), the harness keeping an empty block section, the nav document (iteration 5).
+
+### L5 — the triage round trip and the nav document
+Change: `drop` rows in triage.md (author / spec-to-css keep the split aligned), `first` applies an edited triage.md, the harness keeps block
+sections and re-uploads an edited nav / footer, the nav document by kind and position, grid columns from fully visible units. Result on bms:
+one `first` (2.5 min) at 34 / 30 / 17 % — the best first round so far — stop at 18.8 after four rounds of 35–37 s. Keep. The clock is now the
+agent's own pass (≈ 14 of 18.8 min). Next (iteration 6): the token in every shell, section rules that never beat the agent's, oversized gifs,
+measurements out of git, and a protocol trial: work from the digest, read spec rows only for the sections it names.
