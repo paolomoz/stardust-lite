@@ -1,0 +1,88 @@
+2026-10-10T09:59:30Z START [setup-npm-i]
+2026-10-10T09:59:34Z END   [setup-npm-i] rc=0 4s
+2026-10-10T09:59:34Z START [setup-playwright]
+2026-10-10T09:59:35Z END   [setup-playwright] rc=0 1s
+2026-10-10T09:59:52Z START [setup-init]
+2026-10-10T09:59:52Z END   [setup-init] rc=0 0s
+2026-10-10T10:00:06Z START [probe-load]
+2026-10-10T10:00:26Z END   [probe-load] rc=0 20s
+2026-10-10T10:00:39Z START [measure-page]
+2026-10-10T10:01:12Z END   [measure-page] rc=0 33s
+2026-10-10T10:01:15Z START [brief]
+2026-10-10T10:01:16Z END   [brief] rc=0 1s
+2026-10-10T10:01:34Z START [cmp-probe]
+2026-10-10T10:01:39Z END   [cmp-probe] rc=0 5s
+2026-10-10T10:01:46Z START [probe-load-2]
+2026-10-10T10:01:53Z END   [probe-load-2] rc=0 7s
+2026-10-10T10:02:15Z START [measure-page-2]
+2026-10-10T10:02:55Z END   [measure-page-2] rc=0 40s
+2026-10-10T10:03:07Z START [brief-2]
+2026-10-10T10:03:08Z END   [brief-2] rc=0 1s
+2026-10-10T10:03:12Z START [triage]
+2026-10-10T10:03:12Z END   [triage] rc=0 0s
+2026-10-10T10:03:40Z START [triage-from-md]
+2026-10-10T10:03:40Z END   [triage-from-md] rc=0 0s
+2026-10-10T10:03:46Z START [media-fetch]
+2026-10-10T10:03:47Z END   [media-fetch] rc=2 1s
+2026-10-10T10:03:47Z START [media-fonts]
+2026-10-10T10:04:01Z END   [media-fonts] rc=0 14s
+2026-10-10T10:04:18Z START [author]
+2026-10-10T10:04:18Z START [da-put-media]
+2026-10-10T10:04:18Z END   [author] rc=0 0s
+2026-10-10T10:04:44Z END   [da-put-media] rc=0 26s
+2026-10-10T10:06:36Z START [lint]
+2026-10-10T10:06:36Z END   [lint] rc=0 0s
+2026-10-10T10:06:44Z START [da-put-docs]
+2026-10-10T10:06:53Z END   [da-put-docs] rc=0 9s
+2026-10-10T10:06:53Z START [spec-to-css]
+2026-10-10T10:06:53Z END   [spec-to-css] rc=0 0s
+2026-10-10T10:11:00Z START [css-lint]
+2026-10-10T10:11:00Z END   [css-lint] rc=1 0s
+2026-10-10T10:11:13Z START [harness]
+2026-10-10T10:11:19Z END   [harness] rc=0 6s
+2026-10-10T10:11:43Z START [gate-r1]
+2026-10-10T10:12:43Z END   [gate-r1] rc=0 60s
+2026-10-10T10:14:20Z START [da-put-nav]
+2026-10-10T10:14:24Z END   [da-put-nav] rc=0 4s
+2026-10-10T10:14:24Z START [harness-2]
+2026-10-10T10:14:28Z END   [harness-2] rc=0 4s
+2026-10-10T10:14:28Z START [gate-r2]
+2026-10-10T10:15:27Z END   [gate-r2] rc=0 59s
+2026-10-10T10:16:20Z START [harness-3]
+2026-10-10T10:16:24Z END   [harness-3] rc=0 4s
+2026-10-10T10:16:24Z START [gate-r3]
+2026-10-10T10:17:23Z END   [gate-r3] rc=0 59s
+2026-10-10T10:17:44Z START [harness-4]
+2026-10-10T10:17:48Z END   [harness-4] rc=0 4s
+2026-10-10T10:17:48Z START [gate-r4]
+2026-10-10T10:18:45Z END   [gate-r4] rc=0 57s
+2026-10-10T10:19:57Z START [harness-5]
+2026-10-10T10:20:00Z END   [harness-5] rc=0 3s
+2026-10-10T10:20:00Z START [gate-r5]
+2026-10-10T10:21:04Z END   [gate-r5] rc=0 64s
+2026-10-10T10:21:25Z START [harness-6]
+2026-10-10T10:21:29Z END   [harness-6] rc=0 4s
+2026-10-10T10:21:29Z START [gate-r6]
+2026-10-10T10:22:27Z END   [gate-r6] rc=0 58s
+2026-10-10T10:24:09Z START [harness-7]
+2026-10-10T10:24:13Z END   [harness-7] rc=0 4s
+2026-10-10T10:24:13Z START [gate-r7]
+2026-10-10T10:25:10Z END   [gate-r7] rc=0 57s
+2026-10-10T10:25:33Z START [push]
+2026-10-10T10:25:34Z END   [push] rc=0 1s
+2026-10-10T10:25:35Z START [sync-poll]
+2026-10-10T10:25:48Z END   [sync-poll] rc=0 13s
+2026-10-10T10:25:56Z START [da-put-docs-2]
+2026-10-10T10:26:05Z END   [da-put-docs-2] rc=0 9s
+2026-10-10T10:26:06Z START [gate-served]
+2026-10-10T10:27:53Z END   [gate-served] rc=0 107s
+2026-10-10T10:28:07Z START [leak-proto]
+2026-10-10T10:28:16Z END   [leak-proto] rc=0 9s
+2026-10-10T10:28:16Z START [leak-served]
+2026-10-10T10:28:30Z END   [leak-served] rc=0 14s
+2026-10-10T10:28:41Z START [gate-probes]
+2026-10-10T10:30:21Z END   [gate-probes] rc=0 100s
+2026-10-10T10:30:44Z START [site-profile]
+2026-10-10T10:30:44Z END   [site-profile] rc=0 0s
+2026-10-10T10:30:44Z START [block-inventory]
+2026-10-10T10:30:44Z END   [block-inventory] rc=0 0s

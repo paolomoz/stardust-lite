@@ -29,3 +29,4 @@ t0 = first instrument run on the page (repo setup excluded, reported apart). `<1
 |---|---|---|---|---|---|---|---|---|---|
 | I1 | si.edu / (home) | 1.9 | 17.3 | never at 360; 1440 at 27.6, 1440 + 2560 at 32.1 | 50.9 (0 out of tolerance, 9 missing) | 56.8 | 27.76 / 3.44 / 4.51 (served identical) | 10 | 37.9 min, 119 turns / 26.6 min (gate 15.6) |
 | I2 | acs.org /about.html (`exp/five-min` @ d58b9f8) | 1.2 | 15.8 | 35.1 (the `stop:` line, round 8) | 41.3 | 38.1 | 9.39 / 8.27 / 8.86 (served 9.35 / 8.25 / 8.84) | 8 | to served 16.4 min, 108 turns / 21.7 min (round 75–79 s) |
+| I3 | continental.com /en/ (`exp/five-min` @ 0decf6c) | 1.0 | 11.2 | 25.1 (the `stop:` line, round 7) | 30.2 | 27.8 | 9.27 / 4.97 / 9.49 (served 8.97 / 4.91 / 9.34) | 7 | to served 14.3 min, 102 turns / 11.6 min (round 57–64 s) |

@@ -1,0 +1,23 @@
+# TIMELINE — continental-home (https://www.continental.com/en/), stardust-lite exp/five-min 0decf6c
+
+2026-10-10T09:58:58Z | setup_start | work dir + ./tl; DA token refreshed; guard (repo 404, DA folder empty), repo from boilerplate, fstab, Code Sync 204, aem.js 200, config contentSourceUrl ok, seed index/nav/footer put 201 + preview 200 (preview only)
+2026-10-10T09:59:57Z | setup_end | stardust-lite#0decf6c (--legacy-peer-deps), playwright, init --foundation --force (stardust.js wired), blocks-first pushed — 1.0 min
+2026-10-10T10:00:06Z | t0 probe-load start |
+2026-10-10T10:03:08Z | brief read | 6 main sections (hero slider: image + padded title + 2 pills; welcome: h1 + intro + teaser image + share-price iframe + pill; tires garage: bg image + eyebrow + h2 + video + text + pill; career: h2 + intro + 3 cards; sustainability: bg image + h2 + pill + 3 fact boxes; facts & figures: h2 + 3 news cards) + social list band + footer 4 cols; consentmanager modal in a shadow root (#cmpwrapper) in every chunk of the first measure — probe-load said 'no overlay', --consent a.cmpboxbtnyes then 'ABSENT' at probe-load but clicked by measure-page; hide #cmpwrapper added to the profile; re-measured (noise 5.83 %: hero slider)
+2026-10-10T10:03:46Z | triage done | 9 rows: header, carousel(hero) 2 slides, default h1+p + columns(teaser: annual-report picture | share-price iframe + pill), bg-image section: eyebrow+h2 + columns(video), default h2+p + cards (career), bg-image: h2+p+pill + cards(facts), h2 + cards (news), social links default (row 7 = the unassigned c-socialmedia-list band, suggested accordion — wrong), footer
+2026-10-10T10:04:11Z | fonts.css written | media-fetch --fonts --css: 6 ContinentalStagSansW faces (300/400/700 × normal/italic), real woff2 bytes; 2 WAF'd responses (FontAwesome, VideoJS) refused and refetched through the page by itself; no hand edit
+2026-10-10T10:06:53Z | document authored + lint clean | author --draft-new: 7 sections, 0 empty cells, but lost every card-wide a.c-teaser href (:icon: + 'Find out more' unlinked) again, the video section's bg picture landed as a column, the hero slides in DOM order (the visible slide is the 2nd), nav 3 links of 7 → scripts/build-doc.py (doc / nav / footer) + scripts/icons.py (21 inline source SVGs → icons/); lint 0 red 1 yellow (facts cards D1: painted boxes, justified); 3 docs put
+2026-10-10T10:10:54Z | CSS written | styles (tokens, 1920 page cap, module cap min(100% - 184, 1428), type, pill, bg-image / garage / social styles), carousel (new js + css), columns (teaser iframe embed in js, video), cards (career/news, facts), header (fixed bar, 255×160 logo box, tools, nav row, sticky compact after a viewport), footer (4 columns); drafts read for numbers, none merged verbatim
+2026-10-10T10:11:43Z | first prototype served | :8994, doc 5217 vs live 5163 at 1440, 8 blocks loaded, 0 texts missing
+2026-10-10T10:12:48Z | gate round 1 | 360 28.32 / 1440 10.96 / 2560 12.78
+2026-10-10T10:15:33Z | gate round 2 | 360 19.88 / 1440 10.55 / 2560 15.57 (letter-spacing per row, 360 header icons, h1 360, teaser gaps, garage grid)
+2026-10-10T10:17:29Z | gate round 3 | 360 13.27 / 1440 13.74 / 2560 16.14 (facts 360 type + gaps, garage 360 gaps, card link 24, header bar capped at 1920)
+2026-10-10T10:19:01Z | gate round 4 | 360 13.27 / 1440 4.36 / 2560 10.09 (the bar's spacer shrinks 20 px when it pins — every chunk after the first was 20 px off)
+2026-10-10T10:21:25Z | gate round 5 | 360 12.86 / 1440 4.05 / 2560 10.09 — the 2560 BUILD capture failed (scroll stall 20 px short: the spacer shrinks when the bar pins) and the gate compared the previous round's build png
+2026-10-10T10:22:56Z | gate round 6 | 360 12.86 / 1440 4.85 / 2560 10.40 (body padding when pinned: the 2560 stitch completes, but every later chunk sits 20 px off the live's again — reverted)
+2026-10-10T10:25:16Z | gate round 7 — stop: REACHED | 360 9.27 / 1440 4.97 / 2560 9.49 (360 header row spacing, card link gaps) — 'stop: under 10 % at the three widths'
+2026-10-10T10:25:56Z | pushed + synced | 883d12f, sync-poll 12 s
+2026-10-10T10:27:59Z | served gate done | 360 8.97 / 1440 4.91 / 2560 9.34 — target REACHED on the served page; cap-probe PASS at 2560 (0 of 8 rows)
+2026-10-10T10:28:35Z | leak both | 20 selectors, 0 differing lines
+2026-10-10T10:30:26Z | probes done | gate --probes (5 hover lines, 1440): motion 0 parity / 22 missing / 1 extra / 1 advisory — hover transitions, the slider autoplay, entrance animations not reproduced (register M1–M3)
+2026-10-10T10:32:37Z | close | site-profile init (merged with the t0 profile), block-inventory scan (6 blocks, 8 rows), README, REPORT, REGISTER, LINT, NOTES, TIMING.log copy; no polish round
