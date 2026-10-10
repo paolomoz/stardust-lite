@@ -14,12 +14,17 @@ import { spawnSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import net from 'node:net';
 import { arg } from './common.mjs';
 
 const url = process.argv[2]; const slug = arg('--slug', null);
-if (!url || url.startsWith('--') || typeof slug !== 'string') { console.error('usage: first.mjs <url> --slug <slug> [--template <name>] [--port 8990] [--no-da] [--sections <css>] [--main <css>] [--skip <step,…>]'); process.exit(1); }
+if (!url || url.startsWith('--') || typeof slug !== 'string') { console.error('usage: first.mjs <url> --slug <slug> [--template <name>] [--port 8990] [--no-da] [--sections <css>] [--main <css>] [--header <css>] [--footer <css>] [--skip <step,…>]'); process.exit(1); }
 const here = dirname(fileURLToPath(import.meta.url)); const S = (n) => join(here, `${n}.mjs`);
-const template = String(arg('--template', 'home')); const port = Number(arg('--port', 8990)); const noDa = process.argv.includes('--no-da');
+const template = String(arg('--template', 'home')); const noDa = process.argv.includes('--no-da');
+// a free port: a busy 8990 (another serve left running) cost marriott a whole `first` re-run — the harness refuses a port another dir owns
+const free = (p) => new Promise((res) => { const srv = net.createServer(); srv.once('error', () => res(false)); srv.once('listening', () => srv.close(() => res(true))); srv.listen(p, '127.0.0.1'); });
+let port = Number(arg('--port', 8990)); const ownServe = () => { const pid = spawnSync('lsof', ['-nP', '-t', `-iTCP:${port}`, '-sTCP:LISTEN'], { encoding: 'utf8' }).stdout.trim().split('\n')[0]; if (!pid) return false; const cwd = (spawnSync('lsof', ['-a', '-p', pid, '-d', 'cwd', '-Fn'], { encoding: 'utf8' }).stdout.split('\n').find((l) => l.startsWith('n')) || '').slice(1); return !!cwd && resolve(cwd) === resolve(process.cwd()); }; // our own serve from an earlier `first`
+if (!(await free(port)) && !ownServe()) { for (let p = port + 1; p < port + 40; p += 1) if (await free(p)) { console.log(`first: port ${port} is busy — using ${p}`); port = p; break; } }
 const skip = new Set(String(arg('--skip', '') || '').split(',').filter(Boolean));
 const fstab = existsSync('fstab.yaml') ? readFileSync('fstab.yaml', 'utf8') : ''; const m = /content\.da\.live\/([^/\s]+)\/([^/\s]+)/.exec(fstab);
 if (!m) { console.error('first: run from the site repo root (fstab.yaml with a content.da.live mount)'); process.exit(1); }
@@ -48,7 +53,7 @@ const finish = (code, extra = '') => {
 // 1 tier + profile, 2 measure (the profile's flags are read by every instrument from migration/site.json)
 if (!skip.has('probe')) step('probe-load', S('probe-load'), [url, '360,1440,2560', '--profile', join('migration', 'site.json')], { show: 4, note: (r) => (/^tier: (.*)$/m.exec(r.stdout) || [])[1] || null });
 if (!skip.has('measure')) {
-  const mArgs = [url, '--out', measure, ...(typeof arg('--sections', null) === 'string' ? ['--sections', arg('--sections')] : []), ...(typeof arg('--main', null) === 'string' ? ['--main', arg('--main')] : [])];
+  const mArgs = [url, '--out', measure, ...(typeof arg('--sections', null) === 'string' ? ['--sections', arg('--sections')] : []), ...(typeof arg('--main', null) === 'string' ? ['--main', arg('--main')] : []), ...['--header', '--footer'].flatMap((f) => (typeof arg(f, null) === 'string' ? [f, arg(f)] : []))];
   const r = step('measure-page', S('measure-page'), mArgs, { show: 0, ok: () => existsSync(content), note: (r2) => { try { const s = JSON.parse(readFileSync(join(measure, 'summary.json'), 'utf8')); return `${Object.keys(s.files || {}).length} widths, sections ${s.sectionsSelector || '?'}`; } catch { return null; } } });
   const notes = String(r.stdout).split('\n').filter((l) => /^note: |CHALLENGE|FONT LOAD FAILED|BROKEN/.test(l)).slice(0, 8); if (notes.length) console.log(notes.map((l) => `   ${l.slice(0, 220)}`).join('\n'));
   if (!existsSync(content)) finish(1, 'first: measure-page wrote no content dump — read its output above');

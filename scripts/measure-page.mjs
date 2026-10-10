@@ -51,7 +51,9 @@ const widths = String(arg('--widths', (profile?.widths || [360, 1440, 2560]).joi
 const vh = Number(arg('--vh', 900)); const wait = Number(arg('--wait', 4000)); const depth = Number(arg('--depth', 3));
 const sections = String(arg('--sections', 'main > .section')); // the default header / footer is the PAGE's: a `<header>` inside main / article / section / aside is a section title (acs-about: nine in-section
 // headers read as ten HEADER rows and ten header drafts; si-home: the page title doubled the chrome rows — BACKLOG 206, 207)
-const header = String(arg('--header', 'header:not(main header, article header, section header, aside header)')); const footer = String(arg('--footer', 'footer:not(main footer, article footer, section footer, aside footer)'));
+const headerGiven = typeof arg('--header', null) === 'string'; const footerGiven = typeof arg('--footer', null) === 'string'; const chromeUsed = {};
+const headerDefault = String(arg('--header', 'header:not(main header, article header, section header, aside header)')); const footerDefault = String(arg('--footer', 'footer:not(main footer, article footer, section footer, aside footer)'));
+const header = headerDefault; const footer = footerDefault; // per width: measure() re-reads them from the page (a guess when the page has no <header> / <footer>)
 const mainSel = typeof arg('--main', null) === 'string' ? arg('--main') : (profile?.cap?.contentRoot && profile.cap.contentRoot !== 'main' ? profile.cap.contentRoot : profile?.cap?.contentRoot === 'main' ? 'main' : profile?.cap?.mainSelector || null); // the content root (site-profile init records it from this summary), else the cap shell
 const hidden = String(arg('--hidden', '')).split(',').map((s) => s.trim()).filter(Boolean);
 const noSpec = process.argv.includes('--no-spec');
@@ -95,6 +97,18 @@ async function measure(W) {
   } catch (e) { await ctx.close().catch(() => {}); return { W, error: String(e.message || e).split('\n')[0].slice(0, 200), elapsed: (Date.now() - t0) / 1000 }; }
   log(`loaded (${((Date.now() - t0) / 1000).toFixed(1)} s), settling…`);
   await settle(page);
+  // the chrome when the page has no <header> / <footer> outside main (marriott: the header inside main, the footer a div — no nav, no footer
+  // authored, the harness exited 4): [role=banner] / [role=contentinfo], else a full-width header-ish / footer-ish node at the top / bottom
+  const [header, footer] = await page.evaluate(([h, f, hGiven, fGiven]) => {
+    const vis = (e) => { const r = e.getBoundingClientRect(); return r.width > innerWidth * 0.6 && r.height > 20; }; const docH = document.documentElement.scrollHeight;
+    const sel = (e) => { if (e.id && /^[A-Za-z][\w-]*$/.test(e.id)) return `${e.tagName.toLowerCase()}#${e.id}`; const c = [...e.classList].filter((x) => /^[A-Za-z][\w-]*$/.test(x)).slice(0, 2); return `${e.tagName.toLowerCase()}${c.map((x) => `.${x}`).join('')}`; };
+    const has = (s) => { try { return [...document.querySelectorAll(s)].some(vis); } catch { return false; } };
+    const pick = (role, re, top) => { const r0 = document.querySelector(`[role=${role}]`); if (r0 && vis(r0)) return sel(r0); const c = [...document.querySelectorAll('body *')].filter((e) => re.test(`${e.id} ${e.className}`) && vis(e)).filter((e) => { const r = e.getBoundingClientRect(); const y = r.top + scrollY; return top ? y < 200 && r.height < 600 : y + r.height > docH - 40 && r.height < 1600; }); c.sort((a, b) => b.getBoundingClientRect().width - a.getBoundingClientRect().width || (a.contains(b) ? -1 : 1)); return c[0] ? sel(c[0]) : null; };
+    return [hGiven || has(h) ? h : (pick('banner', /(^|[\s_-])(header|masthead|site-?nav)([\s_-]|$)/i, true) || h), fGiven || has(f) ? f : (pick('contentinfo', /(^|[\s_-])footer([\s_-]|$)/i, false) || f)];
+  }, [headerDefault, footerDefault, headerGiven, footerGiven]).catch(() => [headerDefault, footerDefault]);
+  if (header !== headerDefault) firstLines.push(`header: no <header> outside main — measured with '${header}' (pass --header to choose)`);
+  if (footer !== footerDefault) firstLines.push(`footer: no <footer> outside main — measured with '${footer}' (pass --footer to choose)`);
+  chromeUsed[W] = { header, footer };
   if (profile) { checkRows.unshift(statusRow(W, status)); checkRows.push(...await chromeRows(page, profile, W, { tol })); }
   const files = {};
   const write = (name, data) => { writeFileSync(join(out, name), data); files[name.replace(/-\d+(\.\w+)$/, '$1').replace(/\.\w+$/, '')] = join(out, name); };
@@ -211,7 +225,7 @@ const summary = {
   captures: Object.fromEntries(rows.filter((r) => r.cap && !r.cap.error).map((r) => [r.W, join(out, `live-${r.W}.png`)])),
   captureInfo: Object.fromEntries(rows.filter((r) => r.cap).map((r) => [r.W, r.cap.error ? { error: r.cap.error } : { width: r.cap.width, height: r.cap.height, chunks: r.cap.chunks, seconds: r.cap.seconds, chunkWaitsMs: r.cap.waited, timedOut: r.cap.timedOut, failedFonts: r.cap.failedFonts }])),
   profileCheck: check ? { verdict: check.verdict, checks: check.checks, fails: check.fails, warns: check.warns, tol, profile: profile._file, rows: allCheckRows.map(([W, name, expected, actual, verdict]) => ({ W, check: name, expected, actual, verdict })) } : null,
-  sectionsSelector: rows.find((r) => r.usedSections && r.usedSections !== sections)?.usedSections || sections, header, footer, hidden,
+  sectionsSelector: rows.find((r) => r.usedSections && r.usedSections !== sections)?.usedSections || sections, header: chromeUsed[1440]?.header || Object.values(chromeUsed)[0]?.header || header, footer: chromeUsed[1440]?.footer || Object.values(chromeUsed)[0]?.footer || footer, hidden,
   mainRoot: Object.fromEntries(rows.filter((r) => !r.error).map((r) => [r.W, { structure: r.root.name, path: r.root.path, content: r.contentMain }])),
   fixedLayers: Object.fromEntries(rows.filter((r) => r.first).map((r) => [r.W, r.first.fixed])),
   unassigned: Object.fromEntries(rows.filter((r) => r.first).map((r) => [r.W, r.first.unassigned || []])),

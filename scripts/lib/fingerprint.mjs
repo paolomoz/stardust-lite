@@ -216,7 +216,11 @@ export const allClasses = (fp) => [...new Set([...(fp.classes?.root || []), ...(
  * that is not header / footer / hidden). */
 export function splitSections(dump, { root = null, sections = null } = {}) {
   const keys = Object.keys(dump).filter((k) => !k.startsWith('__') && !k.startsWith('hidden '));
-  const headerKey = keys.find((k) => /^header\b/.test(k)) || null; const footerKey = keys.find((k) => /^footer\b/.test(k)) || null;
+  // the chrome keys: a `header…` / `footer…` selector, else a header-ish key at the top / a footer-ish one (measure-page's guess for a page with
+  // no <header> / <footer> outside main — marriott: `div.m-header`, `div.footer`)
+  const top0 = (k) => (Array.isArray(dump[k]) ? dump[k] : [dump[k]]).find((n) => n?.box)?.box?.[1] ?? 1e9;
+  const headerKey = keys.find((k) => /^header\b/.test(k)) || keys.find((k) => /(^|[\s.#_-])(header|masthead|banner)\b/i.test(k.split(',')[0]) && top0(k) < 250) || null;
+  const footerKey = keys.find((k) => /^footer\b/.test(k)) || keys.find((k) => k !== headerKey && /(^|[\s.#_-])(footer|contentinfo)\b/i.test(k.split(',')[0])) || null;
   const tallest = (ks) => ks.map((k) => [k, Math.max(0, ...(Array.isArray(dump[k]) ? dump[k] : [dump[k]]).filter((n) => n?.box).map((n) => n.box[3]))]).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
   const mainKey = root || keys.find((k) => k === 'main') || tallest(keys.filter((k) => k !== headerKey && k !== footerKey)) || null; // a renamed content root (`#content`, `div.main-container`) is the tallest non-chrome root, not the first key
   const roots = mainKey ? (dump[mainKey] || []) : [];

@@ -45,7 +45,7 @@
 //   verdict) and gate/pages-summary.json. --served-pages gates <branch-host><docPath> with gate/<slug>/ as --origin, out gate-served/<slug>/.
 //   Every single run also writes `gate.json` (the rows, cap and motion lines, chrome, budget) next to the captures.
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
 import { basename, dirname, join, resolve } from 'node:path';
@@ -164,6 +164,9 @@ const secs = (t0) => Number(((Date.now() - t0) / 1000).toFixed(1));
 const capt = {}; let buildQueue = Promise.resolve(); // the BUILD captures one at a time: three at once made the preview host refuse a burst of rendition requests (si-home replay: 24 pictures as alt text at 2560, retries did not recover them); the live opens overlap
 const captureW = async (W) => {
   const origin = join(out, `live-${W}.png`); const eds = join(out, `build-${W}.png`); const t = { live: null, build: null, compare: null, sections: null }; timing[W] = t;
+  // the build is captured fresh every run: a failed capture left the previous round's build-<W>.png on disk and the gate compared it again,
+  // printing last round's numbers as this round's (continental-home r5, one wasted round)
+  try { if (existsSync(eds)) unlinkSync(eds); } catch { /* read-only */ }
   const shared = findOrigin(W);
   if (shared && (!existsSync(origin) || originDir) && !recapture) { console.log(`origin ${W} from ${shared}`); copyFileSync(shared, origin); originFrom[W] = shared; } // an explicit --origin wins over the out dir's copy (si-home)
   else if (existsSync(origin) && !recapture) { console.log(`origin ${W} from ${origin} (cached)`); originFrom[W] = origin; }
@@ -190,7 +193,7 @@ const captureW = async (W) => {
     };
     const buildTask = async () => {
       const t0 = Date.now(); console.log(`build ${W}…`);
-      try { const r = await captureUrl(buildCtx, build, eds, { width: W, vh, log: console.log }); bp = r.page; t.build = secs(t0); } catch (e) { console.log(`build ${W}: capture failed — ${String(e.message || e).split('\n')[0].slice(0, 160)}`); bp = null; }
+      for (let attempt = 1; attempt <= 2 && !bp; attempt += 1) { try { const r = await captureUrl(buildCtx, build, eds, { width: W, vh, log: console.log }); bp = r.page; t.build = secs(t0); } catch (e) { console.log(`build ${W}: capture failed${attempt === 1 ? ' — once more' : ' twice — this width reads ERR, not the last round'} (${String(e.message || e).split('\n')[0].slice(0, 140)})`); bp = null; } }
     };
     const lt = liveTask(); buildQueue = buildQueue.then(buildTask); await Promise.all([lt, buildQueue]);
   }

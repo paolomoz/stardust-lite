@@ -152,10 +152,12 @@ function leavesOf(root) {
     else if (bgCut(n) && !kids.map(unwrap).some((c) => MEDIA(kindOf(c)))) bgCutWarn(n);
     if (k === 'ul') { if (isControlList(n)) { out.push({ kind: 'control', raw: 'ul', node: n, top, parent }); return; } if (isTextList(n)) { out.push({ kind: 'list', raw: 'ul', node: n, top, parent }); return; } kids.forEach((c, i) => walk(c, n === start ? i : top, n, depth + 1)); return; }
     if (k === 'a' && !n.text && linkLabel(n)) { out.push({ kind: 'link', raw: 'a', node: { ...n, children: undefined, text: linkLabel(n) }, top, parent }); return; } // a button's label in a span (acs-about)
-    if (k === 'a' && kids.map(unwrap).some((c) => { const ck = kindOf(c); return MEDIA(ck) || /^h[1-6]$/.test(ck) || ck === 'p' || ck === 'group'; }) && !n.text) {
-      // a card-wide link: the <a> wraps the heading, the picture and the paragraphs — its children are the leaves, the href one link leaf at the end
-      // (every card read as one flattened text, the picture in the wrong cell, a .gif card dropped — takeda, validation V3)
-      kids.forEach((c) => walk(c, top, n)); out.push({ kind: 'link', raw: 'a', node: { ...n, children: undefined, text: n.aria || n.title || (kids.map(unwrap).find((c) => /^h[1-6]$/.test(kindOf(c)))?.text) || 'Learn more' }, top, parent, wrapLink: true }); return;
+    // kindOf reads a card-wide link as a `group` (fingerprint) — the TAG names it here, or the rule never fired and the href was lost (continental)
+    if ((k === 'a' || String(n.tag || '').toLowerCase() === 'a') && n.href && kids.map(unwrap).some((c) => { const ck = kindOf(c); return MEDIA(ck) || /^h[1-6]$/.test(ck) || ck === 'p' || ck === 'group'; }) && !n.text) {
+      // the card's own call to action (a short text in a link / button / cta / more element: "Find out more") is the link's text, not a paragraph
+      let cta = null; const findCta = (x, inCta) => { const c = inCta || /\b(link|button|btn|cta|more)\b/i.test(String(x.cls || '')); if (c && x.text && x.text.trim().length <= 40) { cta = cta || x; return; } (x.children || []).forEach((y) => findCta(y, c)); }; kids.forEach((c) => findCta(c, false));
+      const skipCta = (x) => { if (!cta) return x; const prune = (y) => (y === cta ? null : { ...y, children: (y.children || []).map(prune).filter(Boolean).filter((z) => !(String(z.tag || '').toLowerCase() === 'i' && !(z.children || []).some((w) => w.text))) }); return prune(x); };
+      kids.map(skipCta).filter(Boolean).forEach((c) => walk(c, top, n)); out.push({ kind: 'link', raw: 'a', node: { ...n, children: undefined, text: cta?.text?.trim() || n.aria || n.title || (kids.map(unwrap).find((c) => /^h[1-6]$/.test(kindOf(c)))?.text) || 'Learn more' }, top, parent, wrapLink: true }); return;
     }
     if (k === 'picture' || k === 'video' || k === 'embed' || k === 'icon' || k === 'a' || /^h[1-6]$/.test(k) || k === 'p' || k === 'blockquote' || k === 'hr' || CONTROL.has(k)) {
       if (k === 'picture' && hasBg(n) && !n.src) return; // already pushed as the bg leaf

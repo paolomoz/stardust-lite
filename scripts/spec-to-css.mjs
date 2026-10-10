@@ -102,6 +102,10 @@ function mediaRules(items, W, sel) {
 
 const files = new Map(); const sectionsDraft = []; const pageScale = new Map();
 S.secs.forEach((s, k) => { for (const it of s.items) if (isText(it) && it.t && onPage(it, base) && !it.inline && /^(h[1-6]|p|li)$/.test(it.k)) { const key = `${it.k}: ${font(it)} ${rgb(it.c)}`; pageScale.set(key, (pageScale.get(key) || 0) + 1); } });
+// a block used by more than one section is scoped to each section: three carousels and a brands grid drafted on one `.carousel` selector and
+// only the last applied (marriott)
+const classesAt = (row, i) => blockOf(docSections[i] || '') || (row.match.block && row.match.kind !== 'default' ? [row.match.block, ...(row.match.variant ? row.match.variant.split(/\s+/) : [])] : null);
+const blockUses = count(rows.map((r, i) => classesAt(r, i)).filter(Boolean).map((c) => c.join('.'))); const repeated = new Set(blockUses.filter(([, n]) => n > 1).map(([k]) => k));
 rows.forEach((row, i) => {
   const secHtml = docSections[i] || ''; const classes = blockOf(secHtml) || (row.match.block && row.match.kind !== 'default' ? [row.match.block, ...(row.match.variant ? row.match.variant.split(/\s+/) : [])] : null);
   const style = styleOf(secHtml) || row.sectionStyle || null;
@@ -111,7 +115,7 @@ rows.forEach((row, i) => {
   const items = live.items.filter((it) => onPage(it, base)); const r = xr(items, base); const contentW = r ? r[1] - r[0] : null;
   const head = `/* ${classes ? classes.join(' ') : `section ${i} (default content${style ? `, style "${style}"` : ''})`} — document section #${i} ← live section #${k} "${live.id.slice(0, 40)}" y${live.box[1]} h${live.box[3]} at ${base}${m ? `; ${mobile}: h${m.box[3]}` : ''}${p ? `; ${probe}: h${p.box[3]}` : ''}\n   DRAFT from the spec: structure is the pipeline's (.block > div = row, > div > div = cell); every value is the live page's, annotated. Edit; the decorate's own DOM takes these values. */`;
   const lines = [head]; let innerPad = false; // the card's text cell carries the picture → text gap as padding
-  const sel = classes ? `.${classes.join('.')}` : `main .section${style ? `.${style.split(/[,\s]+/).filter(Boolean).map((t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-')).join('.')}` : `:nth-of-type(${i + 1})`}`;
+  const sel = classes ? `${repeated.has(classes.join('.')) ? `main .section:nth-of-type(${i + 1}) ` : ''}.${classes.join('.')}` : `main .section${style ? `.${style.split(/[,\s]+/).filter(Boolean).map((t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-')).join('.')}` : `:nth-of-type(${i + 1})`}`;
   // the section's padding: from its edge to the first / last CONTENT box of any kind (text, picture, unit paint, control) — the inset chain
   // reads to the last TEXT, and a section ending in cards or a button read `bottom 615` (acs-about: no drafted padding was usable)
   const inset = live.inset;
