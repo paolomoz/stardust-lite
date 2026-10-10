@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const fams = ['Montserrat','Figtree','Outfit','Mulish','Nunito Sans','Raleway','Work Sans','Poppins','Barlow','Barlow Semi Condensed','Archivo','Red Hat Display','Lexend','Albert Sans','Plus Jakarta Sans','Inter','Manrope','DM Sans','Urbanist','Sora'];
+const href = 'https://fonts.googleapis.com/css2?' + fams.map(f => `family=${f.replace(/ /g,'+')}:wght@400;700`).join('&') + '&display=block';
+const b = await chromium.launch(); const p = await b.newPage();
+await p.setContent(`<link rel=stylesheet href="${href}"><div id=x></div>`);
+await p.waitForLoadState('networkidle');
+const r = await p.evaluate(async (fams) => { const out=[]; for (const f of fams) { await document.fonts.load(`700 82px "${f}"`); await document.fonts.load(`400 29px "${f}"`);
+ const s=document.createElement('span'); s.style.cssText=`font:700 82px "${f}";white-space:nowrap`; s.textContent='Win in the platform world'; document.body.append(s); const a=s.getBoundingClientRect().width;
+ s.style.cssText=`font:400 29px "${f}";white-space:nowrap`; s.textContent='Publicis is seamlessly connected through the Power of One, to partner'; const c=s.getBoundingClientRect().width; s.remove(); out.push(`${f}: h1 ${a.toFixed(0)} (928) quote-line ${c.toFixed(0)} (~880)`);} return out; }, fams);
+console.log(r.join('\n')); await b.close();

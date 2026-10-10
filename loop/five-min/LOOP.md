@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L2 | publicisgroupe.com en | eb6b282 (one-shot capture, chrome guess, free port, scoped blocks) | 4.6 (72 / 60 / 48 %) | **9.8** | 11.8 | 2 | 40 | ≈ 5 min own + 4.9 min tools to stop | 3.5 of the 9.8 min were `first` failing: a page scrolling inside main (captures 900 px tall), the hero missing from the split, no footer (author wrote none, da-put / harness exit), a busy port (IPv6 listener) |
 | L1 | marriott.com en-gb | e0e3428 (`first`) | 7.2 (79 / 65 / 47 %) | 34.0 | 36.5 | 10 | 54–57 | 18.3 / 15.7 to stop (104) | a first round at 47–79 %: header in main / no footer element (no nav, no footer), stitched live chunks shifted 53–112 px by a header that leaves the flow, carousel drafts on one selector |
 
 ## Iterations
@@ -29,3 +30,9 @@ Change: `scripts/first.mjs` chains probe → measure → triage → media + font
 continental's replay). Result on marriott: the first round at 7.2 min (3 × `first`: a busy port 8990 held by the orchestrator's own test server,
 then a missing nav / footer), but at 79 / 65 / 47 % — ten rounds to the stop at 34.0. Keep `first` (it removed the step-by-step turns:
 ≈ 2.5 min of tools to the first number); the bottleneck moved to the first round's quality and the capture.
+
+### L2 — one-shot capture, chrome guess, free port, per-section block scope
+Change: Chrome's captureBeyondViewport at scroll 0 instead of stitched chunks (marriott's pinned bar and seams gone; takeda's sticky header once);
+measure-page guesses header / footer when the page has none outside main; first picks a free port; repeated blocks scoped per section; the gate
+never reuses a stale build capture; shadow-root consent hosts hidden; author keeps card-wide links with their call to action. Result on
+publicis: stop at 9.8 min, two rounds of 40 s (1440 / 2560 under 3 % after one round). Keep all. Next: the four `first` failures (3.5 min).
