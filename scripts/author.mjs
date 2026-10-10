@@ -468,7 +468,9 @@ function footerDoc(root) {
 for (const [flag, root, make] of [['--nav', split.header, navDoc], ['--footer', split.footer, footerDoc]]) {
   const f = arg(flag, null); if (!f) continue;
   if (existsSync(resolve(f))) { console.error(`author: ${f} exists — left alone (chrome is authored once)`); continue; }
-  if (!root) { console.error(`author: ${flag}: the dump has no ${flag.slice(2)} root — nothing written`); continue; }
+  // no root (a page without a footer — publicis): an EMPTY chrome document, so the upload and the harness's fragment fetch have one (da-put
+  // exited 2 and the harness 4 on the missing footer.plain.html; the agent typed an empty document by hand)
+  if (!root) { mkdirSync(dirname(resolve(f)), { recursive: true }); writeFileSync(resolve(f), '<body>\n<header></header>\n<main>\n<div></div>\n</main>\n<footer></footer>\n</body>\n'); console.error(`author: ${flag}: the dump has no ${flag.slice(2)} root — an empty ${flag.slice(2)} document written (the source has none)`); continue; }
   mkdirSync(dirname(resolve(f)), { recursive: true }); writeFileSync(resolve(f), make(root)); console.error(`author: ${f} written from the dump's ${flag.slice(2)} root (simplest shape: review it)`);
 }
 

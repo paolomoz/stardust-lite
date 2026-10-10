@@ -121,7 +121,26 @@ export async function openPage(browser, url, { width = 1440, height = 900, scale
   return page;
 }
 
+/** A page that scrolls INSIDE an element (html / body fixed at the viewport height, `main#app` the scroller — publicis): every instrument read a
+ * 900 px page and the capture photographed one viewport. The scroller and its ancestors are unrolled (height auto, overflow visible, a fixed
+ * position made relative) so the document scrolls and every reading sees the whole page — the build is unrolled the same way. Returns the
+ * scroller's selector, or null when the window scrolls. */
+export async function unrollScroller(page) {
+  const sel = await page.evaluate(() => {
+    const docH = Math.max(document.body?.scrollHeight || 0, document.documentElement.scrollHeight); if (docH > innerHeight + 4) return null;
+    const cands = [...document.querySelectorAll('body *')].filter((e) => { const cs = getComputedStyle(e); return /(auto|scroll)/.test(cs.overflowY) && e.scrollHeight > e.clientHeight + 100 && e.clientHeight > innerHeight * 0.5; }).sort((a, b) => b.scrollHeight - a.scrollHeight);
+    const el = cands[0]; if (!el) return null;
+    for (let x = el; x && x !== document.documentElement; x = x.parentElement) x.setAttribute('data-sd-unrolled', '');
+    const st = document.createElement('style'); st.textContent = 'html, body { height: auto !important; min-height: 0 !important; max-height: none !important; overflow: visible !important; } [data-sd-unrolled] { height: auto !important; max-height: none !important; overflow: visible !important; } [data-sd-unrolled][style*="fixed"], [data-sd-unrolled] { position: relative !important; inset: auto !important; }';
+    document.head.append(st);
+    return `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}${[...el.classList].slice(0, 2).map((c) => `.${c}`).join('')}`;
+  }).catch(() => null);
+  if (sel && !page.__sdUnrolled) { page.__sdUnrolled = sel; console.error(`settle: the page scrolls inside ${sel} — unrolled (html / body auto, the scroller visible) so the readings and the capture see the whole page`); }
+  return sel;
+}
+
 export async function settle(page, step = 600, pause = 120, rest = 1500) {
+  await unrollScroller(page);
   await page.evaluate(async ({ step, pause, rest }) => {
     for (let y = 0; y < document.body.scrollHeight; y += step) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, pause)); }
     window.scrollTo(0, 0); await new Promise((r) => setTimeout(r, rest));
