@@ -138,6 +138,19 @@ rows.forEach((row, i) => {
     }
     lines.push(...textRules(items, base, sel).map((t) => t.css));
     lines.push(...mediaRules(items, base, sel));
+    // text OVER the picture (a hero, a banner): the texts' boxes sit inside the largest picture's box — the picture fills the block from
+    // behind and the text keeps its measured offset from the picture's edges (takeda: the title drafted below a 500 px image, +120 px)
+    const big = items.filter((it) => ['img', 'video'].includes(it.k) && onPage(it, base)).sort((a, b) => b.box[2] * b.box[3] - a.box[2] * a.box[3])[0];
+    const over = big ? items.filter((it) => isText(it) && it.t && onPage(it, base) && it.box[0] >= big.box[0] - 1 && it.box[0] + it.box[2] <= big.box[0] + big.box[2] + 1 && it.box[1] >= big.box[1] - 1 && it.box[1] + it.box[3] <= big.box[1] + big.box[3] + 1) : [];
+    if (big && over.length && big.box[2] * big.box[3] >= live.box[2] * live.box[3] * 0.4) {
+      const tx = Math.min(...over.map((it) => it.box[0])); const ty = Math.min(...over.map((it) => it.box[1])); const tb = Math.max(...over.map((it) => it.box[1] + it.box[3]));
+      const left = tx - big.box[0]; const top = ty - big.box[1]; const bottom = big.box[1] + big.box[3] - tb; const align = bottom < top * 0.6 ? 'flex-end' : top < bottom * 0.6 ? 'flex-start' : 'center';
+      lines.push(`${sel} { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: ${align}; min-height: ${px(big.box[3])}; }  /* ${over.length} text(s) over the ${big.box[2]}×${big.box[3]} picture: left ${left}, top ${top}, bottom ${bottom} */`);
+      lines.push(`${sel} picture { position: absolute; inset: 0; z-index: -1; } ${sel} picture img { width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; }`);
+      lines.push(`${sel} > div { padding: ${align === 'flex-start' ? px(top) : 0} ${px(Math.max(0, big.box[0] + big.box[2] - Math.max(...over.map((it) => it.box[0] + it.box[2]))))} ${align === 'flex-end' ? px(bottom) : 0} ${px(left)}; }`);
+      const mbig = m ? m.items.filter((it) => ['img', 'video'].includes(it.k) && onPage(it, mobile)).sort((a, b) => b.box[2] * b.box[3] - a.box[2] * a.box[3])[0] : null;
+      if (mbig) lines.push(`@media (max-width: ${bp - 1}px) { ${sel} { min-height: ${px(mbig.box[3])}; } }  /* the picture at ${mobile}: ${mbig.box[2]}×${mbig.box[3]} */`);
+    }
     lines.push(...controls(items, base, sel));
     // rhythm: the gaps between consecutive boxes (the brief's line), as a comment the margins come from
     // with a repeating unit the rhythm is read INSIDE the first unit: across a grid row it jumped from one card's heading to the next row's
