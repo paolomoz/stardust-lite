@@ -452,12 +452,32 @@ mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, doc);
 // ───────────────────────────── nav / footer (simplest shape, only when absent) ─────────────────────────────
 const chromeDoc = (sections) => `<body>\n  <header></header>\n  <main>\n${sections.map((s) => `<div>\n${s.filter(Boolean).join('\n')}\n</div>`).join('\n')}\n  </main>\n  <footer></footer>\n</body>\n`;
 function navDoc(root) {
-  const leaves = leavesOf(root); const brand = leaves.find((l) => l.kind === 'link' && (l.node.children || []).some((c) => kindOf(unwrap(c)) === 'picture'));
-  const list = leaves.find((l) => l.kind === 'list'); const used = new Set([brand, list].filter(Boolean));
-  const menu = list ? [listHtml(list.node, 'plain')] : [`<ul>${leaves.filter((l) => l.kind === 'link' && l !== brand).map((l) => `<li>${leafInline(l.node, 'plain')}</li>`).join('')}</ul>`];
-  if (!list) leaves.filter((l) => l.kind === 'link' && l !== brand).forEach((l) => used.add(l));
-  const tools = leaves.filter((l) => !used.has(l) && ['link', 'icon'].includes(l.kind) && !(list && list.node === l.parent)).map((l) => leafHtml(l)).filter(Boolean);
-  return chromeDoc([[brand ? linkHtml(brand.node, 'plain') : null], menu, tools]);
+  // by kind AND position (five-minute loop: the nav docs were a skip link and bare icons — toryburch; the logo as "Learn more" — publicis;
+  // 3 of 7 items — continental): off-screen leaves (skip links) dropped; brand = the logo link (a picture or an icon inside, the widest);
+  // a thin full-width text band above the main row (a promo bar) its own section after the three; tools = the right third; sections = the rest
+  const W = root.box ? root.box[2] : 1440; const X0 = root.box ? root.box[0] : 0;
+  const onScreen = (l) => { const b = l.node.box; return !b || (b[0] + b[2] > X0 + 1 && b[0] < X0 + W - 1 && b[2] > 2 && b[3] > 2); };
+  const leaves = leavesOf(root).filter(onScreen);
+  const hasMark = (n) => (n.children || []).some((c) => ['picture', 'icon'].includes(kindOf(unwrap(c))) || /^(svg|img)$/i.test(String(c.tag || '')) || hasMark(c));
+  // a card-wide link leaf (wrapLink: the picture walked before it, its own children dropped) counts as a logo link too — publicis' brand was empty
+  const brand = leaves.filter((l) => l.kind === 'link' && (hasMark(l.node) || l.wrapLink)).sort((a, b) => (b.node.box?.[2] || 0) - (a.node.box?.[2] || 0))[0] || null;
+  const pic = brand ? leaves[leaves.indexOf(brand) - 1] : null; if (brand?.wrapLink && pic && ['picture', 'icon'].includes(pic.kind)) leaves.splice(leaves.indexOf(pic), 1);
+  const label = (n) => { const t = String(n.text || n.aria || n.title || n.alt || '').trim(); return /^learn more$/i.test(t) && n !== brand?.node ? '' : t; };
+  const mainTop = brand?.node.box ? brand.node.box[1] : Math.min(...leaves.map((l) => l.node.box?.[1] ?? 1e9));
+  const promo = leaves.filter((l) => l !== brand && l.node.box && l.node.box[1] + l.node.box[3] <= mainTop - 2 && ['text', 'link'].includes(l.kind));
+  const used = new Set([brand, ...promo].filter(Boolean));
+  const list = leaves.find((l) => l.kind === 'list' && !used.has(l));
+  const right = (l) => l.node.box && l.node.box[0] >= X0 + W * 0.66;
+  const tools = leaves.filter((l) => !used.has(l) && l !== list && right(l) && ['link', 'icon', 'control'].includes(l.kind));
+  tools.forEach((l) => used.add(l)); if (list) used.add(list);
+  const item = (l) => (l.kind === 'link' ? (label(l.node) ? `<li>${leafInline({ ...l.node, text: label(l.node) }, 'plain')}</li>` : null) : label(l.node) ? `<li>${esc(label(l.node))}</li>` : null); // an unlabelled link (an icon-only country selector) is not an item
+  const menu = list ? [listHtml(list.node, 'plain')] : [`<ul>${leaves.filter((l) => !used.has(l) && ['link', 'control'].includes(l.kind)).map(item).filter(Boolean).join('')}</ul>`];
+  const toolsHtml = tools.length ? [`<ul>${tools.map((l) => item(l) || (l.kind === 'icon' ? `<li>${leafHtml(l) || ''}</li>` : null)).filter(Boolean).join('')}</ul>`] : [];
+  const bl = brand ? (String(brand.node.aria || brand.node.title || '').trim() || (pic?.node?.alt || '').trim() || (/^learn more$/i.test(String(brand.node.text || '')) ? '' : String(brand.node.text || '').trim()) || 'Home') : null;
+  const brandHtml = brand ? `<p><a href="${esc(brand.node.href || '/')}">${esc(bl)}</a></p>` : null;
+  const sections = [[brandHtml], menu, toolsHtml];
+  if (promo.length) sections.push(promo.map((l) => leafHtml(l)).filter(Boolean));
+  return chromeDoc(sections);
 }
 function footerDoc(root) {
   let n = root; while (n.children?.length === 1 && !n.text) n = n.children[0];

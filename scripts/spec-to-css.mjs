@@ -70,7 +70,8 @@ function unitOf(items, W, contentW) {
   const isCtl = (it) => /^(a|button)$/.test(it.tag) || /\b(btn|button)\b/i.test(String(it.cls || ''));
   const holds = (it) => items.filter((o) => o !== it && o.k !== 'paint' && onPage(o, W) && inBox(o, it.box)).length >= 2;
   const shape = (m, synth) => {
-    const xs = [...new Set(m.filter((it) => it.box[1] === m[0].box[1]).map((it) => it.box[0]))].sort((a, b) => a - b);
+    // the columns are the units FULLY in the viewport: a slider's half-shown next card made toryburch's 5-up row a 6-column grid
+    const xs = [...new Set(m.filter((it) => it.box[1] === m[0].box[1] && it.box[0] >= -1 && it.box[0] + it.box[2] <= W + 1).map((it) => it.box[0]))].sort((a, b) => a - b);
     const gap = xs.length > 1 ? xs[1] - xs[0] - m[0].box[2] : null; const ys = [...new Set(m.map((it) => it.box[1]))].sort((a, b) => a - b);
     let first = m[0]; let h = m[0].box[3];
     if (synth) { const b = m[0].box; const nextY = ys.length > 1 ? ys[1] : Infinity; const col = items.filter((o) => o.k !== 'paint' && onPage(o, W) && o.box[0] >= b[0] - 1 && o.box[0] + o.box[2] <= b[0] + b[2] + 1 && o.box[1] >= b[1] && o.box[1] < nextY); h = Math.max(...col.map((o) => o.box[1] + o.box[3])) - b[1]; first = { tag: 'div', cls: '(image column)', box: [b[0], b[1], b[2], h] }; }
