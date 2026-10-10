@@ -11,7 +11,7 @@
 //   --skip probe,measure,media,author,css re-runs from where the case dir already has the outputs (e.g. after editing triage.md: --skip probe,measure).
 // Exit: 0 the round ran (its own target line says whether it is under) · 1 a step failed before the round.
 import { spawnSync, spawn } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import net from 'node:net';
@@ -53,6 +53,7 @@ const finish = (code, extra = '') => {
 // 1 tier + profile, 2 measure (the profile's flags are read by every instrument from migration/site.json)
 if (!skip.has('probe')) step('probe-load', S('probe-load'), [url, '360,1440,2560', '--profile', join('migration', 'site.json')], { show: 4, note: (r) => (/^tier: (.*)$/m.exec(r.stdout) || [])[1] || null });
 if (!skip.has('measure')) {
+  rmSync(join(dir, 'gate'), { recursive: true, force: true }); // a new measurement makes the last round's cached live capture and split stale (toryburch: deleted by hand)
   const mArgs = [url, '--out', measure, ...(typeof arg('--sections', null) === 'string' ? ['--sections', arg('--sections')] : []), ...(typeof arg('--main', null) === 'string' ? ['--main', arg('--main')] : []), ...['--header', '--footer'].flatMap((f) => (typeof arg(f, null) === 'string' ? [f, arg(f)] : []))];
   const r = step('measure-page', S('measure-page'), mArgs, { show: 0, ok: () => existsSync(content), note: (r2) => { try { const s = JSON.parse(readFileSync(join(measure, 'summary.json'), 'utf8')); return `${Object.keys(s.files || {}).length} widths, sections ${s.sectionsSelector || '?'}`; } catch { return null; } } });
   const notes = String(r.stdout).split('\n').filter((l) => /^note: |CHALLENGE|FONT LOAD FAILED|BROKEN/.test(l)).slice(0, 8); if (notes.length) console.log(notes.map((l) => `   ${l.slice(0, 220)}`).join('\n'));
