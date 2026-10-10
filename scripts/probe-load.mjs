@@ -30,7 +30,8 @@ const challenge = await p.evaluate(() => { const t = `${document.title} ${docume
 if (challenge) { console.log(`CHALLENGE at ${W}: ${challenge} — this load is a bot challenge, not the page`); if (!tier.chrome) { tier.chrome = true; tier.notes.push(`a bot challenge at ${W} (${challenge}): --chrome (the installed Chrome) on every instrument`); } }
 const info = await p.evaluate(firstLook);
 // a popup / modal layer over the page (a locale chooser, a newsletter): hidden on every instrument — toryburch measured two of them as sections
-for (const sel of await hideModals(p)) if (!tier.hide.includes(sel)) { tier.hide.push(sel); tier.notes.push(`a modal layer at ${W}: ${sel} — hidden on every instrument`); }
+// a bare tag (`div`) would hide every div: only id / class selectors reach the profile (the in-page hide marks the node itself)
+for (const sel of await hideModals(p)) if (/[#.]/.test(sel) && !tier.hide.includes(sel)) { tier.hide.push(sel); tier.notes.push(`a modal layer at ${W}: ${sel} — hidden on every instrument`); }
 console.log(JSON.stringify(info, null, 1));
 if (!info.fixed.length) console.log(`no fixed or sticky layer at ${W}`);
 if (info.tallHeader) console.log(`NOTE: ${info.tallHeader}`);

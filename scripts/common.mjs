@@ -152,6 +152,7 @@ export async function hideModals(page) {
       const cs = getComputedStyle(e); if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0) continue;
       const r = e.getBoundingClientRect(); const area = Math.max(0, Math.min(r.right, vw) - Math.max(r.left, 0)) * Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
       if (area < vw * vh * 0.3) continue; if (r.top <= 2 && r.height < 220) continue; // a header bar
+      const z = Number(cs.zIndex); if (cs.zIndex === 'auto' || !(z >= 10)) continue; // a modal sits ABOVE the page; a fixed background (a parallax image — deloitte's cmp-cta__bg-img) sits behind it
       if (e.closest('header') || e.querySelector('main, [role=main]') || e.matches('main, [role=main]') || e.hasAttribute('data-sd-unrolled')) continue; // the page itself
       if (out.some((o) => o.el.contains(e))) continue;
       out.push({ el: e, sel: `${e.tagName.toLowerCase()}${e.id ? `#${e.id}` : ''}${[...e.classList].slice(0, 2).map((c) => `.${c}`).join('')}` });
