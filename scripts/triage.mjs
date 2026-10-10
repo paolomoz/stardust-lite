@@ -44,9 +44,9 @@ if (arg('--from-md', null)) {
       const cell = c[iBlock];
       // `drop` (or `header` / `footer`) in the block column: the row is not authored — a header band inside main, a skip-link strip (deloitte:
       // the header row could not leave the page; si: the skip links authored and removed by a case script). It keeps its index so the split aligns
-      const dropNow = /^`?(drop|header|footer)`?$/i.test(cell.trim()); if (dropNow !== !!row.drop) { row.drop = dropNow || undefined; changed += 1; row.notes = [...(row.notes || []), dropNow ? `dropped in ${basename(mdFile)}` : `restored in ${basename(mdFile)}`]; } if (dropNow) continue;
+      const dm = /^`?(drop|header|footer)`?$/i.exec(cell.trim()); const dropNow = dm ? dm[1].toLowerCase() : null; if ((dropNow || null) !== (row.drop || null)) { row.drop = dropNow || undefined; changed += 1; row.notes = [...(row.notes || []), dropNow ? `dropped in ${basename(mdFile)}` : `restored in ${basename(mdFile)}`]; } if (dropNow) continue;
       const isDefault = cell.trim() === '—';
-      const m = cell.match(/`([a-z][a-z0-9-]*)(?:\s*\(([^)]*)\))?`/); const isNew = /\*\*new\*\*/.test(cell);
+      const m = cell.match(/`([a-z][a-z0-9-]*)(?:\s*\(([^)]*)\))?`/) || cell.trim().match(/^([a-z][a-z0-9-]*)(?:\s*\(([^)]*)\))?$/); const isNew = /\*\*new\*\*/.test(cell); // a bare `hero` too (equitable: the label without backticks was ignored)
       const kind = isDefault ? 'default' : isNew ? 'new' : m ? 'inventory' : row.match.kind;
       const block = isDefault ? null : m ? m[1] : row.match.block; const variant = isDefault ? null : m && m[2] && m[2] !== '?' ? m[2].trim() : m ? null : row.match.variant;
       if (kind !== row.match.kind || block !== row.match.block || (variant || null) !== (row.match.variant || null)) { row.match = { ...row.match, kind, block, variant: variant || null, confidence: kind === 'inventory' ? 'agent' : row.match.confidence }; row.notes = [...(row.notes || []), `edited in ${basename(mdFile)}`]; changed += 1; }

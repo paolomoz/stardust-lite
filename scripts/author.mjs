@@ -485,7 +485,10 @@ function footerDoc(root) {
   const sections = groups.map((g) => { const leaves = leavesOf(g).filter((l) => !['control', 'hr'].includes(l.kind)); const out = []; let i = 0; while (i < leaves.length) { if (leaves[i].kind === 'link' && leaves[i + 1]?.kind === 'link') { const run = []; while (i < leaves.length && leaves[i].kind === 'link') run.push(leaves[i++]); out.push(`<ul>${run.map((l) => `<li>${leafInline(l.node, 'plain')}</li>`).join('')}</ul>`); } else out.push(leafHtml(leaves[i++])); } return out; }).filter((s) => s.length);
   return chromeDoc(sections);
 }
-for (const [flag, root, make] of [['--nav', split.header, navDoc], ['--footer', split.footer, footerDoc]]) {
+// rows the triage marked `header` / `footer` are the chrome document's source when the dump has no such root (equitable: the footer fragment
+// was two content rows; marking them `footer` only dropped them and footer.html stayed empty)
+const markedRoot = (kind) => { const nodes = mainSections.map((r, i) => (r.drop === kind ? split.sections[i] : null)).filter(Boolean); if (!nodes.length) return null; const bs = nodes.map((n) => n.box).filter(Boolean); return { tag: 'div', box: bs.length ? [Math.min(...bs.map((b) => b[0])), Math.min(...bs.map((b) => b[1])), Math.max(...bs.map((b) => b[0] + b[2])) - Math.min(...bs.map((b) => b[0])), Math.max(...bs.map((b) => b[1] + b[3])) - Math.min(...bs.map((b) => b[1]))] : null, children: nodes }; };
+for (const [flag, root, make] of [['--nav', split.header || markedRoot('header'), navDoc], ['--footer', split.footer || markedRoot('footer'), footerDoc]]) {
   const f = arg(flag, null); if (!f) continue;
   if (existsSync(resolve(f))) { console.error(`author: ${f} exists — left alone (chrome is authored once)`); continue; }
   // no root (a page without a footer — publicis): an EMPTY chrome document, so the upload and the harness's fragment fetch have one (da-put

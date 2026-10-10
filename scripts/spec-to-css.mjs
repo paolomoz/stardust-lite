@@ -245,7 +245,5 @@ if (pageCap && pageCap < base - 16) {
   sd.push(`/* the page cap at ${base}: ${pageCap}${capP ? `; at ${probe}: ${capP.w}${fluid ? ' (it grows: a fraction of the viewport, held at the probe value)' : ' (fixed)'}` : ''} */\nmain > .section > div { max-width: ${fluid ? `min(${px(capP.w)}, ${Number(((100 * pageCap) / base).toFixed(2))}vw)` : px(pageCap)}; margin-left: auto; margin-right: auto; }`);
 }
 if (pageCap && pageCap < base - 16 && capM) sd.push(`@media (max-width: ${(bp || 900) - 1}px) {  /* at ${mobile} the column is the viewport less the gutter (content from x ${capM.x}) */\n  main > .section > div { max-width: none;${capM.x > 0 && capM.x < 48 ? ` padding-left: ${px(capM.x)}; padding-right: ${px(capM.x)};` : ''} }\n}`);
-// every section rule at specificity 0 (`:where(…)`): the regenerated part of styles.css sits below the agent's own rules and won ties (bms: a
-// wasted round at 360 until `body main > .section`)
-const sdText = `${sd.join('\n\n')}\n`.replace(/^(\s*(?:@media[^{]*\{\s*)?)(main \.section[^{]*?)\s*\{/gm, (m0, pre, sel) => (/^main \.section\S*$/.test(sel.trim()) ? `${pre}:where(${sel.trim()}) {` : m0)); // only the section's own box (padding, background): its text rules keep their weight over the page's `p`
+const sdText = `${sd.join('\n\n')}\n`; // imported FIRST by styles.css (first.mjs): its normal specificity beats the foundation's `main > .section`, the agent's rules below win ties
 mkdirSync('styles', { recursive: true }); writeFileSync(join('styles', 'sections-draft.css'), sdText); console.log(`styles/sections-draft.css: ${sectionsDraft.length} rule(s)`);

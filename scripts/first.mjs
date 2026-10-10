@@ -12,7 +12,7 @@
 //   column removes a row) `--skip probe,measure,media` applies the edit (triage --from-md) and re-authors.
 // Exit: 0 the round ran (its own target line says whether it is under) · 1 a step failed before the round.
 import { spawnSync, spawn } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import net from 'node:net';
@@ -24,7 +24,7 @@ const here = dirname(fileURLToPath(import.meta.url)); const S = (n) => join(here
 const template = String(arg('--template', 'home')); const noDa = process.argv.includes('--no-da');
 // a free port: a busy 8990 (another serve left running) cost marriott a whole `first` re-run — the harness refuses a port another dir owns
 const free = (p) => new Promise((res) => { const srv = net.createServer(); srv.once('error', () => res(false)); srv.once('listening', () => srv.close(() => res(true))); srv.listen(p); }); // no host: the dual-stack bind sees a serve listening on :: (publicis: 8990 read free on 127.0.0.1, busy on ::)
-let port = Number(arg('--port', 8990)); const ownServe = () => { const pid = spawnSync('lsof', ['-nP', '-t', `-iTCP:${port}`, '-sTCP:LISTEN'], { encoding: 'utf8' }).stdout.trim().split('\n')[0]; if (!pid) return false; const cwd = (spawnSync('lsof', ['-a', '-p', pid, '-d', 'cwd', '-Fn'], { encoding: 'utf8' }).stdout.split('\n').find((l) => l.startsWith('n')) || '').slice(1); return !!cwd && resolve(cwd) === resolve(process.cwd()); }; // our own serve from an earlier `first`
+let port = Number(arg('--port', 8990)); const ownServe = () => { const pid = spawnSync('lsof', ['-nP', '-t', `-iTCP:${port}`, '-sTCP:LISTEN'], { encoding: 'utf8' }).stdout.trim().split('\n')[0]; if (!pid) return false; const cwd = (spawnSync('lsof', ['-a', '-p', pid, '-d', 'cwd', '-Fn'], { encoding: 'utf8' }).stdout.split('\n').find((l) => l.startsWith('n')) || '').slice(1); if (!cwd) return false; const here = realpathSync(process.cwd()); let there = cwd; try { there = realpathSync(cwd); } catch { /* gone */ } return there === here || there.startsWith(`${here}/`); }; // the serve runs from proto/ inside the repo (equitable: each `first` took a new port) // our own serve from an earlier `first`
 if (!(await free(port)) && !ownServe()) { for (let p = port + 1; p < port + 40; p += 1) if (await free(p)) { console.log(`first: port ${port} is busy — using ${p}`); port = p; break; } }
 const skip = new Set(String(arg('--skip', '') || '').split(',').filter(Boolean));
 const fstab = existsSync('fstab.yaml') ? readFileSync('fstab.yaml', 'utf8') : ''; const m = /content\.da\.live\/([^/\s]+)\/([^/\s]+)/.exec(fstab);
@@ -89,11 +89,17 @@ if (daMedia) { const d = await daMedia; steps.push({ step: 'da-put media (in par
 // 6 the CSS drafts as the CSS: blocks/<name>/<name>.css (header / footer appended below the foundation rules), sections-draft into styles.css
 if (!skip.has('css')) {
   step('spec-to-css', S('spec-to-css'), [measure, '--triage', triage, '--doc', doc, '--out', 'blocks', '--force'], { show: 0, note: (r) => `${(r.stdout.match(/\.css: /g) || []).length} files` });
-  const sd = join('styles', 'sections-draft.css'); const st = join('styles', 'styles.css'); const MARK = '/* ── sections-draft (first.mjs; below this line is regenerated) ── */';
-  if (existsSync(sd) && existsSync(st)) writeFileSync(st, `${readFileSync(st, 'utf8').split(MARK)[0].trimEnd()}\n\n${MARK}\n${readFileSync(sd, 'utf8')}`);
+  // the generated CSS in its own files, imported FIRST: the foundation's rules lose to its specificity, the agent's rules in styles.css come
+  // later and win ties — appended below a mark, the drafts beat the agent's same-specificity rules by order (equitable: 2 of 3 rounds)
+  const st = join('styles', 'styles.css'); const OLD = '/* ── sections-draft (first.mjs; below this line is regenerated) ── */';
+  if (existsSync(st)) { let css = readFileSync(st, 'utf8').split(OLD)[0].trimEnd(); const imports = ["@import url('sections-draft.css');", "@import url('elements.css');"]; css = css.split('\n').filter((l) => !imports.includes(l.trim())).join('\n'); writeFileSync(st, `${imports.join('\n')}\n${css}\n`); }
+  if (!existsSync(join('styles', 'elements.css'))) writeFileSync(join('styles', 'elements.css'), '/* style-pass writes the element pass here */\n');
 }
 // 7 the prototype and the first round at the three widths
 const h = step('harness', S('harness'), [doc, '--serve', 'proto', '--name', slug, '--port', String(port), '--fragments', host, '--content', content, '--site-repo', '.', '--no-lint'], { show: 0, note: (r) => [(/(\d+) blocks? loaded/.exec(r.stdout) || [])[0], (/doc height (\d+)/.exec(r.stdout) || [])[0], (/(\d+) text.*not in the capture/.exec(`${r.stdout}${r.stderr}`) || [])[0]].filter(Boolean).join(' · ') });
 if (h.status) finish(1, 'first: the harness failed — read its output above');
+// the element pass is opt-in: on bms's replay it moved the first round 33.9 / 30.1 / 17.3 → 35.5 / 30.7 / 17.6 (the first round's error is layout,
+// not type) — kept as an instrument, not a default step
+if (process.argv.includes('--style-pass')) step('style-pass', S('style-pass'), [measure, `http://localhost:${port}/${slug}.harness.html`, '--out', join('styles', 'elements.css')], { show: 0, note: (r) => String(r.stdout).split('\n').filter((l) => /^style-pass \d+/.test(l)).map((l) => l.replace(/^style-pass /, '')).join(' · ').slice(0, 160) });
 const g = step('gate --round', S('gate'), ['--live', url, '--build', `http://localhost:${port}/${slug}.harness.html`, '--out', join(dir, 'gate'), '--origin', measure, '--round', '--widths', '360,1440,2560', '--triage', triage], { show: 0, note: (r) => (/^target .*/m.exec(r.stdout) || [''])[0] });
 const out = String(g.stdout); const from = out.indexOf('\n| width'); finish(0, `\n${from >= 0 ? out.slice(from).trim() : tail(out, 40)}\n\nprototype: http://localhost:${port}/${slug}.harness.html · document ${doc} · CSS blocks/*/ and styles/styles.css (sections-draft part) · next: CSS rounds, \`gate … --round --widths 360,1440,2560\` (the same --out ${join(dir, 'gate')})`);

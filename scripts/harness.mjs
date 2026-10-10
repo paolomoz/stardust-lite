@@ -67,6 +67,10 @@ if (!arg('--no-lint', false)) {
 }
 
 const raw = readFileSync(src, 'utf8');
+// a block the document names without a folder in the site repo gets an empty decorate and stylesheet: the runtime 404'd its JS and the block
+// never reached `loaded` (equitable: a hand-made feedback block) — the CSS rounds then fill the stylesheet
+{ const repo = String(arg('--site-repo', '.')); const names = new Set([...raw.matchAll(/<div class="([a-z][a-z0-9-]*)(?:[ "])/g)].map((m) => m[1]).filter((n) => !['section-metadata', 'metadata'].includes(n)));
+  for (const n of names) { const d = join(repo, 'blocks', n); if (existsSync(d)) continue; mkdirSync(d, { recursive: true }); writeFileSync(join(d, `${n}.js`), `/* ${n} — created by the harness (no block folder): structure kept as authored */\nexport default function decorate() {}\n`); writeFileSync(join(d, `${n}.css`), `/* ${n} */\n`); console.log(`harness: blocks/${n}/ created (empty decorate + stylesheet) — the document names a block the repo did not have`); } }
 // an unbalanced inline tag swallows everything after it (the metadata block parsed inside a <strong>: `closest('main > div')` null, natixis): count before folding
 for (const tag of ['strong', 'b', 'em', 'i', 'a', 'span']) { const o = (raw.match(new RegExp(`<${tag}\\b`, 'gi')) || []).length; const c = (raw.match(new RegExp(`</${tag}>`, 'gi')) || []).length; if (o !== c) console.log(`harness: <${tag}> opened ${o} times, closed ${c} — an unbalanced inline tag shifts every later node (the browser re-parents it); fix the document`); }
 const b0 = await launch(); const p0 = await b0.newPage();
