@@ -27,7 +27,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
-import { arg, davidsLint, launch } from './common.mjs';
+import { arg, davidsLint, launch, daToken } from './common.mjs';
 
 if (typeof arg('--pages', null) === 'string') {
   const list = JSON.parse(readFileSync(arg('--pages'), 'utf8')); const pages = list.pages || []; const docDir = String(arg('--doc-dir', 'doc')); const serveDir0 = arg('--serve');
@@ -126,7 +126,7 @@ if (arg('--fragments', null)) {
     if (existsSync(local) && r && r.ok) {
       const served = await r.clone().text(); const norm = (t) => t.replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim(); const lt = readFileSync(local, 'utf8'); const lm = lt.slice(lt.indexOf('<main'), lt.lastIndexOf('</main>'));
       if (norm(lm.replace(/^<main>/, '')) !== norm(served)) {
-        if (process.env.DA_TOKEN && hm) { const up = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'da-put.mjs'), `${hm[3]}/${hm[2]}/${hm[1]}`, local, '--to', dirname(path).replace(/^\//, '')], { encoding: 'utf8' }); console.log(`harness: ${k} document changed locally — uploaded and previewed again (${up.status ? `da-put exit ${up.status}` : 'ok'})`); r = await fetch(`${host}${path}.plain.html`, { cache: 'no-store' }).catch(() => null); }
+        if (daToken() && hm) { const up = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'da-put.mjs'), `${hm[3]}/${hm[2]}/${hm[1]}`, local, '--to', dirname(path).replace(/^\//, '')], { encoding: 'utf8' }); console.log(`harness: ${k} document changed locally — uploaded and previewed again (${up.status ? `da-put exit ${up.status}` : 'ok'})`); r = await fetch(`${host}${path}.plain.html`, { cache: 'no-store' }).catch(() => null); }
         else console.log(`harness: ${k} document changed locally but the prototype shows the previewed one — da-put ${local} (no DA_TOKEN here)`);
       }
     }

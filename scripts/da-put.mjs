@@ -13,7 +13,7 @@
 //   --dry prints what would be uploaded and previewed (no token needed, nothing sent) — with or without --pages.
 import { existsSync, readFileSync } from 'node:fs';
 import { basename, dirname, extname, join } from 'node:path';
-import { arg, siteProfile } from './common.mjs';
+import { arg, siteProfile, daToken } from './common.mjs';
 
 const VALUED = ['--to', '--as', '--pages', '--doc-dir', '--site'];
 const positional = process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && VALUED.includes(all[i - 1])));
@@ -29,7 +29,7 @@ if (typeof pagesFile === 'string') {
   for (const p of JSON.parse(readFileSync(pagesFile, 'utf8')).pages || []) { const f = join(docDir, `${p.slug}.html`); const path = String(p.docPath || `/drafts/${p.slug}`).replace(/^\/|\/$/g, ''); items.push({ file: f, to: dirname(path) === '.' ? '' : dirname(path), name: `${basename(path)}.html`, slug: p.slug }); }
 } else items = positional.map((f) => ({ file: f, to, name: positional.length === 1 && arg('--as', null) ? arg('--as') : basename(f) }));
 if (!org || !site || !branch || !items.length || (typeof pagesFile !== 'string' && !to)) { console.error('usage: da-put.mjs <org>/<site>/<branch> <file…> --to <da-folder> [--as <name>] [--no-preview] [--dry]\n       da-put.mjs [<org>/<site>/<branch>] --pages <pages.json> [--doc-dir doc] [--dry]   (target from the profile\'s da when omitted)'); process.exit(1); }
-const token = process.env.DA_TOKEN; if (!token && !dry) { console.error('da-put: DA_TOKEN is not set (source ~/.claude/.env)'); process.exit(1); }
+const token = daToken(); if (!token && !dry) { console.error('da-put: DA_TOKEN is not set (source ~/.claude/.env)'); process.exit(1); }
 const MIME = { '.html': 'text/html', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.mp4': 'video/mp4', '.pdf': 'application/pdf', '.json': 'application/json' };
 let failed = 0;
 for (const it of items) {

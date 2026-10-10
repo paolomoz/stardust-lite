@@ -14,7 +14,8 @@
 //        node media-fetch.mjs <media-<W>.json> --fonts fonts   the font FILES: media-list's requested font URLs downloaded, and the @font-face
 //                                                             faces embedded as data: URIs written as files (`<family>-<weight>-<style>.woff2`;
 //                                                             a case font-dump.mjs did this — covermore, loop r6); then fonts.css declares them
-import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync, statSync, unlinkSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { join, extname, dirname, relative, resolve } from 'node:path';
 import { arg, launch, contextOptions } from './common.mjs';
 let browserPage = null; // --browser: one context, one page, every URL a navigation
@@ -122,6 +123,14 @@ for (const u of [...new Set(urls)]) {
   const stem = name.replace(/\.[a-z0-9]+$/, ''); const e = extname(name); let k = 1; while (taken.has(name)) { name = `${stem}-${k}${e}`; k += 1; }
   writeFileSync(join(out, name), buf); taken.add(name); manifest[full] = name; n += 1;
   console.log(`${r.status} ${type.padEnd(14)} ${String(buf.length).padStart(8)}  ${full.slice(-80)} → ${name}`);
+}
+// an animated GIF over 10 MB is not a picture the pipeline takes (bms: a 49.6 MB gif authored, broken on the prototype, an ffmpeg still by hand):
+// its first frame as a JPEG, the manifest pointing at the still — register the motion
+for (const [u, f] of Object.entries(manifest)) {
+  const fp = join(out, f); if (!/\.gif$/i.test(f) || !existsSync(fp) || statSync(fp).size < 10 * 1024 * 1024) continue;
+  const still = f.replace(/\.gif$/i, '-still.jpg'); const r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', fp, '-frames:v', '1', '-q:v', '3', join(out, still)], { encoding: 'utf8' });
+  if (!r.error && !r.status && existsSync(join(out, still))) { manifest[u] = still; unlinkSync(fp); console.log(`media-fetch: ${f} is ${(statSync(join(out, still)).size / 1024).toFixed(0)} KB as its first frame (${still}) — the gif was over 10 MB; register the motion`); }
+  else console.error(`media-fetch: ${f} is over 10 MB and no ffmpeg still could be made — replace it before the upload`);
 }
 writeFileSync(join(out, 'manifest.json'), JSON.stringify(manifest, null, 1));
 console.log(`media-fetch: ${n} fetched, ${Object.keys(manifest).length} in ${out}/manifest.json${failed ? `, ${failed} failed` : ''}`);

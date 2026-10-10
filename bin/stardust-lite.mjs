@@ -49,6 +49,9 @@ if (cmd === 'init') {
   const gi = join(cwd, '.gitignore'); const ignore = '\n# stardust-lite evidence that regenerates\nmigration/**/*.png\nmigration/**/*.jpg\nmigration/**/proto/\nmigration/**/media/\n';
   if (!existsSync(gi) || !readFileSync(gi, 'utf8').includes('stardust-lite evidence')) appendFileSync(gi, ignore);
   console.log(`stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at ${rel}/METHOD.md, rollout at ${rel}/ROLLOUT.md)`);
+  // the measurements and captures are evidence, not site code: kept out of git (bms committed measure/ with the source's dom-*.html — AGENTS.md
+  // says captures are not committed)
+  { const gi = join(cwd, '.gitignore'); const block = '\n# stardust-lite: measurements and captures are evidence, not site code\nmigration/cases/*/measure/\nmigration/cases/*/gate*/\nmigration/cases/*/media/\nproto/\n*.harness.html\nTIMING.log\n'; const cur = existsSync(gi) ? readFileSync(gi, 'utf8') : ''; if (!cur.includes('stardust-lite: measurements')) { writeFileSync(gi, cur + block); console.log('stardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git'); } }
   if (rest.includes('--foundation')) {
     // the foundation is site code the operator owns after copying: an existing file is never overwritten
     const src = join(ROOT, 'templates', 'foundation'); const wrote = []; const skipped = [];

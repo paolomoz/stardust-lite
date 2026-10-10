@@ -184,7 +184,7 @@ rows.forEach((row, i) => {
       const mi = m.items.filter((it) => onPage(it, mobile)); const mr = xr(mi, mobile); const mu = unitOf(mi, mobile, mr ? mr[1] - mr[0] : null);
       const prevSigs = new Map(textRules(items, base, sel).map((t) => [t.tag, t.sig])); const mt = textRules(mi, mobile, `  ${sel}`, prevSigs);
       const mob = [];
-      const [mTop, mBottom] = padOf(m, m.items.filter((it) => onPage(it, mobile))); if (mTop !== null && (mTop !== padTop || mBottom !== padBottom)) mob.push(`  ${sectionSel} { padding: ${px(mTop)} 0 ${px(mBottom)}; }  /* edge → first / last content at ${mobile} */`);
+      const [mTop, mBottom] = padOf(m, m.items.filter((it) => onPage(it, mobile))); if (mTop !== null && (mTop !== padTop || mBottom !== padBottom)) { const rule = `${sectionSel} { padding: ${px(mTop)} 0 ${px(mBottom)}; }  /* edge → first / last content at ${mobile} */`; if (classes) sectionsDraft.push(`@media (max-width: ${bp - 1}px) { ${rule} }`); else mob.push(`  ${rule}`); } // a block section's mobile padding with its base padding in sections-draft — in the block file it was lost on a rewrite (bms)
       if (u && (!mu || mu.perRow !== u.perRow)) mob.push(`  ${sel} { grid-template-columns: ${mu ? `repeat(${mu.perRow}, minmax(0, 1fr))` : '1fr'};${mu && mu.rowGap !== null ? ` row-gap: ${px(mu.rowGap)};` : ''} }  /* unit ${mu ? `${mu.n} × ${mu.w}×${mu.h}, ${mu.perRow} per row` : 'stacked'} at ${mobile} */`);
       mob.push(...mt.map((t) => t.css)); mob.push(...mediaRules(mi, mobile, `  ${sel}`).filter((x) => !mediaRules(items, base, sel).map((y) => y.replace(sel, '')).includes(x.replace(`  ${sel}`, ''))));
       if (mob.length) lines.push(`@media (max-width: ${bp - 1}px) {  /* the source's breakpoint ${bp} (media queries by count: ${(summary.breakpoints || []).slice(0, 3).join(', ') || 'unknown — 900 assumed'}) */\n${mob.join('\n')}\n}`);
@@ -245,4 +245,7 @@ if (pageCap && pageCap < base - 16) {
   sd.push(`/* the page cap at ${base}: ${pageCap}${capP ? `; at ${probe}: ${capP.w}${fluid ? ' (it grows: a fraction of the viewport, held at the probe value)' : ' (fixed)'}` : ''} */\nmain > .section > div { max-width: ${fluid ? `min(${px(capP.w)}, ${Number(((100 * pageCap) / base).toFixed(2))}vw)` : px(pageCap)}; margin-left: auto; margin-right: auto; }`);
 }
 if (pageCap && pageCap < base - 16 && capM) sd.push(`@media (max-width: ${(bp || 900) - 1}px) {  /* at ${mobile} the column is the viewport less the gutter (content from x ${capM.x}) */\n  main > .section > div { max-width: none;${capM.x > 0 && capM.x < 48 ? ` padding-left: ${px(capM.x)}; padding-right: ${px(capM.x)};` : ''} }\n}`);
-mkdirSync('styles', { recursive: true }); writeFileSync(join('styles', 'sections-draft.css'), `${sd.join('\n\n')}\n`); console.log(`styles/sections-draft.css: ${sectionsDraft.length} rule(s)`);
+// every section rule at specificity 0 (`:where(…)`): the regenerated part of styles.css sits below the agent's own rules and won ties (bms: a
+// wasted round at 360 until `body main > .section`)
+const sdText = `${sd.join('\n\n')}\n`.replace(/^(\s*(?:@media[^{]*\{\s*)?)(main \.section[^{]*?)\s*\{/gm, (m0, pre, sel) => (/^main \.section\S*$/.test(sel.trim()) ? `${pre}:where(${sel.trim()}) {` : m0)); // only the section's own box (padding, background): its text rules keep their weight over the page's `p`
+mkdirSync('styles', { recursive: true }); writeFileSync(join('styles', 'sections-draft.css'), sdText); console.log(`styles/sections-draft.css: ${sectionsDraft.length} rule(s)`);
