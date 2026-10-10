@@ -73,10 +73,49 @@ const readyInViewport = async (bound) => {
   return { ms: Date.now() - t0, imgs, anims, frames, retried, timedOut: true };
 };
 
+/** The whole page in ONE screenshot, no scrolling (five-minute loop, iteration 2): a chunked capture scrolls, and a page that changes its layout
+ * on scroll (a header that leaves the flow when its search bar pins — marriott, 53–112 px per chunk; a sticky header copied into every chunk —
+ * takeda; acs's seam band) photographed a page that never exists at once. The at-rest steps run once over the page (scripted motion waited
+ * out, entrances finished, broken images retried), then the shot is cropped to the viewport width (a sideways overflow made si's 360 shot
+ * 820 wide). ≈ 1 s against ≈ 13 s stitched. Returns null when the window does not scroll the document (an inner scroller): the caller stitches. */
+async function fullCapture(page, outFile, { vh = 900, freeze = true, park = true } = {}) {
+  const width = (page.viewportSize() || { width: 1440 }).width;
+  const scrolls = await page.evaluate(() => { const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight); if (h <= innerHeight + 4) return true; window.scrollTo({ top: 200, behavior: 'instant' }); const ok = window.scrollY > 0; window.scrollTo({ top: 0, behavior: 'instant' }); return ok; }).catch(() => true);
+  if (!scrolls) return null;
+  if (freeze) await freezeMotion(page);
+  if (park) await page.mouse.move(0, vh - 1).catch(() => {});
+  const fonts = await failedFonts(page);
+  if (fonts.length) console.error(`capture WARNING: FONT LOAD FAILED for ${fonts.join(', ')} — this capture renders fallback type`);
+  const rested = { finished: 0, paused: 0, restless: 0, waitedMs: 0, retried: 0, broken: 0 };
+  if (freeze) {
+    // the whole page is "in view" for a full shot: scripted motion and broken images are read over the document, not the viewport
+    const t0 = Date.now(); let prev = null; let steady = 0;
+    while (Date.now() - t0 < 2500) { const sig = await page.evaluate(() => [...document.querySelectorAll('[style]')].map((e) => { const cs = getComputedStyle(e); return `${cs.opacity}|${cs.transform}`; }).join(';')).catch(() => ''); if (sig === prev) { steady += 1; if (steady >= 2) break; } else steady = 0; prev = sig; await page.waitForTimeout(100); }
+    rested.waitedMs = Date.now() - t0;
+    const m = await page.evaluate(restMotion).catch(() => null); if (m) { rested.finished = m.finished; rested.paused = m.paused; }
+    rested.retried = await page.evaluate(async () => { let n = 0; const broken = [...document.images].filter((i) => i.complete && i.naturalWidth === 0 && (i.currentSrc || i.src) && i.getBoundingClientRect().width > 10); for (const i of broken) { n += 1; const pic = i.closest('picture'); if (pic) pic.querySelectorAll('source').forEach((so) => { const v = so.srcset; so.srcset = ''; so.srcset = v; }); if (i.srcset) { const v = i.srcset; i.srcset = ''; i.srcset = v; } const src = i.getAttribute('src'); if (src) { i.removeAttribute('src'); i.setAttribute('src', src); } } await Promise.race([Promise.all(broken.map((i) => new Promise((r) => { i.addEventListener('load', r, { once: true }); i.addEventListener('error', r, { once: true }); }))), new Promise((r) => setTimeout(r, 3000))]); return n; }).catch(() => 0);
+    await page.evaluate(() => new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res)))).catch(() => {});
+  }
+  rested.broken = await page.evaluate(() => [...document.images].filter((i) => i.complete && i.naturalWidth === 0 && i.getBoundingClientRect().width > 10).length).catch(() => 0);
+  const totalH = await page.evaluate(() => Math.max(document.body.scrollHeight, document.documentElement.scrollHeight));
+  if (!totalH || totalH < 10) throw new Error(`page height ${totalH}px — blank render? (bot challenge / hidden body)`);
+  // Chrome's own capture beyond the viewport, at scroll 0, clipped to the viewport width — Playwright's fullPage tiles by the viewport height
+  // and scrolls between tiles (marriott's pinned search bar in every tile, as stitched); this one renders the document once
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' })).catch(() => {}); await page.waitForTimeout(150);
+  let cdp = null; try { cdp = await page.context().newCDPSession(page); } catch { return null; } // not Chromium: stitch
+  let shot; try { shot = await cdp.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, clip: { x: 0, y: 0, width, height: totalH, scale: 1 } }); } catch (e) { await cdp.detach().catch(() => {}); console.error(`capture: one shot failed (${String(e.message || e).slice(0, 100)}) — stitching`); return null; }
+  await cdp.detach().catch(() => {});
+  const buf = Buffer.from(shot.data, 'base64'); const img = PNG.sync.read(buf); const h = img.height;
+  if (img.width !== width || Math.abs(h - totalH) > 2) { console.error(`capture: one shot ${img.width}×${h} for ${width}×${totalH} — stitching`); return null; }
+  mkdirSync(dirname(outFile), { recursive: true }); writeFileSync(outFile, buf);
+  return { width, height: h, chunks: 1, waited: [rested.waitedMs], timedOut: 0, failedFonts: fonts, rested, mode: 'full' };
+}
+
 /** Stitch an already-open, already-settled page into `outFile`: the document's width × its height now (read AFTER the settle), one
  * chunk per `vh` rows. `freeze` (default true) runs freezeMotion first; `chunkTimeout` bounds the readiness wait per chunk (ms).
  * Returns { width, height, chunks, waited: [ms…], timedOut: n, failedFonts }. Throws on a scroll stall. */
 export async function stitchCapture(page, outFile, { vh = 900, freeze = true, chunkTimeout = 3000, park = true } = {}) {
+  if ((process.env.STARDUST_CAPTURE || 'full') === 'full') { const r = await fullCapture(page, outFile, { vh, freeze, park }); if (r) return r; } // null: an inner scroller — the stitched path fails loud
   if (freeze) await freezeMotion(page);
   if (park) { const vp = page.viewportSize(); await page.mouse.move(0, (vp ? vp.height : vh) - 1).catch(() => {}); }
   const fonts = await failedFonts(page);
@@ -118,6 +157,6 @@ export async function captureUrl(browser, url, outFile, { width = 1440, vh = 900
   await settle(page);
   if (consent || dismiss.length) await acceptOverlays(page, { consent, dismiss, wait: 800 });
   const r = await stitchCapture(page, outFile, { vh, chunkTimeout });
-  if (log) log(`stitched ${outFile}: ${r.width}x${r.height} from ${r.chunks} chunks in ${((Date.now() - t0) / 1000).toFixed(1)} s${r.timedOut ? ` (${r.timedOut} chunk waits hit the ${chunkTimeout} ms bound)` : ''}${r.rested?.finished ? ` · ${r.rested.finished} entrance(s) run to rest` : ''}${r.rested?.retried ? ` · ${r.rested.retried} broken image load(s) retried` : ''}${r.rested?.broken ? ` · ${r.rested.broken} image(s) still BROKEN` : ''}${r.rested?.waitedMs ? ` · ${(r.rested.waitedMs / 1000).toFixed(1)} s waiting for scripted motion to settle${r.rested.restless ? ` (${r.rested.restless} chunk(s) never quiet)` : ''}` : ''}`);
+  if (log) log(`${r.mode === 'full' ? 'captured (one shot)' : 'stitched'} ${outFile}: ${r.width}x${r.height} from ${r.chunks} chunks in ${((Date.now() - t0) / 1000).toFixed(1)} s${r.timedOut ? ` (${r.timedOut} chunk waits hit the ${chunkTimeout} ms bound)` : ''}${r.rested?.finished ? ` · ${r.rested.finished} entrance(s) run to rest` : ''}${r.rested?.retried ? ` · ${r.rested.retried} broken image load(s) retried` : ''}${r.rested?.broken ? ` · ${r.rested.broken} image(s) still BROKEN` : ''}${r.rested?.waitedMs ? ` · ${(r.rested.waitedMs / 1000).toFixed(1)} s waiting for scripted motion to settle${r.rested.restless ? ` (${r.rested.restless} chunk(s) never quiet)` : ''}` : ''}`);
   return { page, seconds: (Date.now() - t0) / 1000, ...r };
 }
