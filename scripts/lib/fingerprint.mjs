@@ -179,12 +179,20 @@ export function fingerprint(root, { depth = 6 } = {}) {
   // the unit is PAINTED (a background, a border, a shadow or a radius on it or down its single-child chain): a link-only list of painted
   // boxes is cards, not an accordion (acs-about: white rounded shadowed link cards drafted as `accordion (?)`)
   const painted = (n) => { let x = n; for (let d = 0; x && d < 4; d += 1) { if ((x.bg && !/rgba\(0, 0, 0, 0\)/.test(x.bg)) || x.shadow || x.border || (x.br && x.br !== '0px')) return true; x = x.children?.length === 1 ? x.children[0] : null; } return false; };
+  // side-by-side columns of DIFFERENT kinds under the first branching node (a picture-only column beside a text-only one): columns, whatever
+  // the text column repeats (takeda: a picture beside three paragraphs read as "text run ×3: default content")
+  let br0 = root; while (br0.children?.length === 1) br0 = br0.children[0];
+  const kidsB = (br0.children || []).filter((c) => c.box && c.box[2] > 40 && c.box[3] > 20);
+  const hasMedia = (n) => MEDIA_TAGS.has(String(n.tag || '').toLowerCase()) || !!n.src || (n.children || []).some(hasMedia);
+  const hasText = (n) => !!n.text || (n.children || []).some(hasText);
+  const sideBySide = kidsB.length >= 2 && kidsB.length <= 4 && kidsB.every((c, i) => i === 0 || (c.box[0] >= kidsB[i - 1].box[0] + kidsB[i - 1].box[2] - 2 && Math.min(c.box[1] + c.box[3], kidsB[i - 1].box[1] + kidsB[i - 1].box[3]) - Math.max(c.box[1], kidsB[i - 1].box[1]) > 20));
+  const mixedCols = sideBySide && kidsB.some((c) => hasMedia(c) && !hasText(c)) && kidsB.some((c) => hasText(c) && !hasMedia(c)) ? kidsB.length : 0;
   const unitPainted = !!u && u.nodes.filter(painted).length * 2 >= u.nodes.length; const unitH = u ? u.nodes.map((n) => (n.box ? n.box[3] : 0)).sort((x, z) => x - z)[Math.floor(u.nodes.length / 2)] : 0;
   return {
     anchorText, box: root.box || null, pattern: a.pattern, repeat: u ? (groups ? groups.reduce((s, g) => s + g, 0) : u.count) : 0, groups, unit: u ? unit.unit : null, unitSig: u ? unit.sig : [], unitCols: u ? cells(unit.unitNode) : null,
     cols: u ? cells(unit.unitNode) : cells(root), media: media.length, texts: texts.length, links: links.length,
     mediaRatio: media.length + texts.length ? Number((media.length / (media.length + texts.length)).toFixed(2)) : 0,
-    headingBefore, linkAfter, unitPainted, unitH, controls, sliderHint, classes: { root: chainClasses(root), unit: unitClasses, context }, kinds,
+    headingBefore, linkAfter, unitPainted, unitH, mixedCols, controls, sliderHint, classes: { root: chainClasses(root), unit: unitClasses, context }, kinds,
     defaultContent: def.slice(0, 12).map((l) => ({ tag: l.kind, text: textOf(l.node).replace(/\s+/g, ' ').trim().slice(0, 80) })), defaultCount: def.length,
     bigText: Math.max(0, ...texts.map((l) => fontPx(l.node))), mediaArea: root.box ? Number(Math.min(1, mediaArea / Math.max(1, area(root))).toFixed(2)) : 0, leafCount: a.leaves.length,
   };
@@ -265,6 +273,7 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
 export function collectionGuess(fp) {
   const u = new Set(fp.unitSig || []); const k = new Set(fp.kinds || []);
   const r = { collection: null, alternatives: [], reason: '' };
+  if (fp.mixedCols && !fp.sliderHint) return { collection: 'columns', alternatives: ['hero'], reason: `${fp.mixedCols} columns side by side, a picture beside the text` };
   if (fp.repeat >= 2) {
     if (fp.sliderHint || fp.controls?.length) return { collection: 'carousel', alternatives: ['cards'], reason: `repeating unit ×${fp.repeat} with controls ${fp.controls?.join(' ') || ''}${fp.sliderHint ? ' and slider classes' : ''}`.trim() };
     if (u.has('media') && (u.has('heading') || u.has('text') || u.has('link'))) return fp.repeat >= 3 ? { collection: 'cards', alternatives: ['columns'], reason: `media + text unit ×${fp.repeat}` } : { collection: 'columns', alternatives: ['cards'], reason: `media + text unit ×${fp.repeat}` };
