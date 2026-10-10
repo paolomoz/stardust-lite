@@ -7,7 +7,7 @@
 // Usage: node probe-load.mjs <url> [W[,W…]] [--headed] [--chrome] [--locale <tag>] [--shot out.png] [--profile migration/site.json]
 //   Ends with the TIER LINE: the flags every later instrument needs (--chrome on a 403 / reset, --consent from the overlay census, --hide for a
 //   third-party fixed widget, --locale / --cookie when the URL changed), and --profile writes them as the site profile at t0 (loop high-impact pass)
-import { UA, arg, overlayOpts, launch, cookiesFor } from './common.mjs';
+import { UA, arg, overlayOpts, launch, cookiesFor, hideModals } from './common.mjs';
 import { firstLook } from './lib/probe-collectors.mjs'; // the in-page reading (shared with measure-page)
 
 const url = process.argv[2]; const widths = String(process.argv[3] && !process.argv[3].startsWith('--') ? process.argv[3] : 1440).split(',').map(Number);
@@ -29,6 +29,8 @@ if (p.url().split('#')[0] !== url.split('#')[0]) { console.log(`URL CHANGED ${ur
 const challenge = await p.evaluate(() => { const t = `${document.title} ${document.body?.innerText?.slice(0, 400) || ''}`; const ifr = [...document.querySelectorAll('iframe')].find((f) => { const r = f.getBoundingClientRect(); return r.width >= innerWidth * 0.9 && r.height >= innerHeight * 0.8; }); const marker = /_Incapsula_Resource|incap_ses|cf-chl|challenge-platform|px-captcha|captcha-delivery|datadome|perimeterx/i.test(document.documentElement.innerHTML.slice(0, 20000)); const words = /pardon our interruption|just a moment|access denied|verify you are (a )?human|checking your browser|request unsuccessful/i.test(t); return (ifr && !document.querySelector('main') && (document.body?.innerText || '').trim().length < 200) || marker || words ? `${ifr ? 'a full-viewport iframe' : ''}${marker ? ' a vendor marker' : ''}${words ? ` "${t.trim().slice(0, 60)}"` : ''}`.trim() : null; }).catch(() => null);
 if (challenge) { console.log(`CHALLENGE at ${W}: ${challenge} — this load is a bot challenge, not the page`); if (!tier.chrome) { tier.chrome = true; tier.notes.push(`a bot challenge at ${W} (${challenge}): --chrome (the installed Chrome) on every instrument`); } }
 const info = await p.evaluate(firstLook);
+// a popup / modal layer over the page (a locale chooser, a newsletter): hidden on every instrument — toryburch measured two of them as sections
+for (const sel of await hideModals(p)) if (!tier.hide.includes(sel)) { tier.hide.push(sel); tier.notes.push(`a modal layer at ${W}: ${sel} — hidden on every instrument`); }
 console.log(JSON.stringify(info, null, 1));
 if (!info.fixed.length) console.log(`no fixed or sticky layer at ${W}`);
 if (info.tallHeader) console.log(`NOTE: ${info.tallHeader}`);

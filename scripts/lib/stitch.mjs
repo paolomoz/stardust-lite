@@ -13,7 +13,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { PNG } from 'pngjs';
-import { openPage, settle, acceptOverlays } from '../common.mjs';
+import { openPage, settle, acceptOverlays, hideModals } from '../common.mjs';
 
 /** Freeze motion for stable chunks — AFTER the settle: CSS animations paused, transitions off, carets hidden, smooth scroll off; every
  * <video> paused at t=0; every pending timeout / interval cleared; the first slick dot clicked (then the timers cleared again). */
@@ -82,6 +82,7 @@ async function fullCapture(page, outFile, { vh = 900, freeze = true, park = true
   const width = (page.viewportSize() || { width: 1440 }).width;
   const scrolls = await page.evaluate(() => { const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight); if (h <= innerHeight + 4) return true; window.scrollTo({ top: 200, behavior: 'instant' }); const ok = window.scrollY > 0; window.scrollTo({ top: 0, behavior: 'instant' }); return ok; }).catch(() => true);
   if (!scrolls) return null;
+  await hideModals(page); // a modal that opened after the readings (toryburch's delayed welcome layer)
   if (freeze) await freezeMotion(page);
   if (park) await page.mouse.move(0, vh - 1).catch(() => {});
   const fonts = await failedFonts(page);

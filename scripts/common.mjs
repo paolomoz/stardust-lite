@@ -95,6 +95,9 @@ export async function openPage(browser, url, { width = 1440, height = 900, scale
   const page = isContext ? await browser.newPage() : await browser.newPage(contextOptions({ width, height, scale, locale }));
   if (isContext) await page.setViewportSize({ width, height });
   if (before) await before(page); // listeners that must exist before navigation (response log for font requests — media-list)
+  // videos never start: autoplay and play() are held, so a video shows its first frame (or its poster) on every load and at every width — a
+  // hero video froze at 2.58 s / 0.62 s / 2.09 s across the three widths and the build matched one still per width (toryburch, ≈ 4 min)
+  if (process.env.STARDUST_VIDEO_PLAY !== '1') await page.addInitScript(() => { try { HTMLMediaElement.prototype.play = function play() { try { this.pause(); } catch { /* detached */ } return Promise.resolve(); }; new MutationObserver((ms) => { for (const m of ms) for (const n of m.addedNodes) { if (n.nodeType !== 1) continue; for (const v of n.tagName === 'VIDEO' ? [n] : n.querySelectorAll?.('video') || []) { v.autoplay = false; v.removeAttribute('autoplay'); } } }).observe(document, { childList: true, subtree: true }); } catch { /* a locked prototype */ } }).catch(() => {});
   const cookies = cookiesFor(url, overlayOpts().cookie); if (cookies.length) await page.context().addCookies(cookies).catch((e) => console.error(`openPage: cookies not set — ${String(e.message).slice(0, 80)}`));
   try { await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 }); } catch (e) {
     // a protocol reset / connection refusal on headless Chromium is the origin's bot tier, not the page: name the next tier before dying
@@ -139,6 +142,34 @@ export async function unrollScroller(page) {
   return sel;
 }
 
+/** Popups and modals are not the page: a fixed layer (not the header) covering ≥ 30 % of the viewport — a locale chooser, a newsletter modal,
+ * their backdrop — is hidden and a body scroll lock released (toryburch: a locale popup and then a welcome modal measured as sections, two
+ * extra `first` runs, ≈ 9 min). Returns the hidden layers' selectors. */
+export async function hideModals(page) {
+  const hidden = await page.evaluate(() => {
+    const vw = innerWidth; const vh = innerHeight; const out = [];
+    for (const e of document.querySelectorAll('body *')) {
+      const cs = getComputedStyle(e); if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0) continue;
+      const r = e.getBoundingClientRect(); const area = Math.max(0, Math.min(r.right, vw) - Math.max(r.left, 0)) * Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+      if (area < vw * vh * 0.3) continue; if (r.top <= 2 && r.height < 220) continue; // a header bar
+      if (e.closest('header') || e.querySelector('main, [role=main]') || e.matches('main, [role=main]') || e.hasAttribute('data-sd-unrolled')) continue; // the page itself
+      if (out.some((o) => o.el.contains(e))) continue;
+      out.push({ el: e, sel: `${e.tagName.toLowerCase()}${e.id ? `#${e.id}` : ''}${[...e.classList].slice(0, 2).map((c) => `.${c}`).join('')}` });
+    }
+    // an open dialog (role=dialog, aria-modal, <dialog open>) in a fixed layer is a modal at any size — its backdrop alone matched the 30 % rule
+    // and the 15 %-off box stayed in toryburch's capture
+    for (const d of document.querySelectorAll('[role=dialog], [aria-modal=true], dialog[open]')) { const r = d.getBoundingClientRect(); if (r.width < 40 || r.height < 40) continue; let fx = false; for (let x = d; x && x !== document.body; x = x.parentElement) if (getComputedStyle(x).position === 'fixed') { fx = true; break; } if (!fx || d.closest('header') || out.some((o) => o.el.contains(d))) continue; out.push({ el: d, sel: `${d.tagName.toLowerCase()}${d.id ? `#${d.id}` : ''}${[...d.classList].slice(0, 2).map((c) => `.${c}`).join('')}` }); }
+    // a stylesheet rule as well as the inline style: a React portal re-rendered its node and the inline style was gone at the capture
+    const ids = (window.__sdModalIds ||= new Set()); for (const o of out) { o.el.style.setProperty('display', 'none', 'important'); o.el.setAttribute('data-sd-modal', ''); if (o.el.id) ids.add(o.el.id); }
+    const st = document.getElementById('sd-hide-modals') || Object.assign(document.createElement('style'), { id: 'sd-hide-modals' }); if (!st.isConnected) document.head.append(st);
+    st.textContent = `[data-sd-modal]${[...ids].map((id) => `, #${CSS.escape(id)}`).join('')} { display: none !important; }`;
+    if (out.length) for (const x of [document.documentElement, document.body]) if (getComputedStyle(x).overflow === 'hidden' && !x.hasAttribute('data-sd-unrolled')) x.style.setProperty('overflow', 'visible', 'important');
+    return out.map((o) => o.sel);
+  }).catch(() => []);
+  for (const h of hidden) if (!(page.__sdModals ||= new Set()).has(h)) { page.__sdModals.add(h); console.error(`settle: a modal layer ${h} covers the viewport — hidden (a popup is not the page; --hide it in the profile to make it explicit)`); }
+  return hidden;
+}
+
 export async function settle(page, step = 600, pause = 120, rest = 1500) {
   await unrollScroller(page);
   await page.evaluate(async ({ step, pause, rest }) => {
@@ -153,6 +184,7 @@ export async function settle(page, step = 600, pause = 120, rest = 1500) {
     const finite = (a) => { try { const t = a.effect.getComputedTiming(); return Number.isFinite(t.iterations) && Number.isFinite(t.endTime) && t.endTime < 10000; } catch { return false; } };
     await Promise.race([Promise.all(document.getAnimations().filter((a) => a.playState === 'running' && finite(a)).map((a) => a.finished.catch(() => {}))), timeout(3000)]);
   }, { step, pause, rest });
+  await hideModals(page); // a modal that opened during the settle (a delayed newsletter layer)
 }
 
 /** Browser-side composed-tree helpers, to be passed into page.evaluate as source (web-component origins keep their paint, boxes and
