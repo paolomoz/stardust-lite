@@ -1,0 +1,24 @@
+# Loop — five minutes to a page under 10 %
+
+Branch `exp/five-min`. Target: from the first instrument (t0) to a prototype under 10 % pixel difference at 360 / 1440 / 2560 in **5 min**.
+Up to 20 iterations, started 2026-10-10. Each iteration: change what the last run's clock says is the bottleneck, check it on the replay bench
+(`scripts/bench.mjs`) when it touches the gate, the capture or the generator, then one timed field run on a page never run, alone on the machine.
+A change stays only if the clock or the bench says it removed time; otherwise it is reverted and the row says so.
+
+Sites: the Exec Forum Boston campaign shortlist (`~/stardust/2026-09-exec-forum-boston/campaign/migration-shortlist.csv`), already-run and
+on-EDS sites excluded, order drawn with seed 20261010; a site that refuses the crawl at the precheck is skipped and named. Home pages.
+Repos `aemcoder-adobe/sdt-<slug>-lite` (an `sdt-<slug>` repo may belong to another project), work dirs `~/stardust/2026-10/sdt-<slug>-lite`.
+
+Order: Marriott, Publicis, Tory Burch, Deloitte, BMS, Equitable, WPP, PGA TOUR, Revlon, Sherwin-Williams, Hasbro, Intel, NFL, Nike, Merck,
+McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom, Lenovo, …
+
+## Clock per run (minutes from t0)
+
+| run | site | code | first prototype | under 10 % (stop) | served | rounds | round s | model / tools to served (turns) | main bottleneck read from the run |
+|---|---|---|---|---|---|---|---|---|---|
+| I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
+| I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
+| I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+
+## Iterations
+

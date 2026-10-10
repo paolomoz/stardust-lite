@@ -2,6 +2,8 @@
 
 From the site repo's root. `<url>` the page, `<slug>` its name, `<host>` = `https://<branch>--<site>--<org>.aem.page`. Record `date -u +%FT%TZ` at t0.
 
+Fast path (steps 1–9 in one call, ≈ 2 min, no decision until the round): `npx stardust-lite first <url> --slug <slug> [--template <name>]` — the step table, then the first round's digest; from there the work is steps 7 and 9 (the CSS, the rounds). Re-run from a step with `--skip probe,measure` after editing triage.md.
+
 | # | step | command | read this, then decide |
 |---|---|---|---|
 | 0 | setup | `npm i -D --legacy-peer-deps github:paolomoz/stardust-lite#<sha> && npx stardust-lite init --foundation --force`; branch, push once | — |
