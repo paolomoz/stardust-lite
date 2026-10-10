@@ -16,7 +16,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, wri
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import net from 'node:net';
-import { arg } from './common.mjs';
+import { arg, daToken } from './common.mjs';
 
 const url = process.argv[2]; const slug = arg('--slug', null);
 if (!url || url.startsWith('--') || typeof slug !== 'string') { console.error('usage: first.mjs <url> --slug <slug> [--template <name>] [--port 8990] [--no-da] [--sections <css>] [--main <css>] [--header <css>] [--footer <css>] [--skip <step,…>]'); process.exit(1); }
@@ -74,8 +74,8 @@ if (!skip.has('media')) {
   step('fonts', S('media-fetch'), [join(measure, 'media-1440.json'), '--fonts', 'fonts', '--css', join('styles', 'fonts.css')], { show: 0, note: (r) => (/(\d+) face\(s\) declared/.exec(`${r.stdout}${r.stderr}`) || [])[0] || 'no faces declared — fonts.css by hand' });
   // the media upload runs while author and spec-to-css work (it is needed by the harness, which warms the branch-host URLs)
   const files = existsSync(media) ? readdirSync(media).filter((f) => !/\.json$/.test(f)).map((f) => join(media, f)) : [];
-  if (!noDa && files.length && process.env.DA_TOKEN) { const t0 = Date.now(); daMedia = new Promise((res) => { const c = spawn(process.execPath, [S('da-put'), daTarget, ...files, '--to', 'drafts/media'], { stdio: ['ignore', 'pipe', 'pipe'] }); let out = ''; c.stdout.on('data', (d) => { out += d; }); c.stderr.on('data', (d) => { out += d; }); c.on('close', (code) => res({ code, out, seconds: Number(((Date.now() - t0) / 1000).toFixed(1)) })); }); }
-  else if (!noDa && !process.env.DA_TOKEN) console.log('   no DA_TOKEN: media not uploaded (source the token, or --no-da for a local-only run)');
+  if (!noDa && files.length && daToken()) { const t0 = Date.now(); daMedia = new Promise((res) => { const c = spawn(process.execPath, [S('da-put'), daTarget, ...files, '--to', 'drafts/media'], { stdio: ['ignore', 'pipe', 'pipe'] }); let out = ''; c.stdout.on('data', (d) => { out += d; }); c.stderr.on('data', (d) => { out += d; }); c.on('close', (code) => res({ code, out, seconds: Number(((Date.now() - t0) / 1000).toFixed(1)) })); }); }
+  else if (!noDa && !daToken()) console.log('   no DA_TOKEN: media not uploaded (source the token, or --no-da for a local-only run)');
 }
 // 5 author: the document, the nav and the footer
 if (!skip.has('author')) {
@@ -83,7 +83,7 @@ if (!skip.has('author')) {
   step('author', S('author'), [triage, '--content', [content, ...(existsSync(hidden) ? [hidden] : [])].join(','), '--blocks', join('migration', 'blocks.json'), '--media', join(media, 'manifest.json'), '--media-host', `${host}/drafts/media`, '--out', doc, '--nav', join(docDir, 'nav.html'), '--footer', join(docDir, 'footer.html'), '--nav-path', '/drafts/nav', '--footer-path', '/drafts/footer', '--draft-new', '--site', join('migration', 'site.json'), '--url', url],
     { show: 0, ok: () => existsSync(doc), note: (r) => [/(\d+) sections? → [^(]*\(([^)]*)\)/.exec(r.stdout)?.[2], ...String(r.stderr).split('\n').filter((l) => /empty cell|did not fit|NEW|🔴/.test(l)).map((l) => l.replace(/^author: /, '').slice(0, 90))].filter(Boolean).slice(0, 3).join(' · ') || null });
   if (daMedia) { const d = await daMedia; steps.push({ step: 'da-put media (in parallel)', seconds: d.seconds, exit: d.code, ok: !d.code, note: (/(\d+) upload/.exec(d.out) || [''])[0] || tail(d.out, 1).slice(0, 80) }); daMedia = null; }
-  if (!noDa && process.env.DA_TOKEN) step('da-put docs', S('da-put'), [daTarget, doc, join(docDir, 'nav.html'), join(docDir, 'footer.html'), '--to', 'drafts'], { show: 0 });
+  if (!noDa && daToken()) step('da-put docs', S('da-put'), [daTarget, doc, join(docDir, 'nav.html'), join(docDir, 'footer.html'), '--to', 'drafts'], { show: 0 });
 }
 if (daMedia) { const d = await daMedia; steps.push({ step: 'da-put media (in parallel)', seconds: d.seconds, exit: d.code, ok: !d.code, note: null }); }
 // 6 the CSS drafts as the CSS: blocks/<name>/<name>.css (header / footer appended below the foundation rules), sections-draft into styles.css

@@ -211,3 +211,12 @@ export function davidsLint() {
   const here = dirname(fileURLToPath(import.meta.url));
   return process.env.DAVIDS_LINT || join(here, '..', 'tools', 'lint', 'davids-model-lint.mjs');
 }
+
+/** The DA / admin token: DA_TOKEN from the environment, else the aem CLI's token file (~/.aem/da-token.json, written by the refresh script)
+ * when it has not expired — each shell of an agent run starts without the environment it sourced before (bms: the harness could not re-upload
+ * an edited nav). Never printed. */
+export function daToken() {
+  if (process.env.DA_TOKEN) return process.env.DA_TOKEN;
+  try { const f = join(process.env.HOME || '', '.aem', 'da-token.json'); const j = JSON.parse(readFileSync(f, 'utf8')); const exp = Number(j.expires_at) || 0; if (j.access_token && (!exp || exp * (exp < 1e12 ? 1000 : 1) > Date.now() + 60000)) return j.access_token; } catch { /* no file */ }
+  return null;
+}
