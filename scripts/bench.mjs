@@ -70,16 +70,21 @@ for (const [i, repo0] of repos.entries()) {
   if (!existsSync(doc)) { row.error = 'no document'; continue; }
   sh('sh', ['-c', `lsof -ti tcp:${port} | xargs kill 2>/dev/null`]);
   step('harness', join(here, 'harness.mjs'), [doc, '--serve', join(scratch, 'proto'), '--name', c.slug, '--port', String(port), '--fragments', c.host, '--content', join(c.measure, 'content-1440.json'), '--site-repo', scratch, '--no-lint']);
-  const g = step('gate', join(here, 'gate.mjs'), ['--live', c.url, '--build', `http://localhost:${port}/${c.slug}.harness.html`, '--out', join(scratch, 'gate'), '--origin', c.measure, '--widths', widths, '--triage', triage, '--no-budget']);
-  try { const gj = JSON.parse(readFileSync(join(scratch, 'gate', 'gate.json'), 'utf8')); row.gate = gj.rows.map((r) => ({ W: r.W, pct: r.pct, dh: r.dh })); row.timing = gj.timing; } catch { row.error = `gate exit ${g.status}`; }
+  const g = step('gate', join(here, 'gate.mjs'), ['--live', c.url, '--build', `http://localhost:${port}/${c.slug}.harness.html`, '--out', join(scratch, 'gate'), '--origin', c.measure, '--widths', widths, '--triage', triage, '--no-budget', '--per-section']);
+  try { const gj = JSON.parse(readFileSync(join(scratch, 'gate', 'gate.json'), 'utf8')); row.gate = gj.rows.map((r) => ({ W: r.W, pct: r.pct, dh: r.dh })); row.timing = gj.timing;
+    // sections within tolerance (|Δh| ≤ 2 or a boundary, pct ≤ 1.5) per width: a page-wide % reads one tall section as the whole page off
+    for (const g of row.gate) { try { const t = JSON.parse(readFileSync(join(scratch, 'gate', `sections-${g.W}.json`), 'utf8')).sections || []; g.ok = t.filter((x) => (x.dh === null || Math.abs(x.dh) <= 2 || x.dhKind === 'boundary') && (x.pct === null || x.pct <= 1.5)).length; g.n = t.length; } catch { /* no table */ } } } catch { row.error = `gate exit ${g.status}`; }
   if (!process.argv.includes('--keep-serving')) sh('sh', ['-c', `lsof -ti tcp:${port} | xargs kill 2>/dev/null`]);
 }
 
 const sum = (r, names) => Number(r.steps.filter((s) => names.includes(s.step)).reduce((a, s) => a + s.seconds, 0).toFixed(1));
-console.log(`\n| site | prototype s | gate s | ${widths.split(',').map((w) => `${w} %`).join(' | ')} | Δdoc | failed steps |\n|---|---|---|${widths.split(',').map(() => '---|').join('')}---|---|`);
+console.log(`\n| site | prototype s | gate s | ${widths.split(',').map((w) => `${w} %`).join(' | ')} | Δdoc | sections ok | failed steps |\n|---|---|---|${widths.split(',').map(() => '---|').join('')}---|---|---|`);
 for (const r of results) {
   const g = (W) => r.gate?.find((x) => String(x.W) === W); const failed = r.steps.filter((s) => !s.ok).map((s) => s.step).join(', ') || (r.error ?? '');
-  console.log(`| ${r.site} | ${sum(r, ['init', 'triage', 'author', 'spec-to-css', 'harness'])} | ${sum(r, ['gate'])} | ${widths.split(',').map((W) => g(W)?.pct ?? '—').join(' | ')} | ${widths.split(',').map((W) => g(W)?.dh ?? '—').join(' / ')} | ${failed} |`);
+  console.log(`| ${r.site} | ${sum(r, ['init', 'triage', 'author', 'spec-to-css', 'harness'])} | ${sum(r, ['gate'])} | ${widths.split(',').map((W) => g(W)?.pct ?? '—').join(' | ')} | ${widths.split(',').map((W) => g(W)?.dh ?? '—').join(' / ')} | ${widths.split(',').map((W) => (g(W)?.n ? `${g(W).ok}/${g(W).n}` : '—')).join(' · ')} | ${failed} |`);
 }
 const outFile = resolve(String(arg('--out', join(work, `bench-${mode}${mode === 'machine' ? `-${triageMode}` : ''}.json`)))); mkdirSync(dirname(outFile), { recursive: true });
+const all = results.flatMap((r) => r.gate || []); const okSum = all.reduce((a, g) => a + (g.ok || 0), 0); const nSum = all.reduce((a, g) => a + (g.n || 0), 0);
+const med = (W) => { const v = results.map((r) => r.gate?.find((x) => String(x.W) === W)?.pct).filter((x) => typeof x === 'number').sort((a, b) => a - b); return v.length ? v[Math.floor(v.length / 2)] : '—'; };
+console.log(`\nmedian % ${widths.split(',').map((W) => `${W} ${med(W)}`).join(' · ')} · sections within tolerance ${okSum}/${nSum}${nSum ? ` (${Math.round((100 * okSum) / nSum)} %)` : ''}`);
 writeFileSync(outFile, JSON.stringify({ _schema: 'stardust-lite/bench@1', _writtenAt: new Date().toISOString(), mode, triage: triageMode, widths, results }, null, 1)); console.log(`\nbench: ${outFile}`);
