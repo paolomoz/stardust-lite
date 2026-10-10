@@ -110,7 +110,7 @@ rows.forEach((row, i) => {
   const m = twin(M, k); const p = twin(P, k);
   const items = live.items.filter((it) => onPage(it, base)); const r = xr(items, base); const contentW = r ? r[1] - r[0] : null;
   const head = `/* ${classes ? classes.join(' ') : `section ${i} (default content${style ? `, style "${style}"` : ''})`} — document section #${i} ← live section #${k} "${live.id.slice(0, 40)}" y${live.box[1]} h${live.box[3]} at ${base}${m ? `; ${mobile}: h${m.box[3]}` : ''}${p ? `; ${probe}: h${p.box[3]}` : ''}\n   DRAFT from the spec: structure is the pipeline's (.block > div = row, > div > div = cell); every value is the live page's, annotated. Edit; the decorate's own DOM takes these values. */`;
-  const lines = [head];
+  const lines = [head]; let innerPad = false; // the card's text cell carries the picture → text gap as padding
   const sel = classes ? `.${classes.join('.')}` : `main .section${style ? `.${style.split(/[,\s]+/).filter(Boolean).map((t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-')).join('.')}` : `:nth-of-type(${i + 1})`}`;
   // the section's padding: from its edge to the first / last CONTENT box of any kind (text, picture, unit paint, control) — the inset chain
   // reads to the last TEXT, and a section ending in cards or a button read `bottom 615` (acs-about: no drafted padding was usable)
@@ -132,6 +132,15 @@ rows.forEach((row, i) => {
       lines.push(`${sel} { display: grid; grid-template-columns: repeat(${u.perRow}, minmax(0, 1fr)); ${u.gap !== null ? `column-gap: ${px(u.gap)}; ` : ''}${u.rowGap !== null ? `row-gap: ${px(u.rowGap)}; ` : ''}}  /* unit ${u.n} × ${u.w}×${u.h} (${u.first.tag}.${String(u.first.cls).split(' ')[0]}), ${u.perRow} per row, first at y${u.first.box[1]} */`);
       const f = u.first; const cardDecl = [...(f.bg ? [`background: ${rgb(f.bg)}`] : []), ...(f.br ? [`border-radius: ${f.br}`] : []), ...(f.border ? [`border: ${String(f.border).split(' | ')[0]}`] : []), ...(f.pad && f.pad !== '0px' ? [`padding: ${f.pad}`] : []), ...(f.shadow ? [`box-shadow: ${f.shadow}`] : [])];
       if (cardDecl.length) lines.push(`${sel} > div { ${cardDecl.join('; ')}; }  /* the unit's own paint */`);
+      // the unit's INNER inset: the texts' offset from the card's edges (and from its picture's bottom) is the text cell's padding — the
+      // drafts gave the card's box and paint, never the 24–34 px the text sits in (takeda, acs: every card's text flush to its edge)
+      const ub = f.box; innerPad = false; const inU = (it) => it.box[0] >= ub[0] - 1 && it.box[0] + it.box[2] <= ub[0] + ub[2] + 1 && it.box[1] >= ub[1] - 1 && it.box[1] + it.box[3] <= ub[1] + ub[3] + 1;
+      const ut = items.filter((it) => isText(it) && it.t && onPage(it, base) && inU(it)); const upic = items.filter((it) => ['img', 'video'].includes(it.k) && inU(it)).sort((a, b) => a.box[1] - b.box[1])[0];
+      if (ut.length && (f.bg || f.border || f.shadow)) {
+        const l = Math.min(...ut.map((it) => it.box[0])) - ub[0]; const r = ub[0] + ub[2] - Math.max(...ut.map((it) => it.box[0] + it.box[2])); const t0 = Math.min(...ut.map((it) => it.box[1])) - (upic ? upic.box[1] + upic.box[3] : ub[1]); const b0 = ub[1] + ub[3] - Math.max(...ut.map((it) => it.box[1] + it.box[3]));
+        const pad = [t0, Math.min(r, l + 8), b0, l].map((v) => Math.max(0, Math.min(v, 80)));
+        if (pad.some((v) => v > 2)) { innerPad = true; lines.push(`${sel} > div > div${upic ? ':not(:has(> picture, > p > picture))' : ''} { padding: ${pad.map(px).join(' ')}; }  /* the texts in the card: ${l} from the left, ${t0} below ${upic ? 'the picture' : 'the top'}, ${b0} above the bottom (right capped at left + 8: a short line ends early) */`); }
+      }
       // inner paints of the unit (a content strip, a media box) — listed, not placed
       const inner = count(items.filter((it) => it.k === 'paint' && it !== f && it.box[0] >= f.box[0] && it.box[0] + it.box[2] <= f.box[0] + f.box[2] + 1 && it.box[1] >= f.box[1] && it.box[1] + it.box[3] <= f.box[1] + f.box[3] + 1).map((it) => `${it.tag}.${String(it.cls).split(' ')[0]} ${it.box[2]}×${it.box[3]} at +${it.box[1] - f.box[1]}${it.pad && it.pad !== '0px' ? ` pad ${it.pad}` : ''}${it.bg ? ` bg ${rgb(it.bg)}` : ''}${it.br ? ` br ${it.br}` : ''}`));
       if (inner.length) lines.push(`/* inside the first unit: ${inner.slice(0, 6).map(([k2, n]) => `${k2}${n > 1 ? ` ×${n}` : ''}`).join(' | ')} */`);
@@ -163,7 +172,7 @@ rows.forEach((row, i) => {
       for (const it of seq) { if (it.box[1] >= prevBottom - 2) { const gap = Math.max(0, it.box[1] - prevBottom); g.push(`${gap} → ${it.k}(${it.box[3]})`); if (prevTag) { if (!after.has(prevTag)) after.set(prevTag, []); after.get(prevTag).push(gap); } prevBottom = it.box[1] + it.box[3]; prevTag = it.k; } }
       lines.push(`/* rhythm at ${base}${u ? ' inside the first unit' : ''}: ${g.slice(0, 12).join('  ')}  → bottom ${scopeBox[1] + scopeBox[3] - prevBottom} */`);
       const med = (a) => a.slice().sort((x, y) => x - y)[Math.floor(a.length / 2)];
-      for (const [tag, gaps] of after) if (/^(h[1-6]|p|ul|ol|img|picture)$/.test(tag) && gaps.length) lines.push(`${sel} ${tag} { margin: 0 0 ${px(med(gaps))}; }  /* the gap after ${tag} ×${gaps.length}${gaps.length > 1 ? ` (${gaps.join('/')})` : ''} — a margin, or the next child's padding */`);
+      for (const [tag, gaps] of after) if (/^(h[1-6]|p|ul|ol|img|picture)$/.test(tag) && gaps.length && !(innerPad && /^(img|picture)$/.test(tag))) lines.push(`${sel} ${tag} { margin: 0 0 ${px(med(gaps))}; }  /* the gap after ${tag} ×${gaps.length}${gaps.length > 1 ? ` (${gaps.join('/')})` : ''} — a margin, or the next child's padding */`);
     }
     // mobile: what differs at 360
     if (m) {
