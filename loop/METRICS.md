@@ -28,3 +28,4 @@ t0 = first instrument run on the page (repo setup excluded, reported apart). `<1
 | round | site / page | setup min | t0 → first prototype | t0 → <10 % (3 widths) | t0 → probes pass | t0 → served gate | final 360 / 1440 / probe | rounds (gate) | model / tools (t0 → close) |
 |---|---|---|---|---|---|---|---|---|---|
 | I1 | si.edu / (home) | 1.9 | 17.3 | never at 360; 1440 at 27.6, 1440 + 2560 at 32.1 | 50.9 (0 out of tolerance, 9 missing) | 56.8 | 27.76 / 3.44 / 4.51 (served identical) | 10 | 37.9 min, 119 turns / 26.6 min (gate 15.6) |
+| I2 | acs.org /about.html (`exp/five-min` @ d58b9f8) | 1.2 | 15.8 | 35.1 (the `stop:` line, round 8) | 41.3 | 38.1 | 9.39 / 8.27 / 8.86 (served 9.35 / 8.25 / 8.84) | 8 | to served 16.4 min, 108 turns / 21.7 min (round 75–79 s) |
