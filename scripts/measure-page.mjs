@@ -101,7 +101,9 @@ async function measure(W) {
   // authored, the harness exited 4): [role=banner] / [role=contentinfo], else a full-width header-ish / footer-ish node at the top / bottom
   const [header, footer] = await page.evaluate(([h, f, hGiven, fGiven]) => {
     const vis = (e) => { const r = e.getBoundingClientRect(); return r.width > innerWidth * 0.6 && r.height > 20; }; const docH = document.documentElement.scrollHeight;
-    const sel = (e) => { if (e.id && /^[A-Za-z][\w-]*$/.test(e.id)) return `${e.tagName.toLowerCase()}#${e.id}`; const c = [...e.classList].filter((x) => /^[A-Za-z][\w-]*$/.test(x)).slice(0, 2); return `${e.tagName.toLowerCase()}${c.map((x) => `.${x}`).join('')}`; };
+    // a UNIQUE selector: the short form when it names one element, else the path — `div.container.responsivegrid` named 32 (sherwin-williams:
+    // the footer guess was the content container and the content root fell back to body)
+    const sel = (e) => { if (e.id && /^[A-Za-z][\w-]*$/.test(e.id)) return `${e.tagName.toLowerCase()}#${e.id}`; const c = [...e.classList].filter((x) => /^[A-Za-z][\w-]*$/.test(x)).slice(0, 2); const short = `${e.tagName.toLowerCase()}${c.map((x) => `.${x}`).join('')}`; if (document.querySelectorAll(short).length === 1) return short; const parts = []; for (let n = e; n && n !== document.body; n = n.parentElement) parts.unshift(`${n.tagName.toLowerCase()}:nth-child(${[...n.parentElement.children].indexOf(n) + 1})`); return ['body', ...parts].join(' > '); };
     const has = (s) => { try { return [...document.querySelectorAll(s)].some(vis); } catch { return false; } };
     const pick = (role, re, top) => { const r0 = document.querySelector(`[role=${role}]`); if (r0 && vis(r0)) return sel(r0); const c = [...document.querySelectorAll('body *')].filter((e) => re.test(`${e.id} ${e.className}`) && vis(e)).filter((e) => { const r = e.getBoundingClientRect(); const y = r.top + scrollY; return top ? y < 200 && r.height < 600 : y + r.height > docH - 40 && r.height < 1600; }); c.sort((a, b) => b.getBoundingClientRect().width - a.getBoundingClientRect().width || (a.contains(b) ? -1 : 1)); return c[0] ? sel(c[0]) : null; };
     return [hGiven || has(h) ? h : (pick('banner', /(^|[\s_-])(header|masthead|site-?nav)([\s_-]|$)/i, true) || h), fGiven || has(f) ? f : (pick('contentinfo', /(^|[\s_-])footer([\s_-]|$)/i, false) || f)];
@@ -114,7 +116,7 @@ async function measure(W) {
   const write = (name, data) => { writeFileSync(join(out, name), data); files[name.replace(/-\d+(\.\w+)$/, '$1').replace(/\.\w+$/, '')] = join(out, name); };
   // the content root (--main / cap main / roster's rule): the structure dump's root and the content dump's main root, under the key
   // `main` when it is the <main> element, else its short selector (the dentsu case dumped `div.main-container`: the hero sits before main)
-  const root = await page.evaluate(contentRootPath, [mainSel]);
+  const root = await page.evaluate(contentRootPath, [mainSel, header, footer]);
   const hasMain = await page.evaluate(() => !!document.querySelector('main'));
   const explicit = typeof arg('--main', null) === 'string';
   const contentMain = explicit ? arg('--main') : root.tag === 'main' ? 'main' : root.name;
@@ -132,7 +134,7 @@ async function measure(W) {
   const pierce = process.argv.includes('--pierce') || (results[W]?.first?.shadowHosts || 0) > 0; // a web-components origin: the composed tree (loop r7)
   const content = await page.evaluate(collectContent, [[header, ...extraRoots, explicit || root.tag === 'main' ? contentMain : root.path, footer], hidden, sections, pierce]); // `sec` marks: the dump splits as the spec does
   if (!explicit && root.tag !== 'main' && root.path !== contentMain) { const o = {}; for (const [k, v] of Object.entries(content)) o[k === root.path ? contentMain : k] = v; Object.assign(content, o); for (const k of Object.keys(content)) if (!(k in o)) delete content[k]; }
-  write(`content-${W}.json`, JSON.stringify(Object.fromEntries([header, ...extraRoots, contentMain, footer, ...hidden.map((h) => `hidden ${h}`), '__doc', '__title', '__desc'].filter((k) => k in content).map((k) => [k, content[k]])), null, 1));
+  write(`content-${W}.json`, JSON.stringify({ ...Object.fromEntries([header, ...extraRoots, contentMain, footer, ...hidden.map((h) => `hidden ${h}`), '__doc', '__title', '__desc'].filter((k) => k in content).map((k) => [k, content[k]])), __chrome: { header, footer } }, null, 1)); // which keys are the chrome (a --footer selector names no `footer` key — sherwin-williams' footer document came out empty)
   const media = await page.evaluate(collectMedia); media.lockBefore = lockBefore; media.fontRequests = [...new Set(fontReqs)];
   // the @font-face rules: every CSS response's text plus the inline <style> sheets (fonts.css is then written, not typed)
   const inlineCss = await page.evaluate(() => [...document.querySelectorAll('style')].map((s) => s.textContent).join('\n')).catch(() => '');
@@ -170,7 +172,7 @@ async function measure(W) {
     usedSections = sectionsGuess.sel; log(`--sections default ${coverLow ? 'covered under 70 % of the content' : 'matched nothing'} — measuring with the guess '${usedSections}' (${sectionsGuess.n} sections)`);
     const content2 = await page.evaluate(collectContent, [[header, ...extraRoots, explicit || root.tag === 'main' ? contentMain : root.path, footer], hidden, usedSections, pierce]);
     if (!explicit && root.tag !== 'main' && root.path !== contentMain) { const o = {}; for (const [k, v] of Object.entries(content2)) o[k === root.path ? contentMain : k] = v; Object.assign(content2, o); for (const k of Object.keys(content2)) if (!(k in o)) delete content2[k]; }
-    write(`content-${W}.json`, JSON.stringify(Object.fromEntries([header, ...extraRoots, contentMain, footer, ...hidden.map((h) => `hidden ${h}`), '__doc', '__title', '__desc'].filter((k) => k in content2).map((k) => [k, content2[k]])), null, 1));
+    write(`content-${W}.json`, JSON.stringify({ ...Object.fromEntries([header, ...extraRoots, contentMain, footer, ...hidden.map((h) => `hidden ${h}`), '__doc', '__title', '__desc'].filter((k) => k in content2).map((k) => [k, content2[k]])), __chrome: { header, footer } }, null, 1));
     if (!noSpec) { const full = await page.evaluate(collectSpec, { sections: usedSections, header, footer, pierce }); const { html, ...rest } = full; spec = rest; write(`spec-${W}.json`, JSON.stringify(rest, null, 1)); write(`dom-${W}.html`, html); }
     if (!deepSels) { const deep2 = await page.evaluate(new Function('args', `${DEEP_HELPERS}\n return (${String(deepProbe)})(args);`), [[header, usedSections, footer], DEEP_MAX, false, [], false]); write(`deep-${W}.txt`, deep2 + '\n'); }
     nSections = sectionsGuess.n;
