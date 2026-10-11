@@ -115,8 +115,8 @@ async function fullCapture(page, outFile, { vh = 900, freeze = true, park = true
 /** Stitch an already-open, already-settled page into `outFile`: the document's width × its height now (read AFTER the settle), one
  * chunk per `vh` rows. `freeze` (default true) runs freezeMotion first; `chunkTimeout` bounds the readiness wait per chunk (ms).
  * Returns { width, height, chunks, waited: [ms…], timedOut: n, failedFonts }. Throws on a scroll stall. */
-export async function stitchCapture(page, outFile, { vh = 900, freeze = true, chunkTimeout = 3000, park = true } = {}) {
-  if ((process.env.STARDUST_CAPTURE || 'full') === 'full') { const r = await fullCapture(page, outFile, { vh, freeze, park }); if (r) return r; } // null: an inner scroller — the stitched path fails loud
+export async function stitchCapture(page, outFile, { vh = 900, freeze = true, chunkTimeout = 3000, park = true, mode = null } = {}) {
+  if ((mode || process.env.STARDUST_CAPTURE || 'full') === 'full') { const r = await fullCapture(page, outFile, { vh, freeze, park }); if (r) return r; } // null: an inner scroller — the stitched path fails loud
   if (freeze) await freezeMotion(page);
   if (park) { const vp = page.viewportSize(); await page.mouse.move(0, (vp ? vp.height : vh) - 1).catch(() => {}); }
   const fonts = await failedFonts(page);
@@ -152,7 +152,7 @@ export async function stitchCapture(page, outFile, { vh = 900, freeze = true, ch
  * images, finite animations), sweep the overlays once more (a timed modal fires during the settle), then stitch to `outFile`. Returns
  * { page, ...stitch }: the page stays OPEN (frozen, at rest, scrolled to 0) so the caller reads its tables from the same load; the caller
  * closes it. `overlays` are openPage's consent / dismiss / locale / require. */
-export async function captureUrl(browser, url, outFile, { width = 1440, vh = 900, wait = null, consent = null, dismiss = [], locale = null, require = [], chunkTimeout = Number(process.env.STARDUST_CHUNK_TIMEOUT || 3000), log = null } = {}) {
+export async function captureUrl(browser, url, outFile, { width = 1440, vh = 900, wait = null, consent = null, dismiss = [], locale = null, require = [], chunkTimeout = Number(process.env.STARDUST_CHUNK_TIMEOUT || 3000), log = null, mode = null } = {}) {
   const t0 = Date.now();
   // a LOCAL build (the harness on localhost) is ready when its blocks are loaded and its images are complete — openPage and settle wait for
   // both; the fixed 2.5 s wait and the slow scroll a live origin needs were most of a build capture (five-minute loop: ≈ 12 s a width)
@@ -160,7 +160,7 @@ export async function captureUrl(browser, url, outFile, { width = 1440, vh = 900
   const page = await openPage(browser, url, { width, height: vh, consent, dismiss, locale, require, wait: wait ?? (local ? 300 : 2500) });
   if (local) await settle(page, 900, 60, 400); else await settle(page);
   if (consent || dismiss.length) await acceptOverlays(page, { consent, dismiss, wait: 800 });
-  const r = await stitchCapture(page, outFile, { vh, chunkTimeout });
+  const r = await stitchCapture(page, outFile, { vh, chunkTimeout, mode });
   if (log) log(`${r.mode === 'full' ? 'captured (one shot)' : 'stitched'} ${outFile}: ${r.width}x${r.height} from ${r.chunks} chunks in ${((Date.now() - t0) / 1000).toFixed(1)} s${r.timedOut ? ` (${r.timedOut} chunk waits hit the ${chunkTimeout} ms bound)` : ''}${r.rested?.finished ? ` · ${r.rested.finished} entrance(s) run to rest` : ''}${r.rested?.retried ? ` · ${r.rested.retried} broken image load(s) retried` : ''}${r.rested?.broken ? ` · ${r.rested.broken} image(s) still BROKEN` : ''}${r.rested?.waitedMs ? ` · ${(r.rested.waitedMs / 1000).toFixed(1)} s waiting for scripted motion to settle${r.rested.restless ? ` (${r.rested.restless} chunk(s) never quiet)` : ''}` : ''}`);
   return { page, seconds: (Date.now() - t0) / 1000, ...r };
 }
