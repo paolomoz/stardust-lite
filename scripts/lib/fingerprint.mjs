@@ -281,7 +281,14 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
   // a TALL section made of heading-led parts (an AEM container holding the hero and a story grid — bms: one 1790 px "cards" section, Δh +1516
   // on the first round) is split into those parts: ≥ 2 children of ≥ 250 px, each with an h1–h3, covering ≥ 70 % of it
   const hasHead = (x) => /^h[1-3]$/.test(tagOf(x)) || (x.children || []).some(hasHead);
-  const refine = (n, d = 0) => { if (d > 2 || !n?.box || n.box[3] < 1200) return [n]; let x = n; while ((x.children || []).length === 1) x = x.children[0]; const parts = (x.children || []).filter((c) => c.box && c.box[3] >= 250 && hasHead(c)); if (parts.length < 2 || parts.reduce((a, c) => a + c.box[3], 0) < n.box[3] * 0.6) return [n]; return parts.flatMap((c) => refine(c, d + 1)); };
+  const refine = (n, d = 0) => { if (d > 2 || !n?.box || n.box[3] < 1200) return [n]; let x = n; while ((x.children || []).length === 1) x = x.children[0]; const parts = (x.children || []).filter((c) => c.box && c.box[3] >= 250 && hasHead(c)); if (parts.length < 2 || parts.reduce((a, c) => a + c.box[3], 0) < n.box[3] * 0.6) return [n];
+    // the children between the parts that carry content (a category icon row, a rewards band, a lone section title) are a section of their own:
+    // dropped, they were missing from the document and the drafts (lenovo: three visible rows authored by hand, ≈ 4 min) — spacers stay out
+    const out = []; let run = [];
+    const flush = () => { const c = run.filter((k) => k.box && k.box[3] > 0); run = []; if (!c.length || !c.some((k) => leaves(k).some((l) => l.text || /^(img|picture|video|svg)$/.test(tagOf(l))))) return; const y0 = Math.min(...c.map((k) => k.box[1])); const y1 = Math.max(...c.map((k) => k.box[1] + k.box[3])); if (y1 - y0 < 24) return; out.push(c.length === 1 ? c[0] : { tag: 'div', cls: 'stardust-gap-part', box: [Math.min(...c.map((k) => k.box[0])), y0, Math.max(...c.map((k) => k.box[0] + k.box[2])) - Math.min(...c.map((k) => k.box[0])), y1 - y0], children: c }); };
+    for (const c of x.children || []) { if (parts.includes(c)) { flush(); out.push(c); } else run.push(c); }
+    flush();
+    return out.flatMap((c) => (parts.includes(c) ? refine(c, d + 1) : [c])); };
   if (!(sections && sections.length)) secs = secs.flatMap((n) => refine(n)); // the gate's live split (no marks) refines the same way
   const extraCount = before.length + after.length; if (extraCount) secs = [...before, ...secs, ...after];
   return { header: headerKey ? dump[headerKey]?.[0] || null : null, footer: footerNode, sections: secs, mainKey, headerKey, footerKey, marked: marked.length && secs.includes(marked[0]) ? marked.length : 0, extraRoots: extraCount };
