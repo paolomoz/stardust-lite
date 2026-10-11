@@ -232,6 +232,8 @@ const summary = {
   elapsedByWidth: Object.fromEntries(rows.map((r) => [r.W, r.elapsed])),
   files: Object.fromEntries(rows.filter((r) => !r.error).map((r) => [r.W, r.files])),
   captures: Object.fromEntries(rows.filter((r) => r.cap && !r.cap.error).map((r) => [r.W, join(out, `live-${r.W}.png`)])),
+  // how each origin was taken — the gate captures the build the same way (intel: a stitched origin, a one-shot build, a sticky header in one only)
+  captureModes: Object.fromEntries(rows.filter((r) => r.cap && !r.cap.error).map((r) => [r.W, r.cap.mode || 'stitch'])),
   captureInfo: Object.fromEntries(rows.filter((r) => r.cap).map((r) => [r.W, r.cap.error ? { error: r.cap.error } : { width: r.cap.width, height: r.cap.height, chunks: r.cap.chunks, seconds: r.cap.seconds, chunkWaitsMs: r.cap.waited, timedOut: r.cap.timedOut, failedFonts: r.cap.failedFonts }])),
   profileCheck: check ? { verdict: check.verdict, checks: check.checks, fails: check.fails, warns: check.warns, tol, profile: profile._file, rows: allCheckRows.map(([W, name, expected, actual, verdict]) => ({ W, check: name, expected, actual, verdict })) } : null,
   sectionsSelector: rows.find((r) => r.usedSections && r.usedSections !== sections)?.usedSections || sections, header: chromeUsed[1440]?.header || Object.values(chromeUsed)[0]?.header || header, footer: chromeUsed[1440]?.footer || Object.values(chromeUsed)[0]?.footer || footer, hidden,

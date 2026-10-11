@@ -161,6 +161,9 @@ const browser = captureTool === 'stitch' ? await launch() : null;
 const secs = (t0) => Number(((Date.now() - t0) / 1000).toFixed(1));
 // the widths at once (exp/five-min: the live opens, ≈ 10–27 s a width, overlap the build captures, which stay in a queue), then the
 // compare and the pairing per width on the pages they left open; --serial-widths keeps one width at a time
+// the build is captured the way its origin was (measure-page's captureModes): a stitched origin of a scroll-driven page against a one-shot
+// build put the sticky header in one capture only (intel, a 20–25 % band)
+const originMode = (W) => { for (const d of [typeof originFrom[W] === 'string' ? dirname(originFrom[W]) : null, originDir, measureDir].filter(Boolean)) { try { const m = JSON.parse(readFileSync(join(d, 'summary.json'), 'utf8')).captureModes?.[W]; if (m) return m; } catch { /* no summary here */ } } return null; };
 const capt = {}; let buildQueue = Promise.resolve(); // the BUILD captures one at a time: three at once made the preview host refuse a burst of rendition requests (si-home replay: 24 pictures as alt text at 2560, retries did not recover them); the live opens overlap
 const captureW = async (W) => {
   const origin = join(out, `live-${W}.png`); const eds = join(out, `build-${W}.png`); const t = { live: null, build: null, compare: null, sections: null }; timing[W] = t;
@@ -195,7 +198,7 @@ const captureW = async (W) => {
     };
     const buildTask = async () => {
       const t0 = Date.now(); console.log(`build ${W}…`);
-      for (let attempt = 1; attempt <= 2 && !bp; attempt += 1) { try { const r = await captureUrl(buildCtx, build, eds, { width: W, vh, log: console.log }); bp = r.page; t.build = secs(t0); } catch (e) { console.log(`build ${W}: capture failed${attempt === 1 ? ' — once more' : ' twice — this width reads ERR, not the last round'} (${String(e.message || e).split('\n')[0].slice(0, 140)})`); bp = null; } }
+      for (let attempt = 1; attempt <= 2 && !bp; attempt += 1) { try { const r = await captureUrl(buildCtx, build, eds, { width: W, vh, log: console.log, mode: originMode(W) }); bp = r.page; t.build = secs(t0); } catch (e) { console.log(`build ${W}: capture failed${attempt === 1 ? ' — once more' : ' twice — this width reads ERR, not the last round'} (${String(e.message || e).split('\n')[0].slice(0, 140)})`); bp = null; } }
     };
     // a LOCAL build serves its own media (harness --local-media): no burst to the preview host, the widths capture at once; a served build queues
     const localBuild = /^https?:\/\/(localhost|127\.0\.0\.1)[:/]/.test(build);
@@ -361,7 +364,11 @@ if (roundMode) {
     const off = (s.dh !== null && Math.abs(s.dh) > 2 && s.dhKind !== 'boundary') || (s.pct !== null && s.pct > (s.budget ?? 1.5)); if (off) clean = false;
     if (!prev || off || (dPct !== null && Math.abs(dPct) >= 0.1) || (dDh !== null && dDh !== 0)) {
       const points = s.dh !== null && Math.abs(s.dh) > 2 ? `Δh ${s.dh > 0 ? '+' : ''}${s.dh}: a height — padding, margin, line-height or a wrapped line in this section` : s.pct !== null && s.pct > 1 ? `Δh 0 but pixels — ${shiftOf(s) || 'paint or position (shift-probe the band)'}; the pair rows below name the child (a fractional height, a pinned link, a control's width)` : 'within tolerance';
-      const live = s.live?.indices || []; const hot = live.flatMap((i) => pairRows[i] || []).slice(0, 3);
+      // pair numbers rows by the MEASUREMENT's sections, the digest by the triage's: the rows go to the digest row whose live y-range holds the
+      // spec section (by overlap) — by index they printed under the wrong heading (sherwin-williams, wpp)
+      const specSecs = (() => { try { return JSON.parse(readFileSync(join(specDir, `spec-${W}.json`), 'utf8')).secs || []; } catch { return []; } })();
+      const ov = (a0, a1, b0, b1) => Math.max(0, Math.min(a1, b1) - Math.max(a0, b0));
+      const hot = s.live ? Object.entries(pairRows).filter(([i]) => { const b = specSecs[Number(i)]?.box; if (!b) return false; const mine = ov(s.live.y0, s.live.y1, b[1], b[1] + b[3]); return mine > 0 && now.every((o) => o === s || !o.live || ov(o.live.y0, o.live.y1, b[1], b[1] + b[3]) <= mine); }).flatMap(([, r]) => r).slice(0, 3) : [];
       moved.push(`  #${s.index} ${String(s.anchorText || s.classes || '').slice(0, 26).padEnd(28)} ${s.pct ?? '—'} %${dPct !== null ? ` (${dPct > 0 ? '+' : ''}${dPct})` : ''}  Δh ${s.dh ?? '—'}${dDh !== null && dDh !== 0 ? ` (was ${p.dh})` : ''}${s.block ? `  ${s.block}` : ''} — ${points}${hot.length ? `\n      ${hot.join('\n      ')}` : ''}`);
     }
   }
