@@ -82,10 +82,8 @@ if (!skip.has('author')) {
   const hidden = join(measure, 'hidden-1440.json');
   step('author', S('author'), [triage, '--content', [content, ...(existsSync(hidden) ? [hidden] : [])].join(','), '--blocks', join('migration', 'blocks.json'), '--media', join(media, 'manifest.json'), '--media-host', `${host}/drafts/media`, '--out', doc, '--nav', join(docDir, 'nav.html'), '--footer', join(docDir, 'footer.html'), '--nav-path', '/drafts/nav', '--footer-path', '/drafts/footer', '--draft-new', '--site', join('migration', 'site.json'), '--url', url],
     { show: 0, ok: () => existsSync(doc), note: (r) => [/(\d+) sections? → [^(]*\(([^)]*)\)/.exec(r.stdout)?.[2], ...String(r.stderr).split('\n').filter((l) => /empty cell|did not fit|NEW|🔴/.test(l)).map((l) => l.replace(/^author: /, '').slice(0, 90))].filter(Boolean).slice(0, 3).join(' · ') || null });
-  if (daMedia) { const d = await daMedia; steps.push({ step: 'da-put media (in parallel)', seconds: d.seconds, exit: d.code, ok: !d.code, note: (/(\d+) upload/.exec(d.out) || [''])[0] || tail(d.out, 1).slice(0, 80) }); daMedia = null; }
   if (!noDa && daToken()) step('da-put docs', S('da-put'), [daTarget, doc, join(docDir, 'nav.html'), join(docDir, 'footer.html'), '--to', 'drafts'], { show: 0 });
 }
-if (daMedia) { const d = await daMedia; steps.push({ step: 'da-put media (in parallel)', seconds: d.seconds, exit: d.code, ok: !d.code, note: null }); }
 // 6 the CSS drafts as the CSS: blocks/<name>/<name>.css (header / footer appended below the foundation rules), sections-draft into styles.css
 if (!skip.has('css')) {
   step('spec-to-css', S('spec-to-css'), [measure, '--triage', triage, '--doc', doc, '--out', 'blocks', '--force'], { show: 0, note: (r) => `${(r.stdout.match(/\.css: /g) || []).length} files` });
@@ -96,10 +94,11 @@ if (!skip.has('css')) {
   if (!existsSync(join('styles', 'elements.css'))) writeFileSync(join('styles', 'elements.css'), '/* style-pass writes the element pass here */\n');
 }
 // 7 the prototype and the first round at the three widths
-const h = step('harness', S('harness'), [doc, '--serve', 'proto', '--name', slug, '--port', String(port), '--fragments', host, '--content', content, '--site-repo', '.', '--no-lint'], { show: 0, note: (r) => [(/(\d+) blocks? loaded/.exec(r.stdout) || [])[0], (/doc height (\d+)/.exec(r.stdout) || [])[0], (/(\d+) text.*not in the capture/.exec(`${r.stdout}${r.stderr}`) || [])[0]].filter(Boolean).join(' · ') });
+const h = step('harness', S('harness'), [doc, '--serve', 'proto', '--name', slug, '--port', String(port), '--fragments', host, '--content', content, '--site-repo', '.', '--no-lint', ...(existsSync(media) ? ['--local-media', media] : [])], { show: 0, note: (r) => [(/(\d+) blocks? loaded/.exec(r.stdout) || [])[0], (/doc height (\d+)/.exec(r.stdout) || [])[0], (/(\d+) text.*not in the capture/.exec(`${r.stdout}${r.stderr}`) || [])[0]].filter(Boolean).join(' · ') });
 if (h.status) finish(1, 'first: the harness failed — read its output above');
 // the element pass is opt-in: on bms's replay it moved the first round 33.9 / 30.1 / 17.3 → 35.5 / 30.7 / 17.6 (the first round's error is layout,
 // not type) — kept as an instrument, not a default step
 if (process.argv.includes('--style-pass')) step('style-pass', S('style-pass'), [measure, `http://localhost:${port}/${slug}.harness.html`, '--out', join('styles', 'elements.css')], { show: 0, note: (r) => String(r.stdout).split('\n').filter((l) => /^style-pass \d+/.test(l)).map((l) => l.replace(/^style-pass /, '')).join(' · ').slice(0, 160) });
 const g = step('gate --round', S('gate'), ['--live', url, '--build', `http://localhost:${port}/${slug}.harness.html`, '--out', join(dir, 'gate'), '--origin', measure, '--round', '--widths', '360,1440,2560', '--triage', triage], { show: 0, note: (r) => (/^target .*/m.exec(r.stdout) || [''])[0] });
+if (daMedia) { const d = await daMedia; steps.push({ step: 'da-put media (background; the prototype uses local media)', seconds: d.seconds, exit: d.code, ok: !d.code, note: (/(\d+) upload/.exec(d.out) || [''])[0] || tail(d.out, 1).slice(0, 80) }); daMedia = null; }
 const out = String(g.stdout); const from = out.indexOf('\n| width'); finish(0, `\n${from >= 0 ? out.slice(from).trim() : tail(out, 40)}\n\nprototype: http://localhost:${port}/${slug}.harness.html · document ${doc} · CSS blocks/*/ and styles/styles.css (sections-draft part) · next: CSS rounds, \`gate … --round --widths 360,1440,2560\` (the same --out ${join(dir, 'gate')})`);
