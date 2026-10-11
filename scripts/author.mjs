@@ -500,7 +500,11 @@ function navDoc(root) {
   // never an empty brand section: the pipeline drops an empty section and every nav role shifts one slot (revlon: the link list in the brand
   // slot) — the site's own name from the page URL when no logo link was found
   const siteName = (() => { try { const h = new URL(arg('--url', '') || 'https://site.example').hostname.replace(/^www\./, '').split('.')[0]; return h.charAt(0).toUpperCase() + h.slice(1); } catch { return 'Home'; } })();
-  const brandHtml = brand ? `<p><a href="${esc(brand.node.href || '/')}">${esc(bl)}</a></p>` : `<p><a href="/">${esc(siteName)}</a></p>`;
+  // the brand is its LOGO when the link holds one (an img inside it, or the picture walked before a card-wide link): the text link lost the
+  // logo on every run and the agents put `<a><picture><img></picture></a>` back by hand (santanderus, rbc, revlon — it serves as written)
+  const logoOf = (n) => { if (!n) return null; if (/^img$/i.test(String(n.tag || '')) && (n.src || bgUrl(n))) return n; for (const c of n.children || []) { const f = logoOf(c); if (f) return f; } return null; };
+  const logo = brand ? (logoOf(brand.node) || (pic && ['picture', 'icon'].includes(pic.kind) ? logoOf(pic.node) : null)) : null;
+  const brandHtml = brand ? (logo ? `<p><a href="${esc(brand.node.href || '/')}">${pictureHtml(logo, logo.alt || bl, null)}</a></p>` : `<p><a href="${esc(brand.node.href || '/')}">${esc(bl)}</a></p>`) : `<p><a href="/">${esc(siteName)}</a></p>`;
   const sections = [[brandHtml], menu, toolsHtml];
   if (promo.length) sections.push(promo.map((l) => leafHtml(l)).filter(Boolean));
   return chromeDoc(sections);
