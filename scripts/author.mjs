@@ -180,7 +180,13 @@ const sigOf = (leaves) => [...new Set(leaves.filter((l) => !['hr', 'control', 'i
 
 // ───────────────────────────── emission ─────────────────────────────
 const stats = { texts: 0 };
-const pictureHtml = (n, alt, wrap = 'p') => { const src = rewriteMedia(n.src || bgUrl(n)); const pic = `<picture><img src="${esc(src)}" alt="${esc(alt ?? n.alt ?? '')}"></picture>`; return wrap === 'p' ? `<p>${pic}</p>` : pic; };
+// art direction: the 360 dump's picture for the same image (document order) when its asset differs (the whole path less resize segments
+// like w_1920,c_limit — a CDN names different assets alike, nike) — authored as a second picture whose alt
+// ends `| mobile <bp>`; stardust.js folds it into the first as a <source media> (nike, revlon, intel: the portrait 360 images were fetched,
+// never authored — 360 sat at ≈ 30 % until a hand swap)
+const mobileMap = (() => { const f = arg('--mobile-content', null); if (typeof f !== 'string') return new Map(); const m = readJson(resolve(f)); if (!m) return new Map(); const imgs = (d) => { const out = []; const walk = (x) => { if (!x || typeof x !== 'object') return; if (x.src && /^(img|picture)$/i.test(String(x.tag || '')) && !/^data:/.test(x.src)) out.push(x.src); (x.children || []).forEach(walk); }; for (const [k, v] of Object.entries(d)) if (!k.startsWith('__') && !k.startsWith('hidden ')) (Array.isArray(v) ? v : [v]).forEach(walk); return out; }; const a = imgs(dump); const b = imgs(m); const map = new Map(); if (a.length !== b.length) return map; const stem = (u) => String(u).split('?')[0].split('/').filter((seg) => !/^([a-z]{1,3}_[^/,]+,?)+$/i.test(seg) && !/^\d{2,4}(x\d{2,4})?$/.test(seg)).join('/').replace(/[-_]?(\d{2,4}w|\d{2,4}x\d{2,4}|small|medium|large|xl)(?=\.[a-z]+$)/gi, ''); a.forEach((u, i) => { if (stem(u) !== stem(b[i])) map.set(u, b[i]); }); return map; })();
+const mobileBp = Number(arg('--mobile-bp', 768)) || 768;
+const pictureHtml = (n, alt, wrap = 'p') => { const src = rewriteMedia(n.src || bgUrl(n)); const a = alt ?? n.alt ?? ''; const pic = `<picture><img src="${esc(src)}" alt="${esc(a)}"></picture>`; const mob = n.src && mobileMap.get(n.src); const pic2 = mob ? `<picture><img src="${esc(rewriteMedia(mob))}" alt="${esc(`${a} | mobile <${mobileBp}`)}"></picture>` : ''; return wrap === 'p' ? `<p>${pic}</p>${pic2 ? `<p>${pic2}</p>` : ''}` : `${pic}${pic2}`; };
 const weightOf = (n, force) => (force && force !== 'plain' ? force : force === 'plain' ? null : n.bg && !/rgba\(0, 0, 0, 0\)/.test(n.bg) ? 'strong' : n.border && !n.bg ? 'em' : null);
 function linkHtml(n, force, { altHint } = {}) {
   const h = href(n.href); const dead = isDead(n.href);
