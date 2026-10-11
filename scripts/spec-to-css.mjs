@@ -55,7 +55,9 @@ const pageCap = (() => { const rs = S.secs.filter((s) => !/^(HEADER|FOOTER)\b/.t
 function textRules(items, W, sel, prev) {
   // one rule per tag with its most common style; inline spans are skipped (buttons are read as controls below)
   const texts = items.filter((it) => isText(it) && it.t && onPage(it, W) && !it.inline && !/^(span|a|button|input|label)$/.test(it.k));
-  const byTag = new Map(); for (const it of texts) { const k = it.k; if (!byTag.has(k)) byTag.set(k, []); byTag.get(k).push(it); }
+  // a text the source sets in a bare `div` is authored as a paragraph: its style is a `p` rule — `.carousel div { font }` hit every cell and
+  // the footer's `div { font: 700 20px }` every column (santanderus panel run)
+  const byTag = new Map(); for (const it of texts) { const k = /^(div|section|article)$/.test(it.k) ? 'p' : it.k; if (!byTag.has(k)) byTag.set(k, []); byTag.get(k).push(it); }
   const out = [];
   for (const [tag, list] of byTag) {
     const key = count(list.map((it) => `${it.fs}|${it.lh}|${it.fw}|${fam(it.ff)}|${it.c}|${it.tt}|${it.ta}|${it.ls}`))[0][0].split('|');
@@ -134,8 +136,12 @@ rows.forEach((row, i) => {
   // without a section style the block's section is scoped to ITSELF (as a default-content section is): an unscoped `main .section` put the
   // last block section's padding and navy background on every section of the page (exp/five-min replay: manulife 85–94 %)
   const sectionSel = classes ? `main .section${style ? `.${style.split(/[,\s]+/).filter(Boolean).map((t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-')).join('.')}` : `:nth-of-type(${i + 1})`}` : sel;
-  const secDecl = [...(padTop !== null ? [`padding: ${px(Math.max(0, padTop))} 0 ${px(Math.max(0, padBottom))}`] : []), ...(bg ? [`background: ${rgb(bg)}`] : []), ...(live.bgi ? [`background-image: ${live.bgi.slice(0, 120)}${live.bgs ? `; background-size: ${live.bgs.split(' ')[0]}; background-position: ${live.bgs.split(' ').slice(1, 3).join(' ')}` : ''}`] : [])];
+  // the section's background picture is ALSO the authored picture (author writes a root's url() as the section's picture): drafted as both,
+  // it painted twice (santanderus hero) — the picture covers the section from behind and the url() is left out
+  const bgiFile = live.bgi && mediaMap ? (/url\((['"]?)([^'")]+)\1\)/.exec(live.bgi) || [])[2] : null; const bgiAuthored = !!(bgiFile && mediaMap(bgiFile) && secHtml.includes(mediaMap(bgiFile)));
+  const secDecl = [...(padTop !== null ? [`padding: ${px(Math.max(0, padTop))} 0 ${px(Math.max(0, padBottom))}`] : []), ...(bg ? [`background: ${rgb(bg)}`] : []), ...(live.bgi && !bgiAuthored ? [`background-image: ${live.bgi.slice(0, 120)}${live.bgs ? `; background-size: ${live.bgs.split(' ')[0]}; background-position: ${live.bgs.split(' ').slice(1, 3).join(' ')}` : ''}`] : [])];
   const insetNote = inset ? ` /* inset top ${inset.first}: ${inset.top.join(' → ')}; bottom ${inset.last}: ${inset.bottom.join(' → ')} */` : '';
+  if (bgiAuthored) (classes ? sectionsDraft : lines).push(`${sectionSel} { position: relative; isolation: isolate; } ${sectionSel} picture:has(img[src*="${mediaMap(bgiFile)}"]) { position: absolute; inset: 0; z-index: -1; } ${sectionSel} img[src*="${mediaMap(bgiFile)}"] { width: 100%; height: 100%; object-fit: ${String(live.bgs || 'cover').split(' ')[0] === 'contain' ? 'contain' : 'cover'}; }  /* the section's background picture, authored once */`);
   if (secDecl.length) (classes ? sectionsDraft : lines).push(`${sectionSel} { ${secDecl.join('; ')}; }${insetNote}${classes && !style ? '  /* this section only: name a section style to share it across pages */' : ''}`);
   if (classes) {
     if (contentW && pageCap && Math.abs(contentW - pageCap) > 8) lines.push(`${sel} { max-width: ${px(contentW)}; margin: 0 auto; }  /* content x ${r[0]}..${r[1]} (the page cap is ${pageCap}) */`);
