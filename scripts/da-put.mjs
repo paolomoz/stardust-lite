@@ -15,7 +15,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { basename, dirname, extname, join } from 'node:path';
 import { arg, siteProfile, daToken } from './common.mjs';
 
-const VALUED = ['--to', '--as', '--pages', '--doc-dir', '--site'];
+const VALUED = ['--to', '--as', '--pages', '--doc-dir', '--site', '--concurrency'];
 const positional = process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && VALUED.includes(all[i - 1])));
 const pagesFile = arg('--pages', null); const dry = arg('--dry', false);
 // the target: the first positional when it looks like org/site/branch, else the profile's DA coordinates (`da` in migration/site.json)
@@ -32,14 +32,15 @@ if (!org || !site || !branch || !items.length || (typeof pagesFile !== 'string' 
 const token = daToken(); if (!token && !dry) { console.error('da-put: DA_TOKEN is not set (source ~/.claude/.env)'); process.exit(1); }
 const MIME = { '.html': 'text/html', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.gif': 'image/gif', '.svg': 'image/svg+xml', '.mp4': 'video/mp4', '.pdf': 'application/pdf', '.json': 'application/json' };
 let failed = 0;
-for (const it of items) {
+// the uploads SIX at a time (--concurrency): one by one, a home page's 26 pictures took 58 s on `first`'s critical path (wpp)
+const one = async (it) => {
   const f = it.file; let { name } = it; if (!extname(name) && extname(f).toLowerCase() === '.html') { name = `${name}.html`; console.error(`da-put: --as ${it.name} → ${name} (a document source needs .html; uploaded 201 and previewed 404 without it — manulife)`); } const ext = extname(name).toLowerCase();
-  if (!existsSync(f)) { failed += 1; console.log(`${f} → (missing)  ${it.slug ? `page ${it.slug}: ` : ''}no such file`); continue; }
+  if (!existsSync(f)) { failed += 1; console.log(`${f} → (missing)  ${it.slug ? `page ${it.slug}: ` : ''}no such file`); return; }
   if (name !== name.toLowerCase()) console.error(`da-put: ${name} has upper-case letters — the DA store is case-insensitive and the pipeline path is lower-case (BACKLOG #4)`);
   if (name.includes('--')) console.error(`da-put: ${name} has a double hyphen — the upload answers 200 and the branch host previews 404 (usta2-home); rename it`);
   if (/[_]|\..*\./.test(name)) console.error(`da-put: ${name} has an underscore or a dot in its stem — uploaded 201, previewed 404 on the branch host (audemarspiguet-home); use a-z0-9 and single hyphens`);
   const srcPath = `${it.to ? `${it.to}/` : ''}${name}`; const previewPath = ext === '.html' ? srcPath.slice(0, -5) : srcPath;
-  if (dry) { console.log(`${f} → ${srcPath}  would PUT https://admin.da.live/source/${org}/${site}/${srcPath}${arg('--no-preview', false) ? '' : `  then POST https://admin.hlx.page/preview/${org}/${site}/${branch}/${previewPath}`}`); continue; }
+  if (dry) { console.log(`${f} → ${srcPath}  would PUT https://admin.da.live/source/${org}/${site}/${srcPath}${arg('--no-preview', false) ? '' : `  then POST https://admin.hlx.page/preview/${org}/${site}/${branch}/${previewPath}`}`); return; }
   const fd = new FormData(); fd.append('data', new Blob([readFileSync(f)], { type: MIME[ext] || 'application/octet-stream' }), name);
   const up = await fetch(`https://admin.da.live/source/${org}/${site}/${srcPath}`, { method: 'PUT', headers: { Authorization: `Bearer ${token}` }, body: fd }).catch((e) => ({ status: String(e.message) }));
   let pv = { status: '-' }; let url = '';
@@ -47,6 +48,8 @@ for (const it of items) {
   if (!up.ok || (pv.status !== '-' && !pv.ok)) failed += 1;
   console.log(`${f} → ${srcPath}  upload ${up.status}  preview ${pv.status}${url ? `  ${url}` : ''}`);
   if (up.status === 401 || pv.status === 401) { console.error('da-put: 401 — refresh DA_TOKEN (python3 ~/.claude/scripts/refresh_da_token.py) and re-source .env'); process.exit(3); }
-}
+};
+const pool = [...items]; const conc = Math.max(1, Number(arg('--concurrency', 6)) || 6);
+await Promise.all(Array.from({ length: Math.min(conc, pool.length) }, async () => { while (pool.length) await one(pool.shift()); }));
 if (dry) console.log(`da-put: dry run — ${items.length} item(s) listed, nothing uploaded${failed ? `, ${failed} missing` : ''}`);
 process.exit(failed ? 2 : 0);
