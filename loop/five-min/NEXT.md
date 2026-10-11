@@ -69,3 +69,15 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
 - decorateVideos KEPT on content fidelity against the bench: mheducation +0.2 / +22 / +34 (its hero is a background video behind the text;
   rendered in flow at 720 px it now pushes the page down — before, the video was a small text link), wpp −1.1 / −3.2 / −1.5, deloitte ±0.4.
   Media rules now size `video` like the picture.
+- P5 lenovo-p1 (7a9be3d): stop 33.4 min (was 34.8), served 8.04 / 4.88 / 7.73. Largest cost ≈ 14 min: every section drafted from the one
+  6734 px wrapper — the defect item 2 fixed and the bench REJECTED (the machine-only first-round % read the wrong-but-tall drafts as better).
+  Also: Montserrat declared as fixed 400 / 700 faces for a variable file (600 rendered as 700, wraps at 360); the hero category strip not
+  authored; the per-section % is page-aligned (a fixed height above moves the % of every section below).
+- Field A/B for item 2: lenovo-p2 = the same code + the bands (branch exp/bands), same protocol.
+- fixes after P5: media-fetch declares faces with identical bytes as one variable face with a weight range (lenovo Montserrat 400 + 700 →
+  100 900); the gate prints each section's own % (own tops) beside the page-aligned share when they differ by > 3 points.
+- P6 lenovo-p2 (a8b975a = 7a9be3d + the bands): stop 16.5 min vs P5's 33.4 on the same page and code — the bands HALVE the clock on the page
+  they target; the bench's machine-only first-round % misjudged them (wrong-but-tall drafts scored better as pixels, cost the agent 14 min).
+  ADOPTED against the bench. Served 9.13 / 11.75 / 9.59 (a slider scrolled sideways on the served capture at 1440 — registered).
+- author: a main row with a chrome row's box is the chrome split twice → drop (marks exactly the rows the agents dropped by hand:
+  lenovo-p2 1 / 12, lenovo-lite 2 / 11, omnicom 6; none elsewhere).
