@@ -52,3 +52,11 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
   merged, a closing CTA missing), cards draft `repeat(1, …)` from a 2-span card (Δh +8582), videos as links, logo SVG not fetched.
 - bench n3 (8fffaf7: div text → p rule; a section's background picture drafted once): 16 changed pages, 0 worse, marriott −4.9 and
   unitedrentals −5.9 at 360 — KEPT.
+- WPP cards `repeat(1, …)`: the per-row count from the fullest row changes nothing — the chosen unit IS the 690×460 2-span video card (the
+  regular cards have no paint of their own, so they are never a unit). Reverted; registered: choose between the painted unit and the image
+  column by members per row. WPP's hero heading is not one text in the dump (per-line nodes without a font) — collector, registered.
+- P3 rbc-p1 (b60175f): stop 11.0 min (was 14.7), served 6.62 / 3.97 / 2.37. Costs: author mis-modelled sections 2–5 (chevron SVGs as card
+  pictures, panels as loose content, accordions dropped — Δh +8293, ≈ 4 min re-authoring), thin chrome drafts (≈ 2 min), drafts keyed on
+  section positions lost after the re-author (≈ 1 min); button rules on `strong a` (decoration makes `a.button`).
+- author: the nav brand is its logo (`<a><picture><img>`) when the link holds one — santanderus / rbc / merck now match the agents' hand
+  versions (revlon / wpp draw an inline SVG never fetched). foundation: decorateVideos (poster + file link → muted looping inline video).
