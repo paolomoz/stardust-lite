@@ -129,8 +129,9 @@ if (arg('--fragments', null)) {
     // served fragment (deloitte: the harness showed the previewed nav, not the edited one); needs DA_TOKEN, else a warning
     const local = join(dirname(resolve(src)), `${basename(path)}.html`); const hm = /^https:\/\/([^-]+(?:-[^-]+)*?)--([^-]+(?:-[^-]+)*?)--([^.]+)\.aem\.page/.exec(host);
     if (existsSync(local) && r && r.ok) {
-      // the pictures COUNT (served media are renamed media_<hash>; revlon: an added logo did not re-upload the nav)
-      const served = await r.clone().text(); const norm = (t) => t.replace(/<(img|source)[^>]*?(?:src|srcset)="([^"?]*)[^>]*>/gi, (m0, tag) => (tag.toLowerCase() === 'img' ? ' [img] ' : ' ')).replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim(); const lt = readFileSync(local, 'utf8'); const lm = lt.slice(lt.indexOf('<main'), lt.lastIndexOf('</main>'));
+      // the pictures COUNT (served media are renamed media_<hash>; revlon: an added logo did not re-upload the nav) and the headings / strong / em
+      // (omnicom: a footer split into labelled columns, same text, was never re-uploaded)
+      const served = await r.clone().text(); const norm = (t) => t.replace(/<(img|source)[^>]*?(?:src|srcset)="([^"?]*)[^>]*>/gi, (m0, tag) => (tag.toLowerCase() === 'img' ? ' [img] ' : ' ')).replace(/<(h[1-6]|strong|em)\b[^>]*>/gi, (m0, tag) => ` [${tag.toLowerCase()}] `).replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim(); const lt = readFileSync(local, 'utf8'); const lm = lt.slice(lt.indexOf('<main'), lt.lastIndexOf('</main>'));
       if (norm(lm.replace(/^<main>/, '')) !== norm(served)) {
         // only when asked (first passes it, not with --no-da): a replay's harness re-uploaded its scratch nav over a run's real one
         if (daToken() && hm && process.argv.includes('--sync-chrome')) { const up = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'da-put.mjs'), `${hm[3]}/${hm[2]}/${hm[1]}`, local, '--to', dirname(path).replace(/^\//, '')], { encoding: 'utf8' }); console.log(`harness: ${k} document changed locally — uploaded and previewed again (${up.status ? `da-put exit ${up.status}` : 'ok'})`); r = await fetch(`${host}${path}.plain.html`, { cache: 'no-store' }).catch(() => null); }

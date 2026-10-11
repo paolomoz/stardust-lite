@@ -57,9 +57,13 @@ export function collectContent([roots, hidden, sectionSel = null, pierce = false
     // a phrasing-only element with no own text is still one text when it holds no link (`<p><strong>Title</strong></p>`, `<p><em><strong>`):
     // descending to the `strong` read the title as a bare paragraph; a lone link child keeps descending so the link is a node of its own
     const phrasingText = phrasingOnly && (own(e) || ((!e.querySelector('a') || /^H[1-6]$/.test(e.tagName)) && norm(e.textContent))); // a heading holding a link stays one heading with its markup (an `<h3><strong>Email:</strong> <a mailto>` was lost — covermore, loop r6)
-    let descend = true;
+    // a heading / paragraph whose inline text sits next to a picture (`<h1><img logo> The world's leading <em>marketing</em> …`) is one text with
+    // its markup, the picture still a node: own text alone dropped the `em` words from the heading (omnicom, loop L21)
+    const MEDIA = /^(IMG|PICTURE|SVG)$/;
+    const phrasingMedia = !phrasingOnly && /^(H[1-6]|P)$/.test(e.tagName) && own(e) && [...e.children].some((c) => MEDIA.test(c.tagName)) && [...e.children].every((c) => MEDIA.test(c.tagName) || (isPhrasing(c) && !c.querySelector('img,picture,svg,video')));
+    let descend = true; let mediaOnly = false;
     const run = lineRun();
-    if (run) { n.text = run.map((k) => norm(k.textContent)).join(' '); n.lines = run.length; n.font = font(run[0]); descend = false; } else if (phrasingText) { n.text = norm(e.textContent); const full = norm(e.innerHTML); n.markup = full.slice(0, 600); if (full.length > 600) n.markupFull = full; n.font = font(); descend = false; } else { const t = own(e); if (t) { n.text = t; n.font = font(); } }
+    if (run) { n.text = run.map((k) => norm(k.textContent)).join(' '); n.lines = run.length; n.font = font(run[0]); descend = false; } else if (phrasingText) { n.text = norm(e.textContent); const full = norm(e.innerHTML); n.markup = full.slice(0, 600); if (full.length > 600) n.markupFull = full; n.font = font(); descend = false; } else if (phrasingMedia) { const clone = e.cloneNode(true); clone.querySelectorAll('img,picture,svg').forEach((m) => m.remove()); n.text = norm(clone.textContent); const full = norm(clone.innerHTML); n.markup = full.slice(0, 600); if (full.length > 600) n.markupFull = full; n.font = font(); mediaOnly = true; } else { const t = own(e); if (t) { n.text = t; n.font = font(); } }
     if (e.tagName === 'A') { n.href = e.getAttribute('href'); if (e.getAttribute('aria-label')) n.aria = e.getAttribute('aria-label'); if (e.target) n.target = e.target; if (e.title) n.title = e.title; }
     if (e.tagName === 'VIDEO') { n.src = e.currentSrc || e.getAttribute('src') || e.querySelector('source')?.getAttribute('src') || null; if (!n.src) delete n.src; if (e.poster) n.poster = e.poster; }
     // an icon-font glyph: an empty element whose class names the font (`icon-search`, `fa-chevron-right`) — content, not paint
@@ -77,7 +81,7 @@ export function collectContent([roots, hidden, sectionSel = null, pierce = false
     if (s.borderRadius !== '0px') n.br = s.borderRadius;
     if (s.boxShadow !== 'none') n.shadow = s.boxShadow;
     if (s.borderTopWidth !== '0px' && s.borderTopStyle !== 'none') n.border = `${s.borderTopWidth} ${s.borderTopStyle} ${s.borderTopColor}`;
-    const kids = descend ? kidsOf(e).map(walk).filter(Boolean) : [];
+    const kids = descend ? kidsOf(e).filter((c) => !mediaOnly || MEDIA.test(c.tagName)).map(walk).filter(Boolean) : [];
     if (kids.length) n.children = kids;
     if (kids.length === 1 && !n.text && !n.href && !n.src && !n.bg && !n.bgi && !n.border && !n.shadow && !n.id && !isSec) return kids[0]; // bare wrapper (a marked section never collapses)
     if (isSec && !kids.length && !n.text && !n.href && !n.src && !n.bg && !n.bgi) return n; // an empty marked section stays a (0-item) row — the spec counts it too

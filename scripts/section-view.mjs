@@ -16,7 +16,7 @@ if (!dir || !url || !part || url.startsWith('--')) { console.error('usage: secti
 const widths = String(arg('--widths', '1440,360')).split(',').map(Number); const out = String(arg('--out', join(dir, 'view'))); mkdirSync(out, { recursive: true });
 const secSel = String(arg('--build-sections', 'main .section'));
 
-const cut = (png, y0, y1) => { const h = Math.max(1, Math.min(png.height, y1) - Math.max(0, y0)); const o = new PNG({ width: png.width, height: h }); PNG.bitblt(png, o, 0, Math.max(0, y0), png.width, h, 0, 0); return o; };
+const cut = (png, y0, y1) => { y0 = Math.min(Math.max(0, y0), png.height - 1); const h = Math.max(1, Math.min(png.height, y1) - y0); const o = new PNG({ width: png.width, height: h }); PNG.bitblt(png, o, 0, Math.max(0, y0), png.width, h, 0, 0); return o; };
 const browser = await launch();
 for (const W of widths) {
   const livePng = join(dir, `live-${W}.png`); const tableFile = join(dir, `sections-${W}.json`);
@@ -42,6 +42,9 @@ for (const W of widths) {
   }, [part, secSel, idx]);
   if (!box) { console.log(`${W}: no build section ${part}`); await ctx.close(); continue; }
   const [by0, by1] = box.map(Math.round);
+  // the footer's live range when the last live section already runs to the capture's bottom (omnicom: the band the live footer holds was a
+  // section of the split) — the bottom of the capture, the build footer's height
+  if (part === 'footer' && ly1 - ly0 < 10) { ly0 = Math.max(0, live.height - (by1 - by0)); ly1 = live.height; }
   const shot = PNG.sync.read(await page.screenshot({ fullPage: true, clip: { x: 0, y: by0, width: W, height: Math.max(1, by1 - by0) } }));
   await ctx.close();
   const a = cut(live, ly0, ly1); const b = shot; const H = Math.max(a.height, b.height); const h = Math.min(a.height, b.height);
