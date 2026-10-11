@@ -130,3 +130,12 @@ export function triageRowFor(triage, liveSection) {
   const a = norm(liveSection.anchorText);
   return (a && rows.find((r) => norm(r.anchorText) && (norm(r.anchorText).startsWith(a.slice(0, 28)) || a.startsWith(norm(r.anchorText).slice(0, 28))))) || rows[liveSection.index] || null;
 }
+
+/** The live sections from the MEASUREMENT's dump (content-<W>.json next to the origin capture), no live page: the same split as the triage's
+ * (splitSections on the whole dump: the extra bands included, as author wrote them) and the same session as the cached capture. The first
+ * round of a run opened the live page at three widths for these boxes (≈ 15–25 s each, wpp's first round 65 s against 31–48 s later). */
+export function liveSectionsFromDump(dump, { sections = null } = {}) {
+  const sp = splitSections(dump, { sections: sections && sections.length ? sections : null });
+  const rows = sp.sections.map((n, index) => { const fp = fingerprint(n); return { index, anchorText: fp.anchorText || '', box: boxOf(n) }; });
+  return { sections: rows, header: sp.header?.box || null, footer: sp.footer?.box || null, doc: Number(dump.__doc) || null, root: { requested: null, resolved: true, name: sp.mainKey }, split: sections && sections.length ? 'selectors' : 'automatic', from: 'dump' };
+}

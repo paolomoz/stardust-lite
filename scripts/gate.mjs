@@ -51,7 +51,7 @@ import pixelmatch from 'pixelmatch';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { arg, openPage, settle, overlayOpts, overlayArgs, siteProfile, stardustScripts, contextOptions, launch } from './common.mjs';
-import { liveSections, pairSections, triageRowFor } from './lib/section-pair.mjs';
+import { liveSections, liveSectionsFromDump, pairSections, triageRowFor } from './lib/section-pair.mjs';
 import { captureUrl } from './lib/stitch.mjs';
 
 const USAGE = 'usage: gate.mjs --live <url> --build <url> --out <dir> [--round] [--widths 360,1440,2560] [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--main <live-content-root>] [--build-main main] [--probes <file>] [--origin <dir with live-<W>.png>] [--vh 900] [--capture-tool stitch|stitch-shot] [--skip-widths-when-clean <sections-verdict.json>] [--chrome|--no-chrome] [--budget|--no-budget] [--triage <triage.json>]\n       gate.mjs --pages <pages.json> --build-base http://localhost:<port> [--out gate]   |   gate.mjs --served-pages <pages.json> --branch-host <url> [--out gate-served] [--origin-base gate]';
@@ -175,6 +175,8 @@ const captureW = async (W) => {
   // per round read Δdoc −603 in the table, −3 in the pixels) and do not reopen the live page (≈ 10 s a width)
   const lsFile = join(out, `live-sections-${W}.json`); const lsKey = JSON.stringify([contentRoot, sectionSels, profile?.chrome?.header?.selector || null, profile?.chrome?.footer?.selector || null]);
   let lsCached = null; if (!needOrigin) { try { const c = JSON.parse(readFileSync(lsFile, 'utf8')); if (c.key === lsKey) lsCached = c.ls; } catch { /* first read */ } }
+  // no cached split yet and the origin came from a measure dir: its dump is the live split (no live open — the first round's slow part)
+  if (!lsCached && !needOrigin && originFrom[W] && typeof originFrom[W] === 'string') { const dumpFile = join(dirname(originFrom[W]), `content-${W}.json`); if (existsSync(dumpFile)) { try { lsCached = liveSectionsFromDump(JSON.parse(readFileSync(dumpFile, 'utf8')), { sections: sectionSels }); writeFileSync(lsFile, JSON.stringify({ key: lsKey, ls: lsCached })); } catch { lsCached = null; } } }
   let lp = null; let bp = null; let liveCtx = null; let buildCtx = null;
   if (captureTool === 'stitch-shot') {
     if (needOrigin) { const t0 = Date.now(); console.log(`origin ${W}…`); run([join(S, 'stitch-shot.mjs'), live, origin, '--width', String(W), '--vh', String(vh), '--settle', ...liveOpts]); t.live = secs(t0); originFrom[W] = 'captured (stitch-shot)'; }
