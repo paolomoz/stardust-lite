@@ -132,7 +132,10 @@ const SMALL_SVG = 64;
 const isIconImg = (n) => kindOf(n) === 'picture' && /\.svg(\?|$)/i.test(n.src || '') && n.box && Math.max(n.box[2], n.box[3]) <= SMALL_SVG;
 
 // ───────────────────────────── leaves ─────────────────────────────
-const hasBg = (n) => !!bgUrl(n);
+// an SVG background on an element that carries its own text is a MARKER (a list chevron, an arrow before a link), not a picture: rbc's 30
+// chevron `li`s were authored as card pictures and drawn ~300 px wide by the drafts' `picture img { width: 100% }` (≈ 4 min re-authoring)
+const textOf = (n) => !!(n && (n.text || (n.children || []).some(textOf)));
+const hasBg = (n) => { const u = bgUrl(n); if (!u) return false; if (/\.svg(\?|#|$)/i.test(u) && textOf(n)) return false; return true; };
 const MEDIA = (k) => general(k) === 'media';
 const CONTROL = new Set(['button', 'input']);
 /** The ordered leaves under a node: { kind (recipe kind), raw (dump kind), node, top (index of the top-level child), parent }. A list is
