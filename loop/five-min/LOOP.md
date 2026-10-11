@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L21 | omc.com (fan-out) | 468cb35 + r2 gate fix (section-view, owners in parallel) | 1.4 (55 / 62 / 50 %) | **never** at 360 (stopped at ≈ 45: 11.8 / 6.8 / 7.7) | (11.7 / 6.6 / 7.4) | 9 | 42–52 | six owner waves 31.7 min (each the slowest owner: carousel 10.4, 8.8), tools 8.1 | the fan-out is bounded by its hardest block; a drop row kept in the gate's live split folded two sections; the footer's band authored twice; Lottie at 360 |
 | L20 | waters.com us en | 78fcbe3 (anti-flicker, lazy placeholders, empty sections kept, clones skipped) | 1.8 (57 / 43 / 46 %) | 33.7 | 44.0 | 3 | 54–57 | own ≈ 26 min, tools 7.3 to stop | the drafts aimed at the wrong sections (an empty first section) and a 608 px cap — thrown away, all CSS by hand (8 min); the installed Chrome's one shot laid 360 out at 500; an empty section the served page dropped |
 | L19 | wyndhamhotels.com en-uk | 2c1fabc (picture img rules, readable tiles) | 5.5 after 2 × `first` (54 / 77 / 76 %) | **never** at 360 (12.92); 1440 / 2560 under 10 at 20.5 | 34.2 | 10 | 32–40 | own ≈ 17.9 min, tools 10.6 to stop | an anti-flicker `body{opacity:0}` (Adobe Target) made every live capture blank; lazy placeholders accepted as loaded (two grey pictures at 360 / 1440); an empty section the harness dropped and the served page kept; slider clones authored |
 | L18 | rbc.com about-rbc | b331bbf (line cap, digest per width, alt-paired mobile pictures) | 1.5 (39 / 41 / 31 %) | 14.7 | 16.9 | 4 | 22–23 | own ≈ 11.5 min, tools 3.2 to stop | an icon img stretched to the card width by `.cards img { width: 100% }` (the build 8000 px too tall), the page / nav / footer documents rewritten (≈ 2.5 min), an unreadable 360 thumbnail |
@@ -173,3 +174,19 @@ art direction generated. What did not: the AGENT's own pass — reading the meas
 and is now 70–85 % of every clock. A clean simple page costs ≈ 1.5 min of tools + ≈ 5 min of agent; a complex one (a rail, a scroll-driven
 hero, a mega-menu) 15+ min of agent. The 5-min target needs the generated document and CSS good enough that the agent only fixes residuals:
 the drafts carried ≈ 20–35 % of the final CSS throughout (bms replay: the element pass `style-pass` did not move the first round).
+
+## Extra runs (L21–L25, asked 2026-10-11: five more with progressive enhancements)
+
+Order continues: Omnicom, Lenovo, Nebraska Furniture Mart, Bank of America, Cisco.
+
+### L21 prep — rejected: the height fit
+`fit.mjs` (live section heights as min-heights where the build is shorter, a desktop line through 1440 / 2560) on the bench, six loop pages,
+machine mode: 4 unchanged, wpp 360 −8.8 but 1440 +2.5 / 2560 +1.7 (`loop/bench/l21-base.json`, `l21-fit.json`). First prototypes are off by
+structure (publicis' first section 2633 px built vs 759 live), not by heights a min-height can absorb. Reverted.
+
+### L21 — the fan-out (`FANOUT.md`) on omnicom
+Owners in parallel after `first`, each with `section-view` (iteration 22). Result: ≈ 45 min, no stop at 360 — see `cases/omnicom-home/NOTES.md`.
+The parallel waves' median owner was 3.5–5 min but each wave lasted as long as its hardest block (10.4, 8.8, 7.8 min); orchestration and
+re-reading per owner add turns a single agent does not pay. Not kept as the protocol; `section-view` is kept for the single agent.
+Iteration 23 (from the run): drop rows leave the gate's live split; author drops a default row that is the chrome's own band; a heading beside a
+picture keeps its inline markup; the harness re-syncs chrome documents on structural edits; section-view's footer range.
