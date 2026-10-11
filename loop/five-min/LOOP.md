@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L10 | sherwin-williams.com | c6073fd (fonts by use, nav brand, picture-count sync, sbs thumbnails) | 5.2 after 3 × `first` (46 / 40 / 38 %) | 26.8 | 29.2 | 12 | 20–35 | own ≈ 17 min, tools 9.6 to stop | no `<main>` (AEM Sites): `body > *` guessed, two re-runs and `--main` by hand ≈ 4 min; empty chrome documents (a --footer key not named footer); Open Sans from a cyrillic subset, a variable face as two static weights ≈ 3 min; crops swept by hand 2.5 min |
 | L9 | revlon.com | b250798 (one-band extra roots, local media, concurrent local builds) | **1.17** (78 / 59 / 43 %) | **10.45** | 12.5 | 2 | 20–21 | own ≈ 8.5 min, tools **1.95** to stop | tools solved (first 70 s, rounds 20 s); the clock is the agent: reading 3, writing 2.5, re-modelling a carousel split into 7 tables 1.5, diagnosis 1.5; fonts.css missing the used families (round 1 in serif), an empty nav brand |
 | L8 | pgatour.com | f5d4a51 (split of tall containers, da-put pool, 2-width probe) | 5.5 after 2 × `first` (48 / 36 / 19 %) | 17.05 | 19.2 | 4 | 55–64 | own ≈ 8.4 min, tools 8.6 to stop | a bare `div` extra root (451 nodes) became the content root: 73 rows, 63 dropped by hand; a round of broken images (aem.page 301s after a harness re-run); block drafts load after styles.css and won |
 | L7 | wpp.com en | 07bd330 (generated CSS imported first, chrome from triage rows, block folders, section guess) | 3.4 (59 / 76 / 53 %) | **9.7** | 12.0 | 1 | 48 | own ≈ 5.4 min, tools 4.3 to stop | one `first` (204 s: the media upload 58 s on the critical path), one round; the agent's pass ≈ 5 min — the drafts' block layouts wrong (a spanning first card, a bleeding slider, a fixed bottom pill header), headings authored one paragraph per line |
@@ -90,3 +91,10 @@ Iteration 10: fonts.css from the families the text uses (aliases), the last @fon
 media, chrome documents re-uploaded on a picture-count change, slideshow controls not content, sbs-<W>.png per round. A replay of this
 iteration re-uploaded a scratch nav over bms's and revlon's real ones (the token file made it possible): both restored from their cases,
 and the harness uploads only with `--sync-chrome` now.
+
+### L10 — fonts by use, a brand that is never empty, sync on picture count, side-by-side thumbnails
+Change: fonts.css from the families the text uses (+ aliases, the last src), the nav brand from the host when no logo link, the harness
+re-uploads on a picture-count change (only with --sync-chrome), the 360 dump's media, slideshow controls not content, sbs-<W>.png.
+Result on sherwin-williams: stop at 26.8 — a page with no `<main>` (3 `first` runs), empty chrome documents, subset / variable fonts, crops
+by hand. Keep. Iteration 11: the content root without `<main>`, unique chrome guesses, chrome keys named in the dump, the latin subset, a
+variable face with its range, a missing decorate created, object-position drafted (replay: 8 sections + footer, the agent's own split).
