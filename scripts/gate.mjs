@@ -386,6 +386,7 @@ if (roundMode) {
   const basePct = rows.find((r) => r.W === W)?.pct;
   digest += `\nround digest at ${W}${prev ? ' (vs the previous round in this dir)' : ' (first round here)'}: page ${basePct} %${moved.length ? `\n${moved.join('\n')}` : '\n  no section moved'}`;
   }
+  { const under = rows.filter((r) => typeof r.pct === 'number' && r.pct < target); if (under.length) digest += `\nunder ${target} % (not digested): ${under.map((r) => `${r.W} ${r.pct} %`).join(' · ')}`; }
   digest += threeW.every(underAt) ? `\nstop: under ${target} % at the three widths — the prototype is done; deploy and name the residuals in the register (polish after this is outside the clock)`
     : widths.every(underAt) ? `\nnext: under ${target} % at ${widths.join(' / ')} — gate the round at the three widths (--widths 360,${baseW},${probeW})`
     : clean && now.length ? `\nnext: every paired section is within 2 px but the pixels are over ${target} % — a paint, a picture or an unpaired section (read sbs-<W>.png)` : `\nnext: one round, changing only what the rows above name`;
@@ -393,4 +394,6 @@ if (roundMode) {
 const tLine = `${tLine0} | cap-probe ${tTail.cap} s, sections pass ${tTail.sections} s, pair ${tTail.pair ?? 0} s | total ${secs(tStart)} s`;
 console.log(`\n${targetLine}\n${capLine}${sectionsLine ? `\n${sectionsLine}` : ''}${motionLine ? `\n${motionLine}` : ''}${budgetLine ? `\n${budgetLine}` : ''}${digest}${roundMode ? `\nside by side (live | build, section tops red; tiles sbs-<W>-1.png …): ${widths.map((W) => join(out, `sbs-${W}-1.png`)).join(' ')}` : ''}\ntiming (${captureTool}${captureTool === 'stitch' ? ', live and build concurrent' : ''}): ${tLine}\nevidence: ${out}/`);
 writeFileSync(join(out, 'gate.json'), JSON.stringify({ _schema: 'stardust-lite/gate@1', _writtenAt: new Date().toISOString(), live, build, slug, widths, rows, timing, timingTail: { ...tTail, total: secs(tStart) }, target: { pct: target, reached: threeW.every(underAt), line: targetLine }, captureTool, origin: originFrom, chrome: { on: chromeOn, template: isTemplate, byWidth: chromeRuns }, cap: { verdict: capLine.split('\n')[0], failing: capLine.split('\n').slice(1) }, motion: motionLine || null, budget: { on: budgetOn, verdict: budgetOn ? (overAll.length ? 'FAIL' : 'PASS') : null, over: overAll, newSections: newCount, defaultSections: defaultCount, blocks: blocks.length ? blocksFile : null }, sections: sectionRuns }, null, 1));
+// every round kept (gate.json is the latest): the widths a digest leaves out once under target were lost with the overwrite (lenovo r4–r8)
+{ const rd = join(out, 'rounds'); mkdirSync(rd, { recursive: true }); copyFileSync(join(out, 'gate.json'), join(rd, `${new Date().toISOString().replace(/[:.]/g, '-')}.json`)); }
 process.exit(0); // nothing may keep the gate alive after gate.json (a dangling page held a bench run 11 min)

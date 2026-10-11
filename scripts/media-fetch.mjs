@@ -155,6 +155,26 @@ for (const [u, f] of Object.entries(manifest)) {
   if (!r.error && !r.status && existsSync(join(out, still))) { manifest[u] = still; unlinkSync(fp); console.log(`media-fetch: ${f} is ${(statSync(join(out, still)).size / 1024).toFixed(0)} KB as its first frame (${still}) — the gif was over 10 MB; register the motion`); }
   else console.error(`media-fetch: ${f} is over 10 MB and no ffmpeg still could be made — replace it before the upload`);
 }
+// an SVG Edge Delivery's media ingestion refuses (an embedded raster `<image>`, a script, a foreignObject, or over 40 KB) uploads with 200 and
+// previews with 409: the served page then shows `<img src="about:error">` where the prototype showed the picture (lenovo: two empty pills,
+// 360 at 11.1 % served against 8.2 % on the prototype). The source file itself, drawn once at 2× its own size, as a transparent PNG.
+{ const bad = Object.entries(manifest).filter(([, f]) => /\.svg$/i.test(f) && existsSync(join(out, f)) && (statSync(join(out, f)).size > 40 * 1024 || /<image\b|<script\b|<foreignObject\b/i.test(readFileSync(join(out, f), 'utf8'))));
+  if (bad.length) {
+    const br = await launch(); const ctx = await br.newContext({ deviceScaleFactor: 2, viewport: { width: 800, height: 800 } }); const pg = await ctx.newPage();
+    for (const [u, f] of bad) {
+      try {
+        const svg = readFileSync(join(out, f), 'utf8'); const vb = /viewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(svg);
+        const w = Math.round(Number(/\bwidth="([\d.]+)(?:px)?"/i.exec(svg)?.[1] || vb?.[1] || 300)); const h = Math.round(Number(/\bheight="([\d.]+)(?:px)?"/i.exec(svg)?.[1] || vb?.[2] || 150));
+        await pg.setViewportSize({ width: Math.max(1, w), height: Math.max(1, h) });
+        await pg.setContent(`<html><body style="margin:0;background:transparent"><img style="display:block;width:${w}px;height:${h}px" src="data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}"></body></html>`);
+        await pg.waitForFunction(() => document.images[0]?.complete, null, { timeout: 5000 });
+        const png = f.replace(/\.svg$/i, '-svg.png'); await pg.screenshot({ path: join(out, png), omitBackground: true, clip: { x: 0, y: 0, width: w, height: h } });
+        manifest[u] = png; console.log(`media-fetch: ${f} — an SVG the delivery refuses (embedded raster / script / > 40 KB): drawn as ${png} (${w}×${h} @2×)`);
+      } catch (e) { console.error(`media-fetch: ${f} could not be drawn as a PNG (${String(e.message || e).slice(0, 80)}) — it will not preview`); }
+    }
+    await br.close();
+  }
+}
 writeFileSync(join(out, 'manifest.json'), JSON.stringify(manifest, null, 1));
 console.log(`media-fetch: ${n} fetched, ${Object.keys(manifest).length} in ${out}/manifest.json${failed ? `, ${failed} failed` : ''}`);
 process.exit(failed ? 2 : 0);

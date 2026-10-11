@@ -3,7 +3,7 @@
 // next to the same section of the last gate round's live capture, with the heights and the section's pixel %. An agent that owns one block
 // checks its own section in ≈ 5 s instead of a full round (20–45 s for the whole page, and one round at a time — the fan-out runs several
 // owners at once). The live side is the gate's capture (never re-fetched); the build side is fresh.
-// Usage: node section-view.mjs <gate-dir> <build-url> --section <i[,j]>|header|footer [--widths 1440,360] [--out <gate-dir>/view]
+// Usage: node section-view.mjs <gate-dir> <build-url> --section <i[,j]>|<block>|<anchor text>|header|footer [--widths 1440,360] [--out <gate-dir>/view]
 //   <i> is the digest's `#i` (the build section's index). Prints one line per width and writes view-<part>-<W>.png (live | build).
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -12,7 +12,7 @@ import pixelmatch from 'pixelmatch';
 import { arg, launch, contextOptions, openPage, settle } from './common.mjs';
 
 const dir = process.argv[2]; const url = process.argv[3]; const part = String(arg('--section', ''));
-if (!dir || !url || !part || url.startsWith('--')) { console.error('usage: section-view.mjs <gate-dir> <build-url> --section <i[,j]>|header|footer [--widths 1440,360] [--out <dir>]'); process.exit(1); }
+if (!dir || !url || !part || url.startsWith('--')) { console.error('usage: section-view.mjs <gate-dir> <build-url> --section <i[,j]>|<block>|<anchor text>|header|footer [--widths 1440,360] [--out <dir>]'); process.exit(1); }
 const widths = String(arg('--widths', '1440,360')).split(',').map(Number); const out = String(arg('--out', join(dir, 'view'))); mkdirSync(out, { recursive: true });
 const secSel = String(arg('--build-sections', 'main .section'));
 
@@ -27,8 +27,12 @@ for (const W of widths) {
   // the live range: the table rows' (consecutive indices joined); the header is above the first section, the footer below the last
   let ly0; let ly1; let idx = [];
   if (part === 'header') { ly0 = 0; ly1 = firstLive; } else if (part === 'footer') { ly0 = lastLive; ly1 = live.height; } else {
-    idx = part.split(',').map(Number); const rows = table.filter((r) => idx.includes(r.index) && r.live);
-    if (!rows.length) { console.log(`${W}: section ${part} has no live partner in the round's table`); await ctx.close(); continue; }
+    // a digest index (`#3`), or a block name / anchor text (`carousel`, `"what's new"`): `brief` numbers LIVE sections (the header is #0) and
+    // the digest numbers BUILD sections — an agent passing brief's numbers read "no live partner" on every section (lenovo, L22)
+    const want = part.split(',').map((x) => x.trim().replace(/^#/, ''));
+    idx = want.flatMap((x) => (/^\d+$/.test(x) ? [Number(x)] : table.filter((r) => r.block === x || String(r.anchorText || '').toLowerCase().includes(x.toLowerCase())).map((r) => r.index)));
+    const rows = table.filter((r) => idx.includes(r.index) && r.live);
+    if (!rows.length) { console.log(`${W}: section ${part} has no live partner in the round's table — the digest's sections: ${table.map((r) => `#${r.index} ${r.block || 'default'} "${String(r.anchorText || '').slice(0, 24)}"${r.live ? '' : ' (no live)'}`).join(' · ')}`); await ctx.close(); continue; }
     ly0 = Math.min(...rows.map((r) => r.live.y0)); ly1 = Math.max(...rows.map((r) => r.live.y1));
   }
   const box = await page.evaluate(([p, sel, ids]) => {

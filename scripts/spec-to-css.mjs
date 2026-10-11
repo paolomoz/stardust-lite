@@ -114,12 +114,28 @@ S.secs.forEach((s, k) => { for (const it of s.items) if (isText(it) && it.t && o
 // only the last applied (marriott)
 const classesAt = (row, i) => blockOf(docSections[i] || '') || (row.match.block && row.match.kind !== 'default' ? [row.match.block, ...(row.match.variant ? row.match.variant.split(/\s+/) : [])] : null);
 const blockUses = count(rows.map((r, i) => classesAt(r, i)).filter(Boolean).map((c) => c.join('.'))); const repeated = new Set(blockUses.filter(([, n]) => n > 1).map(([k]) => k));
+// rows that share ONE spec section (a page wrapper the measurement did not split — lenovo's `responsivegrid` h6734 held eight triage rows):
+// each row is drafted from its own BAND of that section, not from the whole wrapper (every lenovo draft read the same pink background, the
+// same 48 / 143 padding and one slider grid). At the base width the band is the row's box down to the next sharing row's top; at the other
+// widths it starts at the row's anchor text found in that width's section, less the anchor's offset in the base band.
+const sharedBy = new Map(); rows.forEach((r, i) => { const k = liveIndexFor(r); if (k >= 0 && r.box) { if (!sharedBy.has(k)) sharedBy.set(k, []); sharedBy.get(k).push(i); } });
+const normT = (t) => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase();
+const anchorOf = (sec, row) => { const a = normT(row.anchorText).slice(0, 24); if (!a) return null; return sec.items.filter((it) => it.t && it.box).find((it) => { const t = normT(it.t); return t.startsWith(a) || (t.length >= 8 && a.startsWith(t.slice(0, 24))); }) || null; };
+function bandOf(sec, k, i, isBase) {
+  const idx = sharedBy.get(k) || []; if (idx.length < 2 || !sec) return sec;
+  const end = sec.box[1] + sec.box[3];
+  const startAt = (j) => { const r = rows[j]; if (isBase) return r.box[1]; const baseA = anchorOf(S.secs[k], r); const a = anchorOf(sec, r); if (!a) return null; return Math.max(sec.box[1], a.box[1] - (baseA ? Math.max(0, baseA.box[1] - r.box[1]) : 0)); };
+  const y0 = startAt(i); if (y0 === null) return null;
+  const nexts = idx.filter((j) => j > i).map(startAt).filter((y) => y !== null && y > y0); const y1 = nexts.length ? Math.min(...nexts) : end;
+  const items = sec.items.filter((it) => it.box && it.box[1] + it.box[3] / 2 >= y0 && it.box[1] + it.box[3] / 2 < y1);
+  return { ...sec, id: `${sec.id} · band ${Math.round(y0)}–${Math.round(y1)}`, box: [sec.box[0], y0, sec.box[2], y1 - y0], items, bg: null, bgi: null, bgs: null, inset: null };
+}
 rows.forEach((row, i) => {
   const secHtml = docSections[i] || ''; const classes = blockOf(secHtml) || (row.match.block && row.match.kind !== 'default' ? [row.match.block, ...(row.match.variant ? row.match.variant.split(/\s+/) : [])] : null);
   const style = styleOf(secHtml) || row.sectionStyle || null;
-  const k = liveIndexFor(row); const live = k >= 0 ? S.secs[k] : null;
+  const k = liveIndexFor(row); const live = k >= 0 ? bandOf(S.secs[k], k, i, true) : null;
   if (!live) { console.error(`spec-to-css: section ${i} (${classes ? classes.join(' ') : 'default'}) — no live section pairs with the triage row's spec box; skipped`); return; }
-  const m = twin(M, k); const p = twin(P, k);
+  const m = k >= 0 ? bandOf(twin(M, k), k, i, false) : null; const p = k >= 0 ? bandOf(twin(P, k), k, i, false) : null;
   const items = live.items.filter((it) => onPage(it, base)); const r = xr(items, base); const contentW = r ? r[1] - r[0] : null;
   const head = `/* ${classes ? classes.join(' ') : `section ${i} (default content${style ? `, style "${style}"` : ''})`} — document section #${i} ← live section #${k} "${live.id.slice(0, 40)}" y${live.box[1]} h${live.box[3]} at ${base}${m ? `; ${mobile}: h${m.box[3]}` : ''}${p ? `; ${probe}: h${p.box[3]}` : ''}\n   DRAFT from the spec: structure is the pipeline's (.block > div = row, > div > div = cell); every value is the live page's, annotated. Edit; the decorate's own DOM takes these values. */`;
   const lines = [head]; let innerPad = false; // the card's text cell carries the picture → text gap as padding
