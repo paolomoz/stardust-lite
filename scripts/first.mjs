@@ -59,6 +59,12 @@ if (!skip.has('measure')) {
   const r = step('measure-page', S('measure-page'), mArgs, { show: 0, ok: () => existsSync(content), note: (r2) => { try { const s = JSON.parse(readFileSync(join(measure, 'summary.json'), 'utf8')); return `${Object.keys(s.files || {}).length} widths, sections ${s.sectionsSelector || '?'}`; } catch { return null; } } });
   const notes = String(r.stdout).split('\n').filter((l) => /^note: |CHALLENGE|FONT LOAD FAILED|BROKEN/.test(l)).slice(0, 8); if (notes.length) console.log(notes.map((l) => `   ${l.slice(0, 220)}`).join('\n'));
   if (!existsSync(content)) finish(1, 'first: measure-page wrote no content dump — read its output above');
+  // the page the tier finally got is a BLOCK page (a WAF / geo block / challenge): measuring it ran the whole pipeline on "Access Denied" and
+  // the gate printed `REACHED` (nfm: a location block through the installed Chrome) — stop here and say which
+  { let title = ''; let txt = ''; try { const d = JSON.parse(readFileSync(content, 'utf8')); title = String(d.__title || ''); txt = JSON.stringify(d).slice(0, 20000); } catch { /* unreadable */ }
+    const geo = /not accessible from your (current )?location|not available in your (country|region)/i.test(txt);
+    const blocked = /^(access denied|attention required|just a moment|request blocked|403 forbidden|forbidden|pardon our interruption|are you a robot)/i.test(title.trim()) || geo || /(verify you are (a )?human|enable javascript and cookies to continue|checking your browser)/i.test(txt);
+    if (blocked) finish(3, `first: the measured page is a BLOCK page, not the site ("${title.slice(0, 60)}")${geo ? ' — a LOCATION block: no browser tier passes it; it needs network egress from an allowed region' : ' — a bot challenge the installed Chrome did not pass'}. Nothing was authored or uploaded; pick another page.`); }
 }
 // 3 triage: the draft, accepted (edit triage.md and re-run with --skip probe,measure after `triage --from-md` to change it)
 // an EDITED triage.md (newer than triage.json) is applied, not drafted over — `first --skip probe,measure` re-ran triage over the agent's edit (deloitte)
