@@ -22,6 +22,10 @@ const summary = existsSync(join(dir, 'summary.json')) ? JSON.parse(readFileSync(
 const triage = typeof arg('--triage', null) === 'string' ? JSON.parse(readFileSync(arg('--triage'), 'utf8')) : null;
 const doc = typeof arg('--doc', null) === 'string' ? readFileSync(arg('--doc'), 'utf8') : null;
 const outDir = String(arg('--out', 'blocks')); const force = process.argv.includes('--force');
+// --media <manifest.json>: a background picture the source paints (a hero's url()) is the FETCHED file, root-relative (/drafts/media/<file>:
+// the prototype serves it, the branch host previews it) — the draft pointed at the source's host (santanderus)
+const mediaMap = (() => { const f = arg('--media', null); if (typeof f !== 'string' || !existsSync(f)) return null; const m = JSON.parse(readFileSync(f, 'utf8')); const byBare = new Map(Object.entries(m).map(([u, file]) => [u.split('?')[0], file])); return (u) => m[u] || byBare.get(String(u).split('?')[0]) || null; })();
+const localUrls = (css) => (mediaMap ? css.replace(/url\((['"]?)([^'")]+)\1\)/g, (m0, q, u) => { const f = mediaMap(u); return f ? `url('/drafts/media/${f}')` : m0; }) : css);
 
 // ── helpers (brief's readers) ──
 const rgb = (c) => String(c || '').replace(/rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?\)/, (_, r, g, b, a) => (a !== undefined && Number(a) < 1 ? `rgb(${r} ${g} ${b} / ${Math.round(Number(a) * 100)}%)` : `#${[r, g, b].map((x) => Number(x).toString(16).padStart(2, '0')).join('')}`));
@@ -241,7 +245,7 @@ for (const [file, parts] of files) {
   // drawer gone: every no-agent header a list); the draft is appended below a mark and a re-run replaces only that part
   const chrome = /[\\/](header|footer)[\\/]\1\.(draft\.)?css$/.test(target) && force && existsSync(target);
   const keep = chrome ? readFileSync(target, 'utf8').split(MARK)[0].trimEnd() : null;
-  writeFileSync(target, chrome ? `${keep}\n\n${MARK}\n${parts.join('\n\n')}\n` : `${parts.join('\n\n')}\n`); console.log(`${target}: ${parts.length} section(s)`); }
+  writeFileSync(target, localUrls(chrome ? `${keep}\n\n${MARK}\n${parts.join('\n\n')}\n` : `${parts.join('\n\n')}\n`)); console.log(`${target}: ${parts.length} section(s)`); }
 const scale = [...pageScale.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([k, n]) => `   ${k} ×${n}`).join('\n');
 const sd = [`/* sections-draft.css — the default-content sections and the page scale, from ${dir} (spec ${base}${M ? ` / ${mobile}` : ''}${P ? ` / ${probe}` : ''}). Merge into styles.css; every value is the live page's. */`, `/* page type scale at ${base} (most common per tag — the body row and the headings in styles.css):\n${scale} */`, `/* page cap: content ${pageCap || '?'} wide at ${base}${P ? ` — ${(() => { const rs = P.secs.filter((s) => !/^(HEADER|FOOTER)\b/.test(s.id)).map((s) => xr(s.items, probe)).filter(Boolean).map(([a, b]) => b - a); const c = count(rs)[0]; return c ? `${c[0]} at ${probe}: ${Math.abs(c[0] - pageCap) <= 8 ? 'a fixed cap' : 'fluid'}` : '?'; })()}` : ''} (cap-probe names the placement: shell, content or module) */`, ...sectionsDraft];
 // the PAGE cap: the content column every section's wrapper sits in — the foundation leaves it a comment for the agent, and a run with no
@@ -255,4 +259,4 @@ if (pageCap && pageCap < base - 16) {
 }
 if (pageCap && pageCap < base - 16 && capM) sd.push(`@media (max-width: ${(bp || 900) - 1}px) {  /* at ${mobile} the column is the viewport less the gutter (content from x ${capM.x}) */\n  main > .section > div { max-width: none;${capM.x > 0 && capM.x < 48 ? ` padding-left: ${px(capM.x)}; padding-right: ${px(capM.x)};` : ''} }\n}`);
 const sdText = `${sd.join('\n\n')}\n`; // imported FIRST by styles.css (first.mjs): its normal specificity beats the foundation's `main > .section`, the agent's rules below win ties
-mkdirSync('styles', { recursive: true }); writeFileSync(join('styles', 'sections-draft.css'), sdText); console.log(`styles/sections-draft.css: ${sectionsDraft.length} rule(s)`);
+mkdirSync('styles', { recursive: true }); writeFileSync(join('styles', 'sections-draft.css'), localUrls(sdText)); console.log(`styles/sections-draft.css: ${sectionsDraft.length} rule(s)`);

@@ -89,7 +89,7 @@ if (!skip.has('author')) {
 }
 // 6 the CSS drafts as the CSS: blocks/<name>/<name>.css (header / footer appended below the foundation rules), sections-draft into styles.css
 if (!skip.has('css')) {
-  step('spec-to-css', S('spec-to-css'), [measure, '--triage', triage, '--doc', doc, '--out', 'blocks', '--force'], { show: 0, note: (r) => `${(r.stdout.match(/\.css: /g) || []).length} files` });
+  step('spec-to-css', S('spec-to-css'), [measure, '--triage', triage, '--doc', doc, '--out', 'blocks', '--force', ...(existsSync(join(media, 'manifest.json')) ? ['--media', join(media, 'manifest.json')] : [])], { show: 0, note: (r) => `${(r.stdout.match(/\.css: /g) || []).length} files` });
   // the generated CSS in its own files, imported FIRST: the foundation's rules lose to its specificity, the agent's rules in styles.css come
   // later and win ties — appended below a mark, the drafts beat the agent's same-specificity rules by order (equitable: 2 of 3 rounds)
   const st = join('styles', 'styles.css'); const OLD = '/* ── sections-draft (first.mjs; below this line is regenerated) ── */';
