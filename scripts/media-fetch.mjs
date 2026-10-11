@@ -14,7 +14,7 @@
 //        node media-fetch.mjs <media-<W>.json> --fonts fonts   the font FILES: media-list's requested font URLs downloaded, and the @font-face
 //                                                             faces embedded as data: URIs written as files (`<family>-<weight>-<style>.woff2`;
 //                                                             a case font-dump.mjs did this — covermore, loop r6); then fonts.css declares them
-import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync, statSync, unlinkSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync, statSync, unlinkSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join, extname, dirname, relative, resolve } from 'node:path';
 import { arg, launch, contextOptions } from './common.mjs';
@@ -43,7 +43,7 @@ const getBytes = async (url) => {
 const isFont = (b) => !!b && b.length > 64 && ['wOF2', 'wOFF', 'OTTO', 'true', 'ttcf'].includes(b.subarray(0, 4).toString('latin1')) || (!!b && b.length > 64 && b.readUInt32BE(0) === 0x00010000);
 const OPTS = ['--out', '--base', '--extra', '--extra-file', '--fonts', '--from-page', '--css']; // --browser is a bare flag
 if (typeof arg('--fonts', null) === 'string') {
-  const dir = arg('--fonts'); mkdirSync(dir, { recursive: true }); let n = 0; const cssFaces = []; const fetchedUrls = new Set(); const notFont = [];
+  const dir = arg('--fonts'); mkdirSync(dir, { recursive: true }); let n = 0; const cssFaces = []; const fetchedUrls = new Set(); const notFont = []; const aliasPlan = [];
   // --from-page: the font files from the page's own responses, as for the media (a WAF that refuses curl serves them to the page)
   if (typeof arg('--from-page', null) === 'string') {
     const want = process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && OPTS.includes(all[i - 1]))).flatMap((f) => { const m = JSON.parse(readFileSync(f, 'utf8')); return [...(m.fontRequests || []), ...(m.fontFaceRules || []).flatMap((r) => r.srcs.map((x) => x.url))]; }).filter((u) => !u.startsWith('data:'));
@@ -56,8 +56,15 @@ if (typeof arg('--fonts', null) === 'string') {
     // the faces the page LOADED, each matched to its @font-face rule (media.fontFaceRules) → one file per face named by it, and the
     // fonts.css lines (--css): a URL's last segment named si-home's four Typekit faces `l.woff2`, and every run wrote fonts.css by hand
     const rules = m.fontFaceRules || []; const done = new Set();
-    for (const lf of [...new Set(m.loaded || [])]) {
-      const t = lf.split(' '); const style = t.pop(); const weight = t.pop(); const family = t.join(' ').replace(/^["']|["']$/g, '');
+    // the faces LOADED and every family the page's @font-face rules define: the drafts name the families the page's CSS uses (revlon:
+    // `acumin-pro-regular`, `acumin-pro-bold` while only `acumin-pro` loaded as a face — the first round in serif)
+    // the families the measured TEXT uses (spec-*.json beside the media file): a page bundle declares many more faces than it renders
+    const famOf = (ff) => String(ff || '').split(',')[0].replace(/["']/g, '').trim(); const used = new Set();
+    for (const sf of readdirSync(dirname(resolve(f))).filter((x) => /^spec-\d+\.json$/.test(x))) { try { for (const sec of JSON.parse(readFileSync(join(dirname(resolve(f)), sf), 'utf8')).secs || []) for (const it of sec.items || []) if (it.ff) used.add(famOf(it.ff).toLowerCase()); } catch { /* unreadable */ } }
+    const ruleFaces = rules.filter((r) => used.has(r.family.toLowerCase()) && r.srcs.some((x) => !x.url.startsWith('data:'))).map((r) => `${r.family} ${String(r.weight).split(/\s+/)[0]} ${r.style}`);
+    aliasPlan.push(...[...used].filter((u) => !rules.some((r) => r.family.toLowerCase() === u)));
+    for (const lf of [...new Set([...(m.loaded || []), ...ruleFaces])].slice(0, 24)) {
+      const t = lf.split(' '); const style = t.pop(); const weight = String(t.pop()).replace(/^normal$/i, '400').replace(/^bold$/i, '700'); const family = t.join(' ').replace(/^["']|["']$/g, ''); // a loaded face reports `normal` for 400 (revlon)
       const inW = (w) => { const r = String(w).split(/\s+/).map(Number); return r.length > 1 ? Number(weight) >= r[0] && Number(weight) <= r[1] : String(r[0]) === String(Number(weight)); };
       const rule = rules.find((r) => r.family.toLowerCase() === family.toLowerCase() && r.style === style && inW(r.weight) && r.srcs.some((x) => !x.url.startsWith('data:')));
       if (!rule) continue;
@@ -77,6 +84,10 @@ if (typeof arg('--fonts', null) === 'string') {
     if (pageUrl) { console.error(`media-fetch: ${notFont.length} font response(s) were not fonts (a WAF) — again through the page's own responses (--from-page ${pageUrl})`); const { spawnSync } = await import('node:child_process'); const r = spawnSync(process.execPath, [process.argv[1], ...process.argv.slice(2), '--from-page', pageUrl], { stdio: 'inherit' }); process.exit(r.status ?? 1); }
   }
   if (notFont.length) console.error(`media-fetch: ${notFont.length} font response(s) are NOT fonts — not written (a WAF's answer: --from-page <page url>, or --browser):\n  ${notFont.join('\n  ')}`);
+  // a used family with no rule of its own, named after a loaded one (`acumin-pro-regular` → the `acumin-pro` file): an alias face, the weight
+  // from the name — the drafts name the families the page's CSS uses
+  const wOf = (n) => (/black|heavy/i.test(n) ? '900' : /extra-?bold/i.test(n) ? '800' : /semi-?bold|demi/i.test(n) ? '600' : /bold/i.test(n) ? '700' : /medium/i.test(n) ? '500' : /light/i.test(n) ? '300' : /thin/i.test(n) ? '100' : '400');
+  for (const u of [...new Set(aliasPlan)]) { const base = cssFaces.filter((c) => u.startsWith(c.family.toLowerCase()) && u !== c.family.toLowerCase()).sort((a, b) => b.family.length - a.family.length); if (!base.length) continue; const w = wOf(u.slice(base[0].family.length)); const pick = base.filter((c) => c.family === base[0].family).sort((a, b) => Math.abs(Number(a.weight) - Number(w)) - Math.abs(Number(b.weight) - Number(w)))[0]; cssFaces.push({ ...pick, family: u, weight: '400 900'.includes(w) ? w : w, alias: true }); }
   const cssOut = typeof arg('--css', null) === 'string' ? arg('--css') : null;
   if (cssOut && cssFaces.length) { const rel = relative(dirname(resolve(cssOut)), resolve(dir)).split('\\').join('/'); mkdirSync(dirname(resolve(cssOut)), { recursive: true }); writeFileSync(cssOut, `/* fonts.css — the faces the source loaded, from media-*.json fontFaceRules (media-fetch --fonts --css) */\n${cssFaces.map((f) => `@font-face { font-family: '${f.family}'; font-style: ${f.style}; font-weight: ${f.weight}; font-display: swap; src: url('${rel ? `${rel}/` : ''}${f.file}') format('${f.format}'); }`).join('\n')}\n`); console.log(`media-fetch: ${cssFaces.length} face(s) declared in ${cssOut}`); }
   console.log(`media-fetch: ${n} font file(s) in ${dir}/${cssFaces.length ? '' : ' — declare them in styles/fonts.css with the families the spec names (no fontFaceRules in the media JSON: re-measure, then --css styles/fonts.css writes it)'}`); process.exit(0);

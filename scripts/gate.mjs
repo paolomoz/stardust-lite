@@ -229,6 +229,11 @@ for (const W of widths) {
     src.data.copy(dst.data, 0, 0, src.width * H * 4); writeFileSync(join(out, `diff-${W}-top.png`), PNG.sync.write(dst));
   } catch { /* diff image missing */ }
   t.compare = secs(tc);
+  // live | build side by side at a third of the size (`sbs-<W>.png`): the field runs' agents wrote their own side-by-side scripts to see what
+  // a digest row meant (wpp, deloitte) — one image read
+  try { const A0 = PNG.sync.read(readFileSync(origin)); const B0 = PNG.sync.read(readFileSync(eds)); const k = W >= 1440 ? 4 : 2; const H = Math.ceil(Math.max(A0.height, B0.height) / k); const w0 = Math.ceil(A0.width / k); const w1 = Math.ceil(B0.width / k); const gap = 12; const S2 = new PNG({ width: w0 + gap + w1, height: H }); S2.data.fill(255);
+    const put = (img, x0) => { const w = Math.ceil(img.width / k); for (let y = 0; y < H; y += 1) { const sy = y * k; if (sy >= img.height) break; for (let x = 0; x < w; x += 1) { const sx = x * k; const si = (sy * img.width + sx) * 4; const di = (y * S2.width + x0 + x) * 4; S2.data[di] = img.data[si]; S2.data[di + 1] = img.data[si + 1]; S2.data[di + 2] = img.data[si + 2]; S2.data[di + 3] = 255; } } };
+    put(A0, 0); put(B0, w0 + gap); writeFileSync(join(out, `sbs-${W}.png`), PNG.sync.write(S2)); } catch { /* a capture missing */ }
   const closeCtx = async () => { for (const c of [liveCtx, buildCtx]) if (c) await c.close().catch(() => {}); };
   if (!perSection || !existsSync(origin) || !existsSync(eds)) { await closeCtx(); continue; }
   // per-section share: live split (the triage's rows) paired onto the authored sections, each read over its own y-range on each capture —
@@ -367,6 +372,6 @@ if (roundMode) {
     : clean ? `\nstop: the base width is clean (every section within 2 px${budgetOn ? ' and budget' : ''}) — run the three widths with --probes, then name the residuals in the register` : `\nnext: one round, changing only what the rows above name`;
 }
 const tLine = `${tLine0} | cap-probe ${tTail.cap} s, sections pass ${tTail.sections} s, pair ${tTail.pair ?? 0} s | total ${secs(tStart)} s`;
-console.log(`\n${targetLine}\n${capLine}${sectionsLine ? `\n${sectionsLine}` : ''}${motionLine ? `\n${motionLine}` : ''}${budgetLine ? `\n${budgetLine}` : ''}${digest}\ntiming (${captureTool}${captureTool === 'stitch' ? ', live and build concurrent' : ''}): ${tLine}\nevidence: ${out}/`);
+console.log(`\n${targetLine}\n${capLine}${sectionsLine ? `\n${sectionsLine}` : ''}${motionLine ? `\n${motionLine}` : ''}${budgetLine ? `\n${budgetLine}` : ''}${digest}${roundMode ? `\nside by side (live | build): ${widths.map((W) => join(out, `sbs-${W}.png`)).join(' ')}` : ''}\ntiming (${captureTool}${captureTool === 'stitch' ? ', live and build concurrent' : ''}): ${tLine}\nevidence: ${out}/`);
 writeFileSync(join(out, 'gate.json'), JSON.stringify({ _schema: 'stardust-lite/gate@1', _writtenAt: new Date().toISOString(), live, build, slug, widths, rows, timing, timingTail: { ...tTail, total: secs(tStart) }, target: { pct: target, reached: threeW.every(underAt), line: targetLine }, captureTool, origin: originFrom, chrome: { on: chromeOn, template: isTemplate, byWidth: chromeRuns }, cap: { verdict: capLine.split('\n')[0], failing: capLine.split('\n').slice(1) }, motion: motionLine || null, budget: { on: budgetOn, verdict: budgetOn ? (overAll.length ? 'FAIL' : 'PASS') : null, over: overAll, newSections: newCount, defaultSections: defaultCount, blocks: blocks.length ? blocksFile : null }, sections: sectionRuns }, null, 1));
 process.exit(0); // nothing may keep the gate alive after gate.json (a dangling page held a bench run 11 min)

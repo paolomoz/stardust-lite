@@ -320,7 +320,9 @@ function defaultContent(node, report, opts = {}) {
   const controls = leaves.filter((l) => l.kind === 'control').length; if (controls) report.controls += controls;
   // a run of icons with no text between them is a control strip (slider arrows), not content
   const drop = new Set(); for (let i = 0; i < leaves.length; i++) { if (leaves[i].kind !== 'icon') continue; let j = i; while (j < leaves.length && leaves[j].kind === 'icon') j++; if (j - i >= 2) { for (let k = i; k < j; k++) drop.add(leaves[k]); report.controls += j - i; } i = j; }
-  for (const l of leaves) { if (l.kind === 'control' && l.raw === 'button' && l.node.text && !/^(submit|reset)$/.test(l.node.type || '')) { stats.texts += 1; out.push(`<p>${esc(l.node.text)}</p>`); continue; } // a labelled button (a menu's item, an opener) is a text an author types; the lint's control rule is for forms (ir-nav lost 1 of 4 items — take2games)
+  // a slideshow's / player's own control is not content (revlon: "Pause slideshow" authored as a paragraph)
+  const CTRL = /^(pause|play|stop|resume|previous|prev|next|close|skip|mute|unmute|toggle|show (more|less)|load more|go to slide|slide \d+)\b/i;
+  for (const l of leaves) { if (l.kind === 'control' && l.raw === 'button' && l.node.text && !CTRL.test(l.node.text.trim()) && !/^(submit|reset)$/.test(l.node.type || '')) { stats.texts += 1; out.push(`<p>${esc(l.node.text)}</p>`); continue; } // a labelled button (a menu's item, an opener) is a text an author types; the lint's control rule is for forms (ir-nav lost 1 of 4 items — take2games)
     if (l.kind === 'control' || l.kind === 'hr' || drop.has(l)) continue; if (l.kind === 'link' && isDead(l.node.href) && !l.node.text && !(l.node.children || []).some((c) => MEDIA(kindOf(unwrap(c))))) continue; const h = leafHtml(l, opts); if (h) out.push(h); }
   return out;
 }
@@ -474,7 +476,10 @@ function navDoc(root) {
   const menu = list ? [listHtml(list.node, 'plain')] : [`<ul>${leaves.filter((l) => !used.has(l) && ['link', 'control'].includes(l.kind)).map(item).filter(Boolean).join('')}</ul>`];
   const toolsHtml = tools.length ? [`<ul>${tools.map((l) => item(l) || (l.kind === 'icon' ? `<li>${leafHtml(l) || ''}</li>` : null)).filter(Boolean).join('')}</ul>`] : [];
   const bl = brand ? (String(brand.node.aria || brand.node.title || '').trim() || (pic?.node?.alt || '').trim() || (/^learn more$/i.test(String(brand.node.text || '')) ? '' : String(brand.node.text || '').trim()) || 'Home') : null;
-  const brandHtml = brand ? `<p><a href="${esc(brand.node.href || '/')}">${esc(bl)}</a></p>` : null;
+  // never an empty brand section: the pipeline drops an empty section and every nav role shifts one slot (revlon: the link list in the brand
+  // slot) — the site's own name from the page URL when no logo link was found
+  const siteName = (() => { try { const h = new URL(arg('--url', '') || 'https://site.example').hostname.replace(/^www\./, '').split('.')[0]; return h.charAt(0).toUpperCase() + h.slice(1); } catch { return 'Home'; } })();
+  const brandHtml = brand ? `<p><a href="${esc(brand.node.href || '/')}">${esc(bl)}</a></p>` : `<p><a href="/">${esc(siteName)}</a></p>`;
   const sections = [[brandHtml], menu, toolsHtml];
   if (promo.length) sections.push(promo.map((l) => leafHtml(l)).filter(Boolean));
   return chromeDoc(sections);

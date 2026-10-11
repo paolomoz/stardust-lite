@@ -68,7 +68,8 @@ else if (!skip.has('triage') && !skip.has('author')) step('triage', S('triage'),
 // 4 media + fonts (fonts.css written from the measured @font-face rules; a WAF answer goes through the page by itself)
 let daMedia = null;
 if (!skip.has('media')) {
-  step('media', S('media-fetch'), [content, '--out', media], { show: 0, ok: () => existsSync(join(media, 'manifest.json')), note: (r) => (/(\d+) of (\d+)/.exec(r.stdout) || [])[0] || tail(r.stdout, 1).slice(0, 80) });
+  const content360 = join(measure, 'content-360.json'); // the mobile pictures too (revlon's slideshow had its own 360 images, fetched by a case script)
+  step('media', S('media-fetch'), [content, ...(existsSync(content360) ? [content360] : []), '--out', media], { show: 0, ok: () => existsSync(join(media, 'manifest.json')), note: (r) => (/(\d+) of (\d+)/.exec(r.stdout) || [])[0] || tail(r.stdout, 1).slice(0, 80) });
   const man = existsSync(join(media, 'manifest.json')) ? JSON.parse(readFileSync(join(media, 'manifest.json'), 'utf8')) : null; const failed = man ? (man.items || man.files || []).filter((x) => x.status && x.status >= 400).length : 0;
   if (failed > 3) step('media --from-page', S('media-fetch'), [content, '--out', media, '--from-page', url], { show: 0, note: () => `${failed} failed by fetch: again through the page` });
   step('fonts', S('media-fetch'), [join(measure, 'media-1440.json'), '--fonts', 'fonts', '--css', join('styles', 'fonts.css')], { show: 0, note: (r) => (/(\d+) face\(s\) declared/.exec(`${r.stdout}${r.stderr}`) || [])[0] || 'no faces declared — fonts.css by hand' });
@@ -94,7 +95,7 @@ if (!skip.has('css')) {
   if (!existsSync(join('styles', 'elements.css'))) writeFileSync(join('styles', 'elements.css'), '/* style-pass writes the element pass here */\n');
 }
 // 7 the prototype and the first round at the three widths
-const h = step('harness', S('harness'), [doc, '--serve', 'proto', '--name', slug, '--port', String(port), '--fragments', host, '--content', content, '--site-repo', '.', '--no-lint', ...(existsSync(media) ? ['--local-media', media] : [])], { show: 0, note: (r) => [(/(\d+) blocks? loaded/.exec(r.stdout) || [])[0], (/doc height (\d+)/.exec(r.stdout) || [])[0], (/(\d+) text.*not in the capture/.exec(`${r.stdout}${r.stderr}`) || [])[0]].filter(Boolean).join(' · ') });
+const h = step('harness', S('harness'), [doc, '--serve', 'proto', '--name', slug, '--port', String(port), '--fragments', host, '--content', content, '--site-repo', '.', '--no-lint', ...(existsSync(media) ? ['--local-media', media] : []), ...(noDa ? [] : ['--sync-chrome'])], { show: 0, note: (r) => [(/(\d+) blocks? loaded/.exec(r.stdout) || [])[0], (/doc height (\d+)/.exec(r.stdout) || [])[0], (/(\d+) text.*not in the capture/.exec(`${r.stdout}${r.stderr}`) || [])[0]].filter(Boolean).join(' · ') });
 if (h.status) finish(1, 'first: the harness failed — read its output above');
 // the element pass is opt-in: on bms's replay it moved the first round 33.9 / 30.1 / 17.3 → 35.5 / 30.7 / 17.6 (the first round's error is layout,
 // not type) — kept as an instrument, not a default step
