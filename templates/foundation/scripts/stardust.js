@@ -153,3 +153,25 @@ export function decorateArtDirection(root) {
     (holder && holder.tagName === 'P' && holder.children.length === 1 ? holder : mobilePic).remove();
   });
 }
+
+/**
+ * A video the pipeline authored as its poster picture and a link to the file (`<p><picture>…</picture></p><p><a href="….mp4">…</a></p>`):
+ * the link becomes the video — muted, looping, inline, the poster in its place — where the poster stood. Nothing rendered it and the
+ * agents wrote a decorator per run (wpp: a `div.video` wrapper loaded as a block and 404'd). The gate holds videos at frame 0 on both sides.
+ */
+export function decorateVideos(root) {
+  root.querySelectorAll('a[href]').forEach((a) => { try {
+    if (!/\.(mp4|webm|mov)(\?|#|$)/i.test(a.getAttribute('href') || '')) return;
+    const p = a.closest('p'); if (!p || p.textContent.trim() !== a.textContent.trim()) return;
+    const prev = p.previousElementSibling; const posterPic = prev && (prev.tagName === 'PICTURE' ? prev : prev.querySelector(':scope > picture'));
+    const img = posterPic && posterPic.querySelector('img');
+    const video = document.createElement('video');
+    video.muted = true; video.loop = true; video.autoplay = true; video.playsInline = true;
+    ['muted', 'loop', 'autoplay', 'playsinline'].forEach((k) => video.setAttribute(k, ''));
+    video.src = a.href; video.preload = 'auto';
+    if (img) { video.poster = img.currentSrc || img.src; if (img.width && img.height) { video.width = img.width; video.height = img.height; } }
+    video.style.cssText = 'display:block;width:100%;height:auto;object-fit:cover';
+    if (img) prev.replaceWith(video); else p.before(video);
+    p.remove();
+  } catch { /* one video left as its link: the page still decorates */ } });
+}
