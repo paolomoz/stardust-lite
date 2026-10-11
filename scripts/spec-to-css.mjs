@@ -77,9 +77,7 @@ function unitOf(items, W, contentW) {
   const holds = (it) => items.filter((o) => o !== it && o.k !== 'paint' && onPage(o, W) && inBox(o, it.box)).length >= 2;
   const shape = (m, synth) => {
     // the columns are the units FULLY in the viewport: a slider's half-shown next card made toryburch's 5-up row a 6-column grid
-    // the FULLEST row, not the first: a first row holding a 2-span card read `1 per row` and drafted one column (wpp panel run, Δh +8582)
-    const rowsY = [...new Set(m.map((it) => it.box[1]))]; const xsAt = (y) => [...new Set(m.filter((it) => it.box[1] === y && it.box[0] >= -1 && it.box[0] + it.box[2] <= W + 1).map((it) => it.box[0]))].sort((a, b) => a - b);
-    const xs = rowsY.map(xsAt).sort((a, b) => b.length - a.length)[0] || [];
+    const xs = [...new Set(m.filter((it) => it.box[1] === m[0].box[1] && it.box[0] >= -1 && it.box[0] + it.box[2] <= W + 1).map((it) => it.box[0]))].sort((a, b) => a - b);
     const gap = xs.length > 1 ? xs[1] - xs[0] - m[0].box[2] : null; const ys = [...new Set(m.map((it) => it.box[1]))].sort((a, b) => a - b);
     let first = m[0]; let h = m[0].box[3];
     if (synth) { const b = m[0].box; const nextY = ys.length > 1 ? ys[1] : Infinity; const col = items.filter((o) => o.k !== 'paint' && onPage(o, W) && o.box[0] >= b[0] - 1 && o.box[0] + o.box[2] <= b[0] + b[2] + 1 && o.box[1] >= b[1] && o.box[1] < nextY); h = Math.max(...col.map((o) => o.box[1] + o.box[3])) - b[1]; first = { tag: 'div', cls: '(image column)', box: [b[0], b[1], b[2], h] }; }
