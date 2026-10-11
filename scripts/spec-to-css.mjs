@@ -128,7 +128,7 @@ function bandOf(sec, k, i, isBase) {
   const y0 = startAt(i); if (y0 === null) return null;
   const nexts = idx.filter((j) => j > i).map(startAt).filter((y) => y !== null && y > y0); const y1 = nexts.length ? Math.min(...nexts) : end;
   const items = sec.items.filter((it) => it.box && it.box[1] + it.box[3] / 2 >= y0 && it.box[1] + it.box[3] / 2 < y1);
-  return { ...sec, id: `${sec.id} · band ${Math.round(y0)}–${Math.round(y1)}`, box: [sec.box[0], y0, sec.box[2], y1 - y0], items, inset: null };  // the shared section's paint stays: lenovo's wrapper IS the pink behind every row (the bench read +2…+20 points without it)
+  return { ...sec, id: `${sec.id} · band ${Math.round(y0)}–${Math.round(y1)}`, box: [sec.box[0], y0, sec.box[2], y1 - y0], items, bg: null, bgi: null, bgs: null, inset: null };
 }
 rows.forEach((row, i) => {
   const secHtml = docSections[i] || ''; const classes = blockOf(secHtml) || (row.match.block && row.match.kind !== 'default' ? [row.match.block, ...(row.match.variant ? row.match.variant.split(/\s+/) : [])] : null);
