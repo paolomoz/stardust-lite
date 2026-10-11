@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L13 | nike.com gb | 9c75734 (wrapped build sections, target-only stop, printed re-run commands, slider tracks) | 5.2 after 2 × `first` (74 / 36 / 53 %) | 22.8 (1440 / 2560 under 2.4 % at 10.3) | 25.0 | 4 | 26–28 | own ≈ 17.8 min, tools 5.0 to stop | 12.5 min on 360 alone: the portrait 360 images fetched but never authored (art direction ≈ 6 min), buttons styled for `strong a` instead of the decorated button, flattened mega-menu |
 | L12 | nfl.com international | 2dc1ee6 (main stays root, 60 % split, origin-mode builds, digest rows by overlap) | 4.4 after 2 × `first` (55 / 52 / 39 %) | 28.0 | 31.2 | 9 | 26–40 | own ≈ 18.7 min, tools 9.3 to stop | a main column + right rail re-ordered on mobile: no model, the document re-authored by hand (≈ 13 min); the gate found no build section under a wrapper and printed a false `stop: clean` at 22 %; harness re-runs without --local-media / --sync-chrome (stale chrome, 404 media) |
 | L11 | intel.com | 5611ea7 (content root without main, unique chrome guesses, fonts subset / variable, object-position) | 8.8 after 2 × `first` (33 / – / – %) | 17.1 | 21.7 | 4 | 27–28 | own ≈ 12.6 min, tools 4.5 to stop | the root climbed above a large main (header + footer fragment inside: 3 sections, ≈ 7 min); repeating units authored weakly (≈ 4 min); a stitched origin (scroll-driven scenes) against a one-shot build — the sticky header in one capture only |
 | L10 | sherwin-williams.com | c6073fd (fonts by use, nav brand, picture-count sync, sbs thumbnails) | 5.2 after 3 × `first` (46 / 40 / 38 %) | 26.8 | 29.2 | 12 | 20–35 | own ≈ 17 min, tools 9.6 to stop | no `<main>` (AEM Sites): `body > *` guessed, two re-runs and `--main` by hand ≈ 4 min; empty chrome documents (a --footer key not named footer); Open Sans from a cyrillic subset, a variable face as two static weights ≈ 3 min; crops swept by hand 2.5 min |
@@ -111,3 +112,8 @@ Result on nfl: stop at 28.0 — a two-column (main + rail) page the triage canno
 sections and said "clean" over the target; the agent's harness re-runs lacked the flags `first` used. Iteration 13: build sections under
 any wrapper, the stop only from the target, `first` prints the split and the exact harness / round commands, section tops on the
 side-by-side thumbnails, carousels drafted as slider tracks (revlon replay: Δh at 360 −8932 → −3728).
+
+### L13 — wrapped build sections, the stop from the target only, printed re-run commands, slider tracks
+Result on nike: 1440 / 2560 under 2.4 % at 10.3 min, stop at 22.8 — 360 alone took 12.5 min: art direction (portrait images per width)
+had no authoring path. Keep. Iteration 14: author writes the 360 asset as a second picture marked `| mobile <bp>`, stardust.js folds it into
+a `<source media>` (nike replay: 5 sources, the 360 build shows the portrait files).
