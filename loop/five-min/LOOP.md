@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L9 | revlon.com | b250798 (one-band extra roots, local media, concurrent local builds) | **1.17** (78 / 59 / 43 %) | **10.45** | 12.5 | 2 | 20–21 | own ≈ 8.5 min, tools **1.95** to stop | tools solved (first 70 s, rounds 20 s); the clock is the agent: reading 3, writing 2.5, re-modelling a carousel split into 7 tables 1.5, diagnosis 1.5; fonts.css missing the used families (round 1 in serif), an empty nav brand |
 | L8 | pgatour.com | f5d4a51 (split of tall containers, da-put pool, 2-width probe) | 5.5 after 2 × `first` (48 / 36 / 19 %) | 17.05 | 19.2 | 4 | 55–64 | own ≈ 8.4 min, tools 8.6 to stop | a bare `div` extra root (451 nodes) became the content root: 73 rows, 63 dropped by hand; a round of broken images (aem.page 301s after a harness re-run); block drafts load after styles.css and won |
 | L7 | wpp.com en | 07bd330 (generated CSS imported first, chrome from triage rows, block folders, section guess) | 3.4 (59 / 76 / 53 %) | **9.7** | 12.0 | 1 | 48 | own ≈ 5.4 min, tools 4.3 to stop | one `first` (204 s: the media upload 58 s on the critical path), one round; the agent's pass ≈ 5 min — the drafts' block layouts wrong (a spanning first card, a bleeding slider, a fixed bottom pill header), headings authored one paragraph per line |
 | L6 | equitable.com | 36c5b34 (token file, section boxes at specificity 0, gif still, protocol: work from the digest) | 4.5 after 3 × `first` (34 / 39 / 46 %) | **12.0** | 13.6 | 3 | 31 | own ≈ 7 min, tools 5.2 to stop | the section guess (2 re-runs ≈ 3 min), empty nav / footer documents (≈ 3 min), the section boxes at specificity 0 losing to the foundation and the drafts winning ties over the agent's rules (2 of 3 rounds); the agent's CSS pass down to 4.9 min with the digest-first protocol |
@@ -80,3 +81,12 @@ Change: tall sections of heading-led parts split (bench A/B: bms 1440 30.1 → 2
 by geometry, a copyright-line footer; da-put six at a time; probe-load at 360 / 1440. Result on pgatour: stop at 17.05 — a bare `div` extra
 root (measure-page) made 73 rows; a round lost to broken aem.page images. Keep. Next (iteration 9): extra roots name one band, local media in
 the prototype (upload off the clock, no host burst), local builds captured at once (a round 64 → 43 s on wpp's replay).
+
+### L9 — one band per extra root, local media, concurrent local builds
+Change: extra roots need an id / class and ≤ 3 matches; the prototype serves local media (`--local-media`) and the upload runs in the
+background; local builds capture the three widths at once (a round 64 → 43 s on wpp's replay, 20 s on revlon); chrome drafts skip 0 px.
+Result on revlon: `first` 70 s, two rounds of 20 s, stop at 10.45 — tools 117 s of 627. Keep. The clock is the agent's own pass now.
+Iteration 10: fonts.css from the families the text uses (aliases), the last @font-face src, a nav brand that is never empty, the 360 dump's
+media, chrome documents re-uploaded on a picture-count change, slideshow controls not content, sbs-<W>.png per round. A replay of this
+iteration re-uploaded a scratch nav over bms's and revlon's real ones (the token file made it possible): both restored from their cases,
+and the harness uploads only with `--sync-chrome` now.
