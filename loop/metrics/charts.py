@@ -22,7 +22,7 @@ def short(r):
 def period_of(r):
     if r['period'] == 'C': return 'L' if (r['run_label'] or '').startswith('L') else 'I'
     return r['period']  # A, B, D
-PER = {'A': 'Sep 29 – Oct 1 · hand-built', 'B': 'Oct 3 – 4 · rounds R / V', 'I': 'inspection', 'L': 'Oct 10 – 11 · five-minute loop', 'D': 'Oct 11 · next phase (P panel re-runs, N new)'}
+PER = {'A': 'Sep 29 – Oct 1 · hand-built', 'B': 'Oct 3 – 4 · rounds R / V', 'I': 'inspection', 'L': 'Oct 10 – 11 · five-minute loop', 'D': 'next phase'}
 bands = []
 for i, r in enumerate(rows):
     p = period_of(r)
@@ -191,6 +191,30 @@ charts.append(pct_chart('Pixel difference of the first round', 'Per width. Befor
 charts.append(pct_chart('Pixel difference at delivery', 'Per width, the round under target (or the last round when never reached — those sit above the line).', 'deliver'))
 charts.append(pct_chart('Pixel difference of the served page', 'Per width, the deployed preview (aem.page) gated after the clock.', 'served'))
 
+# the panel: each page's loop run against its re-run on the next-phase code (paired: the page's difficulty cancels)
+PAIRS = [('santanderus-home', 'P1'), ('wpp-home', 'P2'), ('rbc-home', 'P3'), ('waters-home', 'P4'), ('lenovo-home', 'P5'), ('lenovo-home', 'P6')]
+def pair_html():
+    by_slug = {r['slug']: r for r in rows if r['period'] == 'C'}; by_lab = {r['run_label']: r for r in rows if r['period'] == 'D'}
+    items = [(slug, lab, num(by_slug[slug]['under10_min']) if slug in by_slug else None, num(by_lab[lab]['under10_min']) if lab in by_lab else None, by_slug.get(slug, {}).get('run_label', '')) for slug, lab in PAIRS]
+    items = [x for x in items if x[2] is not None and x[3] is not None]
+    if not items: return ''
+    PW2, RH = 900, 34; mx = nice_max(max(max(a, b) for _, _, a, b, _ in items)); x = lambda v: 210 + v / mx * PW2
+    g = [f'<svg viewBox="0 0 {210 + PW2 + 80} {len(items) * RH + 40}" role="img" aria-label="panel before and after">']
+    for t in ticks(mx):
+        g.append(f'<line class="grid" x1="{x(t):.1f}" x2="{x(t):.1f}" y1="10" y2="{len(items) * RH + 14}"/><text class="tick" x="{x(t):.1f}" y="{len(items) * RH + 30}" text-anchor="middle">{t:g}</text>')
+    g.append(f'<line class="ref" x1="{x(5):.1f}" x2="{x(5):.1f}" y1="10" y2="{len(items) * RH + 14}"/>')
+    for i, (slug, lab, a, b, la) in enumerate(items):
+        y = 24 + i * RH
+        g.append(f'<text class="tick" x="200" y="{y + 4}" text-anchor="end">{html.escape(slug.replace("-home", ""))} · {la} → {lab}</text>')
+        g.append(f'<line x1="{x(a):.1f}" x2="{x(b):.1f}" y1="{y}" y2="{y}" stroke="var(--text-muted)" stroke-width="2"/>')
+        g.append(f'<g class="hit" data-tip="{html.escape(f"{slug} — loop {la}: {a:g} min → {lab}: {b:g} min ({b - a:+.1f})")}"><circle class="hitarea" cx="{x(a):.1f}" cy="{y}" r="9"/><circle class="s2" cx="{x(a):.1f}" cy="{y}" r="5"/></g>')
+        g.append(f'<g class="hit" data-tip="{html.escape(f"{slug} — {lab}: {b:g} min")}"><circle class="hitarea" cx="{x(b):.1f}" cy="{y}" r="9"/><circle class="s1" cx="{x(b):.1f}" cy="{y}" r="5"/></g>')
+        g.append(f'<text class="medlab" x="{max(x(a), x(b)) + 10:.1f}" y="{y + 4}">{b - a:+.1f} min</text>')
+    g.append('</svg>')
+    return ('<section class="chart"><h2>The panel: the same page before and after</h2><p class="sub">Minutes to under 10 % at the three widths. Orange: the page\'s loop run (old code); blue: its re-run on the next-phase code, a fresh repo and a fresh agent. P6 is P5 plus the spec-to-css bands (a field A/B). Dashed: the 5-minute target.</p>'
+            + legend([('s2', 'loop run (before)'), ('s1', 'panel re-run (after)')]) + ''.join(g) + '</section>')
+charts.insert(1, pair_html())
+
 # 10 — setup
 yms = 15
 charts.append(frame('Setup time (not on the clock)', 'Minutes from the GitHub repo\'s creation to t0 (boilerplate, content source, Code Sync, installs). ▲ above the axis: travelers 40.1 and ibm 52.1 — repos created in an earlier session, not a setup measurement.',
@@ -218,6 +242,7 @@ tiles = [
     ('Median to < 10 % · the loop', f"{med(lambda r: num(r['under10_min']), lambda r: reached(r) and period_of(r) == 'L'):.3g} min", 'L1 – L22, runs that reached it'),
     ('Median tools · before → loop', f"{med(lambda r: num(r['tool_min']), lambda r: period_of(r) in 'AB'):.3g} → {med(lambda r: num(r['tool_min']), lambda r: period_of(r) == 'L'):.3g} min", 'before: estimated · loop: exact'),
     ('Median LLM · before → loop', f"{med(lambda r: num(r['llm_min']), lambda r: period_of(r) in 'AB'):.3g} → {med(lambda r: num(r['llm_min']), lambda r: period_of(r) == 'L'):.3g} min", 'now the larger share of the clock'),
+    ('Median to < 10 % · next phase', (lambda v: f"{v:.3g} min" if v is not None else '—')(med(lambda r: num(r['under10_min']), lambda r: reached(r) and period_of(r) == 'D')), 'Oct 11 evening: panel re-runs + new pages'),
     ('Never under 10 %', f"{sum(1 for r in rows if r['never'] == '1')} of {N}", 'stopped by the budget or by hand'),
 ]
 tile_html = '<div class="tiles">' + ''.join(f'<div class="tile"><div class="tl">{html.escape(a)}</div><div class="tv">{html.escape(b)}</div><div class="ts">{html.escape(c)}</div></div>' for a, b, c in tiles) + '</div>'
@@ -237,7 +262,7 @@ css = """
 body{margin:0;background:var(--surface-1)}
 .viz-root{font:13px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text-primary);background:var(--surface-1);max-width:1220px;margin:0 auto;padding:28px 20px 60px}
 h1{font-size:22px;margin:0 0 4px}.lede{color:var(--text-secondary);margin:0 0 20px;max-width:900px}
-.tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:0 0 26px}.tile{background:var(--surface-2);border-radius:8px;padding:12px 14px}
+.tiles{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin:0 0 26px}.tile{background:var(--surface-2);border-radius:8px;padding:12px 14px}
 .tl{color:var(--text-secondary);font-size:12px}.tv{font-size:22px;font-weight:600;margin:4px 0 2px;font-variant-numeric:tabular-nums}.ts{color:var(--text-muted);font-size:11.5px}
 .chart{margin:0 0 30px}.chart h2{font-size:15px;margin:0 0 2px}.sub{color:var(--text-secondary);margin:0 0 6px;max-width:1000px;font-size:12.5px}
 .legend{display:flex;gap:16px;color:var(--text-secondary);font-size:12px;margin:0 0 2px}.legend span{display:inline-flex;align-items:center;gap:6px}

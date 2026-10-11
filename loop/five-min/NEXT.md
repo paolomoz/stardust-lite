@@ -91,3 +91,6 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
   settle restores horizontal scroll after the lazy-picture pass (lenovo-p2 served slider scrolled sideways).
 - item 7 (faster model) NOT TESTABLE here: the Sonnet A/B on santanderus (P1's code) failed at once — the deployment has no Sonnet model
   (model_not_found); nothing was created. N3 cisco started at 3447787.
+- N3 cisco (3447787): stop 16.1 min, served 6.18 / 8.46 / 4.34. Costs: the picture-behind-text rule on EVERY picture of a block (icons and
+  slides full-bleed — also bankofamerica), the hero video without its poster, a tab list as `:icon:`, stats merged, styles.css left at the
+  skeleton's tokens. Fix: the rule names the one picture by its file.
