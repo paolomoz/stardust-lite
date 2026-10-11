@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L15 | mheducation.com | fc2acb9 (one shot only where faithful) | 1.3 (33 / 49 / 48 %) | **never** at 360 (14.7); 1440 / 2560 under 2 % at 11.2 | 18.2 | 6 | 24 | own ≈ 11.9 min, tools 4.1 to r6 | an autoplay carousel caught on slide 2 at 1440 / 2560 and slide 3 at 360 (a reader sees slide 1): the 360 band unreachable; `first` authored slide 2 |
 | L14 | merck.com | 5d94383 (art direction) | 1.8 (64 / 41 / 34 %) | **never** (clock stopped by hand at 22.5: 38 / 34 / 22 %) | 26.5 | 4 | 26 | own ≈ 13.1 min, tools 9.4 | the one-shot origin was not what a reader sees: every loaded picture below the fold blank, the stories section 206–346 px taller — against a stitched capture the same build read 26 / 16 / 7 %; 8 min diagnosing it |
 | L13 | nike.com gb | 9c75734 (wrapped build sections, target-only stop, printed re-run commands, slider tracks) | 5.2 after 2 × `first` (74 / 36 / 53 %) | 22.8 (1440 / 2560 under 2.4 % at 10.3) | 25.0 | 4 | 26–28 | own ≈ 17.8 min, tools 5.0 to stop | 12.5 min on 360 alone: the portrait 360 images fetched but never authored (art direction ≈ 6 min), buttons styled for `strong a` instead of the decorated button, flattened mega-menu |
 | L12 | nfl.com international | 2dc1ee6 (main stays root, 60 % split, origin-mode builds, digest rows by overlap) | 4.4 after 2 × `first` (55 / 52 / 39 %) | 28.0 | 31.2 | 9 | 26–40 | own ≈ 18.7 min, tools 9.3 to stop | a main column + right rail re-ordered on mobile: no model, the document re-authored by hand (≈ 13 min); the gate found no build section under a wrapper and printed a false `stop: clean` at 22 %; harness re-runs without --local-media / --sync-chrome (stale chrome, 404 media) |
@@ -125,3 +126,8 @@ transform: the mechanism unknown); the build matched the measured DOM at Δy 0 a
 where it is faithful — after the shot, loaded pictures that come out blank (one colour) send the page to the stitched capture, as does a
 layout that changes when the viewport grows or pictures that move with the scroll (replays: merck stitched, marriott / takeda / revlon one
 shot, wpp stitched). The build follows its origin's mode (iteration 12), so both sides stay comparable.
+
+### L15 — the one shot only where faithful
+Result on mheducation: 1440 / 2560 under 2 % at 11.2 min, 360 never — an autoplay carousel on a different slide per width. Keep.
+Iteration 16: every settle rewinds carousels to slide 1 and stops the autoplay before the readings and the capture (replay: PreK–12 at 360
+and 1440).
