@@ -221,7 +221,7 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
   const top0 = (k) => (Array.isArray(dump[k]) ? dump[k] : [dump[k]]).find((n) => n?.box)?.box?.[1] ?? 1e9;
   const headerKey = keys.find((k) => /^header\b/.test(k)) || keys.find((k) => /(^|[\s.#_-])(header|masthead|banner)\b/i.test(k.split(',')[0]) && top0(k) < 250) || null;
   const footerKey = keys.find((k) => /^footer\b/.test(k)) || keys.find((k) => k !== headerKey && /(^|[\s.#_-])(footer|contentinfo)\b/i.test(k.split(',')[0])) || null;
-  const tallest = (ks) => ks.map((k) => [k, Math.max(0, ...(Array.isArray(dump[k]) ? dump[k] : [dump[k]]).filter((n) => n?.box).map((n) => n.box[3]))]).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+  const tallest = (ks) => ks.filter((k) => !Array.isArray(dump[k]) || dump[k].length <= 5).map((k) => [k, Math.max(0, ...(Array.isArray(dump[k]) ? dump[k] : [dump[k]]).filter((n) => n?.box).map((n) => n.box[3]))]).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
   const mainKey = root || keys.find((k) => k === 'main') || tallest(keys.filter((k) => k !== headerKey && k !== footerKey)) || null; // a renamed content root (`#content`, `div.main-container`) is the tallest non-chrome root, not the first key
   const roots = mainKey ? (dump[mainKey] || []) : [];
   // the extra roots measure-page dumped (unassigned bands: a breadcrumb bar, a promo bar outside main) are sections of their own, in the dump's order

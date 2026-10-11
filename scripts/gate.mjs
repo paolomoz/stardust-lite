@@ -197,7 +197,9 @@ const captureW = async (W) => {
       const t0 = Date.now(); console.log(`build ${W}…`);
       for (let attempt = 1; attempt <= 2 && !bp; attempt += 1) { try { const r = await captureUrl(buildCtx, build, eds, { width: W, vh, log: console.log }); bp = r.page; t.build = secs(t0); } catch (e) { console.log(`build ${W}: capture failed${attempt === 1 ? ' — once more' : ' twice — this width reads ERR, not the last round'} (${String(e.message || e).split('\n')[0].slice(0, 140)})`); bp = null; } }
     };
-    const lt = liveTask(); buildQueue = buildQueue.then(buildTask); await Promise.all([lt, buildQueue]);
+    // a LOCAL build serves its own media (harness --local-media): no burst to the preview host, the widths capture at once; a served build queues
+    const localBuild = /^https?:\/\/(localhost|127\.0\.0\.1)[:/]/.test(build);
+    const lt = liveTask(); if (localBuild) await Promise.all([lt, buildTask()]); else { buildQueue = buildQueue.then(buildTask); await Promise.all([lt, buildQueue]); }
   }
   capt[W] = { origin, eds, t, lp, bp, liveCtx, buildCtx, lsCached };
 };

@@ -21,7 +21,7 @@
 //   text in <p> when the item holds a nested list — ibm-home's header decorated on the prototype and crashed on the served page), and
 //   fetches the media the fragments reference. The fold applies the pipeline's single-paragraph cell rule and its list-item rule (see
 //   below) and requests every remote media URL of the document once (the branch host renders a rendition on its first request).
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, copyFileSync } from 'node:fs';
 import { basename, dirname, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -144,8 +144,11 @@ if (arg('--fragments', null)) {
 }
 // the branch host generates a rendition on its first request: the first gate's build capture showed blank picture cells until every media
 // URL had been requested once (audemarspiguet-home, one round). Warm every remote media URL of the document here, once, before the runtime
+// --local-media <dir>: the prototype's pictures from the files media-fetch wrote, not the branch host — the DA upload left `first`'s critical
+// path (wpp: 58 s) and so did the warm-up; the served gate reads the uploaded renditions
+if (typeof arg('--local-media', null) === 'string') { const md = String(arg('--local-media')); const files = existsSync(md) ? readdirSync(md).filter((f) => !/\.json$/.test(f)) : []; const dest = join(serveDir, 'drafts', 'media'); mkdirSync(dest, { recursive: true }); for (const f of files) copyFileSync(join(md, f), join(dest, f)); const have = new Set(files); let n = 0; folded.main = folded.main.replace(/https?:\/\/[^"'\s,)]+\/drafts\/media\/([^"'\s,?)]+)(\?[^"'\s,)]*)?/g, (m0, f) => (have.has(f) ? (n += 1, `/drafts/media/${f}`) : m0)); console.log(`harness: ${n} media URL(s) served from ${md} (local)`); }
 const remote = [...new Set([...folded.main.matchAll(/(?:src|srcset|href)="(https?:[^"]+)"/g)].flatMap((m) => m[1].split(',')).map((u) => u.trim().split(/\s+/)[0]).filter((u) => /\.(avif|webp|png|jpe?g|gif|svg|mp4)(\?|$)/i.test(u)))];
-if (remote.length) { let warm = 0; let cold = 0; for (const u of remote) { const r = await fetch(u, { method: 'GET' }).catch(() => null); if (r && r.ok) { warm += 1; await r.arrayBuffer().catch(() => {}); } else { cold += 1; console.log(`harness: media ${u.slice(-90)} → ${r ? r.status : 'unreachable'}`); } } console.log(`harness: ${warm} remote media URLs warmed${cold ? `, ${cold} failed (a 404 here is a blank cell in the gate)` : ''}`); }
+if (remote.length) { let warm = 0; let cold = 0; const q = [...remote]; await Promise.all(Array.from({ length: Math.min(8, q.length) }, async () => { while (q.length) { const u = q.shift(); const r = await fetch(u, { method: 'GET' }).catch(() => null); if (r && r.ok) { warm += 1; await r.arrayBuffer().catch(() => {}); } else { cold += 1; console.log(`harness: media ${u.slice(-90)} → ${r ? r.status : 'unreachable'}`); } } })); console.log(`harness: ${warm} remote media URLs warmed${cold ? `, ${cold} failed (a 404 here is a blank cell in the gate)` : ''}`); }
 const head = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${metas.map(([k, v]) => `<meta name="${k}" content="${v.replace(/"/g, '&quot;')}">`).join('')}<title>${(metas.find(([k]) => k === 'title') || [, ''])[1]}</title><script src="/scripts/aem.js" type="module"></script><script src="/scripts/scripts.js" type="module"></script><link rel="stylesheet" href="/styles/styles.css"></head>`;
 writeFileSync(`${serveDir}/${name}.harness.html`, `${head}<body><header></header>${folded.main}<footer></footer></body></html>`);
 
