@@ -159,6 +159,13 @@ function leavesOf(root) {
     else if (bgCut(n) && !kids.map(unwrap).some((c) => MEDIA(kindOf(c)))) bgCutWarn(n);
     if (k === 'ul') { if (isControlList(n)) { out.push({ kind: 'control', raw: 'ul', node: n, top, parent }); return; } if (isTextList(n)) { out.push({ kind: 'list', raw: 'ul', node: n, top, parent }); return; } kids.forEach((c, i) => walk(c, n === start ? i : top, n, depth + 1)); return; }
     if (k === 'a' && !n.text && linkLabel(n)) { out.push({ kind: 'link', raw: 'a', node: { ...n, children: undefined, text: linkLabel(n) }, top, parent }); return; } // a button's label in a span (acs-about)
+    // a link whose only content is ONE icon (a social link, an arrow button) is the icon inside the link — written as two leaves it read
+    // `:facebook:` then `<a>Learn more</a>` (rbc footer, every social link)
+    if ((k === 'a' || String(n.tag || '').toLowerCase() === 'a') && n.href && !textOf(n)) {
+      const icons = []; const scan = (x) => { const u = unwrap(x); const ck = kindOf(u); if (ck === 'icon' || isIconImg(u)) icons.push(u); else (x.children || []).forEach(scan); }; kids.forEach(scan);
+      // the icon token is the link's text; the aria label / title / alt stays as its title (the accessible name — linkHtml)
+      if (icons.length === 1) { const ic = icons[0]; const tok = isIconImg(ic) ? `:${iconName({ alt: basename(ic.src || '').replace(/\.[a-z0-9]+$/, '') })}:` : `:${iconName(ic)}:`; out.push({ kind: 'link', raw: 'a', node: { ...n, children: undefined, text: tok, title: n.title || n.aria || ic.alt || ic.aria || '' }, top, parent }); return; }
+    }
     // kindOf reads a card-wide link as a `group` (fingerprint) — the TAG names it here, or the rule never fired and the href was lost (continental)
     if ((k === 'a' || String(n.tag || '').toLowerCase() === 'a') && n.href && kids.map(unwrap).some((c) => { const ck = kindOf(c); return MEDIA(ck) || /^h[1-6]$/.test(ck) || ck === 'p' || ck === 'group'; }) && !n.text) {
       // the card's own call to action (a short text in a link / button / cta / more element: "Find out more") is the link's text, not a paragraph
@@ -207,7 +214,7 @@ function linkHtml(n, force, { altHint } = {}) {
   if (!text) return '';
   if (dead) return label ? `<p>${label}</p>` : '';
   stats.texts += label ? 1 : 0;
-  const w = weightOf(n, force); const a = `<a href="${esc(h)}"${!label && (n.aria || n.title) ? ` title="${esc(n.aria || n.title)}"` : ''}>${text}</a>`;
+  const w = weightOf(n, force); const a = `<a href="${esc(h)}"${(!label || /^:[a-z0-9-]+:$/.test(label)) && (n.aria || n.title) ? ` title="${esc(n.aria || n.title)}"` : ''}>${text}</a>`;
   return `<p>${w ? `<${w}>${a}</${w}>` : a}</p>`;
 }
 function listHtml(n, force) {
