@@ -89,3 +89,5 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
   the downloaded logo; the FDIC strip above the header split into main; the 360 digest named offsets, not the tile spacing.
 - fixes: an SVG drawn as -svg.png is not uploaded (its 409 read as a failure — lenovo-p2's served PNGs checked 200, no about:error);
   settle restores horizontal scroll after the lazy-picture pass (lenovo-p2 served slider scrolled sideways).
+- item 7 (faster model) NOT TESTABLE here: the Sonnet A/B on santanderus (P1's code) failed at once — the deployment has no Sonnet model
+  (model_not_found); nothing was created. N3 cisco started at 3447787.

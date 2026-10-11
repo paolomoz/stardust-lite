@@ -18,8 +18,10 @@ RUNS = [
     ('P5', 'sdt-lenovo-p1', 'lenovo-home', '7a9be3d', 'panel re-run of L22 (34.8)'),
     ('P6', 'sdt-lenovo-p2', 'lenovo-home', 'a8b975a', 'field A/B of P5: the same code + the spec-to-css bands'),
     ('N1', 'sdt-nfm-lite', 'nfm-home', '5104a9f', 'new page'),
-    ('N2', 'sdt-bankofamerica-lite', 'bankofamerica-home', None, 'new page'),
+    # ('M1', 'sdt-santanderus-p2', 'santanderus-home', 'e8dfd0a', 'model A/B of P1: the same code on Sonnet (P1 on Opus: 8.8)'),
+    ('N2', 'sdt-bankofamerica-lite', 'bankofamerica-home', 'fa62608', 'new page'),
     ('N3', 'sdt-cisco-lite', 'cisco-home', None, 'new page'),
+    ('N4', 'sdt-okta-lite', 'okta-home', None, 'new page'),
 ]
 HEADER = open(W.parent / 'part-C.csv').readline().strip().split(',')
 T = lambda s: dt.datetime.fromisoformat(s.replace('Z', '+00:00'))
