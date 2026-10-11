@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L18 | rbc.com about-rbc | b331bbf (line cap, digest per width, alt-paired mobile pictures) | 1.5 (39 / 41 / 31 %) | 14.7 | 16.9 | 4 | 22–23 | own ≈ 11.5 min, tools 3.2 to stop | an icon img stretched to the card width by `.cards img { width: 100% }` (the build 8000 px too tall), the page / nav / footer documents rewritten (≈ 2.5 min), an unreadable 360 thumbnail |
 | L17 | unitedrentals.com | b8b2317 (draft background URLs local, sr-only text dropped) | 1.9 (48 / 50 / 51 %) | 32.4 | 35.5 | 19 | 31–32 | own ≈ 20 min, tools 12.4 to stop | the 2560 cap 24 px off (a fraction, not the line) unseen for eight rounds — the digest named 360 only; 26 mobile pictures lost (image counts differ per width) and authored by hand; nav brand "Shopping cart" |
 | L16 | santanderus.com | 904d802 (carousels rewound to slide 1) | 1.2 (54 / 52 / 46 %) | **8.0** | 10.0 | 2 | 23 | own ≈ 5.8 min, tools **2.25** to stop | best so far: one `first`, one CSS pass (2.5 min), two rounds; the agent still restructured the hero (thumbnails outside the carousel) and rewrote the nav |
 | L15 | mheducation.com | fc2acb9 (one shot only where faithful) | 1.3 (33 / 49 / 48 %) | **never** at 360 (14.7); 1440 / 2560 under 2 % at 11.2 | 18.2 | 6 | 24 | own ≈ 11.9 min, tools 4.1 to r6 | an autoplay carousel caught on slide 2 at 1440 / 2560 and slide 3 at 360 (a reader sees slide 1): the 360 band unreachable; `first` authored slide 2 |
@@ -142,3 +143,7 @@ pictures in the drafts point at the fetched files (`/drafts/media/…`), screen-
 Result on unitedrentals: stop at 32.4 after 19 rounds — a fluid cap off at 2560 that the 360-only digest never named, mobile pictures lost
 when the per-width image counts differ. Keep. Iteration 18: the cap as the line through two widths (replay: calc(91.429vw - 29px) against
 the live calc(91.6vw - 31px)), a digest for every width over the target, mobile pictures paired by alt (replay: 22), overlay paddings ≥ 0.
+
+### L18 — the cap as a line, a digest per width, mobile pictures by alt
+Result on rbc: stop at 14.7 — tools 190 s. Keep. Iteration 19: image rules on `picture img` (icons are span.icon > img), readable
+side-by-side tiles. Telus skipped: a Cloudflare challenge even with the installed Chrome (the tier line named it).
