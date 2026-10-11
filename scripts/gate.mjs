@@ -141,7 +141,7 @@ const prevSections = {}; // --round: the previous round's per-section table per 
 if (roundMode) for (const W of widths) { try { prevSections[W] = JSON.parse(readFileSync(join(out, `sections-${W}.json`), 'utf8')).sections; } catch { prevSections[W] = null; } }
 const triage = typeof arg('--triage', null) === 'string' ? JSON.parse(readFileSync(arg('--triage'), 'utf8')) : null;
 if (process.argv.includes('--probes') && typeof arg('--probes', null) !== 'string') { console.error(`${USAGE}\n  --probes takes a file (one probe per line); a bare --probes crashed the cap-probe step (sdt-dentsu beyond-the-funnel)`); process.exit(1); }
-const secSel = String(arg('--build-sections', 'main > .section'));
+const secSel = String(arg('--build-sections', 'main .section')); // a wrapper around the sections (nfl: a main column + rail) hid every build section from `main > .section`
 // the LIVE content root and the section split for the per-section table: the triage's (its dump key `mainKey` — `main`, or the root's short
 // selector — and its `--sections` node selectors), else the profile's `cap.contentRoot`, else cap-probe's main selector (the cap shell,
 // which on a one-module site excludes a hero that sits before `main`)
@@ -286,6 +286,9 @@ for (const W of widths) {
   for (const u of pairing.unpaired) console.log(`    live "${(u.anchorText || '(no text)').slice(0, 26)}" y ${u.box ? `${u.box[1]}–${u.box[1] + u.box[3]}` : '?'} located in no authored section`);
   sectionRuns[W] = join(out, `sections-${W}.json`);
   t.sections = secs(ts);
+  // the section tops drawn on the side-by-side (red): live on the left, build on the right — the split read at a glance
+  try { const f = join(out, `sbs-${W}.png`); if (existsSync(f)) { const S3 = PNG.sync.read(readFileSync(f)); const k = W >= 1440 ? 4 : 2; const w0 = Math.ceil(A.width / k); const line = (y, x0, x1) => { const yy = Math.round(y / k); if (yy < 0 || yy >= S3.height) return; for (let x = x0; x < Math.min(x1, S3.width); x += 1) for (const dy of [0, 1]) { const i = ((yy + dy) * S3.width + x) * 4; if (yy + dy < S3.height) { S3.data[i] = 230; S3.data[i + 1] = 0; S3.data[i + 2] = 0; S3.data[i + 3] = 255; } } };
+    for (const r of table) { if (r.live) line(r.live.y0, 0, w0); if (r.build) line(r.build.y0, w0 + 12, S3.width); } writeFileSync(f, PNG.sync.write(S3)); } } catch { /* no thumbnail */ }
   writeFileSync(sectionRuns[W], JSON.stringify({ _schema: 'stardust-lite/gate-sections@2', _writtenAt: new Date().toISOString(), width: W, live, build, budgetKey: key, chrome: chromeRuns[W] || null, triage: typeof arg('--triage', null) === 'string' ? resolve(arg('--triage')) : null, blocks: blocks.length ? blocksFile : null, doc: { live: pairing.live.doc, build: pairing.build.doc }, pairing: { mode: pairing.mode, contentRoot: pairing.live.root, split: pairing.live.split, sectionSelectors: sectionSels, mismatches: pairing.mismatches }, sections: table, unpaired: pairing.unpaired, liveInChrome: pairing.chrome, emptyAuthored: pairing.empty }, null, 1));
 }
 if (browser) await browser.close();
@@ -376,7 +379,7 @@ if (roundMode) {
   digest = `\nround digest at ${W}${prev ? ' (vs the previous round in this dir)' : ' (first round here)'}: page ${basePct} %${moved.length ? `\n${moved.join('\n')}` : '\n  no section moved'}`;
   digest += threeW.every(underAt) ? `\nstop: under ${target} % at the three widths — the prototype is done; deploy and name the residuals in the register (polish after this is outside the clock)`
     : widths.every(underAt) ? `\nnext: under ${target} % at ${widths.join(' / ')} — gate the round at the three widths (--widths 360,${baseW},${probeW})`
-    : clean ? `\nstop: the base width is clean (every section within 2 px${budgetOn ? ' and budget' : ''}) — run the three widths with --probes, then name the residuals in the register` : `\nnext: one round, changing only what the rows above name`;
+    : clean && now.length ? `\nnext: every paired section is within 2 px but the pixels are over ${target} % — a paint, a picture or an unpaired section (read sbs-<W>.png)` : `\nnext: one round, changing only what the rows above name`;
 }
 const tLine = `${tLine0} | cap-probe ${tTail.cap} s, sections pass ${tTail.sections} s, pair ${tTail.pair ?? 0} s | total ${secs(tStart)} s`;
 console.log(`\n${targetLine}\n${capLine}${sectionsLine ? `\n${sectionsLine}` : ''}${motionLine ? `\n${motionLine}` : ''}${budgetLine ? `\n${budgetLine}` : ''}${digest}${roundMode ? `\nside by side (live | build): ${widths.map((W) => join(out, `sbs-${W}.png`)).join(' ')}` : ''}\ntiming (${captureTool}${captureTool === 'stitch' ? ', live and build concurrent' : ''}): ${tLine}\nevidence: ${out}/`);
