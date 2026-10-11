@@ -84,3 +84,8 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
 - N1 nfm: SKIPPED — a location block (Akamai "This site is not accessible from your current location") through every tier; `first` ran the
   whole pipeline on the block page and the gate printed REACHED. Fixed: `first` stops when the measured page is a block page (title /
   challenge / location text; across all measured pages it flags only nfm). Its repo and three DA drafts hold the block page (harmless).
+- N2 bankofamerica (fa62608): stop 22.1 min, served 9.82 / 8.12 / 4.61. Costs: author fused the sign-in form, heading and four offers into
+  one cards block (doubled card text, empty rows, goal tiles loose; build 11 321 px vs 4 069) — ≈ 10 min re-modelled by hand; nav without
+  the downloaded logo; the FDIC strip above the header split into main; the 360 digest named offsets, not the tile spacing.
+- fixes: an SVG drawn as -svg.png is not uploaded (its 409 read as a failure — lenovo-p2's served PNGs checked 200, no about:error);
+  settle restores horizontal scroll after the lazy-picture pass (lenovo-p2 served slider scrolled sideways).
