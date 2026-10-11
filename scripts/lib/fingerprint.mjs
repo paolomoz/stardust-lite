@@ -266,10 +266,23 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
   }
   // no footer root, and the last band after main reaches the document's bottom and is mostly links: that band IS the footer (canon: an
   // experience fragment with a "Footer" h2, five link columns and the legal line was authored as an accordion section)
-  let after = extras(afterMain, true); let footerNode = footerKey ? dump[footerKey]?.[0] || null : null;
+  // the extra bands, once each (a fragment dumped under two keys — equitable), none inside a section already split, those below the last
+  // section after the content (a footer fragment inside a tall content root read as "before main")
+  const seenBox = new Set(); const once = (n) => { const k = JSON.stringify(n.box); if (seenBox.has(k)) return false; seenBox.add(k); return true; };
+  const inSec = (n) => n.box && secs.some((sn) => sn.box && inside(n.box, sn.box));
+  const lastBottom = Math.max(0, ...secs.filter((sn) => sn.box).map((sn) => sn.box[1] + sn.box[3]));
+  const allEx = [...extras(beforeMain), ...extras(afterMain, true)].filter(once).filter((n) => !inSec(n));
+  const before = allEx.filter((n) => !(n.box && n.box[1] >= lastBottom - 8) && !extras(afterMain, true).includes(n));
+  let after = allEx.filter((n) => !before.includes(n)).sort((a, b) => (a.box?.[1] ?? 0) - (b.box?.[1] ?? 0)); let footerNode = footerKey ? dump[footerKey]?.[0] || null : null;
+  // the bottom band is the footer when it is mostly links, or holds a copyright line and a few links (equitable: 8 links of 12 texts)
   const docH = Number(dump.__doc) || 0; const last = after[after.length - 1];
-  if (!footerNode && last?.box && docH && last.box[1] + last.box[3] >= docH - 24) { const l = leaves(last).filter((x) => x.text); const links = l.filter((x) => ['a', 'button'].includes(tagOf(x))).length; if (links >= 10 && links >= l.length * 0.6) { footerNode = last; after = after.slice(0, -1); } }
-  const extraCount = extras(beforeMain).length + after.length; if (extraCount) secs = [...extras(beforeMain), ...secs, ...after];
+  if (!footerNode && last?.box && docH && last.box[1] + last.box[3] >= docH - 24) { const l = leaves(last).filter((x) => x.text); const links = l.filter((x) => ['a', 'button'].includes(tagOf(x))).length; if ((links >= 10 && links >= l.length * 0.6) || (links >= 4 && l.some((x) => /©|copyright|all rights reserved/i.test(x.text)))) { footerNode = last; after = after.slice(0, -1); } }
+  // a TALL section made of heading-led parts (an AEM container holding the hero and a story grid — bms: one 1790 px "cards" section, Δh +1516
+  // on the first round) is split into those parts: ≥ 2 children of ≥ 250 px, each with an h1–h3, covering ≥ 70 % of it
+  const hasHead = (x) => /^h[1-3]$/.test(tagOf(x)) || (x.children || []).some(hasHead);
+  const refine = (n, d = 0) => { if (d > 2 || !n?.box || n.box[3] < 1200) return [n]; let x = n; while ((x.children || []).length === 1) x = x.children[0]; const parts = (x.children || []).filter((c) => c.box && c.box[3] >= 250 && hasHead(c)); if (parts.length < 2 || parts.reduce((a, c) => a + c.box[3], 0) < n.box[3] * 0.7) return [n]; return parts.flatMap((c) => refine(c, d + 1)); };
+  if (!(sections && sections.length)) secs = secs.flatMap((n) => refine(n)); // the gate's live split (no marks) refines the same way
+  const extraCount = before.length + after.length; if (extraCount) secs = [...before, ...secs, ...after];
   return { header: headerKey ? dump[headerKey]?.[0] || null : null, footer: footerNode, sections: secs, mainKey, headerKey, footerKey, marked: marked.length && secs.includes(marked[0]) ? marked.length : 0, extraRoots: extraCount };
 }
 

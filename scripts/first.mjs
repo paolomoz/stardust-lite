@@ -52,7 +52,7 @@ const finish = (code, extra = '') => {
 };
 
 // 1 tier + profile, 2 measure (the profile's flags are read by every instrument from migration/site.json)
-if (!skip.has('probe')) step('probe-load', S('probe-load'), [url, '360,1440,2560', '--profile', join('migration', 'site.json')], { show: 4, note: (r) => (/^tier: (.*)$/m.exec(r.stdout) || [])[1] || null });
+if (!skip.has('probe')) step('probe-load', S('probe-load'), [url, '360,1440', '--profile', join('migration', 'site.json')], { show: 4, note: (r) => (/^tier: (.*)$/m.exec(r.stdout) || [])[1] || null });
 if (!skip.has('measure')) {
   rmSync(join(dir, 'gate'), { recursive: true, force: true }); // a new measurement makes the last round's cached live capture and split stale (toryburch: deleted by hand)
   const mArgs = [url, '--out', measure, ...(typeof arg('--sections', null) === 'string' ? ['--sections', arg('--sections')] : []), ...(typeof arg('--main', null) === 'string' ? ['--main', arg('--main')] : []), ...['--header', '--footer'].flatMap((f) => (typeof arg(f, null) === 'string' ? [f, arg(f)] : []))];
