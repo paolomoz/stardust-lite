@@ -144,7 +144,8 @@ function leavesOf(root) {
   // defaultContentBefore never peeled a title (sdt-dentsu beyond-the-funnel, the profiles)
   let start = root; while (start && !start.text && !start.src && (start.children || []).length === 1) start = start.children[0];
   // screen-reader-only text is not page content ("Item 2 of 3.", "opens in a new tab" — mheducation): an sr-only class or a 1–2 px text box
-  const srOnly = (n) => /\b(sr-only|visually-?hidden|screen-reader(-text)?|sr-text|a11y-hidden|offscreen|u-hidden-visually|hide-text)\b/i.test(String(n.cls || '')) || (!!n.text && !!n.box && n.box[2] <= 2 && n.box[3] <= 2);
+  // …and a carousel's cloned slides (the loop's copies — wyndham: 13 offers authored for 5, 21 hotels for 10)
+  const srOnly = (n) => /\b(sr-only|visually-?hidden|screen-reader(-text)?|sr-text|a11y-hidden|offscreen|u-hidden-visually|hide-text|slick-cloned|swiper-slide-duplicate|glide__slide--clone|tns-slide-cloned|splide__slide--clone|owl-item cloned|cloned)\b/i.test(String(n.cls || '')) || (!!n.text && !!n.box && n.box[2] <= 2 && n.box[3] <= 2);
   const walk = (n, top, parent, depth) => {
     if (srOnly(n)) return;
     if (n.spacer) { if (keepSpacers) out.push({ kind: 'text', raw: 'p', node: n, spacer: true, top, parent }); else spacers.push(n); return; }

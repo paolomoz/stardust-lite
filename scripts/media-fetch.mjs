@@ -140,6 +140,13 @@ for (const u of [...new Set(urls)]) {
   writeFileSync(join(out, name), buf); taken.add(name); manifest[full] = name; n += 1;
   console.log(`${r.status} ${type.padEnd(14)} ${String(buf.length).padStart(8)}  ${full.slice(-80)} → ${name}`);
 }
+// a still over 10 MB or 4000 px wide fails the preview (wyndham: a 7500×5000, 34 MB png → 409): scaled to 2400 px wide by ffmpeg
+for (const [, f] of Object.entries(manifest)) {
+  const fp = join(out, f); if (!/\.(png|jpe?g|webp)$/i.test(f) || !existsSync(fp)) continue; const big = statSync(fp).size > 10 * 1024 * 1024;
+  let wide = false; try { const b = readFileSync(fp); if (/\.png$/i.test(f)) wide = b.readUInt32BE(16) > 4000; } catch { /* unreadable */ }
+  if (!big && !wide) continue; const tmp = `${fp}.tmp${extname(fp)}`; const r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', fp, '-vf', 'scale=min(2400\\,iw):-2', tmp], { encoding: 'utf8' });
+  if (!r.error && !r.status && existsSync(tmp)) { renameSync(tmp, fp); console.log(`media-fetch: ${f} scaled to 2400 px wide (${(statSync(fp).size / 1024).toFixed(0)} KB) — the preview refuses a picture that large`); }
+}
 // an animated GIF over 10 MB is not a picture the pipeline takes (bms: a 49.6 MB gif authored, broken on the prototype, an ffmpeg still by hand):
 // its first frame as a JPEG, the manifest pointing at the still — register the motion
 for (const [u, f] of Object.entries(manifest)) {

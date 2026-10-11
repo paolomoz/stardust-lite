@@ -191,6 +191,10 @@ export async function rewindCarousels(page) {
 }
 
 export async function settle(page, step = 600, pause = 120, rest = 1500) {
+  // an anti-flicker style a test tool never lifts for an automated browser (wyndham: Adobe Target's `body{opacity:0}` — every live capture
+  // one colour): the known ones removed, a transparent html / body made visible
+  const unflickered = await page.evaluate(() => { let n = 0; for (const sel of ['style#at-body-style', 'style#alloy-prehiding', 'style.at-flicker-control', 'style#optimizely-hide']) document.querySelectorAll(sel).forEach((e) => { e.remove(); n += 1; }); for (const x of [document.documentElement, document.body]) { if (!x) continue; if (x.classList.contains('async-hide')) { x.classList.remove('async-hide'); n += 1; } if (getComputedStyle(x).opacity === '0' || getComputedStyle(x).visibility === 'hidden') { x.style.setProperty('opacity', '1', 'important'); x.style.setProperty('visibility', 'visible', 'important'); n += 1; } } return n; }).catch(() => 0);
+  if (unflickered && !page.__sdUnflickered) { page.__sdUnflickered = true; console.error(`settle: an anti-flicker style hid the page (${unflickered}) — lifted`); }
   await unrollScroller(page);
   await page.evaluate(async ({ step, pause, rest }) => {
     for (let y = 0; y < document.body.scrollHeight; y += step) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, pause)); }
@@ -205,6 +209,9 @@ export async function settle(page, step = 600, pause = 120, rest = 1500) {
     await Promise.race([Promise.all(document.getAnimations().filter((a) => a.playState === 'running' && finite(a)).map((a) => a.finished.catch(() => {}))), timeout(3000)]);
   }, { step, pause, rest });
   await hideModals(page); // a modal that opened during the settle (a delayed newsletter layer)
+  // lazy pictures still on their placeholder (a 1×1 / data: source) after the scroll: each scrolled into view in turn and waited for — the
+  // settle accepted grey placeholders as loaded (wyndham: two pictures grey at 360 and 1440, the target out of reach)
+  await page.evaluate(async () => { const ph = [...document.images].filter((i) => { const r = i.getBoundingClientRect(); return r.width > 50 && r.height > 50 && (i.naturalWidth <= 2 || /^data:/.test(i.currentSrc || '')) && (i.dataset.src || i.dataset.srcset || i.loading === 'lazy' || i.closest('[data-src],[data-bg]')); }).slice(0, 40); if (!ph.length) return; for (const i of ph) { i.scrollIntoView({ block: 'center', behavior: 'instant' }); await new Promise((r) => setTimeout(r, 150)); } await Promise.race([Promise.all(ph.map((i) => (i.complete && i.naturalWidth > 2 ? null : new Promise((r) => { i.addEventListener('load', r, { once: true }); i.addEventListener('error', r, { once: true }); })))), new Promise((r) => setTimeout(r, 2500))]); window.scrollTo({ top: 0, behavior: 'instant' }); }).catch(() => {});
   await rewindCarousels(page);
 }
 

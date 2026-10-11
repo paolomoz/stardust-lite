@@ -83,7 +83,7 @@ const folded = await p0.evaluate(() => {
   // a section style is a class the way aem.js's toClassName writes it (`Brands Divider` → `brands-divider`); the raw token crashed the fold on a space (pass 5)
   // a section holding a BLOCK stays even with no text or picture (an embed whose video has no URL in the capture — deloitte: the section vanished
   // and the gate paired the hero against hero + video); a truly empty one goes, and is counted
-  document.querySelectorAll('main > div').forEach((d) => { if (!d.textContent.trim() && !d.querySelector('img,picture,iframe,video,div[class]')) { d.remove(); window.__sdDropped = (window.__sdDropped || 0) + 1; } });
+  /* an empty section is KEPT: the served page keeps it, and dropping it here shifted every nth-of-type after it by one (wyndham) */
   // the pipeline's cell rule: a block cell holding ONE paragraph and nothing else loses its <p> (`<div><p><a>x</a></p></div>` → `<div><a>x</a></div>`,
   // verified on the served plain.html — walgreens-home); a decorate that read `:scope > p` worked on the prototype only
   document.querySelectorAll('main > div > div > div > div').forEach((cell) => { const k = cell.children; if (k.length === 1 && k[0].tagName === 'P' && ![...cell.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) k[0].replaceWith(...k[0].childNodes); });
