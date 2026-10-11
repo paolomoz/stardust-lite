@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L20 | waters.com us en | 78fcbe3 (anti-flicker, lazy placeholders, empty sections kept, clones skipped) | 1.8 (57 / 43 / 46 %) | 33.7 | 44.0 | 3 | 54–57 | own ≈ 26 min, tools 7.3 to stop | the drafts aimed at the wrong sections (an empty first section) and a 608 px cap — thrown away, all CSS by hand (8 min); the installed Chrome's one shot laid 360 out at 500; an empty section the served page dropped |
 | L19 | wyndhamhotels.com en-uk | 2c1fabc (picture img rules, readable tiles) | 5.5 after 2 × `first` (54 / 77 / 76 %) | **never** at 360 (12.92); 1440 / 2560 under 10 at 20.5 | 34.2 | 10 | 32–40 | own ≈ 17.9 min, tools 10.6 to stop | an anti-flicker `body{opacity:0}` (Adobe Target) made every live capture blank; lazy placeholders accepted as loaded (two grey pictures at 360 / 1440); an empty section the harness dropped and the served page kept; slider clones authored |
 | L18 | rbc.com about-rbc | b331bbf (line cap, digest per width, alt-paired mobile pictures) | 1.5 (39 / 41 / 31 %) | 14.7 | 16.9 | 4 | 22–23 | own ≈ 11.5 min, tools 3.2 to stop | an icon img stretched to the card width by `.cards img { width: 100% }` (the build 8000 px too tall), the page / nav / footer documents rewritten (≈ 2.5 min), an unreadable 360 thumbnail |
 | L17 | unitedrentals.com | b8b2317 (draft background URLs local, sr-only text dropped) | 1.9 (48 / 50 / 51 %) | 32.4 | 35.5 | 19 | 31–32 | own ≈ 20 min, tools 12.4 to stop | the 2560 cap 24 px off (a fraction, not the line) unseen for eight rounds — the digest named 360 only; 26 mobile pictures lost (image counts differ per width) and authored by hand; nav brand "Shopping cart" |
@@ -153,3 +154,22 @@ side-by-side tiles. Telus skipped: a Cloudflare challenge even with the installe
 Result on wyndham: no stop at 360 — the live page hidden by an anti-flicker style, lazy placeholders captured as grey boxes. Iteration 20:
 settle lifts anti-flicker styles and scrolls unloaded placeholders into view, the harness keeps empty sections (served parity), author skips
 cloned slides, oversized stills scaled (replay: the wyndham capture visible, pictures painted).
+
+### L20 — anti-flicker, lazy placeholders, cloned slides
+Result on waters: stop at 33.7 — the drafts unusable (an empty first section shifted their indices; a 608 px cap), 360 captured as a 500 px
+layout under the installed Chrome. Iteration 21 (no field run left): a narrow viewport under the installed Chrome is stitched; author writes no
+empty section and marks its row `drop: empty` (replay: waters' back-to-top strip and three spacers dropped, none on bms / santanderus / wpp).
+
+## Result (20 runs, 2026-10-10 → 11, `e0e3428` → `exp/five-min`)
+
+The target of 5 min was not reached. Best clocks: santanderus 8.0, wpp 9.7, publicis 9.8, revlon 10.45, equitable 12.0. Three runs never
+reached the target at 360 (merck, mheducation, wyndham) — each a capture defect, fixed after the run. Median of the 20: ≈ 18 min (I1–I3 before
+the loop: 25.1–never).
+
+What moved: the TOOLS went from ≈ 12–27 min of a run to ≈ 2–4 min — `first` (one call to the first round, 70–120 s), one-shot captures where
+faithful, local media in the prototype, concurrent local builds and a dump-based live split (a round 55–119 s → 20–35 s), popups / videos /
+carousels / anti-flicker / lazy pictures handled at the capture, the split (no main, tall containers, chrome bands, empty sections), fonts and
+art direction generated. What did not: the AGENT's own pass — reading the measurement, writing the CSS, repairing the document — is 5–26 min
+and is now 70–85 % of every clock. A clean simple page costs ≈ 1.5 min of tools + ≈ 5 min of agent; a complex one (a rail, a scroll-driven
+hero, a mega-menu) 15+ min of agent. The 5-min target needs the generated document and CSS good enough that the agent only fixes residuals:
+the drafts carried ≈ 20–35 % of the final CSS throughout (bms replay: the element pass `style-pass` did not move the first round).
