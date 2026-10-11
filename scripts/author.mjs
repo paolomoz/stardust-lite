@@ -474,7 +474,10 @@ function navDoc(root) {
   const menu = list ? [listHtml(list.node, 'plain')] : [`<ul>${leaves.filter((l) => !used.has(l) && ['link', 'control'].includes(l.kind)).map(item).filter(Boolean).join('')}</ul>`];
   const toolsHtml = tools.length ? [`<ul>${tools.map((l) => item(l) || (l.kind === 'icon' ? `<li>${leafHtml(l) || ''}</li>` : null)).filter(Boolean).join('')}</ul>`] : [];
   const bl = brand ? (String(brand.node.aria || brand.node.title || '').trim() || (pic?.node?.alt || '').trim() || (/^learn more$/i.test(String(brand.node.text || '')) ? '' : String(brand.node.text || '').trim()) || 'Home') : null;
-  const brandHtml = brand ? `<p><a href="${esc(brand.node.href || '/')}">${esc(bl)}</a></p>` : null;
+  // never an empty brand section: the pipeline drops an empty section and every nav role shifts one slot (revlon: the link list in the brand
+  // slot) — the site's own name from the page URL when no logo link was found
+  const siteName = (() => { try { const h = new URL(arg('--url', '') || 'https://site.example').hostname.replace(/^www\./, '').split('.')[0]; return h.charAt(0).toUpperCase() + h.slice(1); } catch { return 'Home'; } })();
+  const brandHtml = brand ? `<p><a href="${esc(brand.node.href || '/')}">${esc(bl)}</a></p>` : `<p><a href="/">${esc(siteName)}</a></p>`;
   const sections = [[brandHtml], menu, toolsHtml];
   if (promo.length) sections.push(promo.map((l) => leafHtml(l)).filter(Boolean));
   return chromeDoc(sections);

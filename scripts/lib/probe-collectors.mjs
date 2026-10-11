@@ -67,7 +67,8 @@ export const collectMedia = () => {
 export const fontFaceRulesFrom = (css, base) => {
   const out = []; const norm = (v) => String(v || '').trim().replace(/^["']|["']$/g, '');
   for (const m of String(css).matchAll(/@font-face\s*\{([^}]*)\}/g)) {
-    const body = m[1]; const prop = (k) => { const r = new RegExp(`(?:^|;)\\s*${k}\\s*:\\s*([^;]+)`, 'i').exec(body); return r ? r[1].trim() : null; };
+    // the LAST declaration of a property wins (an `src: url(x.eot)` line before the real `src:` list — revlon's acumin faces read as .eot only)
+    const body = m[1]; const prop = (k) => { const all = [...body.matchAll(new RegExp(`(?:^|;)\\s*${k}\\s*:\\s*([^;]+)`, 'gi'))]; return all.length ? all[all.length - 1][1].trim() : null; };
     const family = norm(prop('font-family')); if (!family) continue;
     const srcs = [...String(prop('src') || '').matchAll(/url\(\s*(['"]?)([^'")]+)\1\s*\)\s*(?:format\(\s*['"]?([\w-]+)['"]?\s*\))?/g)].map((x) => { let u = x[2]; try { u = new URL(u, base).href; } catch { /* data: or odd */ } return { url: u, format: x[3] || null }; });
     out.push({ family, weight: norm(prop('font-weight') || '400').replace(/^normal$/i, '400').replace(/^bold$/i, '700'), style: norm(prop('font-style') || 'normal'), srcs, unicodeRange: prop('unicode-range') });

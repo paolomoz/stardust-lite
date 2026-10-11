@@ -68,7 +68,8 @@ else if (!skip.has('triage') && !skip.has('author')) step('triage', S('triage'),
 // 4 media + fonts (fonts.css written from the measured @font-face rules; a WAF answer goes through the page by itself)
 let daMedia = null;
 if (!skip.has('media')) {
-  step('media', S('media-fetch'), [content, '--out', media], { show: 0, ok: () => existsSync(join(media, 'manifest.json')), note: (r) => (/(\d+) of (\d+)/.exec(r.stdout) || [])[0] || tail(r.stdout, 1).slice(0, 80) });
+  const content360 = join(measure, 'content-360.json'); // the mobile pictures too (revlon's slideshow had its own 360 images, fetched by a case script)
+  step('media', S('media-fetch'), [content, ...(existsSync(content360) ? [content360] : []), '--out', media], { show: 0, ok: () => existsSync(join(media, 'manifest.json')), note: (r) => (/(\d+) of (\d+)/.exec(r.stdout) || [])[0] || tail(r.stdout, 1).slice(0, 80) });
   const man = existsSync(join(media, 'manifest.json')) ? JSON.parse(readFileSync(join(media, 'manifest.json'), 'utf8')) : null; const failed = man ? (man.items || man.files || []).filter((x) => x.status && x.status >= 400).length : 0;
   if (failed > 3) step('media --from-page', S('media-fetch'), [content, '--out', media, '--from-page', url], { show: 0, note: () => `${failed} failed by fetch: again through the page` });
   step('fonts', S('media-fetch'), [join(measure, 'media-1440.json'), '--fonts', 'fonts', '--css', join('styles', 'fonts.css')], { show: 0, note: (r) => (/(\d+) face\(s\) declared/.exec(`${r.stdout}${r.stderr}`) || [])[0] || 'no faces declared — fonts.css by hand' });
