@@ -268,6 +268,9 @@ for (const W of widths) {
     const h = Math.max(0, Math.min(s.build.h, B.height - by0, A.height - ly0));
     const n = h > 0 ? pixelmatch(rowsOf(A, ly0, h), rowsOf(B, by0, h), null, w, h, { threshold: 0.1 }) : 0;
     const pct = h > 0 ? Number(((100 * n) / (w * h)).toFixed(2)) : null; const dh = s.live ? s.build.h - s.live.h : null; const dy = s.live ? s.build.y0 - s.live.y0 : null;
+    // and the section on ITS OWN: each side from its own top — a height fixed above moved every section below (lenovo panel run: 4 % → 21–30 %
+    // on sections nobody touched, section-view read 5 %); printed beside the page-aligned share when they differ
+    let pctOwn = null; if (s.live) { const lo = Math.max(0, Math.min(A.height, s.live.y0)); const ho = Math.max(0, Math.min(s.build.h, s.live.h, B.height - by0, A.height - lo)); if (ho > 0) { const no = pixelmatch(rowsOf(A, lo, ho), rowsOf(B, by0, ho), null, w, ho, { threshold: 0.1 }); pctOwn = Number(((100 * no) / (w * ho)).toFixed(2)); } }
     // the block: the triage row of the live section(s) when given, else the authored `.block` class
     let block = s.block; let variant = s.variant; let blockSource = block ? 'dom' : null; let matchKind = null;
     if (triage && s.live) { const rowT = s.live.indices.map((i) => triageRowFor(triage, { index: i, anchorText: s.live.anchorText })).find((r) => r && r.match && r.match.block) || null; if (rowT) { block = rowT.match.block; variant = rowT.match.variant; blockSource = 'triage'; matchKind = rowT.match.kind; } }
@@ -275,7 +278,7 @@ for (const W of widths) {
     const status = !block ? 'default' : budget === null ? 'new' : 'reused';
     // Δh counts against the budget only as a height (`dhKind: height`): a boundary the next row cancels is a box attribution, not a shift
     const over = []; if (status === 'reused' && budgetOn) { if (pct !== null && pct > budget) over.push('pct'); if (dh !== null && Math.abs(dh) > 2 && s.dhKind !== 'boundary') over.push('Δh'); }
-    const row = { index: s.index, anchorText: s.anchorText || s.liveAnchorText || '', classes: s.classes, build: s.build, live: s.live ? { y0: s.live.y0, y1: s.live.y1, h: s.live.h, box: s.live.box, indices: s.live.indices } : null, comparedRows: h, dh, dhKind: s.dhKind ?? null, dy, pct, block, variant, blockSource, matchKind, inventoryVariant: inv ? inv.variant : null, budget, budgetKey: key, status, over: over.join('+') || null };
+    const row = { index: s.index, anchorText: s.anchorText || s.liveAnchorText || '', classes: s.classes, build: s.build, live: s.live ? { y0: s.live.y0, y1: s.live.y1, h: s.live.h, box: s.live.box, indices: s.live.indices } : null, comparedRows: h, pctOwn, dh, dhKind: s.dhKind ?? null, dy, pct, block, variant, blockSource, matchKind, inventoryVariant: inv ? inv.variant : null, budget, budgetKey: key, status, over: over.join('+') || null };
     table.push(row); if (over.length) overAll.push({ W, index: s.index, anchorText: row.anchorText, block: `${block}${variant ? ` (${variant})` : ''}`, pct, budget, dh, over: over.join('+') });
   }
   newCount = Math.max(newCount, table.filter((r) => r.status === 'new').length); defaultCount = Math.max(defaultCount, table.filter((r) => r.status === 'default').length);
@@ -380,7 +383,7 @@ if (roundMode) {
       const specSecs = (() => { try { return JSON.parse(readFileSync(join(specDir, `spec-${W}.json`), 'utf8')).secs || []; } catch { return []; } })();
       const ov = (a0, a1, b0, b1) => Math.max(0, Math.min(a1, b1) - Math.max(a0, b0));
       const hot = s.live ? Object.entries(pairRows).filter(([i]) => { const b = specSecs[Number(i)]?.box; if (!b) return false; const mine = ov(s.live.y0, s.live.y1, b[1], b[1] + b[3]); return mine > 0 && now.every((o) => o === s || !o.live || ov(o.live.y0, o.live.y1, b[1], b[1] + b[3]) <= mine); }).flatMap(([, r]) => r).slice(0, 3) : [];
-      moved.push(`  #${s.index} ${String(s.anchorText || s.classes || '').slice(0, 26).padEnd(28)} ${s.pct ?? '—'} %${dPct !== null ? ` (${dPct > 0 ? '+' : ''}${dPct})` : ''}  Δh ${s.dh ?? '—'}${dDh !== null && dDh !== 0 ? ` (was ${p.dh})` : ''}${s.block ? `  ${s.block}` : ''} — ${points}${hot.length ? `\n      ${hot.join('\n      ')}` : ''}`);
+      moved.push(`  #${s.index} ${String(s.anchorText || s.classes || '').slice(0, 26).padEnd(28)} ${s.pct ?? '—'} %${s.pctOwn !== null && s.pctOwn !== undefined && s.pct !== null && Math.abs(s.pctOwn - s.pct) > 3 ? ` (own ${s.pctOwn} % — the rest is an offset from above)` : ''}${dPct !== null ? ` (${dPct > 0 ? '+' : ''}${dPct})` : ''}  Δh ${s.dh ?? '—'}${dDh !== null && dDh !== 0 ? ` (was ${p.dh})` : ''}${s.block ? `  ${s.block}` : ''} — ${points}${hot.length ? `\n      ${hot.join('\n      ')}` : ''}`);
     }
   }
   const basePct = rows.find((r) => r.W === W)?.pct;
