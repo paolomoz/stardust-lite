@@ -456,7 +456,12 @@ function keyValueSection(node, block, recipe, report) {
 
 // ───────────────────────────── the page ─────────────────────────────
 const sectionsHtml = []; const reports = []; let sawNew = false;
-mainSections.forEach((row, i) => { if (row.drop) { console.error(`author: row ${row.index} dropped in the triage — not authored`); return; } const node = split.sections[i]; const { html, report } = authorSection(node, row); sectionsHtml.push(html); if (report.tabSections) sectionsHtml.push(...report.tabSections.map((p) => `<div>\n${p}\n</div>`)); reports.push(report); if (row.match.kind === 'new' && !(process.argv.includes('--draft-new') && row.match.block)) sawNew = true; });
+// a section that would come out EMPTY (no text, no picture: a back-to-top strip, a 3 px rule) is not authored, and its triage row is marked
+// `drop: empty` so spec-to-css and the gate keep their indices — the harness and the pipeline disagreed on keeping an empty section
+// (wyndham: kept by the served page; waters: dropped) and every nth-of-type after it shifted
+let emptied = 0;
+mainSections.forEach((row, i) => { if (row.drop) { console.error(`author: row ${row.index} dropped in the triage — not authored`); return; } const node = split.sections[i]; const { html, report } = authorSection(node, row); if (!/<(img|picture|video|iframe|a\b|h[1-6]|p|li|div class=)[^>]*>[\s\S]*?(\S)/i.test(html.replace(/<p>\s*<\/p>/g, '')) && !/<img|<picture/i.test(html)) { row.drop = 'empty'; emptied += 1; console.error(`author: row ${row.index} would be an empty section — not authored (drop: empty in ${triageFile})`); return; } sectionsHtml.push(html); if (report.tabSections) sectionsHtml.push(...report.tabSections.map((p) => `<div>\n${p}\n</div>`)); reports.push(report); if (row.match.kind === 'new' && !(process.argv.includes('--draft-new') && row.match.block)) sawNew = true; });
+if (emptied) writeFileSync(resolve(triageFile), JSON.stringify(triage, null, 1)); // the marks reach spec-to-css and the gate
 const meta = [['title', dump.__title || triage.page?.title || ''], ...(dump.__desc ? [['description', dump.__desc]] : []), ...(navPath ? [['nav', navPath]] : []), ...(footerPath ? [['footer', footerPath]] : [])];
 if (!navPath || !footerPath) warn('metadata: no nav / footer path (no profile `chrome.fragments`; pass --nav-path / --footer-path)');
 sectionsHtml.push(`<div>\n<div class="metadata">\n${meta.map(([k, v]) => `<div><div>${esc(k)}</div><div>${esc(v)}</div></div>`).join('\n')}\n</div>\n</div>`);

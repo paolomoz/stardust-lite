@@ -13,7 +13,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { PNG } from 'pngjs';
-import { openPage, settle, acceptOverlays, hideModals } from '../common.mjs';
+import { openPage, settle, acceptOverlays, hideModals, overlayOpts } from '../common.mjs';
 
 /** Freeze motion for stable chunks — AFTER the settle: CSS animations paused, transitions off, carets hidden, smooth scroll off; every
  * <video> paused at t=0; every pending timeout / interval cleared; the first slick dot clicked (then the timers cleared again). */
@@ -80,6 +80,9 @@ const readyInViewport = async (bound) => {
  * 820 wide). ≈ 1 s against ≈ 13 s stitched. Returns null when the window does not scroll the document (an inner scroller): the caller stitches. */
 async function fullCapture(page, outFile, { vh = 900, freeze = true, park = true } = {}) {
   const width = (page.viewportSize() || { width: 1440 }).width;
+  // the installed Chrome lays a one shot out at its minimum window width (500) and crops it to 360 (waters: the 360 capture was a 500 px
+  // layout on both sides while the measurements were at 360) — a narrow viewport there is stitched
+  if (width < 500 && (process.env.STARDUST_CHROME === '1' || process.argv.includes('--chrome') || overlayOpts().chrome)) return null;
   const scrolls = await page.evaluate(() => { const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight); if (h <= innerHeight + 4) return true; window.scrollTo({ top: 200, behavior: 'instant' }); const ok = window.scrollY > 0; window.scrollTo({ top: 0, behavior: 'instant' }); return ok; }).catch(() => true);
   if (!scrolls) return null;
   await hideModals(page); // a modal that opened after the readings (toryburch's delayed welcome layer)
