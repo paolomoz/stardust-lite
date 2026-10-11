@@ -30,7 +30,9 @@ exit $rc
 2. If the split is wrong: a row that is not page content (a header band in main, a skip-link strip) → write `drop` in its block column
    of `migration/cases/home/triage.md`; a wrong block → its name there; then `first URL --slug SLUG --skip probe,measure,media` (it applies
    the edited triage.md and re-authors). A wrong section selector → `first … --sections '<css>'`. Note what you changed.
-3. The CSS: the drafts (`blocks/*/*.css`, `styles/sections-draft.css`) already carry the measured values — start from
+3. The CSS: read `migration/cases/home/gate/cards/INDEX.md` (one card per section: its owner file, Δh and % per width, the live values
+   inside its range at 1440 and 360, and live | build crops) and open the cards of the sections the digest names — do not write your own
+   flatten script over the dumps. The drafts (`blocks/*/*.css`, `styles/sections-draft.css`) already carry the measured values — start from
    the first round's digest and fix the sections it names, worst first. Open `spec-view` / `brief` for a section only when its row is off and
    the draft does not say why; do not read every section at three widths up front.
 4. CSS rounds: edit the block drafts IN PLACE (`blocks/<name>/<name>.css` load after styles.css and are yours once `first` has run — do not

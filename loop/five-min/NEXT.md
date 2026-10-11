@@ -26,3 +26,16 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
 11–12 (user's decision, not run): second page of a migrated template; animation regions out of the %.
 
 ## Log
+- 19:20Z start. Worktree `~/stardust/stardust-lite-gate` (exp/gate), bench under `~/stardust/bench`; each bench variant runs from a FROZEN
+  checkout (`~/stardust/bench/code-<id>`) — the first baseline read the worktree while it was being edited and was restarted from main.
+- item 2 (draft anchoring): rows sharing one spec section are drafted from their own band (lenovo: 8 sections → 8 distinct paddings / bgs).
+- item 8: section-view's "no live partner" on lenovo was brief's LIVE numbering passed as the digest's BUILD numbering — it now takes a
+  block name / anchor text and lists the digest's sections on a miss.
+- item 10: the gate keeps every round in `rounds/` and prints the widths under target.
+- item 9 (served drift): lenovo's two SVGs embed a raster pattern — upload 200, preview 409, served as `about:error` (two empty pills,
+  360 at 11.1 served vs 8.2). media-fetch now draws such SVGs as `-svg.png` (preview 200 checked); `first` names failed media uploads.
+- item 3 (missing rows): the tall-section split dropped children between heading-led parts — kept now when they carry content (lenovo:
+  rewards band + "Innovation in Action" title; bms: two 900 px sections "Life + Science", "Pipeline" with h4-led headings). Changes the
+  section count → scored on the bench in draft mode (patch held in `~/stardust/bench/c5-gap-parts.patch` until then).
+- item 4 (reading cards): `cards.mjs` — one card per build section from the gate's table (values inside its range at 1440 / 360, owner
+  file, Δh / %, live | build crops), ≈ 1 s, refreshed every round, named by `first` and the field protocol.
