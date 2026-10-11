@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L12 | nfl.com international | 2dc1ee6 (main stays root, 60 % split, origin-mode builds, digest rows by overlap) | 4.4 after 2 × `first` (55 / 52 / 39 %) | 28.0 | 31.2 | 9 | 26–40 | own ≈ 18.7 min, tools 9.3 to stop | a main column + right rail re-ordered on mobile: no model, the document re-authored by hand (≈ 13 min); the gate found no build section under a wrapper and printed a false `stop: clean` at 22 %; harness re-runs without --local-media / --sync-chrome (stale chrome, 404 media) |
 | L11 | intel.com | 5611ea7 (content root without main, unique chrome guesses, fonts subset / variable, object-position) | 8.8 after 2 × `first` (33 / – / – %) | 17.1 | 21.7 | 4 | 27–28 | own ≈ 12.6 min, tools 4.5 to stop | the root climbed above a large main (header + footer fragment inside: 3 sections, ≈ 7 min); repeating units authored weakly (≈ 4 min); a stitched origin (scroll-driven scenes) against a one-shot build — the sticky header in one capture only |
 | L10 | sherwin-williams.com | c6073fd (fonts by use, nav brand, picture-count sync, sbs thumbnails) | 5.2 after 3 × `first` (46 / 40 / 38 %) | 26.8 | 29.2 | 12 | 20–35 | own ≈ 17 min, tools 9.6 to stop | no `<main>` (AEM Sites): `body > *` guessed, two re-runs and `--main` by hand ≈ 4 min; empty chrome documents (a --footer key not named footer); Open Sans from a cyrillic subset, a variable face as two static weights ≈ 3 min; crops swept by hand 2.5 min |
 | L9 | revlon.com | b250798 (one-band extra roots, local media, concurrent local builds) | **1.17** (78 / 59 / 43 %) | **10.45** | 12.5 | 2 | 20–21 | own ≈ 8.5 min, tools **1.95** to stop | tools solved (first 70 s, rounds 20 s); the clock is the agent: reading 3, writing 2.5, re-modelling a carousel split into 7 tables 1.5, diagnosis 1.5; fonts.css missing the used families (round 1 in serif), an empty nav brand |
@@ -104,3 +105,9 @@ variable face with its range, a missing decorate created, object-position drafte
 Result on intel: stop at 17.1 — the content root climbed above a main that held the content (header and footer inside the split), a
 scroll-driven hero captured stitched while the build was one shot. Keep. Iteration 12: a large main stays the root, the tall-section split
 at 60 % coverage (intel: hero / news / tiles), the build captured in the origin's mode, pair rows placed by overlap in the digest.
+
+### L12 — the root of a page with a large main, the split at 60 %, builds captured like their origin
+Result on nfl: stop at 28.0 — a two-column (main + rail) page the triage cannot model; the gate's `main > .section` missed wrapped build
+sections and said "clean" over the target; the agent's harness re-runs lacked the flags `first` used. Iteration 13: build sections under
+any wrapper, the stop only from the target, `first` prints the split and the exact harness / round commands, section tops on the
+side-by-side thumbnails, carousels drafted as slider tracks (revlon replay: Δh at 360 −8932 → −3728).

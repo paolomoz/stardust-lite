@@ -36,8 +36,8 @@ exit $rc
 4. CSS rounds: edit the block drafts IN PLACE (`blocks/<name>/<name>.css` load after styles.css and are yours once `first` has run — do not
    re-run `first` past this point) and `styles/styles.css` for page / section rules (the generated `styles/sections-draft.css` is imported first,
    so a rule you write in styles.css wins a tie), then `./tl rN -- npx stardust-lite gate --live URL --build http://localhost:8990/SLUG.harness.html --out migration/cases/home/gate
-   --origin migration/cases/home/measure --round --widths 360,1440,2560 --triage migration/cases/home/triage.json` (re-run the harness first
-   when the document changed; an edited doc/nav.html or footer.html is re-uploaded by the harness itself). Fix as much as the digest names per round, at all three widths at once.
+   --origin migration/cases/home/measure --round --widths 360,1440,2560 --triage migration/cases/home/triage.json` (after a document / nav / footer edit re-run the
+   prototype with the EXACT harness command `first` printed at its end — it carries --local-media and --sync-chrome). Fix as much as the digest names per round, at all three widths at once.
 5. **Stop at the `stop:` line** (all three widths under 10 %) — that is the clock's end. Hard stop: 60 min after t0.
 6. After the clock (not counted, keep it short): push the code, `da-put` the page document if you edited it, `sync-poll`, served gate (`gate --live URL --build <host>/drafts/SLUG --out
    migration/cases/home/gate-served --origin migration/cases/home/measure --widths 360,1440,2560`), `leak` on both. No polish rounds.
