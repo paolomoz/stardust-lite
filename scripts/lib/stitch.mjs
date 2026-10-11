@@ -100,6 +100,22 @@ async function fullCapture(page, outFile, { vh = 900, freeze = true, park = true
   rested.broken = await page.evaluate(() => [...document.images].filter((i) => i.complete && i.naturalWidth === 0 && i.getBoundingClientRect().width > 10).length).catch(() => 0);
   const totalH = await page.evaluate(() => Math.max(document.body.scrollHeight, document.documentElement.scrollHeight));
   if (!totalH || totalH < 10) throw new Error(`page height ${totalH}px — blank render? (bot challenge / hidden body)`);
+  // a page that re-lays itself out when the viewport grows (a slider sizing to the window, parallax, vh boxes — merck: the stories 206 px
+  // taller and the pictures unpainted in the one shot, no run could reach the target) is stitched: the viewport is grown to the document
+  // as the one shot does, the boxes compared, the viewport restored
+  const sample = () => [...document.querySelectorAll('body *')].filter((e) => { const r = e.getBoundingClientRect(); return r.height > 80 && r.width > innerWidth * 0.3; }).slice(0, 60).map((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.top + scrollY), Math.round(r.height)]; });
+  const before = await page.evaluate(sample).catch(() => []);
+  await page.setViewportSize({ width, height: Math.min(totalH, 16000) }).catch(() => {}); await page.waitForTimeout(400);
+  const grown = await page.evaluate(sample).catch(() => []);
+  await page.setViewportSize({ width, height: vh }).catch(() => {}); await page.waitForTimeout(400); await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' })).catch(() => {});
+  const moved = before.length && grown.length === before.length ? before.filter((b, i) => Math.abs(b[0] - grown[i][0]) > 4 || Math.abs(b[1] - grown[i][1]) > 4).length : (before.length ? before.length : 0);
+  if (moved) { console.error(`capture: the page re-lays itself out when the viewport grows (${moved} box(es) moved) — stitched instead of one shot`); return null; }
+  // scroll-driven pictures (parallax: a transform that follows the scroll) and lazy pictures not painted at scroll 0 are right only in a capture
+  // that scrolls to them (merck: the one shot left every picture below the fold unpainted — the target unreachable); a LAYOUT that changes
+  // with the scroll (a header leaving the flow — marriott) is what the one shot is for
+  const scrollFx = await page.evaluate(async () => { const els = [...document.querySelectorAll('img, picture, video, [style*="transform"], [style*="background-image"]')].filter((e) => { const r = e.getBoundingClientRect(); return r.width * r.height > 10000; }).slice(0, 200); const tf = () => els.map((e) => getComputedStyle(e).transform); const a = tf(); window.scrollTo({ top: document.documentElement.scrollHeight / 2, behavior: 'instant' }); await new Promise((r) => setTimeout(r, 250)); const b = tf(); window.scrollTo({ top: 0, behavior: 'instant' }); await new Promise((r) => setTimeout(r, 250)); const changed = a.filter((t, i) => t !== b[i]).length; const lazy = [...document.images].filter((i) => { const r = i.getBoundingClientRect(); return r.width * r.height > 10000 && (!i.complete || i.naturalWidth === 0); }).length; return { changed, lazy }; }).catch(() => ({ changed: 0, lazy: 0 }));
+  if (scrollFx.changed >= 2 || scrollFx.lazy > 3) { console.error(`capture: ${scrollFx.changed >= 2 ? `${scrollFx.changed} picture(s) move with the scroll (parallax)` : `${scrollFx.lazy} picture(s) not painted at scroll 0 (lazy)`} — stitched instead of one shot`); return null; }
+  const picBoxes = await page.evaluate(() => [...document.images].filter((i) => i.complete && i.naturalWidth > 40 && getComputedStyle(i).visibility === 'visible' && Number(getComputedStyle(i).opacity) > 0.5).map((i) => { const r = i.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top + scrollY), Math.round(r.width), Math.round(r.height)]; }).filter((b) => b[2] * b[3] > 40000 && b[0] >= 0 && b[0] + b[2] <= innerWidth)).catch(() => []); // fully inside the width: a slider's next slide is clipped, its box shows the page
   // Chrome's own capture beyond the viewport, at scroll 0, clipped to the viewport width — Playwright's fullPage tiles by the viewport height
   // and scrolls between tiles (marriott's pinned search bar in every tile, as stitched); this one renders the document once
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' })).catch(() => {}); await page.waitForTimeout(150);
@@ -107,6 +123,10 @@ async function fullCapture(page, outFile, { vh = 900, freeze = true, park = true
   let shot; try { shot = await cdp.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, clip: { x: 0, y: 0, width, height: totalH, scale: 1 } }); } catch (e) { await cdp.detach().catch(() => {}); console.error(`capture: one shot failed (${String(e.message || e).slice(0, 100)}) — stitching`); return null; }
   await cdp.detach().catch(() => {});
   const buf = Buffer.from(shot.data, 'base64'); const img = PNG.sync.read(buf); const h = img.height;
+  // the pictures the page has loaded must be PAINTED in the shot: blank boxes (one colour) where loaded pictures sit mean the one shot did not
+  // render them (merck: every picture below the fold blank — the mechanism unknown, the check direct) — stitched instead
+  const blank = picBoxes.filter((b) => { const x0 = Math.max(0, b[0]); const y0 = Math.max(0, b[1]); const x1 = Math.min(img.width, b[0] + b[2]); const y1 = Math.min(img.height, b[1] + b[3]); if (x1 - x0 < 40 || y1 - y0 < 40) return false; let mn = 765; let mx = 0; for (let yy = y0 + 4; yy < y1 - 4; yy += Math.max(1, Math.floor((y1 - y0) / 12))) for (let xx = x0 + 4; xx < x1 - 4; xx += Math.max(1, Math.floor((x1 - x0) / 12))) { const k = (yy * img.width + xx) * 4; const v = img.data[k] + img.data[k + 1] + img.data[k + 2]; if (v < mn) mn = v; if (v > mx) mx = v; } return mx - mn < 12; }).length;
+    if (blank >= 2) { console.error(`capture: ${blank} loaded picture(s) blank in the one shot — stitched instead`); return null; }
   if (img.width !== width || Math.abs(h - totalH) > 2) { console.error(`capture: one shot ${img.width}×${h} for ${width}×${totalH} — stitching`); return null; }
   mkdirSync(dirname(outFile), { recursive: true }); writeFileSync(outFile, buf);
   return { width, height: h, chunks: 1, waited: [rested.waitedMs], timedOut: 0, failedFonts: fonts, rested, mode: 'full' };
