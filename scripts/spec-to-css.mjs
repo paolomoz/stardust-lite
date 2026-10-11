@@ -105,7 +105,7 @@ function mediaRules(items, W, sel) {
   const [wh, n] = count(imgs.map((it) => `${it.box[2]}×${it.box[3]}|${it.fit || 'fill'}`))[0]; const [w, rest] = wh.split('×'); const [h, fit] = rest.split('|');
   // the crop's anchor (object-position): sherwin-williams' agent swept it against the capture to fit two photos (2.5 min)
   const op = count(imgs.filter((it) => `${it.box[2]}×${it.box[3]}` === wh.split('|')[0]).map((it) => it.op || '')).filter(([v]) => v)[0]?.[0];
-  return [`${sel} img { width: 100%; aspect-ratio: ${w} / ${h}; object-fit: ${fit};${op ? ` object-position: ${op};` : ''} height: auto; }  /* ${n} × ${w}×${h} ${fit}${imgs.some((it) => it.broken) ? ' — a BROKEN live image paints its alt text: register it' : ''} */`];
+  return [`${sel} picture img { width: 100%; aspect-ratio: ${w} / ${h}; object-fit: ${fit};${op ? ` object-position: ${op};` : ''} height: auto; }  /* ${n} × ${w}×${h} ${fit}${imgs.some((it) => it.broken) ? ' — a BROKEN live image paints its alt text: register it' : ''} */`];
 }
 
 const files = new Map(); const sectionsDraft = []; const pageScale = new Map();
@@ -188,7 +188,7 @@ rows.forEach((row, i) => {
       for (const it of seq) { if (it.box[1] >= prevBottom - 2) { const gap = Math.max(0, it.box[1] - prevBottom); g.push(`${gap} → ${it.k}(${it.box[3]})`); if (prevTag) { if (!after.has(prevTag)) after.set(prevTag, []); after.get(prevTag).push(gap); } prevBottom = it.box[1] + it.box[3]; prevTag = it.k; } }
       lines.push(`/* rhythm at ${base}${u ? ' inside the first unit' : ''}: ${g.slice(0, 12).join('  ')}  → bottom ${scopeBox[1] + scopeBox[3] - prevBottom} */`);
       const med = (a) => a.slice().sort((x, y) => x - y)[Math.floor(a.length / 2)];
-      for (const [tag, gaps] of after) if (/^(h[1-6]|p|ul|ol|img|picture)$/.test(tag) && gaps.length && !(innerPad && /^(img|picture)$/.test(tag))) lines.push(`${sel} ${tag} { margin: 0 0 ${px(med(gaps))}; }  /* the gap after ${tag} ×${gaps.length}${gaps.length > 1 ? ` (${gaps.join('/')})` : ''} — a margin, or the next child's padding */`);
+      for (const [tag, gaps] of after) if (/^(h[1-6]|p|ul|ol|img|picture)$/.test(tag) && gaps.length && !(innerPad && /^(img|picture)$/.test(tag))) lines.push(`${sel} ${tag === 'img' ? 'picture img' : tag} { margin: 0 0 ${px(med(gaps))}; }  /* the gap after ${tag} ×${gaps.length}${gaps.length > 1 ? ` (${gaps.join('/')})` : ''} — a margin, or the next child's padding */`);
     }
     // mobile: what differs at 360
     if (m) {
