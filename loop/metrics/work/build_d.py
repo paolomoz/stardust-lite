@@ -14,9 +14,10 @@ RUNS = [
     ('P1', 'sdt-santanderus-p1', 'santanderus-home', 'e8dfd0a', 'panel re-run of L16 (8.0)'),
     ('P2', 'sdt-wpp-p1', 'wpp-home', 'e8dfd0a', 'panel re-run of L7 (9.7)'),
     ('P3', 'sdt-rbc-p1', 'rbc-home', 'b60175f', 'panel re-run of L18 (14.7)'),
-    ('P4', 'sdt-waters-p1', 'waters-home', None, 'panel re-run of L20 (33.7)'),
-    ('P5', 'sdt-lenovo-p1', 'lenovo-home', None, 'panel re-run of L22 (34.8)'),
-    ('N1', 'sdt-nfm-lite', 'nfm-home', None, 'new page'),
+    ('P4', 'sdt-waters-p1', 'waters-home', 'c0c9e90', 'panel re-run of L20 (33.7)'),
+    ('P5', 'sdt-lenovo-p1', 'lenovo-home', '7a9be3d', 'panel re-run of L22 (34.8)'),
+    ('P6', 'sdt-lenovo-p2', 'lenovo-home', 'a8b975a', 'field A/B of P5: the same code + the spec-to-css bands'),
+    ('N1', 'sdt-nfm-lite', 'nfm-home', '5104a9f', 'new page'),
     ('N2', 'sdt-bankofamerica-lite', 'bankofamerica-home', None, 'new page'),
     ('N3', 'sdt-cisco-lite', 'cisco-home', None, 'new page'),
 ]

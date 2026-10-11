@@ -81,3 +81,6 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
   ADOPTED against the bench. Served 9.13 / 11.75 / 9.59 (a slider scrolled sideways on the served capture at 1440 — registered).
 - author: a main row with a chrome row's box is the chrome split twice → drop (marks exactly the rows the agents dropped by hand:
   lenovo-p2 1 / 12, lenovo-lite 2 / 11, omnicom 6; none elsewhere).
+- N1 nfm: SKIPPED — a location block (Akamai "This site is not accessible from your current location") through every tier; `first` ran the
+  whole pipeline on the block page and the gate printed REACHED. Fixed: `first` stops when the measured page is a block page (title /
+  challenge / location text; across all measured pages it flags only nfm). Its repo and three DA drafts hold the block page (harmless).
