@@ -129,3 +129,27 @@ export function hideEmptySections(main) {
     if (!s.children.length && !s.textContent.trim()) s.hidden = true;
   });
 }
+
+/**
+ * Art direction authored as a second picture: its alt ends `| mobile <960` (author writes it when the 360 page shows another image) — folded
+ * into the picture before it as `<source media="(max-width: 959px)">`, the second picture removed. Call it on main in decorateMain.
+ * @param {Element} root
+ */
+export function decorateArtDirection(root) {
+  root.querySelectorAll('img[alt*="| mobile"]').forEach((img) => {
+    const m = /\s*\|\s*mobile\s*<\s*(\d+)\s*$/.exec(img.alt);
+    if (!m) return;
+    const mobilePic = img.closest('picture');
+    if (!mobilePic) return;
+    const holder = mobilePic.parentElement;
+    const prev = mobilePic.previousElementSibling || (holder && holder.tagName === 'P' ? holder.previousElementSibling : null);
+    const deskPic = prev && (prev.tagName === 'PICTURE' ? prev : prev.querySelector('picture'));
+    img.alt = img.alt.replace(m[0], '');
+    if (!deskPic) return;
+    const source = document.createElement('source');
+    source.media = `(max-width: ${Number(m[1]) - 1}px)`;
+    source.srcset = img.getAttribute('src');
+    deskPic.prepend(source);
+    (holder && holder.tagName === 'P' && holder.children.length === 1 ? holder : mobilePic).remove();
+  });
+}
