@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L19 | wyndhamhotels.com en-uk | 2c1fabc (picture img rules, readable tiles) | 5.5 after 2 × `first` (54 / 77 / 76 %) | **never** at 360 (12.92); 1440 / 2560 under 10 at 20.5 | 34.2 | 10 | 32–40 | own ≈ 17.9 min, tools 10.6 to stop | an anti-flicker `body{opacity:0}` (Adobe Target) made every live capture blank; lazy placeholders accepted as loaded (two grey pictures at 360 / 1440); an empty section the harness dropped and the served page kept; slider clones authored |
 | L18 | rbc.com about-rbc | b331bbf (line cap, digest per width, alt-paired mobile pictures) | 1.5 (39 / 41 / 31 %) | 14.7 | 16.9 | 4 | 22–23 | own ≈ 11.5 min, tools 3.2 to stop | an icon img stretched to the card width by `.cards img { width: 100% }` (the build 8000 px too tall), the page / nav / footer documents rewritten (≈ 2.5 min), an unreadable 360 thumbnail |
 | L17 | unitedrentals.com | b8b2317 (draft background URLs local, sr-only text dropped) | 1.9 (48 / 50 / 51 %) | 32.4 | 35.5 | 19 | 31–32 | own ≈ 20 min, tools 12.4 to stop | the 2560 cap 24 px off (a fraction, not the line) unseen for eight rounds — the digest named 360 only; 26 mobile pictures lost (image counts differ per width) and authored by hand; nav brand "Shopping cart" |
 | L16 | santanderus.com | 904d802 (carousels rewound to slide 1) | 1.2 (54 / 52 / 46 %) | **8.0** | 10.0 | 2 | 23 | own ≈ 5.8 min, tools **2.25** to stop | best so far: one `first`, one CSS pass (2.5 min), two rounds; the agent still restructured the hero (thumbnails outside the carousel) and rewrote the nav |
@@ -147,3 +148,8 @@ the live calc(91.6vw - 31px)), a digest for every width over the target, mobile 
 ### L18 — the cap as a line, a digest per width, mobile pictures by alt
 Result on rbc: stop at 14.7 — tools 190 s. Keep. Iteration 19: image rules on `picture img` (icons are span.icon > img), readable
 side-by-side tiles. Telus skipped: a Cloudflare challenge even with the installed Chrome (the tier line named it).
+
+### L19 — picture-only image rules, readable tiles
+Result on wyndham: no stop at 360 — the live page hidden by an anti-flicker style, lazy placeholders captured as grey boxes. Iteration 20:
+settle lifts anti-flicker styles and scrolls unloaded placeholders into view, the harness keeps empty sections (served parity), author skips
+cloned slides, oversized stills scaled (replay: the wyndham capture visible, pictures painted).
