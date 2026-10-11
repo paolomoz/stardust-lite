@@ -1,0 +1,106 @@
+{
+ "_schema": "stardust-lite/bench@1",
+ "_writtenAt": "2026-10-11T20:22:24.606Z",
+ "mode": "machine",
+ "triage": "draft",
+ "widths": "360,1440,2560",
+ "results": [
+  {
+   "site": "sdt-lenovo-lite",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.lenovo.com/us/en/",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c5/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c5/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "novelty 85 % (11 new / 13 sections; inventory 0, collection 0, default 2) → /Users/paolo/stardust/bench/d5/sdt-lenovo-lite-machine-draft/triage.json + /Users/paolo/stardust/bench/d5/sdt-lenovo-lite-machine-draft/triage.md\ntriage: /Users/paolo/stardust/bench/d5/sdt-lenovo-lite-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 1 unassigned band(s) outside main (measure-page's extra roots) are rows of their own — chrome or content, decide in the table (a breadcrumb bar never reached the document before — wellsfargo)\ntriage: 3 sections split as measure-page's --sections marked them (the spec's and the gate's split)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "13  NEW       accordion · 5 × 2                        10/10    90     default recipe: the Block Collection's accordion shape (no recipe in blocks.json); NEW drafted through the col\n13 sections → /Users/paolo/stardust/bench/d5/sdt-lenovo-lite-machine-draft/doc/lenovo-home.html (393 texts, 11 block sections, 2 default, 11 new)\nauthor: 1 media source(s) not in the manifest — kept as source URLs:\n  data:image/svg+xml,%3csvg%20width='17'%20height='16'%20viewBox='0%200%2017%2016'%20fill='none'%20xmlns='http://www.w3.or"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/cards/cards.css: 2 section(s)\nblocks/columns/columns.css: 3 section(s)\nblocks/accordion/accordion.css: 1 section(s)\nstyles/sections-draft.css: 24 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 4.2,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 18827\nprototype (gate this): http://localhost:8960/lenovo-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/d5/sdt-lenovo-lite-machine-draft/proto/lenovo-home.html\nsite: /Users/paolo/stardust/bench/d5/sdt-lenovo-lite-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 82.2,
+     "exit": 0,
+     "ok": true,
+     "out": "capture: the page re-lays itself out when the viewport grows (1 box(es) moved) — stitched instead of one shot\ncapture: the page re-lays itself out when the viewport grows (1 box(es) moved) — stitched instead of one shot\ncapture: the page re-lays itself out when the viewport grows (1 box(es) moved) — stitched instead of one shot\ncap-probe: overlay dismissed via [aria-label*=\"close\" i]"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 39.51,
+     "dh": -8584,
+     "ok": 1,
+     "n": 13
+    },
+    {
+     "W": 1440,
+     "pct": 51.96,
+     "dh": -10880,
+     "ok": 0,
+     "n": 13
+    },
+    {
+     "W": 2560,
+     "pct": 32.16,
+     "dh": -10843,
+     "ok": 2,
+     "n": 13
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 27.4,
+     "compare": 1.1,
+     "sections": 0.5,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 20.9,
+     "compare": 3.3,
+     "sections": 1.6,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 23.5,
+     "compare": 5.2,
+     "sections": 2.2,
+     "liveSplit": "cached"
+    }
+   }
+  }
+ ]
+}

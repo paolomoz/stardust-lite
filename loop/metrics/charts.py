@@ -21,8 +21,8 @@ def short(r):
 # the periods, in run order: (first index, last index, label)
 def period_of(r):
     if r['period'] == 'C': return 'L' if (r['run_label'] or '').startswith('L') else 'I'
-    return r['period']
-PER = {'A': 'Sep 29 – Oct 1 · hand-built', 'B': 'Oct 3 – 4 · rounds R / V', 'I': 'inspection', 'L': 'Oct 10 – 11 · five-minute loop'}
+    return r['period']  # A, B, D
+PER = {'A': 'Sep 29 – Oct 1 · hand-built', 'B': 'Oct 3 – 4 · rounds R / V', 'I': 'inspection', 'L': 'Oct 10 – 11 · five-minute loop', 'D': 'Oct 11 · next phase (P panel re-runs, N new)'}
 bands = []
 for i, r in enumerate(rows):
     p = period_of(r)
