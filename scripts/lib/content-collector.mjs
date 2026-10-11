@@ -23,6 +23,10 @@ export function collectContent([roots, hidden, sectionSel = null, pierce = false
   let force = false; // --hidden roots: every element counts as visible
   const vis = (e) => { if (force) return true; const r = e.getBoundingClientRect(); const s = getComputedStyle(e); return (r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none') || e.tagName === 'PICTURE' || e.tagName === 'SOURCE'; };
   const norm = (t) => t.replace(/[^\S\u00A0]+/g, ' ').replace(/^[\s\u00A0]+|[\s\u00A0]+$/g, '');
+  // the text a reader sees: an inline SVG's <style> (`.st0{fill:none…}`), a <script> and the SVG's own title / desc are not text (waters: the
+  // CSS of an icon authored into the page and nav documents)
+  const strip = (e) => { if (!e.querySelector || !e.querySelector('style,script,noscript,svg')) return e; const c = e.cloneNode(true); c.querySelectorAll('style,script,noscript,svg').forEach((x) => x.remove()); return c; };
+  const seen = (e) => strip(e).textContent;
   const own = (e) => [...e.childNodes].filter((n) => n.nodeType === 3).map((n) => norm(n.textContent)).filter(Boolean).join(' ');
   const PHRASING = ['STRONG', 'EM', 'B', 'I', 'U', 'SPAN', 'A', 'SUP', 'SUB', 'BR', 'SMALL', 'MARK', 'ABBR'];
   const walk = (e) => {
@@ -56,14 +60,14 @@ export function collectContent([roots, hidden, sectionSel = null, pierce = false
     const phrasingOnly = e.children.length && !(pierce && e.shadowRoot) && [...e.children].every((c) => isPhrasing(c) && !c.querySelector('img,picture,svg,video'));
     // a phrasing-only element with no own text is still one text when it holds no link (`<p><strong>Title</strong></p>`, `<p><em><strong>`):
     // descending to the `strong` read the title as a bare paragraph; a lone link child keeps descending so the link is a node of its own
-    const phrasingText = phrasingOnly && (own(e) || ((!e.querySelector('a') || /^H[1-6]$/.test(e.tagName)) && norm(e.textContent))); // a heading holding a link stays one heading with its markup (an `<h3><strong>Email:</strong> <a mailto>` was lost — covermore, loop r6)
+    const phrasingText = phrasingOnly && (own(e) || ((!e.querySelector('a') || /^H[1-6]$/.test(e.tagName)) && norm(seen(e)))); // a heading holding a link stays one heading with its markup (an `<h3><strong>Email:</strong> <a mailto>` was lost — covermore, loop r6)
     // a heading / paragraph whose inline text sits next to a picture (`<h1><img logo> The world's leading <em>marketing</em> …`) is one text with
     // its markup, the picture still a node: own text alone dropped the `em` words from the heading (omnicom, loop L21)
     const MEDIA = /^(IMG|PICTURE|SVG)$/;
     const phrasingMedia = !phrasingOnly && /^(H[1-6]|P)$/.test(e.tagName) && own(e) && [...e.children].some((c) => MEDIA.test(c.tagName)) && [...e.children].every((c) => MEDIA.test(c.tagName) || (isPhrasing(c) && !c.querySelector('img,picture,svg,video')));
     let descend = true; let mediaOnly = false;
     const run = lineRun();
-    if (run) { n.text = run.map((k) => norm(k.textContent)).join(' '); n.lines = run.length; n.font = font(run[0]); descend = false; } else if (phrasingText) { n.text = norm(e.textContent); const full = norm(e.innerHTML); n.markup = full.slice(0, 600); if (full.length > 600) n.markupFull = full; n.font = font(); descend = false; } else if (phrasingMedia) { const clone = e.cloneNode(true); clone.querySelectorAll('img,picture,svg').forEach((m) => m.remove()); n.text = norm(clone.textContent); const full = norm(clone.innerHTML); n.markup = full.slice(0, 600); if (full.length > 600) n.markupFull = full; n.font = font(); mediaOnly = true; } else { const t = own(e); if (t) { n.text = t; n.font = font(); } }
+    if (run) { n.text = run.map((k) => norm(seen(k))).join(' '); n.lines = run.length; n.font = font(run[0]); descend = false; } else if (phrasingText) { n.text = norm(seen(e)); const full = norm(strip(e).innerHTML); n.markup = full.slice(0, 600); if (full.length > 600) n.markupFull = full; n.font = font(); descend = false; } else if (phrasingMedia) { const clone = e.cloneNode(true); clone.querySelectorAll('img,picture,svg').forEach((m) => m.remove()); n.text = norm(clone.textContent); const full = norm(clone.innerHTML); n.markup = full.slice(0, 600); if (full.length > 600) n.markupFull = full; n.font = font(); mediaOnly = true; } else { const t = own(e); if (t) { n.text = t; n.font = font(); } }
     if (e.tagName === 'A') { n.href = e.getAttribute('href'); if (e.getAttribute('aria-label')) n.aria = e.getAttribute('aria-label'); if (e.target) n.target = e.target; if (e.title) n.title = e.title; }
     if (e.tagName === 'VIDEO') { n.src = e.currentSrc || e.getAttribute('src') || e.querySelector('source')?.getAttribute('src') || null; if (!n.src) delete n.src; if (e.poster) n.poster = e.poster; }
     // an icon-font glyph: an empty element whose class names the font (`icon-search`, `fa-chevron-right`) — content, not paint
