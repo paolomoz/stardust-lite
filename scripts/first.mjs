@@ -85,6 +85,9 @@ if (!skip.has('author')) {
   const bpm = (summ.breakpoints || []).map((x) => /^(?:min|max) (\d+)/.exec(x)).filter(Boolean).map((x) => Number(x[1])).filter((x) => x >= 600 && x <= 1200)[0] || 768;
   step('author', S('author'), [triage, ...(existsSync(join(measure, 'content-360.json')) ? ['--mobile-content', join(measure, 'content-360.json'), '--mobile-bp', String(bpm)] : []), '--content', [content, ...(existsSync(hidden) ? [hidden] : [])].join(','), '--blocks', join('migration', 'blocks.json'), '--media', join(media, 'manifest.json'), '--media-host', `${host}/drafts/media`, '--out', doc, '--nav', join(docDir, 'nav.html'), '--footer', join(docDir, 'footer.html'), '--nav-path', '/drafts/nav', '--footer-path', '/drafts/footer', '--draft-new', '--site', join('migration', 'site.json'), '--url', url],
     { show: 0, ok: () => existsSync(doc), note: (r) => [/(\d+) sections? → [^(]*\(([^)]*)\)/.exec(r.stdout)?.[2], ...String(r.stderr).split('\n').filter((l) => /empty cell|did not fit|NEW|🔴/.test(l)).map((l) => l.replace(/^author: /, '').slice(0, 90))].filter(Boolean).slice(0, 3).join(' · ') || null });
+  // the documents go up only after their media: DA resolves an <img> at save and stored `about:error` for a file not uploaded yet (waters
+  // panel run: the nav's SVG logo, broken in the prototype's fragment and on the served page)
+  if (daMedia) { const d = await daMedia; daMedia = Promise.resolve(d); }
   if (!noDa && daToken()) step('da-put docs', S('da-put'), [daTarget, doc, join(docDir, 'nav.html'), join(docDir, 'footer.html'), '--to', 'drafts'], { show: 0 });
 }
 // 6 the CSS drafts as the CSS: blocks/<name>/<name>.css (header / footer appended below the foundation rules), sections-draft into styles.css
