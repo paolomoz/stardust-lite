@@ -143,7 +143,10 @@ function leavesOf(root) {
   // (a bordered block holding the title and the row): with the root's own index every leaf read `top 0` and the recipe's
   // defaultContentBefore never peeled a title (sdt-dentsu beyond-the-funnel, the profiles)
   let start = root; while (start && !start.text && !start.src && (start.children || []).length === 1) start = start.children[0];
+  // screen-reader-only text is not page content ("Item 2 of 3.", "opens in a new tab" — mheducation): an sr-only class or a 1–2 px text box
+  const srOnly = (n) => /\b(sr-only|visually-?hidden|screen-reader(-text)?|sr-text|a11y-hidden|offscreen|u-hidden-visually|hide-text)\b/i.test(String(n.cls || '')) || (!!n.text && !!n.box && n.box[2] <= 2 && n.box[3] <= 2);
   const walk = (n, top, parent, depth) => {
+    if (srOnly(n)) return;
     if (n.spacer) { if (keepSpacers) out.push({ kind: 'text', raw: 'p', node: n, spacer: true, top, parent }); else spacers.push(n); return; }
     const k = kindOf(n);
     if (k === 'box') return;
