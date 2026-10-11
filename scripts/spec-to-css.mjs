@@ -107,7 +107,8 @@ function mediaRules(items, W, sel) {
   const [wh, n] = count(imgs.map((it) => `${it.box[2]}×${it.box[3]}|${it.fit || 'fill'}`))[0]; const [w, rest] = wh.split('×'); const [h, fit] = rest.split('|');
   // the crop's anchor (object-position): sherwin-williams' agent swept it against the capture to fit two photos (2.5 min)
   const op = count(imgs.filter((it) => `${it.box[2]}×${it.box[3]}` === wh.split('|')[0]).map((it) => it.op || '')).filter(([v]) => v)[0]?.[0];
-  return [`${sel} picture img { width: 100%; aspect-ratio: ${w} / ${h}; object-fit: ${fit};${op ? ` object-position: ${op};` : ''} height: auto; }  /* ${n} × ${w}×${h} ${fit}${imgs.some((it) => it.broken) ? ' — a BROKEN live image paints its alt text: register it' : ''} */`];
+  // a video (decorateVideos puts it where its poster stood) takes the picture's measured box — unsized it ran at its natural height (mheducation +1000 px)
+  return [`${sel} picture img, ${sel} video { width: 100%; aspect-ratio: ${w} / ${h}; object-fit: ${fit};${op ? ` object-position: ${op};` : ''} height: auto; }  /* ${n} × ${w}×${h} ${fit}${imgs.some((it) => it.broken) ? ' — a BROKEN live image paints its alt text: register it' : ''} */`];
 }
 
 const files = new Map(); const sectionsDraft = []; const pageScale = new Map();
@@ -177,7 +178,7 @@ rows.forEach((row, i) => {
       const tx = Math.min(...over.map((it) => it.box[0])); const ty = Math.min(...over.map((it) => it.box[1])); const tb = Math.max(...over.map((it) => it.box[1] + it.box[3]));
       const left = tx - big.box[0]; const top = ty - big.box[1]; const bottom = big.box[1] + big.box[3] - tb; const align = bottom < top * 0.6 ? 'flex-end' : top < bottom * 0.6 ? 'flex-start' : 'center';
       lines.push(`${sel} { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: ${align}; min-height: ${px(big.box[3])}; }  /* ${over.length} text(s) over the ${big.box[2]}×${big.box[3]} picture: left ${left}, top ${top}, bottom ${bottom} */`);
-      lines.push(`${sel} picture { position: absolute; inset: 0; z-index: -1; } ${sel} picture img { width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; }`);
+      lines.push(`${sel} picture, ${sel} video { position: absolute; inset: 0; z-index: -1; } ${sel} picture img, ${sel} video { width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; }`);
       lines.push(`${sel} > div { padding: ${align === 'flex-start' ? px(Math.max(0, top)) : 0} ${px(Math.max(0, big.box[0] + big.box[2] - Math.max(...over.map((it) => it.box[0] + it.box[2]))))} ${align === 'flex-end' ? px(Math.max(0, bottom)) : 0} ${px(Math.max(0, left))}; }`);
       const mbig = m ? m.items.filter((it) => ['img', 'video'].includes(it.k) && onPage(it, mobile)).sort((a, b) => b.box[2] * b.box[3] - a.box[2] * a.box[3])[0] : null;
       if (mbig) lines.push(`@media (max-width: ${bp - 1}px) { ${sel} { min-height: ${px(mbig.box[3])}; } }  /* the picture at ${mobile}: ${mbig.box[2]}×${mbig.box[3]} */`);
