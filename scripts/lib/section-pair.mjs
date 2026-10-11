@@ -13,7 +13,9 @@ function markRoot([mainSel, headerSel, footerSel]) {
   const R = (e) => { if (!e) return null; const b = e.getBoundingClientRect(); return [Math.round(b.x), Math.round(b.y + scrollY), Math.round(b.width), Math.round(b.height)]; };
   const chrome = (e) => /^(header|footer|nav|aside)$/i.test(e.tagName) || /\b(header|footer|masthead|colophon|nav)\b/i.test(`${e.className} ${e.id}`);
   let el = mainSel ? q(mainSel) : null;
-  if (!el) { el = q('main') || q('[role=main]'); while (el && el.parentElement && el.parentElement !== document.body && ![...el.parentElement.children].some((c) => c !== el && chrome(c))) el = el.parentElement; }
+  // climb above main only when main is a small part of the page (a hero before main — dentsu); a main holding the content stays the root (intel:
+  // the climb took in the header and the footer fragment, 3 sections)
+  if (!el) { el = q('main') || q('[role=main]'); const docH = document.documentElement.scrollHeight; if (el && el.getBoundingClientRect().height < docH * 0.5) while (el && el.parentElement && el.parentElement !== document.body && ![...el.parentElement.children].some((c) => c !== el && chrome(c))) el = el.parentElement; }
   let root = 'body'; if (el) { el.setAttribute('data-gate-root', ''); root = '[data-gate-root]'; }
   const name = el ? `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}${[...el.classList].slice(0, 2).map((c) => `.${c}`).join('')}` : 'body (chrome stripped)';
   return { root, rootName: name, rootResolved: !!(mainSel && q(mainSel)), header: R(q(headerSel || 'header')), footer: R(q(footerSel || 'footer')), doc: document.documentElement.scrollHeight };
@@ -25,7 +27,9 @@ export function contentRootPath([mainSel, headerSel = null, footerSel = null]) {
   const q = (s) => { try { return document.querySelector(s); } catch { return null; } };
   const chrome = (e) => /^(header|footer|nav|aside)$/i.test(e.tagName) || /\b(header|footer|masthead|colophon|nav)\b/i.test(`${e.className} ${e.id}`);
   let el = mainSel ? q(mainSel) : null;
-  if (!el) { el = q('main') || q('[role=main]'); while (el && el.parentElement && el.parentElement !== document.body && ![...el.parentElement.children].some((c) => c !== el && chrome(c))) el = el.parentElement; }
+  // climb above main only when main is a small part of the page (a hero before main — dentsu); a main holding the content stays the root (intel:
+  // the climb took in the header and the footer fragment, 3 sections)
+  if (!el) { el = q('main') || q('[role=main]'); const docH = document.documentElement.scrollHeight; if (el && el.getBoundingClientRect().height < docH * 0.5) while (el && el.parentElement && el.parentElement !== document.body && ![...el.parentElement.children].some((c) => c !== el && chrome(c))) el = el.parentElement; }
   // no main (an AEM Sites page — sherwin-williams: `body > *` guessed, two re-runs and --main by hand): the tallest element that holds neither
   // the header nor the footer and spans ≥ 40 % of the document
   if (!el) { const hd = headerSel ? q(headerSel) : q('header'); const ft = footerSel ? q(footerSel) : q('footer'); const docH = document.documentElement.scrollHeight;
