@@ -80,7 +80,8 @@ if (!skip.has('media')) {
   if (failed > 3) step('media --from-page', S('media-fetch'), [content, '--out', media, '--from-page', url], { show: 0, note: () => `${failed} failed by fetch: again through the page` });
   step('fonts', S('media-fetch'), [join(measure, 'media-1440.json'), '--fonts', 'fonts', '--css', join('styles', 'fonts.css')], { show: 0, note: (r) => (/(\d+) face\(s\) declared/.exec(`${r.stdout}${r.stderr}`) || [])[0] || 'no faces declared — fonts.css by hand' });
   // the media upload runs while author and spec-to-css work (it is needed by the harness, which warms the branch-host URLs)
-  const files = existsSync(media) ? readdirSync(media).filter((f) => !/\.json$/.test(f)).map((f) => join(media, f)) : [];
+  // an SVG media-fetch drew as `-svg.png` (the delivery refuses it) is not uploaded: its 409 read as a failed upload (lenovo-p2)
+  const files = existsSync(media) ? readdirSync(media).filter((f) => !/\.json$/.test(f) && !(/\.svg$/i.test(f) && existsSync(join(media, f.replace(/\.svg$/i, '-svg.png'))))).map((f) => join(media, f)) : [];
   if (!noDa && files.length && daToken()) { const t0 = Date.now(); daMedia = new Promise((res) => { const c = spawn(process.execPath, [S('da-put'), daTarget, ...files, '--to', 'drafts/media'], { stdio: ['ignore', 'pipe', 'pipe'] }); let out = ''; c.stdout.on('data', (d) => { out += d; }); c.stderr.on('data', (d) => { out += d; }); c.on('close', (code) => res({ code, out, seconds: Number(((Date.now() - t0) / 1000).toFixed(1)) })); }); }
   else if (!noDa && !daToken()) console.log('   no DA_TOKEN: media not uploaded (source the token, or --no-da for a local-only run)');
 }
