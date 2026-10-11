@@ -66,15 +66,20 @@ if (typeof arg('--fonts', null) === 'string') {
     for (const lf of [...new Set([...(m.loaded || []), ...ruleFaces])].slice(0, 24)) {
       const t = lf.split(' '); const style = t.pop(); const weight = String(t.pop()).replace(/^normal$/i, '400').replace(/^bold$/i, '700'); const family = t.join(' ').replace(/^["']|["']$/g, ''); // a loaded face reports `normal` for 400 (revlon)
       const inW = (w) => { const r = String(w).split(/\s+/).map(Number); return r.length > 1 ? Number(weight) >= r[0] && Number(weight) <= r[1] : String(r[0]) === String(Number(weight)); };
-      const rule = rules.find((r) => r.family.toLowerCase() === family.toLowerCase() && r.style === style && inW(r.weight) && r.srcs.some((x) => !x.url.startsWith('data:')));
+      // the LATIN subset first (a unicode-range split served open-sans's cyrillic file — sherwin-williams' Open Sans rendered in a serif fallback)
+      const latin = (r) => !r.unicodeRange || /^U\+0{1,4}(-|,|$)/i.test(r.unicodeRange.replace(/\s/g, '')); // latin starts at U+0000
+      const matching = rules.filter((r) => r.family.toLowerCase() === family.toLowerCase() && r.style === style && inW(r.weight) && r.srcs.some((x) => !x.url.startsWith('data:')));
+      const rule = matching.find(latin) || matching[0];
       if (!rule) continue;
       const src = ['woff2', 'woff', 'truetype', 'opentype', null].map((f) => rule.srcs.find((x) => !x.url.startsWith('data:') && (x.format === f || (f === 'woff2' && /\.woff2(\?|$)/.test(x.url))))).find(Boolean) || rule.srcs[0];
       const ext = src.format === 'woff2' || /\.woff2/.test(src.url) ? '.woff2' : src.format === 'woff' || /\.woff(\?|$)/.test(src.url) ? '.woff' : /\.otf/.test(src.url) || src.format === 'opentype' ? '.otf' : /\.ttf/.test(src.url) || src.format === 'truetype' ? '.ttf' : '.woff2';
-      const name = `${safe(family)}-${safe(weight)}-${safe(style)}${ext}`; if (done.has(name)) continue;
+      // a variable face (a weight RANGE, `100 900`): one file, declared once with its range — two static faces made the 300 body copy render 400
+      const range = /\s/.test(String(rule.weight).trim()) ? String(rule.weight).trim().replace(/\s+/g, ' ') : null;
+      const name = `${safe(family)}-${safe(range || weight)}-${safe(style)}${ext}`; if (done.has(name)) continue;
       const r = await getBytes(src.url); if (!r || !r.ok || !r.buf) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${src.url} (${lf})`); continue; }
       if (!isFont(r.buf)) { notFont.push(`${lf} (${r.buf.length} bytes${/^\s*</.test(r.buf.subarray(0, 64).toString('latin1')) ? ', HTML' : ''})`); continue; }
       writeFileSync(join(dir, name), r.buf); done.add(name); n += 1; fetchedUrls.add(src.url);
-      cssFaces.push({ family, weight, style, file: name, format: ext === '.woff2' ? 'woff2' : ext === '.woff' ? 'woff' : ext === '.otf' ? 'opentype' : 'truetype' });
+      cssFaces.push({ family, weight: range || weight, style, file: name, format: ext === '.woff2' ? 'woff2' : ext === '.woff' ? 'woff' : ext === '.otf' ? 'opentype' : 'truetype' });
     }
     for (const u of (m.fontRequests || []).filter((x) => !fetchedUrls.has(x))) { const r = await getBytes(u); if (r?.ok && r.buf && !isFont(r.buf)) { notFont.push(`${u.slice(0, 80)} (${r.buf.length} bytes)`); continue; } if (!r || !r.ok || !r.buf) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${u}${!process.argv.includes('--browser') ? ' (a 403: --browser)' : ''}`); continue; } const name = safe(new URL(u).pathname.split('/').pop().replace(/\.[a-z0-9]+$/, '')) + (extname(new URL(u).pathname) || '.woff2'); writeFileSync(join(dir, name), r.buf); console.log(`${r.status} ${u.slice(-70)} → ${name}`); n += 1; }
   }

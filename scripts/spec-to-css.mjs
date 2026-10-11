@@ -98,7 +98,9 @@ function mediaRules(items, W, sel) {
   const imgs = items.filter((it) => ['img', 'video'].includes(it.k) && onPage(it, W) && it.box[2] >= 48);
   if (!imgs.length) return [];
   const [wh, n] = count(imgs.map((it) => `${it.box[2]}×${it.box[3]}|${it.fit || 'fill'}`))[0]; const [w, rest] = wh.split('×'); const [h, fit] = rest.split('|');
-  return [`${sel} img { width: 100%; aspect-ratio: ${w} / ${h}; object-fit: ${fit}; height: auto; }  /* ${n} × ${w}×${h} ${fit}${imgs.some((it) => it.broken) ? ' — a BROKEN live image paints its alt text: register it' : ''} */`];
+  // the crop's anchor (object-position): sherwin-williams' agent swept it against the capture to fit two photos (2.5 min)
+  const op = count(imgs.filter((it) => `${it.box[2]}×${it.box[3]}` === wh.split('|')[0]).map((it) => it.op || '')).filter(([v]) => v)[0]?.[0];
+  return [`${sel} img { width: 100%; aspect-ratio: ${w} / ${h}; object-fit: ${fit};${op ? ` object-position: ${op};` : ''} height: auto; }  /* ${n} × ${w}×${h} ${fit}${imgs.some((it) => it.broken) ? ' — a BROKEN live image paints its alt text: register it' : ''} */`];
 }
 
 const files = new Map(); const sectionsDraft = []; const pageScale = new Map();

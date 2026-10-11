@@ -21,11 +21,16 @@ function markRoot([mainSel, headerSel, footerSel]) {
 /** Browser side: the content root as a CSS PATH (`body > div:nth-child(2) > main`), so a caller that must not touch the DOM (the
  * structure dump and the captured DOM of measure-page) can name the root roster's rule finds: `mainSel` when it resolves, else the
  * largest ancestor of `main` / `[role=main]` that adds no chrome, else `body`. Returns { path, name }. */
-export function contentRootPath([mainSel]) {
+export function contentRootPath([mainSel, headerSel = null, footerSel = null]) {
   const q = (s) => { try { return document.querySelector(s); } catch { return null; } };
   const chrome = (e) => /^(header|footer|nav|aside)$/i.test(e.tagName) || /\b(header|footer|masthead|colophon|nav)\b/i.test(`${e.className} ${e.id}`);
   let el = mainSel ? q(mainSel) : null;
   if (!el) { el = q('main') || q('[role=main]'); while (el && el.parentElement && el.parentElement !== document.body && ![...el.parentElement.children].some((c) => c !== el && chrome(c))) el = el.parentElement; }
+  // no main (an AEM Sites page — sherwin-williams: `body > *` guessed, two re-runs and --main by hand): the tallest element that holds neither
+  // the header nor the footer and spans ≥ 40 % of the document
+  if (!el) { const hd = headerSel ? q(headerSel) : q('header'); const ft = footerSel ? q(footerSel) : q('footer'); const docH = document.documentElement.scrollHeight;
+    const cands = [...document.querySelectorAll('body *')].filter((e) => { const r = e.getBoundingClientRect(); return r.height >= docH * 0.4 && r.width >= innerWidth * 0.8 && !(hd && (e.contains(hd) || hd.contains(e))) && !(ft && (e.contains(ft) || ft.contains(e))) && !/^(SCRIPT|STYLE|SVG|IMG|PICTURE|VIDEO|IFRAME)$/.test(e.tagName); });
+    cands.sort((a, b) => b.getBoundingClientRect().height - a.getBoundingClientRect().height || (a.contains(b) ? -1 : 1)); el = cands[0] || null; }
   if (!el) return { path: 'body', name: 'body (no main)', tag: 'body' };
   const parts = []; for (let n = el; n && n !== document.body; n = n.parentElement) parts.unshift(`${n.tagName.toLowerCase()}:nth-child(${[...n.parentElement.children].indexOf(n) + 1})`);
   return { path: ['body', ...parts].join(' > '), name: `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}${[...el.classList].slice(0, 2).map((c) => `.${c}`).join('')}`, tag: el.tagName.toLowerCase() };
