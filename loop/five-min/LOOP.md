@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L14 | merck.com | 5d94383 (art direction) | 1.8 (64 / 41 / 34 %) | **never** (clock stopped by hand at 22.5: 38 / 34 / 22 %) | 26.5 | 4 | 26 | own ≈ 13.1 min, tools 9.4 | the one-shot origin was not what a reader sees: every loaded picture below the fold blank, the stories section 206–346 px taller — against a stitched capture the same build read 26 / 16 / 7 %; 8 min diagnosing it |
 | L13 | nike.com gb | 9c75734 (wrapped build sections, target-only stop, printed re-run commands, slider tracks) | 5.2 after 2 × `first` (74 / 36 / 53 %) | 22.8 (1440 / 2560 under 2.4 % at 10.3) | 25.0 | 4 | 26–28 | own ≈ 17.8 min, tools 5.0 to stop | 12.5 min on 360 alone: the portrait 360 images fetched but never authored (art direction ≈ 6 min), buttons styled for `strong a` instead of the decorated button, flattened mega-menu |
 | L12 | nfl.com international | 2dc1ee6 (main stays root, 60 % split, origin-mode builds, digest rows by overlap) | 4.4 after 2 × `first` (55 / 52 / 39 %) | 28.0 | 31.2 | 9 | 26–40 | own ≈ 18.7 min, tools 9.3 to stop | a main column + right rail re-ordered on mobile: no model, the document re-authored by hand (≈ 13 min); the gate found no build section under a wrapper and printed a false `stop: clean` at 22 %; harness re-runs without --local-media / --sync-chrome (stale chrome, 404 media) |
 | L11 | intel.com | 5611ea7 (content root without main, unique chrome guesses, fonts subset / variable, object-position) | 8.8 after 2 × `first` (33 / – / – %) | 17.1 | 21.7 | 4 | 27–28 | own ≈ 12.6 min, tools 4.5 to stop | the root climbed above a large main (header + footer fragment inside: 3 sections, ≈ 7 min); repeating units authored weakly (≈ 4 min); a stitched origin (scroll-driven scenes) against a one-shot build — the sticky header in one capture only |
@@ -117,3 +118,10 @@ side-by-side thumbnails, carousels drafted as slider tracks (revlon replay: Δh 
 Result on nike: 1440 / 2560 under 2.4 % at 10.3 min, stop at 22.8 — 360 alone took 12.5 min: art direction (portrait images per width)
 had no authoring path. Keep. Iteration 14: author writes the 360 asset as a second picture marked `| mobile <bp>`, stardust.js folds it into
 a `<source media>` (nike replay: 5 sources, the 360 build shows the portrait files).
+
+### L14 — art direction
+Result on merck: no stop — the one-shot origin left every picture below the fold blank (not content-visibility, not an entrance, not a
+transform: the mechanism unknown); the build matched the measured DOM at Δy 0 and still read 38 / 34 / 22 %. Iteration 15: the one shot only
+where it is faithful — after the shot, loaded pictures that come out blank (one colour) send the page to the stitched capture, as does a
+layout that changes when the viewport grows or pictures that move with the scroll (replays: merck stitched, marriott / takeda / revlon one
+shot, wpp stitched). The build follows its origin's mode (iteration 12), so both sides stay comparable.
