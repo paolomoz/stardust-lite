@@ -172,7 +172,7 @@ rows.forEach((row, i) => {
       const left = tx - big.box[0]; const top = ty - big.box[1]; const bottom = big.box[1] + big.box[3] - tb; const align = bottom < top * 0.6 ? 'flex-end' : top < bottom * 0.6 ? 'flex-start' : 'center';
       lines.push(`${sel} { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: ${align}; min-height: ${px(big.box[3])}; }  /* ${over.length} text(s) over the ${big.box[2]}×${big.box[3]} picture: left ${left}, top ${top}, bottom ${bottom} */`);
       lines.push(`${sel} picture { position: absolute; inset: 0; z-index: -1; } ${sel} picture img { width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; }`);
-      lines.push(`${sel} > div { padding: ${align === 'flex-start' ? px(top) : 0} ${px(Math.max(0, big.box[0] + big.box[2] - Math.max(...over.map((it) => it.box[0] + it.box[2]))))} ${align === 'flex-end' ? px(bottom) : 0} ${px(left)}; }`);
+      lines.push(`${sel} > div { padding: ${align === 'flex-start' ? px(Math.max(0, top)) : 0} ${px(Math.max(0, big.box[0] + big.box[2] - Math.max(...over.map((it) => it.box[0] + it.box[2]))))} ${align === 'flex-end' ? px(Math.max(0, bottom)) : 0} ${px(Math.max(0, left))}; }`);
       const mbig = m ? m.items.filter((it) => ['img', 'video'].includes(it.k) && onPage(it, mobile)).sort((a, b) => b.box[2] * b.box[3] - a.box[2] * a.box[3])[0] : null;
       if (mbig) lines.push(`@media (max-width: ${bp - 1}px) { ${sel} { min-height: ${px(mbig.box[3])}; } }  /* the picture at ${mobile}: ${mbig.box[2]}×${mbig.box[3]} */`);
     }
@@ -255,7 +255,7 @@ const capOf = (spec, W) => { if (!spec) return null; const rs = spec.secs.filter
 const capP = capOf(P, probe); const capM = capOf(M, mobile);
 if (pageCap && pageCap < base - 16) {
   const fluid = capP && capP.w > pageCap + 16;
-  sd.push(`/* the page cap at ${base}: ${pageCap}${capP ? `; at ${probe}: ${capP.w}${fluid ? ' (it grows: a fraction of the viewport, held at the probe value)' : ' (fixed)'}` : ''} */\nmain > .section > div { max-width: ${fluid ? `min(${px(capP.w)}, ${Number(((100 * pageCap) / base).toFixed(2))}vw)` : px(pageCap)}; margin-left: auto; margin-right: auto; }`);
+  sd.push(`/* the page cap at ${base}: ${pageCap}${capP ? `; at ${probe}: ${capP.w}${fluid ? ' (it grows: the line through both widths — a fraction left unitedrentals 24 px off at 2560)' : ' (fixed)'}` : ''} */\nmain > .section > div { max-width: ${fluid ? (() => { const a = (capP.w - pageCap) / (probe - base); const b = pageCap - a * base; return `calc(${Number((a * 100).toFixed(3))}vw ${b < 0 ? '-' : '+'} ${px(Math.abs(Math.round(b)))})`; })() : px(pageCap)}; margin-left: auto; margin-right: auto; }`);
 }
 if (pageCap && pageCap < base - 16 && capM) sd.push(`@media (max-width: ${(bp || 900) - 1}px) {  /* at ${mobile} the column is the viewport less the gutter (content from x ${capM.x}) */\n  main > .section > div { max-width: none;${capM.x > 0 && capM.x < 48 ? ` padding-left: ${px(capM.x)}; padding-right: ${px(capM.x)};` : ''} }\n}`);
 const sdText = `${sd.join('\n\n')}\n`; // imported FIRST by styles.css (first.mjs): its normal specificity beats the foundation's `main > .section`, the agent's rules below win ties

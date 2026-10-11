@@ -355,13 +355,16 @@ const threeW = [360, baseW, probeW]; const underAt = (W) => rows.some((r) => r.W
 const targetLine = `target ${target} %: ${threeW.every(underAt) ? 'REACHED at the three widths' : widths.every(underAt) ? `under at ${widths.join(' / ')} — not yet gated at ${threeW.filter((W) => !widths.includes(W)).join(' / ')}` : `not yet — over at ${widths.filter((W) => !underAt(W)).join(' / ')}`}`;
 let digest = '';
 if (roundMode) {
-  const W = widths[0]; let now = []; try { now = JSON.parse(readFileSync(join(out, `sections-${W}.json`), 'utf8')).sections || []; } catch { /* no table */ }
+  // a digest for EVERY width over the target, worst rows first (unitedrentals: the digest named 360 only; a 2560 cap 24 px off ran eight rounds)
+  const digestWidths = widths.filter((W) => !underAt(W)).length ? widths.filter((W) => !underAt(W)) : [widths[0]]; let clean = true;
+  for (const W of digestWidths) {
+   let now = []; try { now = JSON.parse(readFileSync(join(out, `sections-${W}.json`), 'utf8')).sections || []; } catch { /* no table */ }
   const prev = prevSections[W]; const lines = [];
   // pair's hot rows per live section (Δy·loc = the section's own offset) when the spec is at hand
-  const pairRows = {}; const tp0 = Date.now(); if (specDir && existsSync(join(specDir, `spec-${W}.json`))) { const pr = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'pair.mjs'), join(specDir, `spec-${W}.json`), build, '--max', '400', ...liveOpts.filter((x) => x !== '--require')], { encoding: 'utf8' }); let sec = null; for (const l of pr.stdout.split('\n')) { const m = /^-- section (\d+)/.exec(l); if (m) { sec = Number(m[1]); continue; } if (sec !== null && /^.{30,32}\[/.test(l) && !/^anchor /.test(l)) { (pairRows[sec] ||= []).push(l.replace(/\s+\|.*$/, '').replace(/\s{2,}/g, ' ').trim()); } } } tTail.pair = secs(tp0);
+  const pairRows = {}; const tp0 = Date.now(); if (W === digestWidths[0] && specDir && existsSync(join(specDir, `spec-${W}.json`))) { const pr = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'pair.mjs'), join(specDir, `spec-${W}.json`), build, '--max', '400', ...liveOpts.filter((x) => x !== '--require')], { encoding: 'utf8' }); let sec = null; for (const l of pr.stdout.split('\n')) { const m = /^-- section (\d+)/.exec(l); if (m) { sec = Number(m[1]); continue; } if (sec !== null && /^.{30,32}\[/.test(l) && !/^anchor /.test(l)) { (pairRows[sec] ||= []).push(l.replace(/\s+\|.*$/, '').replace(/\s{2,}/g, ' ').trim()); } } } tTail.pair = secs(tp0);
   const originPng = join(out, `live-${W}.png`); const buildPng = join(out, `build-${W}.png`); // the captures this run compared
   const shiftOf = (s) => { if (!s.live || !existsSync(originPng) || !existsSync(buildPng)) return ''; const sp = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'shift-probe.mjs'), originPng, buildPng, '--x0', '0', '--x1', String(W), '--y0', String(s.live.y0), '--y1', String(s.live.y1), '--r', '8', '--step', '2'], { encoding: 'utf8' }); const m1 = /best shift build→live dx=(-?\d+) dy=(-?\d+) → ([\d.]+)(.*)$/m.exec(sp.stdout); const m2 = /ratio ([\d.]+)(.*)$/m.exec(sp.stdout); return `${m1 ? `shift dx ${m1[1]} dy ${m1[2]}${m1[4].trim().slice(0, 60)}` : ''}${m2 ? `; luminance ratio ${m2[1]}${m2[2].trim().slice(0, 50)}` : ''}`; };
-  const moved = []; let clean = true;
+  const moved = [];
   for (const s of now) {
     const p = prev ? prev.find((x) => x.index === s.index) : null; const dPct = p && p.pct !== null && s.pct !== null ? Number((s.pct - p.pct).toFixed(2)) : null; const dDh = p && p.dh !== null && s.dh !== null ? s.dh - p.dh : null;
     const off = (s.dh !== null && Math.abs(s.dh) > 2 && s.dhKind !== 'boundary') || (s.pct !== null && s.pct > (s.budget ?? 1.5)); if (off) clean = false;
@@ -376,7 +379,8 @@ if (roundMode) {
     }
   }
   const basePct = rows.find((r) => r.W === W)?.pct;
-  digest = `\nround digest at ${W}${prev ? ' (vs the previous round in this dir)' : ' (first round here)'}: page ${basePct} %${moved.length ? `\n${moved.join('\n')}` : '\n  no section moved'}`;
+  digest += `\nround digest at ${W}${prev ? ' (vs the previous round in this dir)' : ' (first round here)'}: page ${basePct} %${moved.length ? `\n${moved.join('\n')}` : '\n  no section moved'}`;
+  }
   digest += threeW.every(underAt) ? `\nstop: under ${target} % at the three widths — the prototype is done; deploy and name the residuals in the register (polish after this is outside the clock)`
     : widths.every(underAt) ? `\nnext: under ${target} % at ${widths.join(' / ')} — gate the round at the three widths (--widths 360,${baseW},${probeW})`
     : clean && now.length ? `\nnext: every paired section is within 2 px but the pixels are over ${target} % — a paint, a picture or an unpaired section (read sbs-<W>.png)` : `\nnext: one round, changing only what the rows above name`;
