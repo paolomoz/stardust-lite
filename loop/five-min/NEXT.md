@@ -39,3 +39,10 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
   section count → scored on the bench in draft mode (patch held in `~/stardust/bench/c5-gap-parts.patch` until then).
 - item 4 (reading cards): `cards.mjs` — one card per build section from the gate's table (values inside its range at 1440 / 360, owner
   file, Δh / %, live | build crops), ≈ 1 s, refreshed every round, named by `first` and the field protocol.
+- bench n0 (main, case triage, 23 pages; bms / equitable / pgatour fail in replay at author): median 54.0 / 55.1 / 47.0 %.
+- item 2 REJECTED: the bands left 16 pages unchanged and made lenovo / nfl / sherwin-williams +2…+20 points worse (builds 1.5–6 k px
+  shorter: the old wrapper-wide padding had been compensating content the machine build lacks), omnicom mixed; keeping the wrapper's
+  paint changed nothing. Reverted (aac276b).
+- item 3 KEPT on content completeness against the bench: lenovo draft-mode 33.5 / 51.4 / 31.3 → 39.5 / 52.0 / 32.2 %, 0 → 3 sections in
+  tolerance; every other loop page splits identically.
+- 20:20Z merged e8dfd0a (items 3, 4, 8, 9, 10) → panel P1 santanderus-p1 started.
