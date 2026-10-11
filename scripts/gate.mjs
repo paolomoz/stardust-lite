@@ -286,6 +286,9 @@ for (const W of widths) {
   for (const u of pairing.unpaired) console.log(`    live "${(u.anchorText || '(no text)').slice(0, 26)}" y ${u.box ? `${u.box[1]}–${u.box[1] + u.box[3]}` : '?'} located in no authored section`);
   sectionRuns[W] = join(out, `sections-${W}.json`);
   t.sections = secs(ts);
+  // the section tops drawn on the side-by-side (red): live on the left, build on the right — the split read at a glance
+  try { const f = join(out, `sbs-${W}.png`); if (existsSync(f)) { const S3 = PNG.sync.read(readFileSync(f)); const k = W >= 1440 ? 4 : 2; const w0 = Math.ceil(A.width / k); const line = (y, x0, x1) => { const yy = Math.round(y / k); if (yy < 0 || yy >= S3.height) return; for (let x = x0; x < Math.min(x1, S3.width); x += 1) for (const dy of [0, 1]) { const i = ((yy + dy) * S3.width + x) * 4; if (yy + dy < S3.height) { S3.data[i] = 230; S3.data[i + 1] = 0; S3.data[i + 2] = 0; S3.data[i + 3] = 255; } } };
+    for (const r of table) { if (r.live) line(r.live.y0, 0, w0); if (r.build) line(r.build.y0, w0 + 12, S3.width); } writeFileSync(f, PNG.sync.write(S3)); } } catch { /* no thumbnail */ }
   writeFileSync(sectionRuns[W], JSON.stringify({ _schema: 'stardust-lite/gate-sections@2', _writtenAt: new Date().toISOString(), width: W, live, build, budgetKey: key, chrome: chromeRuns[W] || null, triage: typeof arg('--triage', null) === 'string' ? resolve(arg('--triage')) : null, blocks: blocks.length ? blocksFile : null, doc: { live: pairing.live.doc, build: pairing.build.doc }, pairing: { mode: pairing.mode, contentRoot: pairing.live.root, split: pairing.live.split, sectionSelectors: sectionSels, mismatches: pairing.mismatches }, sections: table, unpaired: pairing.unpaired, liveInChrome: pairing.chrome, emptyAuthored: pairing.empty }, null, 1));
 }
 if (browser) await browser.close();
