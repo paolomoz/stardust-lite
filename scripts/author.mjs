@@ -132,7 +132,10 @@ const SMALL_SVG = 64;
 const isIconImg = (n) => kindOf(n) === 'picture' && /\.svg(\?|$)/i.test(n.src || '') && n.box && Math.max(n.box[2], n.box[3]) <= SMALL_SVG;
 
 // ───────────────────────────── leaves ─────────────────────────────
-const hasBg = (n) => !!bgUrl(n);
+// an SVG background on an element that carries its own text is a MARKER (a list chevron, an arrow before a link), not a picture: rbc's 30
+// chevron `li`s were authored as card pictures and drawn ~300 px wide by the drafts' `picture img { width: 100% }` (≈ 4 min re-authoring)
+const textOf = (n) => !!(n && (n.text || (n.children || []).some(textOf)));
+const hasBg = (n) => { const u = bgUrl(n); if (!u) return false; if (/\.svg(\?|#|$)/i.test(u) && textOf(n)) return false; return true; };
 const MEDIA = (k) => general(k) === 'media';
 const CONTROL = new Set(['button', 'input']);
 /** The ordered leaves under a node: { kind (recipe kind), raw (dump kind), node, top (index of the top-level child), parent }. A list is
@@ -156,6 +159,13 @@ function leavesOf(root) {
     else if (bgCut(n) && !kids.map(unwrap).some((c) => MEDIA(kindOf(c)))) bgCutWarn(n);
     if (k === 'ul') { if (isControlList(n)) { out.push({ kind: 'control', raw: 'ul', node: n, top, parent }); return; } if (isTextList(n)) { out.push({ kind: 'list', raw: 'ul', node: n, top, parent }); return; } kids.forEach((c, i) => walk(c, n === start ? i : top, n, depth + 1)); return; }
     if (k === 'a' && !n.text && linkLabel(n)) { out.push({ kind: 'link', raw: 'a', node: { ...n, children: undefined, text: linkLabel(n) }, top, parent }); return; } // a button's label in a span (acs-about)
+    // a link whose only content is ONE icon (a social link, an arrow button) is the icon inside the link — written as two leaves it read
+    // `:facebook:` then `<a>Learn more</a>` (rbc footer, every social link)
+    if ((k === 'a' || String(n.tag || '').toLowerCase() === 'a') && n.href && !textOf(n)) {
+      const icons = []; const scan = (x) => { const u = unwrap(x); const ck = kindOf(u); if (ck === 'icon' || isIconImg(u)) icons.push(u); else (x.children || []).forEach(scan); }; kids.forEach(scan);
+      // the icon token is the link's text; the aria label / title / alt stays as its title (the accessible name — linkHtml)
+      if (icons.length === 1) { const ic = icons[0]; const tok = isIconImg(ic) ? `:${iconName({ alt: basename(ic.src || '').replace(/\.[a-z0-9]+$/, '') })}:` : `:${iconName(ic)}:`; out.push({ kind: 'link', raw: 'a', node: { ...n, children: undefined, text: tok, title: n.title || n.aria || ic.alt || ic.aria || '' }, top, parent }); return; }
+    }
     // kindOf reads a card-wide link as a `group` (fingerprint) — the TAG names it here, or the rule never fired and the href was lost (continental)
     if ((k === 'a' || String(n.tag || '').toLowerCase() === 'a') && n.href && kids.map(unwrap).some((c) => { const ck = kindOf(c); return MEDIA(ck) || /^h[1-6]$/.test(ck) || ck === 'p' || ck === 'group'; }) && !n.text) {
       // the card's own call to action (a short text in a link / button / cta / more element: "Find out more") is the link's text, not a paragraph
@@ -204,7 +214,7 @@ function linkHtml(n, force, { altHint } = {}) {
   if (!text) return '';
   if (dead) return label ? `<p>${label}</p>` : '';
   stats.texts += label ? 1 : 0;
-  const w = weightOf(n, force); const a = `<a href="${esc(h)}"${!label && (n.aria || n.title) ? ` title="${esc(n.aria || n.title)}"` : ''}>${text}</a>`;
+  const w = weightOf(n, force); const a = `<a href="${esc(h)}"${(!label || /^:[a-z0-9-]+:$/.test(label)) && (n.aria || n.title) ? ` title="${esc(n.aria || n.title)}"` : ''}>${text}</a>`;
   return `<p>${w ? `<${w}>${a}</${w}>` : a}</p>`;
 }
 function listHtml(n, force) {
