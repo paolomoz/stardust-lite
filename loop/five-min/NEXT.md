@@ -60,3 +60,12 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
   section positions lost after the re-author (≈ 1 min); button rules on `strong a` (decoration makes `a.button`).
 - author: the nav brand is its logo (`<a><picture><img>`) when the link holds one — santanderus / rbc / merck now match the agents' hand
   versions (revlon / wpp draw an inline SVG never fetched). foundation: decorateVideos (poster + file link → muted looping inline video).
+- P4 waters-p1 (c0c9e90): stop 13.3 min (was 33.7), served = prototype (8.94 / 7.74 / 5.56). Costs: author junk (SVG <style> text,
+  `:layer-1:` tokens, video as a bare link, a link list as a 9-row accordion), the nav's SVG logo served as about:error, sections-draft
+  unusable (608 px cap from a narrow column, paddings 0).
+- fixes after P3 / P4: author — SVG backgrounds on text elements are markers, not pictures (rbc 38 → 8 pictures; bench rbc −10.7 / −2.6 /
+  −1.5); icon-only links keep the icon inside the link with the label as title. first — documents upload after their media (waters'
+  logo: DA stored about:error for a file still uploading). collector — text excludes inline-SVG <style> / scripts.
+- decorateVideos KEPT on content fidelity against the bench: mheducation +0.2 / +22 / +34 (its hero is a background video behind the text;
+  rendered in flow at 720 px it now pushes the page down — before, the video was a small text link), wpp −1.1 / −3.2 / −1.5, deloitte ±0.4.
+  Media rules now size `video` like the picture.
