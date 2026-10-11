@@ -251,7 +251,10 @@ for (const W of widths) {
     }
     const ls = lsCached || await liveSections(lp, { mainSel: contentRoot, headerSel: profile?.chrome?.header?.selector || null, footerSel: profile?.chrome?.footer?.selector || null, sections: sectionSels });
     if (!lsCached) writeFileSync(lsFile, JSON.stringify({ key: lsKey, ls })); else t.liveSplit = 'cached';
-    pairing = await pairSections(bp, ls, { secSel });
+    // a live section whose triage row says `drop` (a strip that is not page content, a band the footer already holds) is no row: it stayed in
+    // the live split, the counts differed by one, the pairing fell to anchors and folded two sections into one (omnicom: "Stay connected")
+    const lsUse = triage ? { ...ls, sections: ls.sections.filter((x) => !triageRowFor(triage, { index: x.index, anchorText: x.anchorText })?.drop) } : ls;
+    pairing = await pairSections(bp, lsUse, { secSel });
   } catch (e) { console.log(`sections ${W}: pairing failed — ${String(e.message || e).slice(0, 160)}`); await closeCtx(); continue; } finally { if (br) await br.close().catch(() => {}); } // a pairing that threw left this browser open and the gate never exited (bench, cibc)
   await closeCtx();
   const A = PNG.sync.read(readFileSync(origin)); const B = PNG.sync.read(readFileSync(eds)); const w = Math.min(A.width, B.width);

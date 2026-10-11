@@ -104,7 +104,7 @@ export async function pairSections(buildPage, live, { secSel = 'main > .section'
   const sections = kept.map((s) => {
     const idx = partner.map((p, i) => (p === s.index ? i : -1)).filter((i) => i >= 0); const boxes = idx.map((i) => live.sections[i].box).filter(Boolean);
     const y0 = boxes.length ? Math.min(...boxes.map((x) => x[1])) : null; const y1 = boxes.length ? Math.max(...boxes.map((x) => x[1] + x[3])) : null;
-    return { ...s, build: { y0: s.box[1], y1: s.box[1] + s.box[3], h: s.box[3] }, live: y0 === null ? null : { y0, y1, h: y1 - y0, indices: idx, anchorText: live.sections[idx[0]].anchorText }, liveAnchorText: idx.length ? live.sections[idx[0]].anchorText : null };
+    return { ...s, build: { y0: s.box[1], y1: s.box[1] + s.box[3], h: s.box[3] }, live: y0 === null ? null : { y0, y1, h: y1 - y0, indices: idx.map((i) => live.sections[i].index ?? i), anchorText: live.sections[idx[0]].anchorText }, liveAnchorText: idx.length ? live.sections[idx[0]].anchorText : null };
   });
   // the range a section is READ over runs to the next section's top (its stride): a block margin that collapses out of the section box
   // (the 30 px member — METHOD step 6) is still this section's pixels, and the boxes alone read the hero 30 px short at 0.02 % diff
