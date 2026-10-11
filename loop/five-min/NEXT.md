@@ -46,3 +46,9 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
 - item 3 KEPT on content completeness against the bench: lenovo draft-mode 33.5 / 51.4 / 31.3 → 39.5 / 52.0 / 32.2 %, 0 → 3 sections in
   tolerance; every other loop page splits identically.
 - 20:20Z merged e8dfd0a (items 3, 4, 8, 9, 10) → panel P1 santanderus-p1 started.
+- P1 santanderus-p1 (e8dfd0a): stop 8.8 min (was 8.0), served = prototype (5.66 / 3.08 / 4.10). Defects: drafts rewritten (hero picture
+  twice, `div` text rules on every cell, footer `div { font }`), nav doc unusable, hero thumbnails outside the carousel.
+- P2 wpp-p1 (e8dfd0a): stop 9.5 min (was 9.7), served = prototype. Defects: author lost structure (h1 as three line p's, heading + intro
+  merged, a closing CTA missing), cards draft `repeat(1, …)` from a 2-span card (Δh +8582), videos as links, logo SVG not fetched.
+- bench n3 (8fffaf7: div text → p rule; a section's background picture drafted once): 16 changed pages, 0 worse, marriott −4.9 and
+  unitedrentals −5.9 at 360 — KEPT.

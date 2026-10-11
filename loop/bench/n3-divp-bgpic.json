@@ -1,0 +1,1272 @@
+{
+ "_schema": "stardust-lite/bench@1",
+ "_writtenAt": "2026-10-11T21:09:34.696Z",
+ "mode": "machine",
+ "triage": "case",
+ "widths": "360,1440,2560",
+ "results": [
+  {
+   "site": "sdt-deloitte-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.deloitte.com/us/en.html",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 3,
+     "ok": true,
+     "out": "9 sections → /Users/paolo/stardust/bench/c6/sdt-deloitte-lite-machine-case/doc/deloitte-home.html (69 texts, 5 block sections, 3 default, 6 new)\nauthor: 2 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)\nauthor: video without a source (a player — video#dynamicmedia_30393953_html5_api): author its poster picture and mp4 link by hand\nauthor: a NEW section was emitted as default content — triage it (name the block, write its recipe), then run author again (exit 3)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/cards/cards.css: 1 section(s)\nblocks/carousel/carousel.css: 1 section(s)\nstyles/sections-draft.css: 16 rule(s)\nspec-to-css: section 0 (accordion) — no live section pairs with the triage row's spec box; skipped"
+    },
+    {
+     "step": "harness",
+     "seconds": 3.4,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 8931\nprototype (gate this): http://localhost:8960/deloitte-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-deloitte-lite-machine-case/proto/deloitte-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-deloitte-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 58.2,
+     "exit": 0,
+     "ok": true,
+     "out": "evidence: /Users/paolo/stardust/bench/c6/sdt-deloitte-lite-machine-case/gate/\nsite: /Users/paolo/stardust/bench/c6/sdt-deloitte-lite-machine-case/migration/site.json\ncapture: the page re-lays itself out when the viewport grows (6 box(es) moved) — stitched instead of one shot\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 61.71,
+     "dh": -86,
+     "ok": 0,
+     "n": 8
+    },
+    {
+     "W": 1440,
+     "pct": 73.46,
+     "dh": -3702,
+     "ok": 1,
+     "n": 8
+    },
+    {
+     "W": 2560,
+     "pct": 61.3,
+     "dh": -3817,
+     "ok": 2,
+     "n": 8
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 11.2,
+     "compare": 0.7,
+     "sections": 0.3,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 12.1,
+     "compare": 2,
+     "sections": 1,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 16.7,
+     "compare": 3.2,
+     "sections": 1.5,
+     "liveSplit": "cached"
+    }
+   }
+  },
+  {
+   "site": "sdt-equitable-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://equitable.com/",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 1,
+     "ok": false,
+     "out": "author: /Users/paolo/stardust/bench/c6/sdt-equitable-lite-machine-case/migration/blocks.json has no blocks — every inventory match falls back to the default recipe\nsite: /Users/paolo/stardust/bench/c6/sdt-equitable-lite-machine-case/migration/site.json\nauthor: the dump splits into 6 sections, the triage has 8 — same dump and --root / --sections as the triage?"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 1,
+     "ok": false,
+     "out": "  syscall: 'open',\n  path: '/Users/paolo/stardust/bench/c6/sdt-equitable-lite-machine-case/doc/equitable-home.html'\n}\nNode.js v25.2.1"
+    }
+   ],
+   "gate": null,
+   "error": "no document"
+  },
+  {
+   "site": "sdt-intel-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.intel.com/content/www/us/en/homepage.html",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "3   NEW       columns · 1 × 4                          4/4      14     default recipe: the Block Collection's columns shape (no recipe in blocks.json); NEW drafted through the colle\n4   NEW       cards · 4 × 2                            4/8      5      default recipe: the Block Collection's cards shape (no recipe in blocks.json); NEW drafted through the collect\n4 sections → /Users/paolo/stardust/bench/c6/sdt-intel-lite-machine-case/doc/intel-home.html (63 texts, 3 block sections, 1 default, 3 new)\nauthor: 8 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/cards/cards.css: 1 section(s)\nblocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 7 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 2.8,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 8302\nprototype (gate this): http://localhost:8962/intel-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-intel-lite-machine-case/proto/intel-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-intel-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 56.9,
+     "exit": 0,
+     "ok": true,
+     "out": "capture: the page re-lays itself out when the viewport grows (4 box(es) moved) — stitched instead of one shot\ncapture: the page re-lays itself out when the viewport grows (2 box(es) moved) — stitched instead of one shot\ncapture: the page re-lays itself out when the viewport grows (4 box(es) moved) — stitched instead of one shot\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 38.18,
+     "dh": 642,
+     "ok": 0,
+     "n": 4
+    },
+    {
+     "W": 1440,
+     "pct": 55.1,
+     "dh": -2557,
+     "ok": 0,
+     "n": 4
+    },
+    {
+     "W": 2560,
+     "pct": 46.01,
+     "dh": -2213,
+     "ok": 1,
+     "n": 4
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 12.7,
+     "compare": 0.6,
+     "sections": 0.2,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 14.3,
+     "compare": 1.8,
+     "sections": 0.8,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 15.3,
+     "compare": 2.9,
+     "sections": 1.1,
+     "liveSplit": "cached"
+    }
+   }
+  },
+  {
+   "site": "sdt-lenovo-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.lenovo.com/us/en/",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 1,
+     "ok": false,
+     "out": "author: /Users/paolo/stardust/bench/c6/sdt-lenovo-lite-machine-case/migration/blocks.json has no blocks — every inventory match falls back to the default recipe\nsite: /Users/paolo/stardust/bench/c6/sdt-lenovo-lite-machine-case/migration/site.json\nauthor: the dump splits into 13 sections, the triage has 11 — same dump and --root / --sections as the triage?"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 1,
+     "ok": false,
+     "out": "  syscall: 'open',\n  path: '/Users/paolo/stardust/bench/c6/sdt-lenovo-lite-machine-case/doc/lenovo-home.html'\n}\nNode.js v25.2.1"
+    }
+   ],
+   "gate": null,
+   "error": "no document"
+  },
+  {
+   "site": "sdt-marriott-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.marriott.com/en-gb/default.mi",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "6   NEW       carousel · 6 × 2                         12/12    8      default recipe: the Block Collection's carousel shape (no recipe in blocks.json); NEW drafted through the coll\n7   NEW       carousel · 4 × 2                         8/8      96     default recipe: the Block Collection's carousel shape (no recipe in blocks.json); NEW drafted through the coll\n7 sections → /Users/paolo/stardust/bench/c6/sdt-marriott-lite-machine-case/doc/marriott-home.html (163 texts, 6 block sections, 1 default, 6 new)\nauthor: 2 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/hero/hero.css: 1 section(s)\nblocks/carousel/carousel.css: 4 section(s)\nblocks/header/header.css: 1 section(s)\nstyles/sections-draft.css: 11 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 2.6,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 5500\nprototype (gate this): http://localhost:8964/marriott-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-marriott-lite-machine-case/proto/marriott-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-marriott-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 49.5,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached, build 9.4 s, compare 0.6 s, sections 0.3 s | 1440: live cached, build 9.1 s, compare 1.8 s, sections 0.9 s | 2560: live cached, build 9.3 s, compare 3.2 s, sections 1.4 s | cap-probe 20.2 s, sections pass 8.6 s, pair 0 s | total 49.4 s\nevidence: /Users/paolo/stardust/bench/c6/sdt-marriott-lite-machine-case/gate/\nsite: /Users/paolo/stardust/bench/c6/sdt-marriott-lite-machine-case/migration/site.json\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 52.63,
+     "dh": -618,
+     "ok": 0,
+     "n": 7
+    },
+    {
+     "W": 1440,
+     "pct": 61.71,
+     "dh": -848,
+     "ok": 0,
+     "n": 7
+    },
+    {
+     "W": 2560,
+     "pct": 45.46,
+     "dh": -302,
+     "ok": 0,
+     "n": 7
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 9.4,
+     "compare": 0.6,
+     "sections": 0.3,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 9.1,
+     "compare": 1.8,
+     "sections": 0.9,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 9.3,
+     "compare": 3.2,
+     "sections": 1.4,
+     "liveSplit": "cached"
+    }
+   }
+  },
+  {
+   "site": "sdt-nfl-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.nfl.com/international",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 3,
+     "ok": true,
+     "out": "13  default   —                                        —        3      \n13 sections → /Users/paolo/stardust/bench/c6/sdt-nfl-lite-machine-case/doc/nfl-home.html (208 texts, 6 block sections, 2 default, 11 new)\nauthor: 2 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)\nauthor: a NEW section was emitted as default content — triage it (name the block, write its recipe), then run author again (exit 3)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/embed/embed.css: 1 section(s)\nblocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 27 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 4.2,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 15057\nprototype (gate this): http://localhost:8965/nfl-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-nfl-lite-machine-case/proto/nfl-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-nfl-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 63.2,
+     "exit": 0,
+     "ok": true,
+     "out": "capture: the page re-lays itself out when the viewport grows (1 box(es) moved) — stitched instead of one shot\ncapture: the page re-lays itself out when the viewport grows (43 box(es) moved) — stitched instead of one shot\ncapture: the page re-lays itself out when the viewport grows (43 box(es) moved) — stitched instead of one shot\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 50.49,
+     "dh": -7804,
+     "ok": 0,
+     "n": 13
+    },
+    {
+     "W": 1440,
+     "pct": 51.78,
+     "dh": -10689,
+     "ok": 0,
+     "n": 13
+    },
+    {
+     "W": 2560,
+     "pct": 38.87,
+     "dh": -10689,
+     "ok": 0,
+     "n": 13
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 15.7,
+     "compare": 0.7,
+     "sections": 0.3,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 19.2,
+     "compare": 1.8,
+     "sections": 0.8,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 18.2,
+     "compare": 2.9,
+     "sections": 1.2,
+     "liveSplit": "cached"
+    }
+   }
+  },
+  {
+   "site": "sdt-pgatour-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.pgatour.com/",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 1,
+     "ok": false,
+     "out": "author: /Users/paolo/stardust/bench/c6/sdt-pgatour-lite-machine-case/migration/blocks.json has no blocks — every inventory match falls back to the default recipe\nsite: /Users/paolo/stardust/bench/c6/sdt-pgatour-lite-machine-case/migration/site.json\nauthor: the dump splits into 81 sections, the triage has 73 — same dump and --root / --sections as the triage?"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 1,
+     "ok": false,
+     "out": "  syscall: 'open',\n  path: '/Users/paolo/stardust/bench/c6/sdt-pgatour-lite-machine-case/doc/pgatour-home.html'\n}\nNode.js v25.2.1"
+    }
+   ],
+   "gate": null,
+   "error": "no document"
+  },
+  {
+   "site": "sdt-rbc-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.rbc.com/about-rbc.html",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "5 sections → /Users/paolo/stardust/bench/c6/sdt-rbc-lite-machine-case/doc/rbc-home.html (81 texts, 5 block sections, 0 default, 5 new)\nauthor: 4 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)\nauthor: 1 media source(s) not in the manifest — kept as source URLs:\n  https://www.rbc.com/undefined"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/carousel/carousel.css: 2 section(s)\nblocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 10 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 4,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 21088\nprototype (gate this): http://localhost:8967/rbc-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-rbc-lite-machine-case/proto/rbc-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-rbc-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 70.8,
+     "exit": 0,
+     "ok": true,
+     "out": "capture: the page re-lays itself out when the viewport grows (1 box(es) moved) — stitched instead of one shot\ncapture: the page re-lays itself out when the viewport grows (26 box(es) moved) — stitched instead of one shot\ncapture: the page re-lays itself out when the viewport grows (1 box(es) moved) — stitched instead of one shot\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 38.89,
+     "dh": -6558,
+     "ok": 0,
+     "n": 5
+    },
+    {
+     "W": 1440,
+     "pct": 40.88,
+     "dh": -17968,
+     "ok": 0,
+     "n": 5
+    },
+    {
+     "W": 2560,
+     "pct": 30.54,
+     "dh": -17968,
+     "ok": 0,
+     "n": 5
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 15.2,
+     "compare": 0.6,
+     "sections": 0.2,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 23,
+     "compare": 1.8,
+     "sections": 0.8,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 21.5,
+     "compare": 3,
+     "sections": 1.3,
+     "liveSplit": "cached"
+    }
+   }
+  },
+  {
+   "site": "sdt-revlon-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.revlon.com/",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "4   NEW       carousel · 4 × 2                         8/8      20     default recipe: the Block Collection's carousel shape (no recipe in blocks.json); NEW drafted through the coll\n5   NEW       carousel · 8 × 2                         16/16    17     default recipe: the Block Collection's carousel shape (no recipe in blocks.json); NEW drafted through the coll\n5 sections → /Users/paolo/stardust/bench/c6/sdt-revlon-lite-machine-case/doc/revlon-home.html (128 texts, 5 block sections, 0 default, 5 new)\nauthor: 4 empty spacer paragraph(s) in the source (6 px at y 646, 6 px at y 646, 6 px at y 646, 6 px at y 646) dropped — the pipeline drops <p>&nbsp;</p> and <p><br></p> too; a section table Δh of that size is this: model the rhythm in the section style or file it as a deviation (--keep-spacers writes a zero-width-space paragraph, an anti-pattern METHOD names)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/hero/hero.css: 1 section(s)\nblocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 6 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 2.8,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 6316\nprototype (gate this): http://localhost:8968/revlon-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-revlon-lite-machine-case/proto/revlon-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-revlon-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 49.5,
+     "exit": 0,
+     "ok": true,
+     "out": "capture: the page re-lays itself out when the viewport grows (7 box(es) moved) — stitched instead of one shot\ncapture: the page re-lays itself out when the viewport grows (16 box(es) moved) — stitched instead of one shot\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler\ncap-probe: overlay dismissed via [aria-label*=\"close\" i]"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 56.61,
+     "dh": -3587,
+     "ok": 0,
+     "n": 5
+    },
+    {
+     "W": 1440,
+     "pct": 58.76,
+     "dh": -2539,
+     "ok": 0,
+     "n": 5
+    },
+    {
+     "W": 2560,
+     "pct": 43.22,
+     "dh": -2539,
+     "ok": 0,
+     "n": 5
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 14.5,
+     "compare": 0.5,
+     "sections": 0.2,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 15,
+     "compare": 1.3,
+     "sections": 0.6,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 14.3,
+     "compare": 2.1,
+     "sections": 0.9,
+     "liveSplit": "cached"
+    }
+   }
+  },
+  {
+   "site": "sdt-santanderus-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.santanderus.com/",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "3   NEW       columns · 1 × 2                          2/2      3      default recipe: the Block Collection's columns shape (no recipe in blocks.json); NEW drafted through the colle\n4   NEW       carousel · 3 × 2                         6/6      13     default recipe: the Block Collection's carousel shape (no recipe in blocks.json); NEW drafted through the coll\n4 sections → /Users/paolo/stardust/bench/c6/sdt-santanderus-lite-machine-case/doc/santanderus-home.html (60 texts, 3 block sections, 1 default, 3 new)\nauthor: 3 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/columns/columns.css: 1 section(s)\nblocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 10 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 2.5,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 4730\nprototype (gate this): http://localhost:8969/santanderus-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-santanderus-lite-machine-case/proto/santanderus-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-santanderus-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 45.4,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached, build 8.1 s, compare 0.5 s, sections 0.2 s | 1440: live cached, build 9.9 s, compare 1.5 s, sections 0.7 s | 2560: live cached, build 9.5 s, compare 2.4 s, sections 1 s | cap-probe 18.3 s, sections pass 8.4 s, pair 0 s | total 45.4 s\nevidence: /Users/paolo/stardust/bench/c6/sdt-santanderus-lite-machine-case/gate/\nsite: /Users/paolo/stardust/bench/c6/sdt-santanderus-lite-machine-case/migration/site.json\ncap-probe: overlay dismissed via #js-close-cookies"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 54.02,
+     "dh": -258,
+     "ok": 0,
+     "n": 4
+    },
+    {
+     "W": 1440,
+     "pct": 52.02,
+     "dh": -1336,
+     "ok": 0,
+     "n": 4
+    },
+    {
+     "W": 2560,
+     "pct": 46.15,
+     "dh": -1336,
+     "ok": 0,
+     "n": 4
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 8.1,
+     "compare": 0.5,
+     "sections": 0.2,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 9.9,
+     "compare": 1.5,
+     "sections": 0.7,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 9.5,
+     "compare": 2.4,
+     "sections": 1,
+     "liveSplit": "cached"
+    }
+   }
+  },
+  {
+   "site": "sdt-sherwinwilliams-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.sherwin-williams.com/",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 3,
+     "ok": true,
+     "out": "author: 1 media source(s) not in the manifest — kept as source URLs:\n  data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\nauthor: 3 empty spacer paragraph(s) in the source (28 px at y 3873, 28 px at y 3905, 28 px at y 3873) dropped — the pipeline drops <p>&nbsp;</p> and <p><br></p> too; a section table Δh of that size is this: model the rhythm in the section style or file it as a deviation (--keep-spacers writes a zero-width-space paragraph, an anti-pattern METHOD names)\nauthor: a NEW section was emitted as default content — triage it (name the block, write its recipe), then run author again (exit 3)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/cards/cards.css: 2 section(s)\nblocks/columns/columns.css: 1 section(s)\nblocks/header/header.css: 1 section(s)\nstyles/sections-draft.css: 16 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 3.6,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 11733\nprototype (gate this): http://localhost:8970/sherwinwilliams-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-sherwinwilliams-lite-machine-case/proto/sherwinwilliams-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-sherwinwilliams-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 54.8,
+     "exit": 0,
+     "ok": true,
+     "out": "tables: 18 row(s) off, 6 new sections — 360 #1 Δh -195 (default); 360 #2 \"Explore Color\" Δh -40 (accordion, new); 360 #3 \"Top Colors\" Δh -8 (carousel, new); 360 #4 \"Every client, every \" Δh -1753 (accordion, new); 360 #5 \"All the brands you l\" Δh +294 (cards, new); 360 #6 \"Get to know our Comp\" Δh -98 (columns, new); 1440 #1 Δh +24 (default); 1440 #2 \"Explore Color\" Δh +273 (accordion, new); 1440 #3 \"Top Colors\" Δh +43 (carousel, new); 1440 #4 \"Every client, every \" Δh -1946 (accordion, new); 1440 #5 \"All the brands you l\" Δh +4824 (cards, new); 1440 #6 \"Get to know our Comp\" Δh +30 (columns, new); 2560 #1 Δh -315 (default); 2560 #2 \"Explore Color\" Δh +273 (accordion, new); 2560 #3 \"Top Colors\" Δh -53 (carousel, new); 2560 #4 \"Every client, every \" Δh -1946 (accordion, new); 2560 #5 \"All the brands you l\" Δh +4889 (cards, new); 2560 #6 \"Get to know our Comp\" Δh +30 (columns, new); new: #2 \"Explore Color\" (accordion), #3 \"Top Colors\" (carousel), #4 \"Every client, every contract\" (accordion), #5 \"All the brands you love.\" (cards), #6 \"Get to know our Company\" (columns), #7 \"DIV container responsivegrid\" (cards) — a new section takes the full gate at the three widths\ntiming (stitch, live and build concurrent): 360: live cached, build 8.3 s, compare 0.6 s, sections 0.2 s | 1440: live cached, build 9.8 s, compare 2.1 s, sections 0.9 s | 2560: live cached, build 10.1 s, compare 3.1 s, sections 1.3 s | cap-probe 22.9 s, sections pass 8.9 s, pair 0 s | total 54.7 s\nevidence: /Users/paolo/stardust/bench/c6/sdt-sherwinwilliams-lite-machine-case/gate/\nsite: /Users/paolo/stardust/bench/c6/sdt-sherwinwilliams-lite-machine-case/migration/site.json"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 37.78,
+     "dh": -3895,
+     "ok": 0,
+     "n": 8
+    },
+    {
+     "W": 1440,
+     "pct": 49.06,
+     "dh": -5652,
+     "ok": 0,
+     "n": 8
+    },
+    {
+     "W": 2560,
+     "pct": 37.68,
+     "dh": -5282,
+     "ok": 0,
+     "n": 8
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 8.3,
+     "compare": 0.6,
+     "sections": 0.2,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 9.8,
+     "compare": 2.1,
+     "sections": 0.9,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 10.1,
+     "compare": 3.1,
+     "sections": 1.3,
+     "liveSplit": "cached"
+    }
+   }
+  },
+  {
+   "site": "sdt-toryburch-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.toryburch.com/en-us/",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 3,
+     "ok": true,
+     "out": "5   NEW       —                                        —        3      NEW section: emitted as default content; triage it first (exit 3)\n5 sections → /Users/paolo/stardust/bench/c6/sdt-toryburch-lite-machine-case/doc/toryburch-home.html (79 texts, 3 block sections, 1 default, 4 new)\nauthor: video without a source (a player — video): author its poster picture and mp4 link by hand\nauthor: a NEW section was emitted as default content — triage it (name the block, write its recipe), then run author again (exit 3)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/cards/cards.css: 1 section(s)\nblocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 9 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 2.7,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 5993\nprototype (gate this): http://localhost:8971/toryburch-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-toryburch-lite-machine-case/proto/toryburch-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-toryburch-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 77.8,
+     "exit": 0,
+     "ok": true,
+     "out": "evidence: /Users/paolo/stardust/bench/c6/sdt-toryburch-lite-machine-case/gate/\nsite: /Users/paolo/stardust/bench/c6/sdt-toryburch-lite-machine-case/migration/site.json\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler\ncap-probe: overlay dismissed via [data-id=\"LocalePopupCloseButton\"]"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 65.33,
+     "dh": -28,
+     "ok": 0,
+     "n": 5
+    },
+    {
+     "W": 1440,
+     "pct": 82.19,
+     "dh": -1426,
+     "ok": 0,
+     "n": 5
+    },
+    {
+     "W": 2560,
+     "pct": 61.72,
+     "dh": 194,
+     "ok": 0,
+     "n": 5
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 10.6,
+     "compare": 0.6,
+     "sections": 0.2,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 20.7,
+     "compare": 2.3,
+     "sections": 1.3,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 21,
+     "compare": 4.6,
+     "sections": 2.5,
+     "liveSplit": "cached"
+    }
+   }
+  },
+  {
+   "site": "sdt-unitedrentals-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.unitedrentals.com/",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "10  NEW       columns · 1 × 2                          2/2      6      default recipe: the Block Collection's columns shape (no recipe in blocks.json); NEW drafted through the colle\n10 sections → /Users/paolo/stardust/bench/c6/sdt-unitedrentals-lite-machine-case/doc/unitedrentals-home.html (306 texts, 9 block sections, 1 default, 9 new)\nauthor: 2 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)\nauthor: 1 empty spacer paragraph(s) in the source (40 px at y 352) dropped — the pipeline drops <p>&nbsp;</p> and <p><br></p> too; a section table Δh of that size is this: model the rhythm in the section style or file it as a deviation (--keep-spacers writes a zero-width-space paragraph, an anti-pattern METHOD names)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/cards/cards.css: 3 section(s)\nblocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 20 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 3,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 9723\nprototype (gate this): http://localhost:8972/unitedrentals-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-unitedrentals-lite-machine-case/proto/unitedrentals-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-unitedrentals-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 58.7,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached, build 13.5 s, compare 0.7 s, sections 0.3 s | 1440: live cached, build 8.9 s, compare 2 s, sections 1 s | 2560: live cached, build 12.7 s, compare 4.1 s, sections 1.9 s | cap-probe 21.4 s, sections pass 8.9 s, pair 0 s | total 58.7 s\nevidence: /Users/paolo/stardust/bench/c6/sdt-unitedrentals-lite-machine-case/gate/\nsite: /Users/paolo/stardust/bench/c6/sdt-unitedrentals-lite-machine-case/migration/site.json\ncap-probe: overlay dismissed via #onetrust-reject-all-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 43.5,
+     "dh": -5986,
+     "ok": 1,
+     "n": 10
+    },
+    {
+     "W": 1440,
+     "pct": 47.51,
+     "dh": -3381,
+     "ok": 0,
+     "n": 10
+    },
+    {
+     "W": 2560,
+     "pct": 45.93,
+     "dh": -3665,
+     "ok": 0,
+     "n": 10
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 13.5,
+     "compare": 0.7,
+     "sections": 0.3,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 8.9,
+     "compare": 2,
+     "sections": 1,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 12.7,
+     "compare": 4.1,
+     "sections": 1.9,
+     "liveSplit": "cached"
+    }
+   }
+  },
+  {
+   "site": "sdt-waters-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.waters.com/nextgen/us/en.html",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "9   NEW       accordion · 4 × 2                        4/8      5      default recipe: the Block Collection's accordion shape (no recipe in blocks.json); NEW drafted through the col\n11  NEW       columns · 1 × 2                          2/2      2      default recipe: the Block Collection's columns shape (no recipe in blocks.json); NEW drafted through the colle\n7 sections → /Users/paolo/stardust/bench/c6/sdt-waters-lite-machine-case/doc/waters-home.html (137 texts, 6 block sections, 1 default, 6 new)\nauthor: 14 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/accordion/accordion.css: 3 section(s)\nblocks/columns/columns.css: 1 section(s)\nblocks/header/header.css: 1 section(s)\nstyles/sections-draft.css: 12 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 23.9,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 7497\nprototype (gate this): http://localhost:8973/waters-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-waters-lite-machine-case/proto/waters-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-waters-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 71.9,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached, build 9.6 s, compare 1.4 s, sections 0.3 s | 1440: live cached, build 10.3 s, compare 1.9 s, sections 0.6 s | 2560: live cached, build 12.2 s, compare 3 s, sections 1 s | cap-probe 27.1 s, sections pass 17.7 s, pair 0 s | total 71.8 s\nevidence: /Users/paolo/stardust/bench/c6/sdt-waters-lite-machine-case/gate/\nsite: /Users/paolo/stardust/bench/c6/sdt-waters-lite-machine-case/migration/site.json\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 53.24,
+     "dh": -563,
+     "ok": 0,
+     "n": 7
+    },
+    {
+     "W": 1440,
+     "pct": 38.9,
+     "dh": -4030,
+     "ok": 0,
+     "n": 7
+    },
+    {
+     "W": 2560,
+     "pct": 31.67,
+     "dh": -5724,
+     "ok": 3,
+     "n": 7
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 9.6,
+     "compare": 1.4,
+     "sections": 0.3,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 10.3,
+     "compare": 1.9,
+     "sections": 0.6,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 12.2,
+     "compare": 3,
+     "sections": 1,
+     "liveSplit": "cached"
+    }
+   }
+  },
+  {
+   "site": "sdt-wpp-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.wpp.com/en",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "5   default   —                                        —        6      1 control(s) dropped (buttons / inputs)\n6   NEW       carousel · 9 × 2                         17/18    19     default recipe: the Block Collection's carousel shape (no recipe in blocks.json); NEW drafted through the coll\n6 sections → /Users/paolo/stardust/bench/c6/sdt-wpp-lite-machine-case/doc/wpp-home.html (86 texts, 4 block sections, 2 default, 4 new)\nauthor: 1 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/carousel/carousel.css: 2 section(s)\nblocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 11 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 4,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 14626\nprototype (gate this): http://localhost:8974/wpp-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-wpp-lite-machine-case/proto/wpp-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-wpp-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 68.6,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached, build 10.9 s, compare 0.6 s, sections 0.2 s | 1440: live cached, build 16.1 s, compare 3.6 s, sections 2.1 s | 2560: live cached, build 16.7 s, compare 4.9 s, sections 2.6 s | cap-probe 22.7 s, sections pass 9.1 s, pair 0 s | total 68.5 s\nevidence: /Users/paolo/stardust/bench/c6/sdt-wpp-lite-machine-case/gate/\nsite: /Users/paolo/stardust/bench/c6/sdt-wpp-lite-machine-case/migration/site.json\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 52.18,
+     "dh": 1485,
+     "ok": 0,
+     "n": 6
+    },
+    {
+     "W": 1440,
+     "pct": 75.57,
+     "dh": -7612,
+     "ok": 0,
+     "n": 6
+    },
+    {
+     "W": 2560,
+     "pct": 52.69,
+     "dh": -7612,
+     "ok": 0,
+     "n": 6
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 10.9,
+     "compare": 0.6,
+     "sections": 0.2,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 16.1,
+     "compare": 3.6,
+     "sections": 2.1,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 16.7,
+     "compare": 4.9,
+     "sections": 2.6,
+     "liveSplit": "cached"
+    }
+   }
+  },
+  {
+   "site": "sdt-wyndham-lite",
+   "mode": "machine",
+   "triage": "case",
+   "url": "https://www.wyndhamhotels.com/en-uk",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /Users/paolo/stardust/bench/code-c6/METHOD.md, rollout at /Users/paolo/stardust/bench/code-c6/ROLLOUT.md)\nstardust-lite: .gitignore keeps measure/, gate*/, media/ and proto/ out of git\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "12  NEW       hero · 1 × 1                             1/1      4      default recipe: the Block Collection's hero shape (no recipe in blocks.json); NEW drafted through the collecti\n13  default   —                                        —        4      \n12 sections → /Users/paolo/stardust/bench/c6/sdt-wyndham-lite-machine-case/doc/wyndham-home.html (265 texts, 7 block sections, 5 default, 7 new)\nauthor: 7 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 20 rule(s)\nspec-to-css: section 0 (carousel) — no live section pairs with the triage row's spec box; skipped\nspec-to-css: section 1 (carousel) — no live section pairs with the triage row's spec box; skipped"
+    },
+    {
+     "step": "harness",
+     "seconds": 6,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 23403\nprototype (gate this): http://localhost:8975/wyndham-home.harness.html\nserialised (review):   /Users/paolo/stardust/bench/c6/sdt-wyndham-lite-machine-case/proto/wyndham-home.html\nsite: /Users/paolo/stardust/bench/c6/sdt-wyndham-lite-machine-case/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 83.2,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached, build 10.3 s, compare 0.8 s, sections 0.4 s | 1440: live cached, build 12.4 s, compare 2.9 s, sections 1.4 s | 2560: live cached, build 23 s, compare 5.4 s, sections 2.6 s | cap-probe 27.4 s, sections pass 9.9 s, pair 0 s | total 83.1 s\nevidence: /Users/paolo/stardust/bench/c6/sdt-wyndham-lite-machine-case/gate/\nsite: /Users/paolo/stardust/bench/c6/sdt-wyndham-lite-machine-case/migration/site.json\ncap-probe: overlay dismissed via #ensAcceptAll"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 54.68,
+     "dh": -12757,
+     "ok": 0,
+     "n": 12
+    },
+    {
+     "W": 1440,
+     "pct": 74.35,
+     "dh": -16315,
+     "ok": 0,
+     "n": 12
+    },
+    {
+     "W": 2560,
+     "pct": 75.47,
+     "dh": -16896,
+     "ok": 0,
+     "n": 12
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 10.3,
+     "compare": 0.8,
+     "sections": 0.4,
+     "liveSplit": "cached"
+    },
+    "1440": {
+     "live": 0,
+     "build": 12.4,
+     "compare": 2.9,
+     "sections": 1.4,
+     "liveSplit": "cached"
+    },
+    "2560": {
+     "live": 0,
+     "build": 23,
+     "compare": 5.4,
+     "sections": 2.6,
+     "liveSplit": "cached"
+    }
+   }
+  }
+ ]
+}
