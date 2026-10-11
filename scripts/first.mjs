@@ -95,7 +95,7 @@ if (!skip.has('css')) {
   if (!existsSync(join('styles', 'elements.css'))) writeFileSync(join('styles', 'elements.css'), '/* style-pass writes the element pass here */\n');
 }
 // 7 the prototype and the first round at the three widths
-const h = step('harness', S('harness'), [doc, '--serve', 'proto', '--name', slug, '--port', String(port), '--fragments', host, '--content', content, '--site-repo', '.', '--no-lint', ...(existsSync(media) ? ['--local-media', media] : [])], { show: 0, note: (r) => [(/(\d+) blocks? loaded/.exec(r.stdout) || [])[0], (/doc height (\d+)/.exec(r.stdout) || [])[0], (/(\d+) text.*not in the capture/.exec(`${r.stdout}${r.stderr}`) || [])[0]].filter(Boolean).join(' · ') });
+const h = step('harness', S('harness'), [doc, '--serve', 'proto', '--name', slug, '--port', String(port), '--fragments', host, '--content', content, '--site-repo', '.', '--no-lint', ...(existsSync(media) ? ['--local-media', media] : []), ...(noDa ? [] : ['--sync-chrome'])], { show: 0, note: (r) => [(/(\d+) blocks? loaded/.exec(r.stdout) || [])[0], (/doc height (\d+)/.exec(r.stdout) || [])[0], (/(\d+) text.*not in the capture/.exec(`${r.stdout}${r.stderr}`) || [])[0]].filter(Boolean).join(' · ') });
 if (h.status) finish(1, 'first: the harness failed — read its output above');
 // the element pass is opt-in: on bms's replay it moved the first round 33.9 / 30.1 / 17.3 → 35.5 / 30.7 / 17.6 (the first round's error is layout,
 // not type) — kept as an instrument, not a default step
