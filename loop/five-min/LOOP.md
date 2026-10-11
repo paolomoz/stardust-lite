@@ -19,6 +19,7 @@ McGraw Hill, Santander US, United Rentals, Telus, RBC, Wyndham, Waters, Omnicom,
 | I1 | si.edu home | 35f9b73 | 17.3 | never | 56.8 | 10 | 103–119 | 37.9 / 26.6 to close (119) | capture unstable, polish past the target |
 | I2 | acs.org about | d58b9f8 | 15.8 | 35.1 | 38.1 | 8 | 75–79 | 16.4 / 21.7 (108) | CSS by hand 10 min, WAF fonts, document repair |
 | I3 | continental.com en | 0decf6c | 11.2 | 25.1 | 27.8 | 7 | 57–64 | 14.3 / 11.6 (102) | rounds (7 × ≈ 2 min), ≈ 100 turns, document repair |
+| L7 | wpp.com en | 07bd330 (generated CSS imported first, chrome from triage rows, block folders, section guess) | 3.4 (59 / 76 / 53 %) | **9.7** | 12.0 | 1 | 48 | own ≈ 5.4 min, tools 4.3 to stop | one `first` (204 s: the media upload 58 s on the critical path), one round; the agent's pass ≈ 5 min — the drafts' block layouts wrong (a spanning first card, a bleeding slider, a fixed bottom pill header), headings authored one paragraph per line |
 | L6 | equitable.com | 36c5b34 (token file, section boxes at specificity 0, gif still, protocol: work from the digest) | 4.5 after 3 × `first` (34 / 39 / 46 %) | **12.0** | 13.6 | 3 | 31 | own ≈ 7 min, tools 5.2 to stop | the section guess (2 re-runs ≈ 3 min), empty nav / footer documents (≈ 3 min), the section boxes at specificity 0 losing to the foundation and the drafts winning ties over the agent's rules (2 of 3 rounds); the agent's CSS pass down to 4.9 min with the digest-first protocol |
 | L5 | bms.com | 54f7deb (triage drop, edited triage applied, block sections kept, nav by position) | 2.5 (34 / 30 / 17 %) | 18.8 | 20.8 | 4 | 35–37 | own ≈ 13.8 min, tools 5.0 to stop | one `first`, a better first round; the agent's CSS pass ≈ 12 min (4.5 reading spec rows at three widths, 3 writing); a lost DA_TOKEN in a new shell, 360 paddings in block files, a 49.6 MB gif |
 | L4 | deloitte.com us | c9bd927 (modals hidden, videos at frame 0) | 6.9 after 3 × `first` (81 / 91 / 91 %) | 21.2 | 23.8 | 3 | 40–46 | own ≈ 13.6 min, tools 7.6 to stop | the split: a nested grid picked, a header row in main that triage.md could not drop, `first --skip` re-running triage over the edit, the harness silently dropping an empty video section (≈ 8 min together); reading + writing the CSS ≈ 7.5 min |
@@ -65,3 +66,10 @@ Change: daToken() reads the aem token file; oversized gifs as their first frame;
 fix what the digest names, read spec rows only for those sections. Result on equitable: stop at 12.0 — the agent's own CSS pass 4.9 min (12 on
 bms). The `:where()` part backfired (the foundation's `main > .section` padding won; the drafts still beat the agent's same-specificity rules
 by order): reverted in iteration 7 for an ordering fix (generated CSS in its own files, imported first). Keep the rest.
+
+### L7 — generated CSS imported first, chrome from triage rows, block folders, a deeper section guess
+Change: sections-draft.css / elements.css imported at the top of styles.css (:where reverted); style-pass tried and kept opt-in (bms replay:
+33.9 / 30.1 / 17.3 → 35.5 / 30.7 / 17.6, no gain); rows marked header / footer become the chrome documents; bare block names in triage.md;
+the harness creates a missing block folder; first reuses its own serve; the section guess descends into a dominant child. Result on wpp: one
+`first`, one round, stop at 9.7. Keep. Next: the media upload off the critical path (da-put six at a time), the split of tall containers
+(A/B on the bench), the 2-widths probe.
