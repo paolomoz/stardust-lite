@@ -171,6 +171,25 @@ export async function hideModals(page) {
   return hidden;
 }
 
+/** Carousels back on slide 1 and paused: an autoplaying carousel was caught on another slide at each width (mheducation: slide 2 at 1440 /
+ * 2560, slide 3 at 360 — the reader lands on slide 1; 360 never reached the target) — the libraries' own APIs (Swiper, Splide, slick,
+ * Bootstrap, Flickity), the first pagination control, then every pending timer cleared (the autoplay). The readings and the capture follow. */
+export async function rewindCarousels(page) {
+  const n = await page.evaluate(() => {
+    let hits = 0; const tryIt = (f) => { try { if (f() !== false) hits += 1; } catch { /* not this library */ } };
+    document.querySelectorAll('.swiper, .swiper-container').forEach((el) => tryIt(() => { if (!el.swiper) return false; el.swiper.autoplay?.stop?.(); el.swiper.slideTo?.(0, 0); return true; }));
+    document.querySelectorAll('.splide').forEach((el) => tryIt(() => { if (!el.splide) return false; el.splide.Components?.Autoplay?.pause?.(); el.splide.go?.(0); return true; }));
+    tryIt(() => { if (!window.jQuery || !window.jQuery.fn?.slick) return false; window.jQuery('.slick-initialized').each(function each() { window.jQuery(this).slick('slickPause'); window.jQuery(this).slick('slickGoTo', 0, true); }); return true; });
+    tryIt(() => { if (!window.bootstrap?.Carousel) return false; document.querySelectorAll('.carousel').forEach((el) => { const c = window.bootstrap.Carousel.getInstance(el); c?.pause(); c?.to(0); }); return true; });
+    tryIt(() => { if (!window.Flickity) return false; document.querySelectorAll('.flickity-enabled').forEach((el) => { const f = window.Flickity.data(el); f?.stopPlayer?.(); f?.select?.(0, false, true); }); return true; });
+    document.querySelectorAll('[aria-label="Go to slide 1"], [aria-label="Slide 1"], .swiper-pagination-bullet:first-child, .slick-dots li:first-child button, .glide__bullet:first-child, .tns-nav button:first-child, .splide__pagination__page:first-of-type, .carousel-indicators [data-bs-slide-to="0"], .owl-dot:first-child').forEach((d) => tryIt(() => { d.click(); return true; }));
+    let id = window.setTimeout(() => {}, 0); while (id-- > 0) { window.clearTimeout(id); window.clearInterval(id); }
+    return hits;
+  }).catch(() => 0);
+  if (n) await page.waitForTimeout(700);
+  return n;
+}
+
 export async function settle(page, step = 600, pause = 120, rest = 1500) {
   await unrollScroller(page);
   await page.evaluate(async ({ step, pause, rest }) => {
@@ -186,6 +205,7 @@ export async function settle(page, step = 600, pause = 120, rest = 1500) {
     await Promise.race([Promise.all(document.getAnimations().filter((a) => a.playState === 'running' && finite(a)).map((a) => a.finished.catch(() => {}))), timeout(3000)]);
   }, { step, pause, rest });
   await hideModals(page); // a modal that opened during the settle (a delayed newsletter layer)
+  await rewindCarousels(page);
 }
 
 /** Browser-side composed-tree helpers, to be passed into page.evaluate as source (web-component origins keep their paint, boxes and
