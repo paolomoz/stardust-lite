@@ -75,7 +75,8 @@ function unitOf(items, W, contentW) {
     const gap = xs.length > 1 ? xs[1] - xs[0] - m[0].box[2] : null; const ys = [...new Set(m.map((it) => it.box[1]))].sort((a, b) => a - b);
     let first = m[0]; let h = m[0].box[3];
     if (synth) { const b = m[0].box; const nextY = ys.length > 1 ? ys[1] : Infinity; const col = items.filter((o) => o.k !== 'paint' && onPage(o, W) && o.box[0] >= b[0] - 1 && o.box[0] + o.box[2] <= b[0] + b[2] + 1 && o.box[1] >= b[1] && o.box[1] < nextY); h = Math.max(...col.map((o) => o.box[1] + o.box[3])) - b[1]; first = { tag: 'div', cls: '(image column)', box: [b[0], b[1], b[2], h] }; }
-    return { w: m[0].box[2], h, n: m.length, perRow: xs.length, gap, first, rowGap: ys.length > 1 ? ys[1] - ys[0] - h : null };
+    const overflow = m.some((it) => Math.abs(it.box[1] - m[0].box[1]) <= 2 && (it.box[0] + it.box[2] > W + 1 || it.box[0] < -1)); // a unit beyond the viewport on the first row: a slider track
+    return { w: m[0].box[2], h, n: m.length, perRow: xs.length, gap, first, rowGap: ys.length > 1 ? ys[1] - ys[0] - h : null, overflow };
   };
   const cands = count(items.filter((it) => it.k === 'paint' && onPage(it, W) && !isCtl(it) && it.box[2] < (contentW || W) * 0.8 && it.box[3] >= 40 && it.box[2] >= 80 && holds(it)).map((it) => `${it.box[2]}×${it.box[3]}`)).filter(([, n]) => n >= 2);
   if (cands.length) {
@@ -136,7 +137,11 @@ rows.forEach((row, i) => {
     if (contentW && pageCap && Math.abs(contentW - pageCap) > 8) lines.push(`${sel} { max-width: ${px(contentW)}; margin: 0 auto; }  /* content x ${r[0]}..${r[1]} (the page cap is ${pageCap}) */`);
     const u = unitOf(items, base, contentW);
     if (u) {
-      lines.push(`${sel} { display: grid; grid-template-columns: repeat(${u.perRow}, minmax(0, 1fr)); ${u.gap !== null ? `column-gap: ${px(u.gap)}; ` : ''}${u.rowGap !== null ? `row-gap: ${px(u.rowGap)}; ` : ''}}  /* unit ${u.n} × ${u.w}×${u.h} (${u.first.tag}.${String(u.first.cls).split(' ')[0]}), ${u.perRow} per row, first at y${u.first.box[1]} */`);
+      // a carousel (the block, or units running past the viewport): ONE row of measured slides, the rest off-screen — a grid of perRow columns
+      // wrapped the slides into rows (revlon's best sellers, wpp's slider, sherwin-williams' hero)
+      const slider = u.overflow || (classes || []).includes('carousel');
+      if (slider) lines.push(`${sel} { display: grid; grid-auto-flow: column; grid-auto-columns: ${px(u.w)}; ${u.gap !== null ? `column-gap: ${px(u.gap)}; ` : ''}overflow: hidden; }  /* a slider track: unit ${u.n} × ${u.w}×${u.h}, ${u.perRow} in view, first at x${u.first.box[0]} y${u.first.box[1]} */`);
+      else lines.push(`${sel} { display: grid; grid-template-columns: repeat(${u.perRow}, minmax(0, 1fr)); ${u.gap !== null ? `column-gap: ${px(u.gap)}; ` : ''}${u.rowGap !== null ? `row-gap: ${px(u.rowGap)}; ` : ''}}  /* unit ${u.n} × ${u.w}×${u.h} (${u.first.tag}.${String(u.first.cls).split(' ')[0]}), ${u.perRow} per row, first at y${u.first.box[1]} */`);
       const f = u.first; const cardDecl = [...(f.bg ? [`background: ${rgb(f.bg)}`] : []), ...(f.br ? [`border-radius: ${f.br}`] : []), ...(f.border ? [`border: ${String(f.border).split(' | ')[0]}`] : []), ...(f.pad && f.pad !== '0px' ? [`padding: ${f.pad}`] : []), ...(f.shadow ? [`box-shadow: ${f.shadow}`] : [])];
       if (cardDecl.length) lines.push(`${sel} > div { ${cardDecl.join('; ')}; }  /* the unit's own paint */`);
       // the unit's INNER inset: the texts' offset from the card's edges (and from its picture's bottom) is the text cell's padding — the
@@ -187,7 +192,8 @@ rows.forEach((row, i) => {
       const prevSigs = new Map(textRules(items, base, sel).map((t) => [t.tag, t.sig])); const mt = textRules(mi, mobile, `  ${sel}`, prevSigs);
       const mob = [];
       const [mTop, mBottom] = padOf(m, m.items.filter((it) => onPage(it, mobile))); if (mTop !== null && (mTop !== padTop || mBottom !== padBottom)) { const rule = `${sectionSel} { padding: ${px(mTop)} 0 ${px(mBottom)}; }  /* edge → first / last content at ${mobile} */`; if (classes) sectionsDraft.push(`@media (max-width: ${bp - 1}px) { ${rule} }`); else mob.push(`  ${rule}`); } // a block section's mobile padding with its base padding in sections-draft — in the block file it was lost on a rewrite (bms)
-      if (u && (!mu || mu.perRow !== u.perRow)) mob.push(`  ${sel} { grid-template-columns: ${mu ? `repeat(${mu.perRow}, minmax(0, 1fr))` : '1fr'};${mu && mu.rowGap !== null ? ` row-gap: ${px(mu.rowGap)};` : ''} }  /* unit ${mu ? `${mu.n} × ${mu.w}×${mu.h}, ${mu.perRow} per row` : 'stacked'} at ${mobile} */`);
+      if (u && mu && (u.overflow || (classes || []).includes('carousel'))) mob.push(`  ${sel} { grid-auto-columns: ${px(mu.w)};${mu.gap !== null ? ` column-gap: ${px(mu.gap)};` : ''} }  /* the slide at ${mobile}: ${mu.w}×${mu.h} */`);
+      else if (u && (!mu || mu.perRow !== u.perRow)) mob.push(`  ${sel} { grid-template-columns: ${mu ? `repeat(${mu.perRow}, minmax(0, 1fr))` : '1fr'};${mu && mu.rowGap !== null ? ` row-gap: ${px(mu.rowGap)};` : ''} }  /* unit ${mu ? `${mu.n} × ${mu.w}×${mu.h}, ${mu.perRow} per row` : 'stacked'} at ${mobile} */`);
       mob.push(...mt.map((t) => t.css)); mob.push(...mediaRules(mi, mobile, `  ${sel}`).filter((x) => !mediaRules(items, base, sel).map((y) => y.replace(sel, '')).includes(x.replace(`  ${sel}`, ''))));
       if (mob.length) lines.push(`@media (max-width: ${bp - 1}px) {  /* the source's breakpoint ${bp} (media queries by count: ${(summary.breakpoints || []).slice(0, 3).join(', ') || 'unknown — 900 assumed'}) */\n${mob.join('\n')}\n}`);
     }
