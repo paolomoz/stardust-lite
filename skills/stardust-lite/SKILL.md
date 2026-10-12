@@ -1,6 +1,6 @@
 ---
 name: stardust-lite
-description: Migrate one web page to AEM Edge Delivery Services with high fidelity, blocks-first — set up the site repo, open a live-reloading view of the prototype in the browser, measure the source at three widths, triage the content model (David's Model), author the document, write the blocks, gate the runtime prototype pixel-by-pixel until every width is under 10 %, optionally deploy to DA and gate the served page. Use when asked to "migrate <url> with stardust-lite", to migrate, replicate or prototype a page in EDS with a fidelity number.
+description: Migrate one web page to AEM Edge Delivery Services with high fidelity, blocks-first, inside the EDS site repo the session works in — open a live-reloading view of the prototype in the browser, measure the source at three widths, triage the content model (David's Model), author the document, write the blocks, gate the runtime prototype pixel-by-pixel until every width is under 10 %, optionally deploy to DA and gate the served page. Use when asked to "migrate <url> with stardust-lite", to migrate, replicate or prototype a page in EDS with a fidelity number.
 ---
 
 # stardust-lite — one page, from a URL to a gated prototype
@@ -10,25 +10,27 @@ The method lives in this plugin: `${CLAUDE_PLUGIN_ROOT}/CHECKLIST.md` (twelve st
 the open rows of `${CLAUDE_PLUGIN_ROOT}/BACKLOG.md` (`grep -n '| open'`; cite, do not re-solve). The instruments run inside the site repo
 as `npx stardust-lite <name>` once step 1 has installed them (`npx stardust-lite list --usage` prints every usage line).
 
-## 0. Read the request
+## 0. The context: an EDS site repo
 
-- **URL** — the page. **Mode** — `prototype` (default: a local repo, nothing published) or `eds` when the user says deploy / EDS / DA /
-  publish / preview. Publishing is outward-facing: never pick `eds` on your own.
-- **Site name** `sdt-<domain label>` (bmc.com → `sdt-bmc`), **page slug** `<label>-<last path segment | home>`. Do not ask unless the
-  user's words conflict with these; say what you picked.
-- **Directory**: next to the git repo the session starts in (`$(git rev-parse --show-toplevel)/../<site>`), else `./<site>`.
-  If it already exists with an `fstab.yaml`, this is a **second page of that site**: work on a new branch, and read ROLLOUT.md first
-  (a second `first` rewrites the first page's block CSS with `spec-to-css --force` — restore the shared files from git after it).
+stardust-lite works **inside an EDS site repo** — the session's working directory (or the repo the user names): the aem-boilerplate shape,
+`fstab.yaml` mounting `content.da.live/<org>/<site>/`, `scripts/aem.js`, `head.html`. The blocks, styles and the case evidence are written
+there; the branch host `https://<branch>--<site>--<org>.aem.page` is where a deploy is gated. This skill never creates that repo. If the
+working directory is not one, stop and tell the user: open the session in the site's EDS repo (or create it first — the `eds-new-site`
+skill, or a clone of `adobe/aem-boilerplate` with an `fstab.yaml`).
 
-## 1. The site repo (≈ 1 min)
+Read from the request and the repo:
+- **URL** — the page. **Slug** `<domain label>-<last path segment | home>`, **template** the last path segment or `home`. Say what you picked.
+- **Mode** — `prototype` (default: nothing leaves the machine; `first --no-da`) or `deploy` when the user says deploy / publish / preview /
+  DA. Publishing is outward-facing: never pick `deploy` on your own. `deploy` needs the repo on GitHub with AEM Code Sync and `DA_TOKEN`.
+- **A second page of a site that already has runs** (`migration/cases/` holds one): work on a new branch and read ROLLOUT.md first — a second
+  `first` rewrites the first page's block CSS with `spec-to-css --force`; restore the shared files from git after it.
 
-- `prototype`: `node ${CLAUDE_PLUGIN_ROOT}/bin/stardust-lite.mjs new <url> --dir <dir> --slug <slug>` — clones the aem-boilerplate on a
-  `proto` branch (no remote), writes a placeholder fstab, installs stardust-lite and Playwright's Chromium, copies the foundation, commits,
-  and prints the two commands below.
-- `eds`: create the repo first — the `eds-new-site` skill when it is available (it confirms the name and wires Code Sync), otherwise
-  `gh repo create <org>/<site> --template adobe/aem-boilerplate --private --clone`, an `fstab.yaml` mounting `content.da.live/<org>/<site>/`,
-  the AEM Code Sync app on the repo. Then the same `new <url> --dir <clone>` (it only installs into an existing repo), a branch, push, and
-  `npx stardust-lite sync-poll <host> . styles/styles.css --trigger <org>/<site>/<branch>`. Needs `DA_TOKEN` (Adobe IMS bearer) in the env.
+## 1. stardust-lite in the repo (≈ 30 s)
+
+From the site repo: `node ${CLAUDE_PLUGIN_ROOT}/bin/stardust-lite.mjs setup <url> [--slug <slug>] [--template <name>]`. It refuses a
+directory that is not an EDS site repo (exit 2 — stop as in step 0), installs stardust-lite and Playwright's Chromium, copies the foundation
+(over the boilerplate's styles only on a fresh repo), writes `migration/run.json`, commits, and prints the two commands below. In `deploy`
+mode work on a branch, push it, and `npx stardust-lite sync-poll <host> . styles/styles.css --trigger <org>/<site>/<branch>`.
 
 ## 2. The live view — before anything is measured
 
@@ -40,7 +42,7 @@ URL it printed. It is for eyes only — never gate its port; the gated page is t
 ## 3. The run
 
 Record `date -u +%FT%TZ` in `TIMING.log` (t0). Then `npx stardust-lite first <url> --slug <slug> --template <template>` (`--no-da` in
-`prototype` mode; with no branch host the chrome is folded locally by `local-fragments`). It measures, triages, authors, drafts the CSS,
+`prototype` mode; when the branch host serves no nav — a repo not synced yet — the chrome is folded locally by `local-fragments`). It measures, triages, authors, drafts the CSS,
 builds the prototype and runs round 1, and prints the exact harness / round commands to re-use. From there follow CHECKLIST steps 4–9:
 fix the model in the document (the draft is a draft — remodel it, lint it), write the block CSS from the brief and the spec rows, one round
 at a time, until `target 10 %: REACHED` at 360 / 1440 / 2560 → `stop:`. Stamp the stop in `TIMING.log`.
@@ -56,8 +58,8 @@ What the field runs paid for (read before the first round):
 ## 4. Close
 
 - `prototype`: write `migration/cases/<template>/` README, REPORT (clock, rounds table, lessons), REGISTER (triage, deviations with their
-  pixel cost, motion), LINT; commit locally. Offer `eds` as the next step.
-- `eds`: CHECKLIST steps 10–12 — media to DA **before** the document (DA stores `about:error` for an image not uploaded yet; check the served
+  pixel cost, motion), LINT; commit. Offer `deploy` as the next step.
+- `deploy`: CHECKLIST steps 10–12 — media to DA **before** the document (DA stores `about:error` for an image not uploaded yet; check the served
   `.plain.html` for it), the document to `drafts/`, push, `sync-poll`, gate the served page, `leak` on both, then the case documents.
   Quote file lists for `da-put` as separate arguments (zsh does not word-split a `$VAR`).
 

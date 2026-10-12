@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // stardust-lite — run the method's instruments from any project (the site repo being migrated).
-//   npx stardust-lite new <url> [--dir]    create the site repo for a run (local aem-boilerplate on `proto`, or install into an existing one)
+//   npx stardust-lite setup <url>          in an EDS site repo: install stardust-lite + Chromium, the foundation, run.json, the next commands
 //   npx stardust-lite init                 scaffold the skill stub, AGENTS.md section and migration/ case dir in the current repo
 //   npx stardust-lite init --foundation    also copy templates/foundation/ (scripts/stardust.js, styles/reset.css, styles.css, fonts.css) — never overwrites
 //   npx stardust-lite <instrument> [args]  run scripts/<instrument>.mjs or tools/replica/<instrument>.mjs (lint → tools/lint)
@@ -70,40 +70,39 @@ if (cmd === 'init') {
   }
   process.exit(0);
 }
-if (cmd === 'new') {
-  // the site repo a run works in, from nothing (node built-ins only: it runs from the plugin dir, before any `npm install`). Local by default —
-  // the aem-boilerplate on a `proto` branch, no remote, a placeholder fstab for `first`; an existing site repo (`--dir` with an fstab, e.g. one
-  // `eds-new-site` made) only gets stardust-lite installed. Then the foundation, one commit, and the commands to run next
-  // (bmc-home: ≈ 2 min of hand-typed setup; continental vision-mission: the same steps on an EDS repo).
+if (cmd === 'setup') {
+  // stardust-lite in the EDS site repo the session works in (node built-ins only: it runs from the plugin dir before any `npm install`).
+  // It never creates a repo — an EDS site repo is the run's context (the aem-boilerplate shape: fstab.yaml, scripts/aem.js, head.html) and
+  // its absence is a stop. It installs stardust-lite and Chromium, copies the foundation (over the boilerplate's styles only on a fresh
+  // repo: a site with earlier runs keeps its tuned files), writes migration/run.json, commits, and prints the next commands
+  // (bmc-home, continental vision-mission: ≈ 2 min of hand-typed setup each).
   const opt = (f, d) => { const i = rest.indexOf(f); return i >= 0 && rest[i + 1] && !rest[i + 1].startsWith('--') ? rest[i + 1] : d; };
   const url = rest.find((a) => /^https?:\/\//.test(a));
-  if (!url) { console.error('usage: stardust-lite new <url> [--dir <path>] [--slug <page-slug>] [--site <sdt-name>] [--ref <git-ref> | --from <local checkout>] [--template <name>]'); process.exit(1); }
-  const u = new URL(url); const host = u.hostname.replace(/^www\d?\./, ''); const base = host.split('.').slice(0, -1).join('-') || host;
-  const site = opt('--site', `sdt-${base}`); const segs = u.pathname.split('/').filter(Boolean).map((x) => x.replace(/\.[a-z]+$/i, ''));
+  if (!url) { console.error('usage: stardust-lite setup <url> [--dir <site-repo>] [--slug <page-slug>] [--template <name>] [--ref <git-ref> | --from <local checkout>]'); process.exit(1); }
+  const dir = resolve(opt('--dir', '.'));
+  const missing = ['fstab.yaml', 'scripts/aem.js', 'head.html'].filter((f) => !existsSync(join(dir, f)));
+  if (missing.length) { console.error(`stardust-lite setup: ${dir} is not an EDS site repo (no ${missing.join(', ')}). stardust-lite runs inside one — create it (the eds-new-site skill, or a clone of adobe/aem-boilerplate with an fstab.yaml) and open the session there.`); process.exit(2); }
+  const u = new URL(url); const base = u.hostname.replace(/^www\d?\./, '').split('.').slice(0, -1).join('-') || u.hostname;
+  const segs = u.pathname.split('/').filter(Boolean).map((x) => x.replace(/\.[a-z]+$/i, ''));
   const template = opt('--template', segs.length ? segs[segs.length - 1].toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'home');
-  const slug = opt('--slug', `${base}-${template}`); const dir = resolve(opt('--dir', site)); const ref = opt('--ref', 'main');
-  const sh = (c, a, o = {}) => { const r = spawnSync(c, a, { stdio: 'inherit', ...o }); if (r.status) { console.error(`stardust-lite new: ${c} ${a.join(' ')} failed (exit ${r.status})`); process.exit(r.status || 1); } };
-  const existing = existsSync(join(dir, 'fstab.yaml'));
-  if (!existing) {
-    if (existsSync(dir) && readdirSync(dir).length) { console.error(`stardust-lite new: ${dir} exists and is not a site repo (no fstab.yaml) — pass another --dir`); process.exit(1); }
-    sh('git', ['clone', '-q', '--depth', '1', 'https://github.com/adobe/aem-boilerplate.git', dir]);
-    sh('git', ['remote', 'remove', 'origin'], { cwd: dir }); sh('git', ['checkout', '-q', '-b', 'proto'], { cwd: dir });
-    writeFileSync(join(dir, 'fstab.yaml'), `mountpoints:\n  /: https://content.da.live/local/${site}/\n`);   // a placeholder: `first` reads org / site from it; no host answers
-  }
+  const slug = opt('--slug', `${base}-${template}`); const ref = opt('--ref', 'main'); const from = opt('--from', null);
+  const sh = (c, a) => { const r = spawnSync(c, a, { stdio: 'inherit', cwd: dir }); if (r.status) { console.error(`stardust-lite setup: ${c} ${a.join(' ')} failed (exit ${r.status})`); process.exit(r.status || 1); } };
+  const fresh = !existsSync(join(dir, 'migration')) && /roboto/.test(existsSync(join(dir, 'styles', 'styles.css')) ? readFileSync(join(dir, 'styles', 'styles.css'), 'utf8') : '');
   // --from <path>: a local stardust-lite checkout (a branch not pushed yet, the plugin's own copy) instead of the GitHub ref
-  const from = opt('--from', null);
-  sh('npm', ['i', '-D', '-q', '--no-audit', '--no-fund', '--legacy-peer-deps', from ? resolve(from) : `github:paolomoz/stardust-lite#${ref}`], { cwd: dir });
-  sh('npx', ['-y', 'playwright', 'install', 'chromium'], { cwd: dir });
-  sh('npx', ['stardust-lite', 'init', '--foundation', '--force'], { cwd: dir });
+  sh('npm', ['i', '-D', '-q', '--no-audit', '--no-fund', '--legacy-peer-deps', from ? resolve(from) : `github:paolomoz/stardust-lite#${ref}`]);
+  sh('npx', ['-y', 'playwright', 'install', 'chromium']);
+  sh('npx', ['stardust-lite', 'init', '--foundation', ...(fresh ? ['--force'] : [])]);
   const lock = existsSync(join(dir, 'package-lock.json')) ? readFileSync(join(dir, 'package-lock.json'), 'utf8') : '';
-  const sha = from ? 'local checkout' : (/"resolved": "git\+ssh:\/\/git@github\.com\/paolomoz\/stardust-lite\.git#([0-9a-f]{7,40})"/.exec(lock) || /stardust-lite\.git#([0-9a-f]{7,40})/.exec(lock) || [null, ref])[1];
-  sh('git', ['add', '-A'], { cwd: dir }); spawnSync('git', ['commit', '-q', '-m', `stardust-lite ${String(sha).slice(0, 7)}: foundation${existing ? '' : ' (local prototype repo)'}`], { cwd: dir, stdio: 'inherit' });
-  const local = !existing || /content\.da\.live\/local\//.test(readFileSync(join(dir, 'fstab.yaml'), 'utf8'));
-  writeFileSync(join(dir, 'migration', 'run.json'), JSON.stringify({ url, site, slug, template, dir, local, stardustLite: from ? `file:${resolve(from)}` : sha, createdAt: new Date().toISOString() }, null, 1));
-  console.log(`\nstardust-lite new: ${existing ? 'stardust-lite installed in' : 'local prototype repo'} ${dir} (stardust-lite ${String(sha).slice(0, 7)}, slug ${slug}, template ${template})
+  const sha = from ? 'local checkout' : (/stardust-lite\.git#([0-9a-f]{7,40})/.exec(lock) || [null, ref])[1]; const short = /^[0-9a-f]{40}$/.test(sha) ? sha.slice(0, 7) : sha;
+  const fstab = readFileSync(join(dir, 'fstab.yaml'), 'utf8'); const m = /content\.da\.live\/([^/\s]+)\/([^/\s]+)/.exec(fstab);
+  const branch = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: dir, encoding: 'utf8' }).stdout.trim();
+  const host = m ? `https://${branch}--${m[2]}--${m[1]}.aem.page` : null;
+  writeFileSync(join(dir, 'migration', 'run.json'), JSON.stringify({ url, slug, template, host, stardustLite: from ? `file:${resolve(from)}` : sha, createdAt: new Date().toISOString() }, null, 1));
+  spawnSync('git', ['add', '-A'], { cwd: dir }); spawnSync('git', ['commit', '-q', '-m', `stardust-lite ${short}: setup for ${slug}`], { cwd: dir, stdio: 'inherit' });
+  console.log(`\nstardust-lite setup: ${dir} (stardust-lite ${short}, foundation ${fresh ? 'over the boilerplate' : 'where missing'}, slug ${slug}, template ${template}, host ${host || '—'})
 next, from ${dir}:
   npx stardust-lite live proto --site-repo . --open ${slug}        # the live view (background; it picks a free port)
-  npx stardust-lite first ${url} --slug ${slug} --template ${template}${local ? ' --no-da' : ''}`);
+  npx stardust-lite first ${url} --slug ${slug} --template ${template} --no-da   # drop --no-da to upload to DA (deploy runs only)`);
   process.exit(0);
 }
 const name = cmd === 'lint' ? 'davids-model-lint' : cmd;
