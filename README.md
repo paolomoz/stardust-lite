@@ -58,6 +58,20 @@ Every instrument takes `--consent <css>` (a consent control that reloads the pag
 geo modal, interstitial), `--locale <tag>`, `--chrome` / `--headed` (the installed Chrome, headless or with a window — inherited by every child process) and `--require <css,…>` (composition gate: exit 4 when the session is not the one the origin
 was captured in); every measurement waits for `document.fonts.ready`.
 
+## Use as a Claude Code plugin (one sentence per page)
+
+```
+/plugin install stardust-lite --marketplace paolomoz/stardust-lite
+```
+
+(on Claude Code before 2.1.275: `/plugin marketplace add paolomoz/stardust-lite`, then `/plugin install stardust-lite@stardust-lite`).
+Then, in a session opened **in the site's EDS repo** (an aem-boilerplate clone with an `fstab.yaml`; the plugin never creates
+one), say **"migrate https://www.example.com/ with stardust-lite"**. The plugin's skill
+(`skills/stardust-lite/SKILL.md`) installs stardust-lite into that repo (`stardust-lite setup`: the instruments, Chromium, the foundation),
+opens the live-reloading prototype view in the browser (`stardust-lite live`), runs `first`, then the CSS rounds until every width is under
+10 %, and writes the case documents. Nothing is published unless the request says deploy: then the page goes to DA drafts (preview only)
+and the served page is gated. Needs Node ≥ 20 and git; a deploy also `DA_TOKEN` and the repo on AEM Code Sync.
+
 ## Use from a site repo (the normal way)
 
 stardust-lite is a tool the **site being migrated** installs; the site repo holds the blocks and the evidence, this repo holds the
@@ -109,6 +123,8 @@ step 2, served page within the prototype's numbers, leak table identical.
 | `hiltongrandvacations-home` | 2026-10-01 | 5.91 / 2.76 / 3.29 | 5.94 / 2.76 / 3.28 | 3 table rounds (r0–r2) to the first push + 3 gate rounds (r3–r5, none void) + 0 served fixes; 110 min wall, first shareable URL at 77 min; light-DOM Angular origin, Osano consent bar, Vimeo iframe hero (≈ 80 % of every width's number), two count-ups, Font Awesome Pro icons redrawn, avif media end to end, noise floor 0.10 (the hero frame); leak table 0 lines; cap-probe 11/11 |
 | `dentsu-home` | 2026-10-01 | 4.88 / 2.21 / 2.12 | 4.98 / 2.21 / 2.11 | 2 table rounds (r0–r1) to the first push + 5 gate rounds (r2–r6, none void, 1 regression) + 0 served fixes; 55 min wall, first shareable URL at 37 min; light-DOM Kentico origin serving its Switzerland edition by IP, OneTrust bottom bar, header absolute over a 100vh hero, rellax parallax on four elements, no video, noise floor 0.84 (the parallax band); leak table 0 lines; every block a Block Collection shape |
 | `marriottvacationsworldwide-home` | 2026-10-01 | 2.66 / 0.30 / 0.16 | 2.82 / 0.33 / 0.20 | 3 table rounds (r0–r2) to the first push + 6 gate rounds (r3–r8, none void, 2 cost by instrument readings: an entrance-state spec and a mis-attributed `background-size`) + 0 served fixes; 110 min wall, first shareable URL at 57 min; light-DOM WordPress / Kadence origin, Splide hero with a Brightcove player (its playback API's progressive MP4 served `video/mp4` by DA), AOS entrances parked in the spec, nine body modals as hidden-but-present content, OneTrust reload-on-accept, noise floor 0.00; leak table 0 lines; every block but `brand-bar` a Block Collection shape |
+| `continental-vision-mission` | 2026-10-12 | 4.71 / 2.93 / 2.50 | 5.56 / 3.22 / 2.61 | second page of an EDS site (`sdt-continental-lite`, branch `vision-mission`): stop at r2, 6.4 min from t0, served at 13.2; `first` overwrote the home's block CSS (restored from git); the pipeline's `<strong><a>` one served fix |
+| `bmc-home` | 2026-10-12 | 8.86 / 4.42 / 4.70 (r4 polish 6.02 / 3.12 / 3.75) | — (prototype only) | local repo, no EDS: stop at r3, 14.2 min from t0; a sticky announcement bar in every capture chunk (dismissed, re-measured); the chrome folded locally — the origin of `setup`, `live`, `local-fragments` and the plugin skill |
 
 What each case taught is in its REPORT and in `BACKLOG.md` (the rows name the case): ibm-home the composed-tree tier for shadow-DOM origins,
 walgreens-home the composition gate (`--require`), stryker-home the tooling that cost rounds (consent that reloads, lazy fonts, a single-threaded
