@@ -221,11 +221,16 @@ order; blocks hold only what default content cannot.
   (first visible match), `click-state` (`--hover` first or alone; repeated `--click` for a control inside a closed panel; prints the panel and the control's
   `aria-expanded`), `leak` (every wrapper, prototype vs served), `crop`, `extent` (painted bbox of a colour / alpha / non-background pixels in a region of a
   capture).
+- The fast path — `first` (steps 1–9 in one call to the first gated round; stops on a block page), `cards` (a reading card per build section
+  from the round's table and captures, refreshed by every `gate --round`), `section-view` (one section's mini-gate: the build fresh, the live
+  side from the round's capture), `style-pass` (opt-in element pass), `bench` (a finished run replayed with no agent — a regression gate; it
+  misjudges draft quality, which a field A/B on one page scores: `loop/five-min/REPORT-next-phase.md`).
 - Page-specific probes (a sticky bar's state machine, an icon-sprite inventory) live in `cases/*/scripts` as templates; `page-report` writes a rollout page's
   row and screen (`ROLLOUT.md`).
 - Every instrument that opens a page takes `--consent`, `--dismiss <css,…>`, `--locale <tag>` and `--require <css,…>` (`common.mjs openPage`;
   `--require` exits 4 when the session is not the composition the origin shows); `gate` passes the overlay options to the live capture side. `settle`
-  reads after the fonts, every image and every finite animation — a table read before them is not a measurement.
+  reads after the fonts, every image and every finite animation — a table read before them is not a measurement; chat hosts are hidden by a
+  stylesheet before the page's scripts and horizontal scroll is restored after the lazy-picture pass, on both sides.
 
 ## Deviations register (write it in step 3)
 
