@@ -21,3 +21,5 @@
 2026-10-12T08:21:17Z START b10 claude-opus-5-5 high
 2026-10-12T08:38:02Z END   b10 rc=0
 2026-10-12T08:38:02Z PHASE 1 DONE
+2026-10-12T08:57:57Z START q01 qwen-3.8-27b(cerebras) default
+2026-10-12T09:21:51Z END   q01 rc=0 — ended by an API error: Qwen's 131 072-token context exceeded after 104 turns (Claude Code, told the model was Sonnet 5.5, never compacted)
