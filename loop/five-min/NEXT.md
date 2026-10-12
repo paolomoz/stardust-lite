@@ -100,3 +100,8 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
   styles.css's `main > .section` (the "styles.css wins a tie" promise does not hold for them). Fix: settle hides chat launchers on both
   sides (unverified — the widget did not load in the check session).
 - 00:45Z final bench started from e25f669 (every kept generator change) against n0.
+- final bench n9 (e25f669, every kept generator change) vs n0, 19 pages replaying on both: medians unchanged (Δ 0.0 at each width);
+  better on 6 (rbc −10.7 / unitedrentals −5.9 / continental −3.5 / marriott −2.4 at 360, wpp −3.2 at 1440, omnicom −15.7 at 360), worse on
+  4 (nfl and sherwin-williams: the bands; mheducation: decorateVideos; merck +2.4 at 360). lenovo no longer replays its old triage (the
+  new split). The bench disagrees with the field on draft changes — see REPORT-next-phase.md.
+- 01:08Z N5 accenture (us-en) started at f7427c9, told to end by 01:55Z.
