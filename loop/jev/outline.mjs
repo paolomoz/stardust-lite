@@ -10,7 +10,7 @@ const dump = JSON.parse(readFileSync(process.argv[2], 'utf8')); const W = 1440;
 const sp = splitSections(dump, {});
 const third = (b) => { const c = b[0] + b[2] / 2; return c < W / 3 ? 'left' : c < (2 * W) / 3 ? 'centre' : 'right'; };
 const width = (b) => (b[2] >= W * 0.8 ? 'full-width' : b[2] >= W * 0.45 ? 'half-width' : b[2] >= W * 0.25 ? 'a third wide' : 'narrow');
-const out = {};
+const out = [];
 for (const n of sp.sections) {
   const fp = fingerprint(n); const leaves = [];
   const walk = (x) => { if (!x) return; const t = String(x.tag || '').toLowerCase(); const b = x.box;
@@ -25,6 +25,7 @@ for (const n of sp.sections) {
   const rowsOf = new Map(); for (const b of media) { const k = Math.round(b[1] / 20); rowsOf.set(k, (rowsOf.get(k) || 0) + 1); }
   const maxRow = Math.max(0, ...rowsOf.values()); const past = media.filter((b) => b[0] >= W || b[0] + b[2] <= 0).length;
   const layout = media.length < 2 ? 'no repeated pictures' : past ? `${media.length} pictures, ${past} of them past the viewport (a row running off-screen)` : maxRow >= 2 ? `${media.length} pictures, up to ${maxRow} side by side in one row, ${rowsOf.size} row(s)` : `${media.length} pictures stacked one per row`;
-  out[fp.anchorText || ''] = { layout, outline: leaves.slice(0, 30) };
+  const texts = []; const tx = (x) => { if (!x) return; if (x.text) texts.push(String(x.text).replace(/\s+/g, ' ').trim()); (x.children || []).forEach(tx); }; tx(n);
+  out.push({ anchor: fp.anchorText || '', layout, outline: leaves.slice(0, 30), texts, height: n.box ? n.box[3] : null, top: n.box ? n.box[1] : null });
 }
 console.log(JSON.stringify(out));
