@@ -32,7 +32,7 @@ def timing(path):
     ev, open_ = [], {}
     for line in Path(path).read_text().splitlines():
         p = line.split()
-        if len(p) < 3: continue
+        if len(p) < 3 or '[' not in line: continue
         lab = line[line.index('[') + 1:line.index(']')]
         if p[1] == 'START': open_[lab] = T(p[0])
         elif p[1] == 'END': ev.append({'label': lab, 'start': open_.pop(lab, None), 'end': T(p[0]), 's': int(p[-1].rstrip('s'))})
@@ -68,7 +68,8 @@ for label, repo, slug, code, note in RUNS:
     if not rounds: continue
     under = lambda p, ws=(360, 1440, 2560): all(isinstance(p.get(w), (int, float)) and p[w] < 10 for w in ws)
     stop_i = next((i for i, (_, p) in enumerate(rounds) if under(p)), None)
-    end_t = rounds[stop_i][0] if stop_i is not None else rounds[-1][0]
+    clock_stop = next((T(l.split()[0]) for l in (H / 'TIMING.log').read_text().splitlines() if 'CLOCK STOP' in l), None)
+    end_t = rounds[stop_i][0] if stop_i is not None else (clock_stop or rounds[-1][0])
     first_t, first_p = rounds[0]
     u = {w: next((mins(t0, t) for t, p in rounds if isinstance(p.get(w), (int, float)) and p[w] < 10), '') for w in (360, 1440, 2560)}
     tool = sum(e['s'] for e in ev if e['end'] <= end_t + dt.timedelta(seconds=1)) / 60
