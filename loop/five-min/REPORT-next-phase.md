@@ -50,7 +50,9 @@ Each with the run that found it:
 - **Guards**: `first` stops on a block page (nfm ran the whole pipeline on "Access Denied" and the gate printed REACHED); the capture hides
   chat launchers and restores horizontal scroll after the lazy-picture pass (lenovo P6 served). The chat rule did NOT work: an
   okta re-run (N6, 01:36Z) still had the chat in every live tile — at 1440 / 2560 it is an open 290×580 panel on the right edge, not a
-  small corner launcher; N6 stopped at 11.5 min (46 / 39 / 29 %). Open: hide a fixed chat panel by its host, verified on okta.
+  small corner launcher, and it loads AFTER the capture's one hide pass; N6 stopped at 11.5 min (46 / 39 / 29 %). Fixed at 01:55Z: a
+  stylesheet injected before the page's scripts hides the known chat hosts whenever they load — verified on okta's live page (both hosts
+  loaded and display:none, the capture clean); not yet re-run as a field run.
 
 ## Rejected, flagged or not testable
 - **Reverted at the end for served parity**: two draft rules named their picture by its local file name (the section's background
@@ -83,7 +85,8 @@ Tools are 2–8 min of a run (median ≈ 5). The agent's own pass is the rest, a
    rbc ≈ 4 min: accordions dropped; okta ≈ 6 min: empty slide cells, missing cards; wpp: heading semantics lost). The largest remaining cost.
 2. **Drafts the agent rewrites anyway** (cisco, okta: `sections-draft.css`'s `nth-of-type` rules beat `styles.css`, so the agents dropped
    the import; a 608 px cap read from a narrow column on waters).
-3. **Capture residuals that no CSS fixes** (okta's chat panel in every tile — the guard tonight missed it; lenovo's served slider).
+3. **Capture residuals that no CSS fixes** (okta's chat panel in every tile — fixed and verified at the capture at 01:55Z, not re-run;
+   lenovo's served slider).
 4. **Block drafts that beat the agent's styles.css** (okta N6: drafted 3-column grids on 2-cell rows; deleting them took 1440 −11 points).
 
 Next, in order: a delivery-stable way for a draft to name one picture (see the parity revert), the author's block modelling for forms / offers / accordions (scored by the agents' re-author minutes on the panel), the
