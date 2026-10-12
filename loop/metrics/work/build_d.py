@@ -22,6 +22,7 @@ RUNS = [
     ('N2', 'sdt-bankofamerica-lite', 'bankofamerica-home', 'fa62608', 'new page'),
     ('N3', 'sdt-cisco-lite', 'cisco-home', '3447787', 'new page'),
     ('N4', 'sdt-okta-lite', 'okta-home', 'e25f669', 'new page'),
+    ('N5', 'sdt-accenture-lite', 'accenture-home', 'f7427c9', 'new page'),
 ]
 HEADER = open(W.parent / 'part-C.csv').readline().strip().split(',')
 T = lambda s: dt.datetime.fromisoformat(s.replace('Z', '+00:00'))

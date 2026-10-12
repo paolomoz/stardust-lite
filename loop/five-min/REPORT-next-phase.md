@@ -1,11 +1,12 @@
 # The next phase — report (2026-10-11 19:20Z → 2026-10-12 02:20Z, hands off)
 
 Asked: run the full plan of `NEXT.md` hands off, iterate on as many sites as needed, stop at 02:20Z with a report and updated charts.
-Charts: `loop/metrics/charts.html` (data `loop/metrics/runs.csv`, 58 runs; tonight's are period D). Running log: `loop/five-min/NEXT.md`.
-Code: `exp/five-min` (pushed). Cases: `cases/*-p1`, `cases/lenovo-home-p2`, `cases/bankofamerica-home`, `cases/cisco-home`, `cases/okta-home`.
+Charts: `loop/metrics/charts.html` (data `loop/metrics/runs.csv`, 59 runs; tonight's 10 are period D). Running log: `loop/five-min/NEXT.md`.
+Code: `exp/five-min` (pushed). Cases: `cases/*-p1`, `cases/lenovo-home-p2`, `cases/bankofamerica-home`, `cases/cisco-home`, `cases/okta-home`, `cases/accenture-home`.
 
 ## Result
-The 5-minute target was not reached. Tonight's runs: median time to under 10 % **14.7 min** (the loop's: 20; before the loop: 43–66).
+The 5-minute target was not reached. Tonight's runs: median time to under 10 % **16.0 min** over the 9 that reached it (14.7 without P5,
+the no-bands control); the loop's median was 20, before the loop 43–66. Tools are now a median 5.2 min of a run, the agent 10.7.
 On a fixed panel of already-run pages, re-run with tonight's code by fresh agents, the hard pages got much faster and the easy ones held:
 
 | page | loop run (old code) | panel re-run | Δ |
@@ -17,8 +18,9 @@ On a fixed panel of already-run pages, re-run with tonight's code by fresh agent
 | lenovo | L22 34.8 | P5 33.4 (without the bands) | −1.4 |
 | lenovo | L22 34.8 | P6 16.5 (P5 + the bands: a field A/B) | **−18.3** |
 
-New pages: bankofamerica 22.1, cisco 16.1, okta never (35.3, a chat widget in every live tile), nfm skipped (a location block).
-Served pages matched their prototypes on P1–P4, cisco and bankofamerica; lenovo P6 served 11.75 at 1440 (a slider scrolled sideways in
+New pages: cisco 16.1, accenture 17.3, bankofamerica 22.1, okta never (35.3, a chat widget in every live tile), nfm skipped (a location
+block — `first` now stops on block pages).
+Served pages matched their prototypes on P1–P4, cisco, bankofamerica and accenture (after one fix); lenovo P6 served 11.75 at 1440 (a slider scrolled sideways in
 the served capture — fixed in settle after the run).
 
 ## How it was run
@@ -49,6 +51,10 @@ Each with the run that found it:
   chat launchers (okta) and restores horizontal scroll after the lazy-picture pass (lenovo P6 served).
 
 ## Rejected, flagged or not testable
+- **Reverted at the end for served parity**: two draft rules named their picture by its local file name (the section's background
+  picture; the picture behind the text). The served page renames media to `media_<hash>`, so they held on the prototype and missed on the
+  delivery (accenture's careers backdrop: served 1440 at 7.53 % until fixed by hand). Back to the block-wide rule; naming ONE picture by a
+  delivery-stable key is open (first next item).
 - Rejected on the bench, then **re-adopted on field evidence**: the bands (above).
 - Kept **against** the bench, on content fidelity: the gap-part split (lenovo −0.5…+6 points: two visible rows were missing from the
   document) and `decorateVideos` (mheducation +22 / +34 at 1440 / 2560: its hero is a background video, now rendered in flow; wpp −3).
@@ -77,5 +83,5 @@ Tools are 2–8 min of a run (median ≈ 5). The agent's own pass is the rest, a
    the import; a 608 px cap read from a narrow column on waters).
 3. **Capture residuals that no CSS fixes** (okta's chat tiles, lenovo's served slider) — guarded tonight, unverified on okta.
 
-Next, in order: the author's block modelling for forms / offers / accordions (scored by the agents' re-author minutes on the panel), the
+Next, in order: a delivery-stable way for a draft to name one picture (see the parity revert), the author's block modelling for forms / offers / accordions (scored by the agents' re-author minutes on the panel), the
 draft specificity (`sections-draft.css` at `:where()` specificity or after `styles.css` with a clear owner), the bench metric for drafts.

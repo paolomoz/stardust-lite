@@ -105,3 +105,8 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
   4 (nfl and sherwin-williams: the bands; mheducation: decorateVideos; merck +2.4 at 360). lenovo no longer replays its old triage (the
   new split). The bench disagrees with the field on draft changes — see REPORT-next-phase.md.
 - 01:08Z N5 accenture (us-en) started at f7427c9, told to end by 01:55Z.
+- N5 accenture (f7427c9): stop 17.3 min, served 8.28 / 3.78 / 8.42 after one fix — the drafts' file-name picture selectors miss the served
+  `media_<hash>` names (careers backdrop: served 1440 at 7.53 %). Reverted for parity (ea02ff9): the picture-behind-text rule is
+  block-wide again; the authored background picture keeps only "no url()". Other costs: the hero's content width from a 48 px pause
+  button, the animated headline not authored, a carousel without decorate, an h2 outside `.cards` drafted inside it.
+- 02:20Z stop: report REPORT-next-phase.md, charts loop/metrics/charts.html (59 runs).
