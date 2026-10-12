@@ -63,7 +63,8 @@ Each with the run that found it:
 - Kept **against** the bench, on content fidelity: the gap-part split (lenovo −0.5…+6 points: two visible rows were missing from the
   document) and `decorateVideos` (mheducation +22 / +34 at 1440 / 2560: its hero is a background video, now rendered in flow; wpp −3).
 - No effect, reverted: the cards per-row count from the fullest row (the chosen unit was the 2-span card itself).
-- Not testable here: a faster model (item 7) — the deployment has no Sonnet model; nothing was run.
+- Not run: a faster model (item 7). The sub-agent alias `sonnet` resolved to claude-sonnet-4-5, which this deployment does not serve
+  (model_not_found); Sonnet 5.5 IS available and was not tried — the test is still open (correction 2026-10-12).
 - Not started: hybrid fan-out (item 5), machine geometry rounds (item 6). Items 11–12 are the user's decision.
 
 ## The bench at the end
