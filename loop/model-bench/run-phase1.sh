@@ -18,6 +18,7 @@ RUNS=(
   "b07 claude-opus-5-5 medium"
   "b08 claude-sonnet-5-5 medium"
   "b09 claude-fable-5-1 high"
+  "b09r claude-fable-5-1 high"
   "b10 claude-opus-5-5 high"
 )
 for r in "${RUNS[@]}"; do
