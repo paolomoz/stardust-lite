@@ -1,7 +1,7 @@
 # The next phase — report (2026-10-11 19:20Z → 2026-10-12 02:20Z, hands off)
 
 Asked: run the full plan of `NEXT.md` hands off, iterate on as many sites as needed, stop at 02:20Z with a report and updated charts.
-Charts: `loop/metrics/charts.html` (data `loop/metrics/runs.csv`, 59 runs; tonight's 10 are period D). Running log: `loop/five-min/NEXT.md`.
+Charts: `loop/metrics/charts.html` (data `loop/metrics/runs.csv`, 60 runs; tonight's 11 are period D). Running log: `loop/five-min/NEXT.md`.
 Code: `exp/five-min` (pushed). Cases: `cases/*-p1`, `cases/lenovo-home-p2`, `cases/bankofamerica-home`, `cases/cisco-home`, `cases/okta-home`, `cases/accenture-home`.
 
 ## Result
@@ -48,7 +48,9 @@ Each with the run that found it:
   with identical bytes declared as one variable face (lenovo's Montserrat 600 rendered 700).
 - **Foundation**: `decorateVideos` renders a video authored as poster + link (wpp, waters, mheducation: videos never rendered).
 - **Guards**: `first` stops on a block page (nfm ran the whole pipeline on "Access Denied" and the gate printed REACHED); the capture hides
-  chat launchers (okta) and restores horizontal scroll after the lazy-picture pass (lenovo P6 served).
+  chat launchers and restores horizontal scroll after the lazy-picture pass (lenovo P6 served). The chat rule did NOT work: an
+  okta re-run (N6, 01:36Z) still had the chat in every live tile — at 1440 / 2560 it is an open 290×580 panel on the right edge, not a
+  small corner launcher; N6 stopped at 11.5 min (46 / 39 / 29 %). Open: hide a fixed chat panel by its host, verified on okta.
 
 ## Rejected, flagged or not testable
 - **Reverted at the end for served parity**: two draft rules named their picture by its local file name (the section's background
@@ -81,7 +83,8 @@ Tools are 2–8 min of a run (median ≈ 5). The agent's own pass is the rest, a
    rbc ≈ 4 min: accordions dropped; okta ≈ 6 min: empty slide cells, missing cards; wpp: heading semantics lost). The largest remaining cost.
 2. **Drafts the agent rewrites anyway** (cisco, okta: `sections-draft.css`'s `nth-of-type` rules beat `styles.css`, so the agents dropped
    the import; a 608 px cap read from a narrow column on waters).
-3. **Capture residuals that no CSS fixes** (okta's chat tiles, lenovo's served slider) — guarded tonight, unverified on okta.
+3. **Capture residuals that no CSS fixes** (okta's chat panel in every tile — the guard tonight missed it; lenovo's served slider).
+4. **Block drafts that beat the agent's styles.css** (okta N6: drafted 3-column grids on 2-cell rows; deleting them took 1440 −11 points).
 
 Next, in order: a delivery-stable way for a draft to name one picture (see the parity revert), the author's block modelling for forms / offers / accordions (scored by the agents' re-author minutes on the panel), the
 draft specificity (`sections-draft.css` at `:where()` specificity or after `styles.css` with a clear owner), the bench metric for drafts.

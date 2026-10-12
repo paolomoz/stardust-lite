@@ -110,3 +110,6 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
   block-wide again; the authored background picture keeps only "no url()". Other costs: the hero's content width from a 48 px pause
   button, the animated headline not authored, a carousel without decorate, an h2 outside `.cards` drafted inside it.
 - 02:20Z stop: report REPORT-next-phase.md, charts loop/metrics/charts.html (59 runs).
+- N6 okta-p1 (f78ebe6, the chat rule): NO stop — stopped by hand at 11.5 min (46.09 / 38.68 / 28.85). The chat is still in every live
+  tile: an open 290×580 panel on the right edge at 1440 / 2560, a bubble + pill at 360 — the corner-launcher rule misses it. Also: block
+  drafts load after styles.css and drafted 3-column grids for 2-cell rows (deleting them: 1440 −11, 2560 −12); three cards not authored.

@@ -23,6 +23,7 @@ RUNS = [
     ('N3', 'sdt-cisco-lite', 'cisco-home', '3447787', 'new page'),
     ('N4', 'sdt-okta-lite', 'okta-home', 'e25f669', 'new page'),
     ('N5', 'sdt-accenture-lite', 'accenture-home', 'f7427c9', 'new page'),
+    ('N6', 'sdt-okta-p1', 'okta-home', 'f78ebe6', 're-run of N4 with chat launchers hidden at the capture'),
 ]
 HEADER = open(W.parent / 'part-C.csv').readline().strip().split(',')
 T = lambda s: dt.datetime.fromisoformat(s.replace('Z', '+00:00'))

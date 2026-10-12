@@ -1,0 +1,19 @@
+2026-10-12T01:36:07Z START [first]
+2026-10-12T01:38:18Z END   [first] rc=0 131s
+2026-10-12T01:39:25Z START [r1]
+2026-10-12T01:40:11Z END   [r1] rc=0 46s
+2026-10-12T01:40:58Z START [r2]
+2026-10-12T01:41:46Z END   [r2] rc=0 48s
+2026-10-12T01:42:10Z START [r3]
+2026-10-12T01:42:59Z END   [r3] rc=0 49s
+2026-10-12T01:43:20Z START [r4]
+2026-10-12T01:44:08Z END   [r4] rc=0 48s
+2026-10-12T01:44:25Z START [r5]
+2026-10-12T01:45:14Z END   [r5] rc=0 49s
+2026-10-12T01:45:31Z START [r6]
+2026-10-12T01:46:20Z END   [r6] rc=0 49s
+2026-10-12T01:46:44Z START [r7]
+2026-10-12T01:47:33Z END   [r7] rc=0 49s
+2026-10-12T01:47:39Z CLOCK STOP (by hand: no stop: line; residuals are image/content — carousel renditions, missing identity cards in #2, video in #5, live chat panel in every viewport; hard end 02:10Z)
+2026-10-12T01:48:01Z START [served]
+2026-10-12T01:49:46Z END   [served] rc=0 105s
