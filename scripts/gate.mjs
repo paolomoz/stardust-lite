@@ -400,5 +400,9 @@ writeFileSync(join(out, 'gate.json'), JSON.stringify({ _schema: 'stardust-lite/g
 // every round kept (gate.json is the latest): the widths a digest leaves out once under target were lost with the overwrite (lenovo r4–r8)
 // the reading cards refreshed every round (cards.mjs: the measured values inside each section's range + the round's live | build crops)
 if (roundMode && specDir && existsSync(specDir)) { const cr = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'cards.mjs'), out, specDir], { encoding: 'utf8' }); const cl = String(cr.stdout).trim().split('\n').pop(); if (cl) console.log(`${cl} — open the card of a section the digest names (values + crops), not the specs`); }
-{ const rd = join(out, 'rounds'); mkdirSync(rd, { recursive: true }); copyFileSync(join(out, 'gate.json'), join(rd, `${new Date().toISOString().replace(/[:.]/g, '-')}.json`)); }
+// and with it the round's per-section tables and the digest it printed — the state a round decision was made on (which section, which
+// cause, an invalid round), so the round decisions can be replayed offline (exp/jev: only the last round's tables survived)
+{ const rd = join(out, 'rounds'); const ts = new Date().toISOString().replace(/[:.]/g, '-'); mkdirSync(join(rd, ts), { recursive: true }); copyFileSync(join(out, 'gate.json'), join(rd, `${ts}.json`));
+  for (const W of widths) { const f = join(out, `sections-${W}.json`); if (existsSync(f)) copyFileSync(f, join(rd, ts, `sections-${W}.json`)); }
+  writeFileSync(join(rd, ts, 'digest.txt'), `${targetLine}\n${digest.trim()}\n`); }
 process.exit(0); // nothing may keep the gate alive after gate.json (a dangling page held a bench run 11 min)

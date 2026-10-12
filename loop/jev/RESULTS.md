@@ -54,3 +54,8 @@ drop real content (a page title, a nav strip). It misses the costly one (lenovo'
 
 Time value: a missed drop cost ≈ 2 min (triage.md edit + `first` re-run, lenovo / deloitte); Jev at 0.8 adds 2 correct flags over 33 pages —
 an expected saving far below the ≈ ±1 min run-to-run noise, so a field A/B could not see it. Not wired.
+
+## Step 2 — round decisions made measurable
+The gate now keeps, per round, `rounds/<time>/sections-<W>.json` and `digest.txt` beside `rounds/<time>.json`: the state each round decision
+was made on (which section, which cause, an invalid round). Field runs from this commit on record the corpus a fix-pattern / valid-round /
+residual-cause replay needs; the agent's own decision is recoverable from the next round (the section whose Δh / % moved).
