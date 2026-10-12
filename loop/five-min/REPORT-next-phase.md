@@ -56,6 +56,12 @@ Each with the run that found it:
 - Not testable here: a faster model (item 7) — the deployment has no Sonnet model; nothing was run.
 - Not started: hybrid fan-out (item 5), machine geometry rounds (item 6). Items 11–12 are the user's decision.
 
+## The bench at the end
+Every kept generator change together (`loop/bench/n9-final.json`) against the baseline (`n0-base.json`), 19 pages replaying on both:
+medians unchanged (54.0 / 58.8 / 46.2 %, Δ 0.0 at each width) — better on 6 pages (rbc −10.7, unitedrentals −5.9, continental −3.5,
+marriott −2.4 at 360; wpp −3.2 at 1440; omnicom −15.7 at 360), worse on 4 (nfl, sherwin-williams: the bands; mheducation: the videos;
+merck +2.4 at 360). The machine-only first prototype is still ≈ 50 % — the gain is in how much of it the agent keeps, not in its %.
+
 ## The finding about the method
 The bench's metric — the machine-only first-round pixel % — misjudges draft quality. The bands drafted every Lenovo section from its own
 range and the bench read the page 2–6 points worse (the old wrapper-wide padding happened to make the incomplete machine build taller and
