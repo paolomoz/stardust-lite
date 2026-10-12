@@ -94,3 +94,9 @@ On the same code the loop's time to < 10 % ranged 8–35 min by page: a field ru
 - N3 cisco (3447787): stop 16.1 min, served 6.18 / 8.46 / 4.34. Costs: the picture-behind-text rule on EVERY picture of a block (icons and
   slides full-bleed — also bankofamerica), the hero video without its poster, a tab list as `:icon:`, stats merged, styles.css left at the
   skeleton's tokens. Fix: the rule names the one picture by its file.
+- N4 okta (e25f669): NO stop — stopped at 35.3 min, 12.66 / 12.13 / 9.61 (2560 under since r7). The live capture holds the "Ask Ollie" chat
+  launcher in every stitched tile (masked: 1440 at 3.2 %); a fresh capture with it dismissed had the hero on another slide. author: slides
+  with empty text cells, three cards missing, mobile pictures from CSS variables not fetched. sections-draft's nth-of-type rules beat
+  styles.css's `main > .section` (the "styles.css wins a tie" promise does not hold for them). Fix: settle hides chat launchers on both
+  sides (unverified — the widget did not load in the check session).
+- 00:45Z final bench started from e25f669 (every kept generator change) against n0.
