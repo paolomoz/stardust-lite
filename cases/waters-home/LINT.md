@@ -1,0 +1,2 @@
+🟡 D4 migration/cases/home/doc/waters-home.html: 3 authored SVG media reference(s) — batch-verify pure-vector (an SVG embedding raster data URIs 409s the whole page's preview, #99): https://blocks-first--sdt-waters-lite--aemcoder-adobe.aem.page/drafts/media/1.svg, https://blocks-first--sdt-waters-lite--aemcoder-adobe.aem.page/drafts/media/2.svg, https://blocks-first--sdt-waters-lite--aemcoder-adobe.aem.page/drafts/media/3.svg
+PASS — 0 🔴, 1 🟡 (rules: ../davids-model.md)

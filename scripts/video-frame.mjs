@@ -7,14 +7,13 @@
 // (hiltongrandvacations-home wrote `hero-poster.mjs` for it). --hide works for the <video> path too.
 // Usage: node video-frame.mjs <url> <W> <out.png> [--video <css> [--t 0]] [--box <css>] [--hide <css,…>] [--scale 2] [--wait 3000]
 //        [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>]
-import { chromium } from 'playwright';
-import { arg, openPage, overlayOpts } from './common.mjs';
+import { arg, openPage, overlayOpts, launch } from './common.mjs';
 
 const [url, W, out] = process.argv.slice(2);
 if (!url || !W || !out) { console.error('usage: video-frame.mjs <url> <W> <out.png> [--video <css> [--t 0]] [--box <css>] [--hide <css,…>] [--scale 2]'); process.exit(1); }
 const boxSel = arg('--box', null); const sel = arg('--video', 'video'); const t = Number(arg('--t', 0)); const scale = Number(arg('--scale', 2));
 const hide = String(arg('--hide', '')).split(',').map((s) => s.trim()).filter(Boolean); const wait = Number(arg('--wait', 3000));
-const browser = await chromium.launch();
+const browser = await launch();
 const page = await openPage(browser, url, { width: Number(W), height: 900, scale, ...overlayOpts() });
 const target = boxSel || sel;
 const found = await page.waitForSelector(target, { timeout: 30000 }).catch(() => null);

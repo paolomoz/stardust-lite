@@ -6,11 +6,102 @@
 // served Content-Type (`.jpg.thumb.585.1170.png` is a JPEG), names AEM `.transform/…/img.jpg` renditions after their asset, and writes
 // <out>/manifest.json (url → file) for the document generator. Written per case twice (stryker-home, usta2-home); this is the instrument.
 // Usage: node media-fetch.mjs <content.json…> --out media [--base https://www.site.com] [--extra <url,…>] [--extra-file <list>]
-import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync } from 'node:fs';
-import { join, extname } from 'node:path';
-import { arg } from './common.mjs';
+//        … --browser   fetch every URL by navigating a browser page to it (common.launch: --chrome tier, cookies) and reading the response body —
+//                      the only path a WAF lets through when curl, node fetch and an in-page fetch() all 403 (manulife, loop r7); slower, use on a 403
+//        … --from-page <url>   the third tier: open the PAGE (chrome tier, cookies, overlays), scroll it, and keep the bytes of every response
+//                              whose URL is one the dump names (media and fonts) — a WAF that refuses a navigation to the asset itself still serves
+//                              it to the page (canon, loop r10: `--browser` 0 files, a case asset-capture.mjs 23)
+//        node media-fetch.mjs <media-<W>.json> --fonts fonts   the font FILES: media-list's requested font URLs downloaded, and the @font-face
+//                                                             faces embedded as data: URIs written as files (`<family>-<weight>-<style>.woff2`;
+//                                                             a case font-dump.mjs did this — covermore, loop r6); then fonts.css declares them
+import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync, statSync, unlinkSync, readdirSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { join, extname, dirname, relative, resolve } from 'node:path';
+import { arg, launch, contextOptions } from './common.mjs';
+let browserPage = null; // --browser: one context, one page, every URL a navigation
+const fromPage = new Map(); // --from-page: url → { status, type, buf } captured from the page's own responses
+async function captureFromPage(pageUrl, wanted) {
+  const { openPage, settle, overlayOpts } = await import('./common.mjs'); const b = await launch(); const ctx = await b.newContext(contextOptions({ width: 1440, height: 900, locale: overlayOpts().locale }));
+  const want = new Set(wanted.map((u) => u.split('#')[0])); const bare = (u) => u.split('#')[0].split('?')[0];
+  const wantBare = new Set([...want].map(bare));
+  const pending = [];
+  const page = await openPage(ctx, pageUrl, { width: 1440, height: 900, ...overlayOpts(), before: (p) => p.on('response', (r) => { const u = r.url(); if (!(want.has(u) || wantBare.has(bare(u)))) return; pending.push(r.body().then((buf) => { if (r.ok() && buf?.length) fromPage.set(want.has(u) ? u : [...want].find((w) => bare(w) === bare(u)) || u, { ok: true, status: r.status(), type: (r.headers()['content-type'] || '').split(';')[0].trim(), buf }); }).catch(() => {})); }) });
+  await settle(page); await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 600) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 120)); } window.scrollTo(0, 0); }); await page.waitForTimeout(1500);
+  await Promise.all(pending); await b.close();
+  console.log(`media-fetch: ${fromPage.size} of ${want.size} URL(s) captured from the page's own responses`);
+}
+const getBytes = async (url) => {
+  if (fromPage.has(url)) return fromPage.get(url);
+  if (!process.argv.includes('--browser')) { const r = await fetch(url).catch(() => null); if (!r) return null; return { ok: r.ok, status: r.status, type: (r.headers.get('content-type') || '').split(';')[0].trim(), buf: r.ok ? Buffer.from(await r.arrayBuffer()) : null }; }
+  if (!browserPage) { const b = await launch(); const ctx = await b.newContext(contextOptions({ width: 1280, height: 800 })); browserPage = await ctx.newPage(); process.on('exit', () => b.close().catch(() => {})); }
+  const r = await browserPage.goto(url, { waitUntil: 'commit', timeout: 60000 }).catch(() => null); if (!r) return null;
+  return { ok: r.ok(), status: r.status(), type: (r.headers()['content-type'] || '').split(';')[0].trim(), buf: r.ok() ? await r.body().catch(() => null) : null };
+};
 
-const OPTS = ['--out', '--base', '--extra', '--extra-file'];
+// a font file is a font: a WAF answers a font URL with its challenge page and a 200 (acs-about: four `.woff2` files were Imperva's 212-byte
+// HTML, the first round rendered in the fallback face) — the bytes are checked, never the status
+const isFont = (b) => !!b && b.length > 64 && ['wOF2', 'wOFF', 'OTTO', 'true', 'ttcf'].includes(b.subarray(0, 4).toString('latin1')) || (!!b && b.length > 64 && b.readUInt32BE(0) === 0x00010000);
+const OPTS = ['--out', '--base', '--extra', '--extra-file', '--fonts', '--from-page', '--css']; // --browser is a bare flag
+if (typeof arg('--fonts', null) === 'string') {
+  const dir = arg('--fonts'); mkdirSync(dir, { recursive: true }); let n = 0; const cssFaces = []; const fetchedUrls = new Set(); const notFont = []; const aliasPlan = [];
+  // --from-page: the font files from the page's own responses, as for the media (a WAF that refuses curl serves them to the page)
+  if (typeof arg('--from-page', null) === 'string') {
+    const want = process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && OPTS.includes(all[i - 1]))).flatMap((f) => { const m = JSON.parse(readFileSync(f, 'utf8')); return [...(m.fontRequests || []), ...(m.fontFaceRules || []).flatMap((r) => r.srcs.map((x) => x.url))]; }).filter((u) => !u.startsWith('data:'));
+    await captureFromPage(arg('--from-page'), [...new Set(want)]); if (!fromPage.size) { console.log('media-fetch: 0 captured — once more (a challenge page answers the first load)'); await captureFromPage(arg('--from-page'), [...new Set(want)]); }
+  }
+  const safe = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  for (const f of process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && OPTS.includes(all[i - 1])))) {
+    const m = JSON.parse(readFileSync(f, 'utf8'));
+    for (const d of m.dataFaces || []) { const mm = /^data:([^;,]+)(;base64)?,(.*)$/s.exec(d.data); if (!mm) continue; const ext = /woff2/.test(mm[1]) ? '.woff2' : /woff/.test(mm[1]) ? '.woff' : /ttf|truetype/.test(mm[1]) ? '.ttf' : /otf|opentype/.test(mm[1]) ? '.otf' : '.bin'; const name = `${safe(d.family)}-${safe(d.weight)}-${safe(d.style)}${ext}`; writeFileSync(join(dir, name), mm[2] ? Buffer.from(mm[3], 'base64') : Buffer.from(decodeURIComponent(mm[3]), 'latin1')); console.log(`data: ${d.family} ${d.weight} ${d.style} → ${name}`); n += 1; }
+    // the faces the page LOADED, each matched to its @font-face rule (media.fontFaceRules) → one file per face named by it, and the
+    // fonts.css lines (--css): a URL's last segment named si-home's four Typekit faces `l.woff2`, and every run wrote fonts.css by hand
+    const rules = m.fontFaceRules || []; const done = new Set();
+    // the faces LOADED and every family the page's @font-face rules define: the drafts name the families the page's CSS uses (revlon:
+    // `acumin-pro-regular`, `acumin-pro-bold` while only `acumin-pro` loaded as a face — the first round in serif)
+    // the families the measured TEXT uses (spec-*.json beside the media file): a page bundle declares many more faces than it renders
+    const famOf = (ff) => String(ff || '').split(',')[0].replace(/["']/g, '').trim(); const used = new Set();
+    for (const sf of readdirSync(dirname(resolve(f))).filter((x) => /^spec-\d+\.json$/.test(x))) { try { for (const sec of JSON.parse(readFileSync(join(dirname(resolve(f)), sf), 'utf8')).secs || []) for (const it of sec.items || []) if (it.ff) used.add(famOf(it.ff).toLowerCase()); } catch { /* unreadable */ } }
+    const ruleFaces = rules.filter((r) => used.has(r.family.toLowerCase()) && r.srcs.some((x) => !x.url.startsWith('data:'))).map((r) => `${r.family} ${String(r.weight).split(/\s+/)[0]} ${r.style}`);
+    aliasPlan.push(...[...used].filter((u) => !rules.some((r) => r.family.toLowerCase() === u)));
+    for (const lf of [...new Set([...(m.loaded || []), ...ruleFaces])].slice(0, 24)) {
+      const t = lf.split(' '); const style = t.pop(); const weight = String(t.pop()).replace(/^normal$/i, '400').replace(/^bold$/i, '700'); const family = t.join(' ').replace(/^["']|["']$/g, ''); // a loaded face reports `normal` for 400 (revlon)
+      const inW = (w) => { const r = String(w).split(/\s+/).map(Number); return r.length > 1 ? Number(weight) >= r[0] && Number(weight) <= r[1] : String(r[0]) === String(Number(weight)); };
+      // the LATIN subset first (a unicode-range split served open-sans's cyrillic file — sherwin-williams' Open Sans rendered in a serif fallback)
+      const latin = (r) => !r.unicodeRange || /^U\+0{1,4}(-|,|$)/i.test(r.unicodeRange.replace(/\s/g, '')); // latin starts at U+0000
+      const matching = rules.filter((r) => r.family.toLowerCase() === family.toLowerCase() && r.style === style && inW(r.weight) && r.srcs.some((x) => !x.url.startsWith('data:')));
+      const rule = matching.find(latin) || matching[0];
+      if (!rule) continue;
+      const src = ['woff2', 'woff', 'truetype', 'opentype', null].map((f) => rule.srcs.find((x) => !x.url.startsWith('data:') && (x.format === f || (f === 'woff2' && /\.woff2(\?|$)/.test(x.url))))).find(Boolean) || rule.srcs[0];
+      const ext = src.format === 'woff2' || /\.woff2/.test(src.url) ? '.woff2' : src.format === 'woff' || /\.woff(\?|$)/.test(src.url) ? '.woff' : /\.otf/.test(src.url) || src.format === 'opentype' ? '.otf' : /\.ttf/.test(src.url) || src.format === 'truetype' ? '.ttf' : '.woff2';
+      // a variable face (a weight RANGE, `100 900`): one file, declared once with its range — two static faces made the 300 body copy render 400
+      const range = /\s/.test(String(rule.weight).trim()) ? String(rule.weight).trim().replace(/\s+/g, ' ') : null;
+      const name = `${safe(family)}-${safe(range || weight)}-${safe(style)}${ext}`; if (done.has(name)) continue;
+      const r = await getBytes(src.url); if (!r || !r.ok || !r.buf) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${src.url} (${lf})`); continue; }
+      if (!isFont(r.buf)) { notFont.push(`${lf} (${r.buf.length} bytes${/^\s*</.test(r.buf.subarray(0, 64).toString('latin1')) ? ', HTML' : ''})`); continue; }
+      writeFileSync(join(dir, name), r.buf); done.add(name); n += 1; fetchedUrls.add(src.url);
+      cssFaces.push({ family, weight: range || weight, style, file: name, format: ext === '.woff2' ? 'woff2' : ext === '.woff' ? 'woff' : ext === '.otf' ? 'opentype' : 'truetype' });
+    }
+    for (const u of (m.fontRequests || []).filter((x) => !fetchedUrls.has(x))) { const r = await getBytes(u); if (r?.ok && r.buf && !isFont(r.buf)) { notFont.push(`${u.slice(0, 80)} (${r.buf.length} bytes)`); continue; } if (!r || !r.ok || !r.buf) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${u}${!process.argv.includes('--browser') ? ' (a 403: --browser)' : ''}`); continue; } const name = safe(new URL(u).pathname.split('/').pop().replace(/\.[a-z0-9]+$/, '')) + (extname(new URL(u).pathname) || '.woff2'); writeFileSync(join(dir, name), r.buf); console.log(`${r.status} ${u.slice(-70)} → ${name}`); n += 1; }
+  }
+  if (notFont.length && typeof arg('--from-page', null) !== 'string') { // the page URL is in the measure dir's summary: go through the page once, no agent turn
+    const jsons = process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && OPTS.includes(all[i - 1])));
+    let pageUrl = null; for (const f of jsons) { try { pageUrl = JSON.parse(readFileSync(join(dirname(resolve(f)), 'summary.json'), 'utf8')).url; } catch { /* no summary */ } if (pageUrl) break; }
+    if (pageUrl) { console.error(`media-fetch: ${notFont.length} font response(s) were not fonts (a WAF) — again through the page's own responses (--from-page ${pageUrl})`); const { spawnSync } = await import('node:child_process'); const r = spawnSync(process.execPath, [process.argv[1], ...process.argv.slice(2), '--from-page', pageUrl], { stdio: 'inherit' }); process.exit(r.status ?? 1); }
+  }
+  if (notFont.length) console.error(`media-fetch: ${notFont.length} font response(s) are NOT fonts — not written (a WAF's answer: --from-page <page url>, or --browser):\n  ${notFont.join('\n  ')}`);
+  // a used family with no rule of its own, named after a loaded one (`acumin-pro-regular` → the `acumin-pro` file): an alias face, the weight
+  // from the name — the drafts name the families the page's CSS uses
+  const wOf = (n) => (/black|heavy/i.test(n) ? '900' : /extra-?bold/i.test(n) ? '800' : /semi-?bold|demi/i.test(n) ? '600' : /bold/i.test(n) ? '700' : /medium/i.test(n) ? '500' : /light/i.test(n) ? '300' : /thin/i.test(n) ? '100' : '400');
+  for (const u of [...new Set(aliasPlan)]) { const base = cssFaces.filter((c) => u.startsWith(c.family.toLowerCase()) && u !== c.family.toLowerCase()).sort((a, b) => b.family.length - a.family.length); if (!base.length) continue; const w = wOf(u.slice(base[0].family.length)); const pick = base.filter((c) => c.family === base[0].family).sort((a, b) => Math.abs(Number(a.weight) - Number(w)) - Math.abs(Number(b.weight) - Number(w)))[0]; cssFaces.push({ ...pick, family: u, weight: '400 900'.includes(w) ? w : w, alias: true }); }
+  const cssOut = typeof arg('--css', null) === 'string' ? arg('--css') : null;
+  // one VARIABLE file the source declares twice (`400` and `700`, the same bytes): two static faces pin it to 400 / 700 and a 600 heading
+  // renders 700, wider, and wraps at 360 (lenovo panel run) — the faces with identical bytes become one face with the weight range
+  { const { createHash } = await import('node:crypto'); const groups = new Map();
+    for (const c of cssFaces) { if (/\s/.test(String(c.weight))) continue; let h = null; try { h = createHash('md5').update(readFileSync(join(dir, c.file))).digest('hex'); } catch { continue; } const k = `${c.family.toLowerCase()}|${c.style}|${h}`; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(c); }
+    for (const g of groups.values()) { if (g.length < 2) continue; const ws = g.map((c) => Number(c.weight)).filter(Number.isFinite); const keep = g[0]; keep.weight = `${Math.min(100, ...ws)} ${Math.max(900, ...ws)}`; for (const c of g.slice(1)) cssFaces.splice(cssFaces.indexOf(c), 1); console.log(`media-fetch: ${keep.family} ${keep.style} — ${g.length} faces are one file (variable): declared once, weight ${keep.weight}`); } }
+  if (cssOut && cssFaces.length) { const rel = relative(dirname(resolve(cssOut)), resolve(dir)).split('\\').join('/'); mkdirSync(dirname(resolve(cssOut)), { recursive: true }); writeFileSync(cssOut, `/* fonts.css — the faces the source loaded, from media-*.json fontFaceRules (media-fetch --fonts --css) */\n${cssFaces.map((f) => `@font-face { font-family: '${f.family}'; font-style: ${f.style}; font-weight: ${f.weight}; font-display: swap; src: url('${rel ? `${rel}/` : ''}${f.file}') format('${f.format}'); }`).join('\n')}\n`); console.log(`media-fetch: ${cssFaces.length} face(s) declared in ${cssOut}`); }
+  console.log(`media-fetch: ${n} font file(s) in ${dir}/${cssFaces.length ? '' : ' — declare them in styles/fonts.css with the families the spec names (no fontFaceRules in the media JSON: re-measure, then --css styles/fonts.css writes it)'}`); process.exit(0);
+}
 const files = process.argv.slice(2).filter((a, i, all) => !a.startsWith('--') && !(i > 0 && OPTS.includes(all[i - 1])));
 if (!files.length) { console.error('usage: media-fetch.mjs <content.json…> --out media [--base <origin>] [--extra <url,…>] [--extra-file <list>]'); process.exit(1); }
 const out = arg('--out', 'media'); let base = arg('--base', null);
@@ -28,26 +119,66 @@ const EXT = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 
 const nameOf = (u) => {
   const path = decodeURIComponent(new URL(u).pathname); const parts = path.split('/').filter(Boolean); let name = (parts[parts.length - 1] || 'media').toLowerCase();
   if (/^img\.(jpe?g|png|webp)$/.test(name)) { const asset = parts.find((p) => /\.(jpe?g|png|webp|gif|svg)/i.test(p)); if (asset) name = asset.toLowerCase().split('.transform')[0]; } // AEM transform rendition: the asset's name
+  // an AEM DAM rendition (`<asset>.png/_jcr_content/renditions/cq5dam.web.1280.1280.png`): the asset's name with the rendition's width —
+  // `cq5dam-web-1280-1280.png` named four assets alike and collided by suffix (scotiabank-personal)
+  const jcr = parts.findIndex((p) => /^_?jcr[:_]content$/.test(p));
+  if (jcr > 0 && parts[jcr + 1] === 'renditions') { const asset = parts[jcr - 1].toLowerCase(); const size = (name.match(/\.(\d{2,4})\.\d{2,4}\./) || [])[1]; name = `${asset.replace(/\.[a-z0-9]+$/, '')}${size ? `-${size}` : ''}${extname(name) || extname(asset)}`; }
   // the branch host previews `musee_hp-2.jpg` and `a.b.jpg` 404 after a 201 upload (audemarspiguet-home), `kids--x.jpg` too (usta2-home):
   // the stem keeps a-z0-9 and single hyphens only, the extension stays
   const m = /^(.*?)(\.[a-z0-9]+)?$/.exec(name); const stem = (m[1] || 'media').replace(/[^a-z0-9]+/g, '-').replace(/-{2,}/g, '-').replace(/^-|-$/g, '');
   return `${stem || 'media'}${m[2] || ''}`;
 };
 mkdirSync(out, { recursive: true });
+if (typeof arg('--from-page', null) === 'string') await captureFromPage(arg('--from-page'), [...new Set(urls)].map((u) => { try { return new URL(u, base || undefined).href.replace(/ /g, '%20'); } catch { return null; } }).filter(Boolean));
 const manifest = existsSync(join(out, 'manifest.json')) ? JSON.parse(readFileSync(join(out, 'manifest.json'), 'utf8')) : {};
 const taken = new Set(Object.values(manifest)); let n = 0; let failed = 0;
 for (const u of [...new Set(urls)]) {
   let full; try { full = new URL(u, base || undefined).href.replace(/ /g, '%20'); } catch { console.error(`media-fetch: skip ${u} (relative and no --base)`); failed += 1; continue; }
   if (manifest[full] && existsSync(join(out, manifest[full]))) continue;
-  let name = nameOf(full); const r = await fetch(full).catch(() => null);
-  if (!r || !r.ok) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${full}`); failed += 1; continue; }
-  const type = (r.headers.get('content-type') || '').split(';')[0].trim(); const ext = EXT[type];
+  let name = nameOf(full); const r = await getBytes(full);
+  if (!r || !r.ok || !r.buf) { console.error(`media-fetch: ${r ? r.status : 'unreachable'} ${full}${!process.argv.includes('--browser') && r?.status === 403 ? ' — a WAF: run again with --browser' : ''}`); failed += 1; continue; }
+  const type = r.type; const ext = EXT[type];
   if (/^text\/|^application\/(json|javascript|xml|xhtml\+xml)$/.test(type)) { console.error(`media-fetch: skip ${full.slice(-80)} — ${type} is a document, not media`); continue; }
-  const buf = Buffer.from(await r.arrayBuffer());
+  const buf = r.buf;
   if (ext && extname(name) !== ext && !(ext === '.jpg' && extname(name) === '.jpeg')) name = `${name.replace(/\.[a-z0-9]+$/, '')}${ext}`; // the actual bytes name the extension
   const stem = name.replace(/\.[a-z0-9]+$/, ''); const e = extname(name); let k = 1; while (taken.has(name)) { name = `${stem}-${k}${e}`; k += 1; }
   writeFileSync(join(out, name), buf); taken.add(name); manifest[full] = name; n += 1;
   console.log(`${r.status} ${type.padEnd(14)} ${String(buf.length).padStart(8)}  ${full.slice(-80)} → ${name}`);
+}
+// a still over 10 MB or 4000 px wide fails the preview (wyndham: a 7500×5000, 34 MB png → 409): scaled to 2400 px wide by ffmpeg
+for (const [, f] of Object.entries(manifest)) {
+  const fp = join(out, f); if (!/\.(png|jpe?g|webp)$/i.test(f) || !existsSync(fp)) continue; const big = statSync(fp).size > 10 * 1024 * 1024;
+  let wide = false; try { const b = readFileSync(fp); if (/\.png$/i.test(f)) wide = b.readUInt32BE(16) > 4000; } catch { /* unreadable */ }
+  if (!big && !wide) continue; const tmp = `${fp}.tmp${extname(fp)}`; const r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', fp, '-vf', 'scale=min(2400\\,iw):-2', tmp], { encoding: 'utf8' });
+  if (!r.error && !r.status && existsSync(tmp)) { renameSync(tmp, fp); console.log(`media-fetch: ${f} scaled to 2400 px wide (${(statSync(fp).size / 1024).toFixed(0)} KB) — the preview refuses a picture that large`); }
+}
+// an animated GIF over 10 MB is not a picture the pipeline takes (bms: a 49.6 MB gif authored, broken on the prototype, an ffmpeg still by hand):
+// its first frame as a JPEG, the manifest pointing at the still — register the motion
+for (const [u, f] of Object.entries(manifest)) {
+  const fp = join(out, f); if (!/\.gif$/i.test(f) || !existsSync(fp) || statSync(fp).size < 10 * 1024 * 1024) continue;
+  const still = f.replace(/\.gif$/i, '-still.jpg'); const r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', fp, '-frames:v', '1', '-q:v', '3', join(out, still)], { encoding: 'utf8' });
+  if (!r.error && !r.status && existsSync(join(out, still))) { manifest[u] = still; unlinkSync(fp); console.log(`media-fetch: ${f} is ${(statSync(join(out, still)).size / 1024).toFixed(0)} KB as its first frame (${still}) — the gif was over 10 MB; register the motion`); }
+  else console.error(`media-fetch: ${f} is over 10 MB and no ffmpeg still could be made — replace it before the upload`);
+}
+// an SVG Edge Delivery's media ingestion refuses (an embedded raster `<image>`, a script, a foreignObject, or over 40 KB) uploads with 200 and
+// previews with 409: the served page then shows `<img src="about:error">` where the prototype showed the picture (lenovo: two empty pills,
+// 360 at 11.1 % served against 8.2 % on the prototype). The source file itself, drawn once at 2× its own size, as a transparent PNG.
+{ const bad = Object.entries(manifest).filter(([, f]) => /\.svg$/i.test(f) && existsSync(join(out, f)) && (statSync(join(out, f)).size > 40 * 1024 || /<image\b|<script\b|<foreignObject\b/i.test(readFileSync(join(out, f), 'utf8'))));
+  if (bad.length) {
+    const br = await launch(); const ctx = await br.newContext({ deviceScaleFactor: 2, viewport: { width: 800, height: 800 } }); const pg = await ctx.newPage();
+    for (const [u, f] of bad) {
+      try {
+        const svg = readFileSync(join(out, f), 'utf8'); const vb = /viewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(svg);
+        const w = Math.round(Number(/\bwidth="([\d.]+)(?:px)?"/i.exec(svg)?.[1] || vb?.[1] || 300)); const h = Math.round(Number(/\bheight="([\d.]+)(?:px)?"/i.exec(svg)?.[1] || vb?.[2] || 150));
+        await pg.setViewportSize({ width: Math.max(1, w), height: Math.max(1, h) });
+        await pg.setContent(`<html><body style="margin:0;background:transparent"><img style="display:block;width:${w}px;height:${h}px" src="data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}"></body></html>`);
+        await pg.waitForFunction(() => document.images[0]?.complete, null, { timeout: 5000 });
+        const png = f.replace(/\.svg$/i, '-svg.png'); await pg.screenshot({ path: join(out, png), omitBackground: true, clip: { x: 0, y: 0, width: w, height: h } });
+        manifest[u] = png; console.log(`media-fetch: ${f} — an SVG the delivery refuses (embedded raster / script / > 40 KB): drawn as ${png} (${w}×${h} @2×)`);
+      } catch (e) { console.error(`media-fetch: ${f} could not be drawn as a PNG (${String(e.message || e).slice(0, 80)}) — it will not preview`); }
+    }
+    await br.close();
+  }
 }
 writeFileSync(join(out, 'manifest.json'), JSON.stringify(manifest, null, 1));
 console.log(`media-fetch: ${n} fetched, ${Object.keys(manifest).length} in ${out}/manifest.json${failed ? `, ${failed} failed` : ''}`);

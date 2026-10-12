@@ -33,12 +33,11 @@
 // }
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync, statSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
-import { chromium } from 'playwright';
-import { UA, arg, acceptOverlays } from './common.mjs';
+import { UA, arg, acceptOverlays, launch } from './common.mjs';
 import { statusRow, overlayRows, chromeRows, verdictOf } from './lib/profile-check.mjs';
 
 const [,, cmd, target] = process.argv;
-const usage = () => { console.error('usage: site-profile.mjs init <case-dir> --out migration/site.json [--site-repo <dir>] [--live <url>] [--served <url>]\n       site-profile.mjs check <site.json> [--tol 2]\n       site-profile.mjs print <site.json>'); process.exit(1); };
+const usage = () => { console.error('usage: site-profile.mjs init <case-dir> --out migration/site.json [--site-repo <dir>] [--live <url>] [--served <url>]\n       site-profile.mjs check <site.json> [--tol 2]\n       site-profile.mjs print <site.json>\n  init reads: <case>/measure/spec-<W>.json, summary.json, probe-load*.txt (or probe-load-<W>.txt), cap.json (measure/ or gate/), gate*/noise-1440.json or noise*.log (`= x%`), serve*.log (port), and the case prose (README / REPORT / REGISTER: served URL, --consent / --dismiss / --locale / --main flags); a null carries its _note'); process.exit(1); };
 if (!cmd || !target || !['init', 'check', 'print'].includes(cmd)) usage();
 
 const read = (f) => (existsSync(f) ? readFileSync(f, 'utf8') : null);
@@ -172,7 +171,11 @@ if (cmd === 'init') {
   if (!edition) note('edition', 'REGISTER.md\'s first paragraph');
 
   const profile = { _schema: 'stardust-lite/site-profile@1', _writtenAt: new Date().toISOString(), _source: { caseDir, siteRepo: repo }, origin, edition, widths, baseWidth, probeWidth, overlays: { consent, dismiss, locale, require, headed, reloadOnConsent }, firstLook, cap: capOut, fonts: { families, files: fontFiles, faces }, body, tokens, chrome, media, da, serve: { port }, noise: { floor1440, compositionMarkers: require }, pages, _notes: notes };
-  mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, JSON.stringify(profile, null, 1));
+  // an existing profile (probe-load --profile wrote the overlays at t0) is merged, never overwritten: a null here keeps the value there (consent and hide were wiped — takeda, V3)
+  let prev = null; try { prev = JSON.parse(readFileSync(out, 'utf8')); } catch { prev = null; }
+  const mergeInto = (a, b) => { if (!b || typeof b !== 'object' || Array.isArray(b)) return a == null || (Array.isArray(a) && !a.length) ? b : a; const o = { ...(a && typeof a === 'object' ? a : {}) }; for (const [k, v] of Object.entries(b)) o[k] = mergeInto(o[k], v); return o; };
+  const merged = prev ? mergeInto(profile, prev) : profile; if (prev) console.error(`site-profile: merged with the existing ${out} (its overlays and every value this init left null survive)`);
+  mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, JSON.stringify(merged, null, 1));
   const hb = chrome.header.heightsByWidth; const fb = chrome.footer.heightsByWidth; const perW = (o) => Object.entries(o).map(([w, v]) => `${w}:${v}`).join(' ') || '—';
   table([
     ['origin', origin], ['edition', edition ? `${edition.slice(0, 90)}…` : null], ['widths', `${widths.join(',')} (base ${baseWidth}, probe ${probeWidth})`],
@@ -225,7 +228,7 @@ if (cmd === 'print') {
 const tol = Number(arg('--tol', 2)); const o = P.overlays || {}; const H = P.chrome?.header || {};
 const widths = [...new Set([...(P.widths || []), ...Object.keys(H.heightsByWidth || {}).map(Number)])].sort((a, b) => a - b);
 if (!P.origin || !widths.length) { console.error('site-profile check: the profile has no origin or no widths'); process.exit(1); }
-const b = await chromium.launch(o.headed ? { headless: false, channel: 'chrome', args: ['--disable-blink-features=AutomationControlled'] } : {});
+const b = await launch();
 const rows = [];
 for (const W of widths) {
   const page = await b.newPage({ viewport: { width: W, height: 900 }, userAgent: UA, ...(o.locale ? { locale: o.locale, extraHTTPHeaders: { 'Accept-Language': `${o.locale},${o.locale.split('-')[0]};q=0.9` } } : {}) });

@@ -7,6 +7,18 @@ import { fileURLToPath } from 'node:url';
 
 export const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
 
+/** The browser every instrument opens. Chrome tier (`--chrome`, or STARDUST_CHROME=1 in the env, or the profile's `overlays.chrome`): the
+ * installed Google Chrome, headless — an origin that resets headless Chromium's HTTP/2 (`net::ERR_HTTP2_PROTOCOL_ERROR`) accepts it
+ * (cibc-careers, loop r2; BACKLOG #1). `--headed`: real Chrome with a window (the bot-managed tier). The tier is exported to the env so the
+ * children an instrument spawns (gate → cap-probe, motion-observe; harness → serve) inherit it, the vendored tools through lib/chrome-tier.mjs. */
+export async function launch(opts = {}) {
+  const { chromium } = await import('playwright');
+  const headed = process.argv.includes('--headed'); const chrome = headed || process.argv.includes('--chrome') || process.env.STARDUST_CHROME === '1' || !!siteDefaults()?.overlays?.chrome;
+  if (chrome) process.env.STARDUST_CHROME = '1';
+  const cookie = overlayOpts().cookie; // sets STARDUST_COOKIE
+  if ((chrome || cookie) && !(process.env.NODE_OPTIONS || '').includes('chrome-tier')) process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS || ''} --import ${new URL('./lib/chrome-tier.mjs', import.meta.url).pathname}`.trim(); // the vendored tools: channel and cookies
+  return chromium.launch({ ...(chrome ? { channel: 'chrome' } : {}), ...(headed ? { headless: false, args: ['--disable-blink-features=AutomationControlled'] } : {}), ...opts });
+}
 export function arg(name, def) {
   const i = process.argv.indexOf(name);
   if (i === -1) return def;
@@ -39,16 +51,26 @@ const list = (v) => String(v ?? '').split(',').map((s) => s.trim()).filter(Boole
 export const overlayOpts = () => {
   const o = siteDefaults()?.overlays || {};
   const pick = (name, key) => { const v = arg(name, null); return v === null ? (o[key] ?? null) : v; };
-  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')) };
+  const cookie = pick('--cookie', 'cookie') ?? process.env.STARDUST_COOKIE ?? null; if (cookie) process.env.STARDUST_COOKIE = String(cookie); // the children (gate → cap-probe …) read the env; the preload adds them to the vendored tools' contexts
+  const hide = list(pick('--hide', 'hide')); if (hide.length) process.env.STARDUST_HIDE = hide.join(','); else if (process.env.STARDUST_HIDE) hide.push(...process.env.STARDUST_HIDE.split(',')); // the children inherit it
+  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')), cookie: cookie ? String(cookie) : null, hide, chrome: !!o.chrome };
 };
+/** `--cookie 'name=value; name2=value2'` (or the profile's `overlays.cookie`, or STARDUST_COOKIE) as Playwright cookies for the page's host —
+ * an attestation gate (HarbourVest: `HV.attestation`, `HV.country`, `HV.language`) forwarded every cookieless session to a persona page and
+ * loaded the chrome by AJAX after the check; a 35-line case preload did this (loop r5). */
+export const cookiesFor = (url, cookie) => { if (!cookie) return []; let host; try { host = new URL(url).hostname; } catch { return []; } return String(cookie).split(/;\s*/).map((kv) => kv.trim()).filter(Boolean).map((kv) => { const i = kv.indexOf('='); return { name: kv.slice(0, i).trim(), value: kv.slice(i + 1).trim(), domain: host.replace(/^www\./, '.'), path: '/' }; }).filter((c) => c.name); };
 /** The same options as argv for a vendored capture tool's live side (`stitch-shot`, `cap-probe`, `motion-observe`). */
 export const overlayArgs = () => { const o = overlayOpts(); return [...(o.consent ? ['--consent', o.consent] : []), ...(o.dismiss.length ? ['--dismiss', o.dismiss.join(',')] : []), ...(o.locale ? ['--locale', o.locale] : [])]; };
 
 /** Click the dismiss controls, then the first consent control that resolves; a consent accept may RELOAD the page (OneTrust "reload on
  * consent" — stryker-home): every instrument then ran `settle` in a destroyed context. Arm the navigation wait before the click; when it
  * fires, wait the page in again and re-dismiss the other overlays. Returns the control that was clicked (null when none resolved). */
+const OVERLAY_CENSUS = '[id*=onetrust],[class*=onetrust],[id*=consent],[class*=consent],[id*=cookie],[class*=cookie],[class*=truste],[id*=truste],[id*=privacy],[class*=privacy],[role=dialog],[aria-modal=true],[id*=survey],[class*=survey],[id*=feedback],[class*=feedback],[class*=modal],[id*=modal]';
+const overlayCensus = (page) => page.evaluate((q) => [...document.querySelectorAll(q)].filter((el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 40 && r.height > 40 && cs.visibility !== 'hidden' && cs.display !== 'none' && (cs.position === 'fixed' || cs.position === 'absolute'); }).map((el) => `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${[...el.classList].slice(0, 2).map((c) => '.' + c).join('')} [${Math.round(el.getBoundingClientRect().left)},${Math.round(el.getBoundingClientRect().top)},${Math.round(el.getBoundingClientRect().width)},${Math.round(el.getBoundingClientRect().height)}]`), OVERLAY_CENSUS).catch(() => []);
 export async function acceptOverlays(page, { consent = null, dismiss = [], wait = 2500 } = {}) {
   const dismissAll = async () => { for (const sel of dismiss) { try { await page.click(sel, { timeout: 1500 }); } catch { /* absent */ } } };
+  const before = (consent || dismiss.length) ? await overlayCensus(page) : [];
+  const after = async () => { if (!(consent || dismiss.length)) return; await page.waitForTimeout(400); const now = await overlayCensus(page); const fresh = now.filter((s) => !before.includes(s)); if (fresh.length) console.error(`openPage: NEW overlay after the overlay controls — ${fresh.slice(0, 3).join(' ; ')} — a --dismiss control that opens something (a feedback opener)? pass its close control instead; it sits in every capture otherwise`); };
   await dismissAll();
   const candidates = [consent, '#onetrust-accept-btn-handler', '.agree-button', 'button:has-text("Accept all")', 'button:has-text("Accept All")'].filter(Boolean);
   for (const sel of candidates) {
@@ -57,10 +79,10 @@ export async function acceptOverlays(page, { consent = null, dismiss = [], wait 
       await page.click(sel, { timeout: 1200 });
       if (await nav) { console.error(`openPage: consent control ${sel} reloaded the page — waited for it`); await page.waitForTimeout(wait); await dismissAll(); }
       else console.error(`openPage: consent control ${sel} clicked`);
-      return sel;
+      await after(); return sel;
     } catch { /* next */ }
   }
-  return null;
+  await after(); return null;
 }
 
 /** `browser` may also be a BrowserContext (no `newContext`): the caller owns UA, locale, scale and cookies — a consent accepted once holds
@@ -73,7 +95,18 @@ export async function openPage(browser, url, { width = 1440, height = 900, scale
   const page = isContext ? await browser.newPage() : await browser.newPage(contextOptions({ width, height, scale, locale }));
   if (isContext) await page.setViewportSize({ width, height });
   if (before) await before(page); // listeners that must exist before navigation (response log for font requests — media-list)
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
+  // videos never start: autoplay and play() are held, so a video shows its first frame (or its poster) on every load and at every width — a
+  // hero video froze at 2.58 s / 0.62 s / 2.09 s across the three widths and the build matched one still per width (toryburch, ≈ 4 min)
+  if (process.env.STARDUST_VIDEO_PLAY !== '1') await page.addInitScript(() => { try { HTMLMediaElement.prototype.play = function play() { try { this.pause(); } catch { /* detached */ } return Promise.resolve(); }; new MutationObserver((ms) => { for (const m of ms) for (const n of m.addedNodes) { if (n.nodeType !== 1) continue; for (const v of n.tagName === 'VIDEO' ? [n] : n.querySelectorAll?.('video') || []) { v.autoplay = false; v.removeAttribute('autoplay'); } } }).observe(document, { childList: true, subtree: true }); } catch { /* a locked prototype */ } }).catch(() => {});
+  // chat widgets load AFTER settle's one hide pass (okta re-run: the 'Ollie' panel, 290×580 on the right edge, in every stitched tile):
+  // a stylesheet in place before the page's scripts hides the known chat hosts whenever they appear — on both sides
+  await page.addInitScript(() => { const css = '#q-messenger-frame,#qualified-multimodal-host,[id^="qualified"],#intercom-container,#intercom-frame,.intercom-lightweight-app,#hubspot-messages-iframe-container,#drift-widget,#drift-frame-controller,#launcher,#webWidget,iframe[title*="chat" i],[id*="chat-widget" i],#tidio-chat,#crisp-chatbox,.zsiq_floatmain,#fc_frame{display:none!important}'; const add = () => { if (document.getElementById('stardust-chat-hide')) return; const st = document.createElement('style'); st.id = 'stardust-chat-hide'; st.textContent = css; (document.head || document.documentElement).appendChild(st); }; if (document.documentElement) add(); document.addEventListener('DOMContentLoaded', add); });
+  const cookies = cookiesFor(url, overlayOpts().cookie); if (cookies.length) await page.context().addCookies(cookies).catch((e) => console.error(`openPage: cookies not set — ${String(e.message).slice(0, 80)}`));
+  try { await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 }); } catch (e) {
+    // a protocol reset / connection refusal on headless Chromium is the origin's bot tier, not the page: name the next tier before dying
+    if (/ERR_HTTP2|ERR_CONNECTION_RESET|ERR_SSL|ERR_FAILED/.test(String(e.message)) && process.env.STARDUST_CHROME !== '1') console.error(`openPage: ${String(e.message).split('\n')[0].slice(0, 120)} — the origin refuses headless Chromium; run every instrument with --chrome (installed Google Chrome, headless) or STARDUST_CHROME=1, --headed for a window`);
+    throw e;
+  }
   await page.waitForTimeout(wait);
   if (afterLoad) await afterLoad(page);
   await acceptOverlays(page, { consent, dismiss, wait });
@@ -81,14 +114,96 @@ export async function openPage(browser, url, { width = 1440, height = 900, scale
   // fonts are a measurement precondition: the boilerplate loads fonts.css lazily and a table read before the swap measures fallback metrics
   // (sections / pair / deep-probe disagreed by 40–100 px between runs on one page — stryker-home)
   await page.evaluate(() => document.fonts.ready.then(() => document.fonts.status)).catch(() => {});
-  if (require.length) { // composition gate: the session must be the one the cached origin shows (retry the run otherwise)
+  // --hide <css,…> (profile `overlays.hide`): a third-party fixed widget (an accessibility launcher, a chat bubble) is not the page — hidden on every
+  // live reading and capture, and registered (Userway was the whole 360 residue, 2.6 %, bny-leadership, loop r9)
+  const hide = overlayOpts().hide; if (hide.length) await page.addStyleTag({ content: hide.map((s) => `${s} { display: none !important; visibility: hidden !important; }`).join('\n') }).catch(() => {});
+  if (page.url().split('#')[0] !== url.split('#')[0]) console.error(`openPage: URL changed ${url} → ${page.url()} (a redirect or a JS forward: an edition, a locale, an attestation page — measure the page you mean)`);
+  if (require.length) { // composition gate: the session must be the one the cached origin shows (retry the run otherwise); a marker a fragment
+    // loads by AJAX is WAITED for (10 s) before it counts as missing — a one-shot check exited 4 twice on the same fragment race (loop r5)
+    await page.waitForFunction((sels) => sels.every((s) => { try { return !!document.querySelector(s); } catch { return false; } }), require, { timeout: 10000 }).catch(() => {});
     const missing = await page.evaluate((sels) => sels.filter((s) => { try { return !document.querySelector(s); } catch { return true; } }), require);
     if (missing.length) { console.error(`composition mismatch — missing: ${missing.join(' | ')} (exit 4; run again until the session matches the origin)`); await browser.close(); process.exit(4); }
   }
   return page;
 }
 
+/** A page that scrolls INSIDE an element (html / body fixed at the viewport height, `main#app` the scroller — publicis): every instrument read a
+ * 900 px page and the capture photographed one viewport. The scroller and its ancestors are unrolled (height auto, overflow visible, a fixed
+ * position made relative) so the document scrolls and every reading sees the whole page — the build is unrolled the same way. Returns the
+ * scroller's selector, or null when the window scrolls. */
+export async function unrollScroller(page) {
+  const sel = await page.evaluate(() => {
+    const docH = Math.max(document.body?.scrollHeight || 0, document.documentElement.scrollHeight); if (docH > innerHeight + 4) return null;
+    const cands = [...document.querySelectorAll('body *')].filter((e) => { const cs = getComputedStyle(e); return /(auto|scroll)/.test(cs.overflowY) && e.scrollHeight > e.clientHeight + 100 && e.clientHeight > innerHeight * 0.5; }).sort((a, b) => b.scrollHeight - a.scrollHeight);
+    const el = cands[0]; if (!el) return null;
+    for (let x = el; x && x !== document.documentElement; x = x.parentElement) x.setAttribute('data-sd-unrolled', '');
+    const st = document.createElement('style'); st.textContent = 'html, body { height: auto !important; min-height: 0 !important; max-height: none !important; overflow: visible !important; } [data-sd-unrolled] { height: auto !important; max-height: none !important; overflow: visible !important; } [data-sd-unrolled][style*="fixed"], [data-sd-unrolled] { position: relative !important; inset: auto !important; }';
+    document.head.append(st);
+    return `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}${[...el.classList].slice(0, 2).map((c) => `.${c}`).join('')}`;
+  }).catch(() => null);
+  if (sel && !page.__sdUnrolled) { page.__sdUnrolled = sel; console.error(`settle: the page scrolls inside ${sel} — unrolled (html / body auto, the scroller visible) so the readings and the capture see the whole page`); }
+  return sel;
+}
+
+/** Popups and modals are not the page: a fixed layer (not the header) covering ≥ 30 % of the viewport — a locale chooser, a newsletter modal,
+ * their backdrop — is hidden and a body scroll lock released (toryburch: a locale popup and then a welcome modal measured as sections, two
+ * extra `first` runs, ≈ 9 min). Returns the hidden layers' selectors. */
+export async function hideModals(page) {
+  const hidden = await page.evaluate(() => {
+    const vw = innerWidth; const vh = innerHeight; const out = [];
+    for (const e of document.querySelectorAll('body *')) {
+      const cs = getComputedStyle(e); if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0) continue;
+      const r = e.getBoundingClientRect(); const area = Math.max(0, Math.min(r.right, vw) - Math.max(r.left, 0)) * Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+      // a CHAT launcher (a small fixed box pinned to a bottom corner, or a known chat host): stitched, it sat in every viewport tile of the
+      // live capture and held okta's 360 / 1440 at 12 % (the chat column masked: 3.2 %) — hidden on both sides like a modal
+      const chatHost = /(q-messenger|qualified|intercom|drift|zendesk|zEmbed|hubspot-messages|livechat|chat-widget|chatbot|launcher|ollie|olark|tawk|crisp|freshchat|ada-button|webchat)/i.test(`${e.id} ${e.className && e.className.baseVal === undefined ? e.className : ''} ${e.tagName}`);
+      const corner = r.bottom >= vh - 140 && r.bottom <= vh + 2 && (r.right >= vw - 140 || r.left <= 140) && r.width <= Math.min(480, vw * 0.9) && r.height <= Math.min(640, vh * 0.8) && Number(cs.zIndex || 0) >= 10;
+      if ((chatHost || corner) && area < vw * vh * 0.3) { e.setAttribute('data-stardust-hidden', 'chat'); e.style.setProperty('display', 'none', 'important'); out.push(`chat ${e.tagName.toLowerCase()}${e.id ? `#${e.id}` : ''}`); continue; }
+      if (area < vw * vh * 0.3) continue; if (r.top <= 2 && r.height < 220) continue; // a header bar
+      const z = Number(cs.zIndex); if (cs.zIndex === 'auto' || !(z >= 10)) continue; // a modal sits ABOVE the page; a fixed background (a parallax image — deloitte's cmp-cta__bg-img) sits behind it
+      if (e.closest('header') || e.querySelector('main, [role=main]') || e.matches('main, [role=main]') || e.hasAttribute('data-sd-unrolled')) continue; // the page itself
+      if (out.some((o) => o.el.contains(e))) continue;
+      out.push({ el: e, sel: `${e.tagName.toLowerCase()}${e.id ? `#${e.id}` : ''}${[...e.classList].slice(0, 2).map((c) => `.${c}`).join('')}` });
+    }
+    // an open dialog (role=dialog, aria-modal, <dialog open>) in a fixed layer is a modal at any size — its backdrop alone matched the 30 % rule
+    // and the 15 %-off box stayed in toryburch's capture
+    for (const d of document.querySelectorAll('[role=dialog], [aria-modal=true], dialog[open]')) { const r = d.getBoundingClientRect(); if (r.width < 40 || r.height < 40) continue; let fx = false; for (let x = d; x && x !== document.body; x = x.parentElement) if (getComputedStyle(x).position === 'fixed') { fx = true; break; } if (!fx || d.closest('header') || out.some((o) => o.el.contains(d))) continue; out.push({ el: d, sel: `${d.tagName.toLowerCase()}${d.id ? `#${d.id}` : ''}${[...d.classList].slice(0, 2).map((c) => `.${c}`).join('')}` }); }
+    // a stylesheet rule as well as the inline style: a React portal re-rendered its node and the inline style was gone at the capture
+    const ids = (window.__sdModalIds ||= new Set()); for (const o of out) { o.el.style.setProperty('display', 'none', 'important'); o.el.setAttribute('data-sd-modal', ''); if (o.el.id) ids.add(o.el.id); }
+    const st = document.getElementById('sd-hide-modals') || Object.assign(document.createElement('style'), { id: 'sd-hide-modals' }); if (!st.isConnected) document.head.append(st);
+    st.textContent = `[data-sd-modal]${[...ids].map((id) => `, #${CSS.escape(id)}`).join('')} { display: none !important; }`;
+    if (out.length) for (const x of [document.documentElement, document.body]) if (getComputedStyle(x).overflow === 'hidden' && !x.hasAttribute('data-sd-unrolled')) x.style.setProperty('overflow', 'visible', 'important');
+    return out.map((o) => o.sel);
+  }).catch(() => []);
+  for (const h of hidden) if (!(page.__sdModals ||= new Set()).has(h)) { page.__sdModals.add(h); console.error(`settle: a modal layer ${h} covers the viewport — hidden (a popup is not the page; --hide it in the profile to make it explicit)`); }
+  return hidden;
+}
+
+/** Carousels back on slide 1 and paused: an autoplaying carousel was caught on another slide at each width (mheducation: slide 2 at 1440 /
+ * 2560, slide 3 at 360 — the reader lands on slide 1; 360 never reached the target) — the libraries' own APIs (Swiper, Splide, slick,
+ * Bootstrap, Flickity), the first pagination control, then every pending timer cleared (the autoplay). The readings and the capture follow. */
+export async function rewindCarousels(page) {
+  const n = await page.evaluate(() => {
+    let hits = 0; const tryIt = (f) => { try { if (f() !== false) hits += 1; } catch { /* not this library */ } };
+    document.querySelectorAll('.swiper, .swiper-container').forEach((el) => tryIt(() => { if (!el.swiper) return false; el.swiper.autoplay?.stop?.(); el.swiper.slideTo?.(0, 0); return true; }));
+    document.querySelectorAll('.splide').forEach((el) => tryIt(() => { if (!el.splide) return false; el.splide.Components?.Autoplay?.pause?.(); el.splide.go?.(0); return true; }));
+    tryIt(() => { if (!window.jQuery || !window.jQuery.fn?.slick) return false; window.jQuery('.slick-initialized').each(function each() { window.jQuery(this).slick('slickPause'); window.jQuery(this).slick('slickGoTo', 0, true); }); return true; });
+    tryIt(() => { if (!window.bootstrap?.Carousel) return false; document.querySelectorAll('.carousel').forEach((el) => { const c = window.bootstrap.Carousel.getInstance(el); c?.pause(); c?.to(0); }); return true; });
+    tryIt(() => { if (!window.Flickity) return false; document.querySelectorAll('.flickity-enabled').forEach((el) => { const f = window.Flickity.data(el); f?.stopPlayer?.(); f?.select?.(0, false, true); }); return true; });
+    document.querySelectorAll('[aria-label="Go to slide 1"], [aria-label="Slide 1"], .swiper-pagination-bullet:first-child, .slick-dots li:first-child button, .glide__bullet:first-child, .tns-nav button:first-child, .splide__pagination__page:first-of-type, .carousel-indicators [data-bs-slide-to="0"], .owl-dot:first-child').forEach((d) => tryIt(() => { d.click(); return true; }));
+    let id = window.setTimeout(() => {}, 0); while (id-- > 0) { window.clearTimeout(id); window.clearInterval(id); }
+    return hits;
+  }).catch(() => 0);
+  if (n) await page.waitForTimeout(700);
+  return n;
+}
+
 export async function settle(page, step = 600, pause = 120, rest = 1500) {
+  // an anti-flicker style a test tool never lifts for an automated browser (wyndham: Adobe Target's `body{opacity:0}` — every live capture
+  // one colour): the known ones removed, a transparent html / body made visible
+  const unflickered = await page.evaluate(() => { let n = 0; for (const sel of ['style#at-body-style', 'style#alloy-prehiding', 'style.at-flicker-control', 'style#optimizely-hide']) document.querySelectorAll(sel).forEach((e) => { e.remove(); n += 1; }); for (const x of [document.documentElement, document.body]) { if (!x) continue; if (x.classList.contains('async-hide')) { x.classList.remove('async-hide'); n += 1; } if (getComputedStyle(x).opacity === '0' || getComputedStyle(x).visibility === 'hidden') { x.style.setProperty('opacity', '1', 'important'); x.style.setProperty('visibility', 'visible', 'important'); n += 1; } } return n; }).catch(() => 0);
+  if (unflickered && !page.__sdUnflickered) { page.__sdUnflickered = true; console.error(`settle: an anti-flicker style hid the page (${unflickered}) — lifted`); }
+  await unrollScroller(page);
   await page.evaluate(async ({ step, pause, rest }) => {
     for (let y = 0; y < document.body.scrollHeight; y += step) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, pause)); }
     window.scrollTo(0, 0); await new Promise((r) => setTimeout(r, rest));
@@ -101,6 +216,11 @@ export async function settle(page, step = 600, pause = 120, rest = 1500) {
     const finite = (a) => { try { const t = a.effect.getComputedTiming(); return Number.isFinite(t.iterations) && Number.isFinite(t.endTime) && t.endTime < 10000; } catch { return false; } };
     await Promise.race([Promise.all(document.getAnimations().filter((a) => a.playState === 'running' && finite(a)).map((a) => a.finished.catch(() => {}))), timeout(3000)]);
   }, { step, pause, rest });
+  await hideModals(page); // a modal that opened during the settle (a delayed newsletter layer)
+  // lazy pictures still on their placeholder (a 1×1 / data: source) after the scroll: each scrolled into view in turn and waited for — the
+  // settle accepted grey placeholders as loaded (wyndham: two pictures grey at 360 and 1440, the target out of reach)
+  await page.evaluate(async () => { const ph = [...document.images].filter((i) => { const r = i.getBoundingClientRect(); return r.width > 50 && r.height > 50 && (i.naturalWidth <= 2 || /^data:/.test(i.currentSrc || '')) && (i.dataset.src || i.dataset.srcset || i.loading === 'lazy' || i.closest('[data-src],[data-bg]')); }).slice(0, 40); if (!ph.length) return; const hs = [...document.querySelectorAll('*')].filter((e) => e.scrollWidth > e.clientWidth + 1).map((e) => [e, e.scrollLeft]); for (const i of ph) { i.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }); await new Promise((r) => setTimeout(r, 150)); } hs.forEach(([e, x]) => { e.scrollLeft = x; }); /* a slider track scrolled sideways by scrollIntoView went back (lenovo-p2 served 1440: 56 % bands) */ await Promise.race([Promise.all(ph.map((i) => (i.complete && i.naturalWidth > 2 ? null : new Promise((r) => { i.addEventListener('load', r, { once: true }); i.addEventListener('error', r, { once: true }); })))), new Promise((r) => setTimeout(r, 2500))]); window.scrollTo({ top: 0, behavior: 'instant' }); }).catch(() => {});
+  await rewindCarousels(page);
 }
 
 /** Browser-side composed-tree helpers, to be passed into page.evaluate as source (web-component origins keep their paint, boxes and
@@ -125,4 +245,13 @@ export function stardustScripts() {
 export function davidsLint() {
   const here = dirname(fileURLToPath(import.meta.url));
   return process.env.DAVIDS_LINT || join(here, '..', 'tools', 'lint', 'davids-model-lint.mjs');
+}
+
+/** The DA / admin token: DA_TOKEN from the environment, else the aem CLI's token file (~/.aem/da-token.json, written by the refresh script)
+ * when it has not expired — each shell of an agent run starts without the environment it sourced before (bms: the harness could not re-upload
+ * an edited nav). Never printed. */
+export function daToken() {
+  if (process.env.DA_TOKEN) return process.env.DA_TOKEN;
+  try { const f = join(process.env.HOME || '', '.aem', 'da-token.json'); const j = JSON.parse(readFileSync(f, 'utf8')); const exp = Number(j.expires_at) || 0; if (j.access_token && (!exp || exp * (exp < 1e12 ? 1000 : 1) > Date.now() + 60000)) return j.access_token; } catch { /* no file */ }
+  return null;
 }

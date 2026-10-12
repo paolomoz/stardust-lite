@@ -1,0 +1,4 @@
+/* footer — foundation skeleton: structure only; sizes, colours, columns and gaps come from the spec (brief's footer row).
+   One level: .footer > .footer-1 / .footer-2 / … (the authored sections, their section styles as classes) */
+footer .footer ul { list-style: none; margin: 0; padding: 0; }
+footer .footer > div { width: 100%; }

@@ -6,18 +6,18 @@
 // authored texts it holds (23 correctly authored captions and tab texts read as "not in the capture" — hiltongrandvacations-home).
 // Usage: node click-dump.mjs <url> <W> --panel <css> --click <css> [--click <css> …] [--open <css>] [--out <file.json>] [--wait 900]
 //        [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>]
-import { chromium } from 'playwright';
 import { writeFileSync } from 'node:fs';
-import { arg, openPage, overlayOpts } from './common.mjs';
+import { arg, openPage, overlayOpts, launch } from './common.mjs';
 
 const [url, wArg] = process.argv.slice(2); const panel = arg('--panel', null);
 const clicks = process.argv.map((a, i, all) => (a === '--click' ? all[i + 1] : null)).filter((v) => v && !v.startsWith('--'));
 if (!url || !wArg || !panel || !clicks.length) { console.error('usage: click-dump.mjs <url> <W> --panel <css> --click <css> [--click <css> …] [--open <css>] [--out <file.json>] [--wait 900]'); process.exit(1); }
 const W = Number(wArg); const wait = Number(arg('--wait', 900)); const open = arg('--open', null);
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: W, height: 900, ...overlayOpts() });
+const browser = await launch(); const page = await openPage(browser, url, { width: W, height: 900, ...overlayOpts() });
 
 const dump = () => page.evaluate((s) => {
-  const roots = [...document.querySelectorAll(s)]; if (!roots.length) return { nodes: [], lines: [`NO PANEL ${s}`] };
+  const qsa = (sel) => { const out = []; const walk0 = (e) => { for (const c of (e.shadowRoot ? [...e.shadowRoot.children, ...e.children] : [...e.children])) { if (c.matches && c.matches(sel)) out.push(c); walk0(c); } }; walk0(document.documentElement); return [...new Set(out)]; }; // composed tree (a panel inside a shadow root — manulife)
+  const roots = qsa(s); if (!roots.length) return { nodes: [], lines: [`NO PANEL ${s}`] };
   const norm = (t) => t.replace(/\s+/g, ' ').trim(); const lines = [];
   const walk = (el, d) => {
     const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);

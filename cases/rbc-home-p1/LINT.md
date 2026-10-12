@@ -1,0 +1,3 @@
+🟡 D1 doc/rbc-home.html: section (unnamed) → block "cards": single-column, 3-row block holding only prose elements — default-content candidate (justify in the conversion log if it is a genuine bespoke widget)
+🟡 D4 doc/rbc-home.html: 6 authored SVG media reference(s) — batch-verify pure-vector (an SVG embedding raster data URIs 409s the whole page's preview, #99): https://blocks-first--sdt-rbc-p1--aemcoder-adobe.aem.page/drafts/media/icon-branch.svg, https://blocks-first--sdt-rbc-p1--aemcoder-adobe.aem.page/drafts/media/icon-investments.svg, https://blocks-first--sdt-rbc-p1--aemcoder-adobe.aem.page/drafts/media/icon-insurance.svg, https://blocks-first--sdt-rbc-p1--aemcoder-adobe.aem.page/drafts/media/dollar-hand.svg (+2 more)
+PASS — 0 🔴, 2 🟡 (rules: ../davids-model.md)

@@ -13,22 +13,21 @@
 // its box is its contents' range box, and it counts as a block. A live anchor the spec read inside an entrance state (`rest` on the item:
 // an AOS wrapper at translateY/opacity 0 — step 1) is compared at its rest box.
 // Usage: node pair.mjs <spec.json> <build-url> [--max 120] [--filter <regex>] [--all]   (--all also prints rows within tolerance) [--consent <css>] [--dismiss <css,…>] [--locale <tag>] [--require <css,…>]
-import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
-import { arg, openPage, settle, overlayOpts } from './common.mjs';
+import { arg, openPage, settle, overlayOpts, launch } from './common.mjs';
 
 const [,, specPath, url] = process.argv;
 if (!specPath || !url) { console.error('usage: pair.mjs <spec.json> <build-url> [--max 120] [--filter <regex>] [--all]'); process.exit(1); }
 const spec = JSON.parse(readFileSync(specPath, 'utf8')); const MAX = Number(arg('--max', 120)); const filter = arg('--filter', null) ? new RegExp(arg('--filter')) : null; const all = arg('--all', false);
 const anchors = []; const seen = new Set();
-for (const s of spec.secs) for (const it of s.items) {
+spec.secs.forEach((s, si) => { for (const it of s.items) {
   if (!['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'span', 'button', 'li', 'div'].includes(it.k)) continue;
   // off-page anchors (a 4×4 "Skip Advertisement" link at x −995) are not visible text: they pair with nothing a reader sees (usta2-home)
   if (!it.t || it.t.length < 3 || it.box[0] >= spec.W || it.box[0] + it.box[2] <= 0 || it.box[3] < 8) continue;
   const key = it.t.slice(0, 28); if (seen.has(key)) continue; if (filter && !filter.test(it.t)) continue;
-  seen.add(key); anchors.push({ t: key, box: it.rest || it.box, cbox: it.cbox || null, pad: it.pad || null, fs: it.fs, lh: it.lh, fw: it.fw, ff: it.ff, c: it.c, tt: it.tt, inline: !!it.inline || it.k === 'a' || it.k === 'span' });
-}
-const browser = await chromium.launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800, ...overlayOpts() });
+  seen.add(key); anchors.push({ sec: si, t: key, box: it.rest || it.box, cbox: it.cbox || null, pad: it.pad || null, fs: it.fs, lh: it.lh, fw: it.fw, ff: it.ff, c: it.c, tt: it.tt, inline: !!it.inline || it.k === 'a' || it.k === 'span' });
+} });
+const browser = await launch(); const page = await openPage(browser, url, { width: spec.W, height: spec.vh || 900, wait: 800, ...overlayOpts() });
 await settle(page, 800, 50, 400);
 const out = await page.evaluate((anchors) => {
   // `display: contents` paints its children and has a 0×0 rect: its box is the range box of its contents
@@ -41,7 +40,9 @@ const out = await page.evaluate((anchors) => {
   let prevBlock = null;
   return anchors.map((a) => {
     const lc = a.t.toLowerCase();
-    const cands = all.filter((e) => norm(e.textContent).toLowerCase().startsWith(lc) || norm([...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(' ')).toLowerCase().startsWith(lc));
+    let cands = all.filter((e) => norm(e.textContent).toLowerCase().startsWith(lc) || norm([...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(' ')).toLowerCase().startsWith(lc));
+    // a short control text ("Search", "Sign in") starts many longer texts: when some candidate's text IS the anchor, only those count (manulife: every table anchored them on another element)
+    if (lc.length <= 12) { const exact = cands.filter((e) => norm(e.textContent).toLowerCase() === lc || norm([...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(' ')).toLowerCase() === lc); if (exact.length) cands = exact; }
     // nearest the live y first (the same words recur in nav, cards and footer), shortest text second
     let e = cands.sort((x, y) => Math.abs(rect(x).top + scrollY - a.box[1]) - Math.abs(rect(y).top + scrollY - a.box[1]) || x.textContent.length - y.textContent.length)[0];
     if (!e) {
@@ -67,10 +68,15 @@ const lineBox = (a) => { const lh = parseFloat(a.lh); if (!a.inline || a.pad || 
 // the live box a row compares against: the control box (⌗), else the line box when it explains the build height better than the glyph
 // box (a padded footer span is as tall as the build's p — its glyph box is the right one), else the glyph box
 const liveBox = (a, o) => { if (!o) return a.box; if (o.ctl) return a.cbox; const lb = o.block ? lineBox(a) : null; return lb && Math.abs(o.box[3] - lb[3]) < Math.abs(o.box[3] - a.box[3]) ? lb : a.box; };
-console.log('anchor'.padEnd(30), 'live box'.padEnd(22), 'build box'.padEnd(22), 'Δx  Δy  Δw  Δh | font live → build');
+// rows grouped per live section, with the section's cascade removed: Δy·loc = the row's Δy minus the Δy of the section's first located
+// anchor — a local offset is this section's CSS, a cascade is an earlier section's height (six minutes over four tables deciding which, cibc-careers)
+const secBase = {}; anchors.forEach((a, i) => { const o = out[i]; if (o && !o.cont && !(a.sec in secBase)) secBase[a.sec] = o.box[1] - liveBox(a, o)[1]; });
+let lastSec = -1;
+console.log('anchor'.padEnd(30), 'live box'.padEnd(22), 'build box'.padEnd(22), 'Δx  Δy  Δw  Δh Δy·loc | font live → build');
 let n = 0;
 anchors.forEach((a, i) => {
   if (n >= MAX) return; const o = out[i];
+  if (a.sec !== lastSec && (all || !o || (() => { const lb0 = liveBox(a, o); const d0 = [o.box[0] - lb0[0], o.box[1] - lb0[1], 0, o.box[3] - lb0[3]]; return d0.some((v) => Math.abs(v) > 3) || a.fs !== o.fs || a.fw !== o.fw || a.c !== o.c || (a.tt && a.tt !== o.tt) || String(a.ff || '').toLowerCase() !== String(o.ff || '').toLowerCase(); })())) { lastSec = a.sec; console.log(`-- section ${a.sec} ${String(spec.secs[a.sec].id).slice(0, 36)} y${spec.secs[a.sec].box[1]}${a.sec in secBase ? ` (cascade Δy ${secBase[a.sec] > 0 ? '+' : ''}${secBase[a.sec]} from its first anchor; Δy·loc below is the section's own)` : ''}`); }
   if (o && o.cont) { if (all) { n += 1; console.log(`${a.t.slice(0, 26)} ⤷`.padEnd(30), JSON.stringify(a.box).padEnd(22), JSON.stringify(o.box).padEnd(22), '   line of the previous anchor'); } return; }
   const lb = liveBox(a, o); // control paired with control (⌗); inline glyph box read as its line box (≈)
   const d = o ? [o.box[0] - lb[0], o.box[1] - lb[1], o.box[2] - lb[2], o.box[3] - lb[3]] : null;
@@ -81,8 +87,8 @@ anchors.forEach((a, i) => {
   const ffHot = o && String(a.ff || '').toLowerCase() !== String(o.ff || '').toLowerCase();
   const hot = !o || Math.abs(d[0]) > 3 || Math.abs(d[1]) > 3 || Math.abs(d[3]) > 3 || a.fs !== o.fs || a.fw !== o.fw || a.c !== o.c || ttHot || ffHot;
   if (!all && !hot) return; n += 1;
-  const f = o ? `${a.fs}/${a.lh} ${a.fw} ${a.ff.slice(0, 7)} → ${o.fs}/${o.lh} ${o.fw} ${(ffHot ? o.ff : a.ff).slice(0, 7)}${a.c !== o.c ? ` COLOR ${a.c}→${o.c}` : ''}${ttHot ? ` TRANSFORM ${a.tt}→${o.tt}` : ''}${ffHot ? ` FAMILY ${a.ff}→${o.ff}` : ''}` : '';
-  console.log((o && o.ctl ? `${a.t.slice(0, 26)} ⌗` : (lb !== a.box ? `${a.t.slice(0, 26)} ≈` : a.t)).padEnd(30), JSON.stringify(lb).padEnd(22), (o ? JSON.stringify(o.box) : '-').padEnd(22), o ? d.map((v) => String(v).padStart(4)).join('') : ' MISSING', '|', f);
+  const f = o ? `${a.fs}/${a.lh} ${a.fw} ${a.ff.slice(0, 7)} → ${o.fs}/${o.lh} ${o.fw} ${(ffHot ? o.ff : a.ff).slice(0, 7)}${a.pad && Math.abs(d[3]) > 3 ? ` live pad ${a.pad} (box = padding + lines × lh: a padding on the text, not a margin)` : ''}${a.c !== o.c ? ` COLOR ${a.c}→${o.c}` : ''}${ttHot ? ` TRANSFORM ${a.tt}→${o.tt}` : ''}${ffHot ? ` FAMILY ${a.ff}→${o.ff}` : ''}` : '';
+  console.log((o && o.ctl ? `${a.t.slice(0, 26)} ⌗` : (lb !== a.box ? `${a.t.slice(0, 26)} ≈` : a.t)).padEnd(30), JSON.stringify(lb).padEnd(22), (o ? JSON.stringify(o.box) : '-').padEnd(22), o ? d.map((v) => String(v).padStart(4)).join('') + String(d[1] - (secBase[a.sec] ?? 0)).padStart(6) : ' MISSING', '|', f);
 });
 console.log(`${anchors.length} anchors, ${out.filter(Boolean).length} located${out.some((o) => o && o.cont) ? ` (${out.filter((o) => o && o.cont).length} ⤷ continuation lines of a split paragraph, inside the previous anchor's build box)` : ''}${out.some((o) => o && o.ctl) ? ', ⌗ = control paired with control' : ''}${out.some((o, i) => o && liveBox(anchors[i], o) !== anchors[i].box && !o.ctl) ? ', ≈ = live inline glyph box read as its line box' : ''}${all ? '' : ` (rows within 3 px and same font hidden; --all shows them)`}`);
 // group offsets: ≥ 3 consecutive located anchors sharing the same non-zero Δx or Δy (any magnitude, tolerance or not)

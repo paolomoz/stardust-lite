@@ -1,0 +1,13 @@
+# Cerebras qwen-3.8-27b served under a Claude model name: Claude Code rejects names it does not know. Only THIS local proxy maps it.
+model_list:
+  - model_name: claude-sonnet-5-5
+    litellm_params:
+      model: cerebras/qwen-3.8-27b
+      api_key: os.environ/CEREBRAS_API_KEY
+  - model_name: qwen-3.8-27b
+    litellm_params:
+      model: cerebras/qwen-3.8-27b
+      api_key: os.environ/CEREBRAS_API_KEY
+litellm_settings:
+  drop_params: true
+  callbacks: strip_thinking.strip_thinking

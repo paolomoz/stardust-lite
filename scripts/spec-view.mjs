@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // spec-view.mjs — compact readout of a live-spec JSON. Usage: node spec-view.mjs <spec.json> [sectionIndex …]
 import { readFileSync } from 'node:fs';
+if (!process.argv[2]) { console.error('usage: spec-view.mjs <spec.json> [sectionIndex …]'); process.exit(1); }
 const spec = JSON.parse(readFileSync(process.argv[2], 'utf8')); const only = process.argv.slice(3).map(Number);
 console.log('W', spec.W, 'doc', spec.doc);
 spec.secs.forEach((s, i) => {

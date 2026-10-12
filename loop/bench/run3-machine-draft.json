@@ -1,0 +1,1274 @@
+{
+ "_schema": "stardust-lite/bench@1",
+ "_writtenAt": "2026-10-09T21:11:10.490Z",
+ "mode": "machine",
+ "triage": "draft",
+ "widths": "360,1440,2560",
+ "results": [
+  {
+   "site": "sdt-bny",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "novelty 50 % (2 new / 4 sections; inventory 0, collection 0, default 2) → /tmp/stardust-bench3/sdt-bny-machine-draft/triage.json + /tmp/stardust-bench3/sdt-bny-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-bny-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 2 unassigned band(s) outside main (measure-page's extra roots) are rows of their own — chrome or content, decide in the table (a breadcrumb bar never reached the document before — wellsfargo)\ntriage: 2 sections split as measure-page's --sections marked them (the spec's and the gate's split)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "3   default   —                                        —        65     \n4 sections → /tmp/stardust-bench3/sdt-bny-machine-draft/doc/leadership.html (86 texts, 2 block sections, 2 default, 2 new)\nauthor: 2 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)\nauthor: 22 empty spacer paragraph(s) in the source (24 px at y 312, 24 px at y 352, 24 px at y 962, 24 px at y 1010, 24 px at y 962, 24 px at y 962, 24 px at y 1470, 24 px at y 1422, 24 px at y 1422, 24 px at y 1446, 24 px at y 1882, 24 px at y 1906, 24 px at y 1882, 24 px at y 1882, 24 px at y 2318, 24 px at y 2366, 24 px at y 2342, 24 px at y 2342, 24 px at y 2778, 24 px at y 2802, 24 px at y 2778, 24 px at y 2778) dropped — the pipeline drops <p>&nbsp;</p> and <p><br></p> too; a section table Δh of that size is this: model the rhythm in the section style or file it as a deviation (--keep-spacers writes a zero-width-space paragraph, an anti-pattern METHOD names)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/accordion/accordion.css: 2 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 9 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 3.3,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 11753\nprototype (gate this): http://localhost:8930/leadership.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-bny-machine-draft/proto/leadership.html\nsite: /private/tmp/stardust-bench3/sdt-bny-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 85.9,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached, build 15.4 s, compare 0.9 s, sections — | 1440: live cached, build 16.6 s, compare 1.5 s, sections — | 2560: live cached, build 17.2 s, compare 2.2 s, sections — | cap-probe 24.5 s, sections pass 7.2 s | total 85.8 s\nevidence: /tmp/stardust-bench3/sdt-bny-machine-draft/gate/\nsite: /private/tmp/stardust-bench3/sdt-bny-machine-draft/migration/site.json\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 71.7,
+     "dh": -4217
+    },
+    {
+     "W": 1440,
+     "pct": 44.7,
+     "dh": -8246
+    },
+    {
+     "W": 2560,
+     "pct": 29.38,
+     "dh": -8246
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 15.4,
+     "compare": 0.9,
+     "sections": null
+    },
+    "1440": {
+     "live": 0,
+     "build": 16.6,
+     "compare": 1.5,
+     "sections": null
+    },
+    "2560": {
+     "live": 0,
+     "build": 17.2,
+     "compare": 2.2,
+     "sections": null
+    }
+   }
+  },
+  {
+   "site": "sdt-canonusa",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.usa.canon.com/support/about-consumer-support",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "novelty 40 % (2 new / 5 sections; inventory 0, collection 0, default 3) → /tmp/stardust-bench3/sdt-canonusa-machine-draft/triage.json + /tmp/stardust-bench3/sdt-canonusa-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-canonusa-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 2 unassigned band(s) outside main (measure-page's extra roots) are rows of their own — chrome or content, decide in the table (a breadcrumb bar never reached the document before — wellsfargo)\ntriage: 3 sections split as measure-page's --sections marked them (the spec's and the gate's split)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "4   default   —                                        —        9      \n5   NEW       accordion · 5 × 2                        10/10    48     default recipe: the Block Collection's accordion shape (no recipe in blocks.json); NEW drafted through the col\n5 sections → /tmp/stardust-bench3/sdt-canonusa-machine-draft/doc/about-consumer-support.html (82 texts, 2 block sections, 3 default, 2 new)\nauthor: 1 empty spacer paragraph(s) in the source (26 px at y 1929) dropped — the pipeline drops <p>&nbsp;</p> and <p><br></p> too; a section table Δh of that size is this: model the rhythm in the section style or file it as a deviation (--keep-spacers writes a zero-width-space paragraph, an anti-pattern METHOD names)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/cards/cards.css: 1 section(s)\nblocks/header/header.css: 1 section(s)\nstyles/sections-draft.css: 11 rule(s)\nspec-to-css: section 4 (accordion) — no live section pairs with the triage row's spec box; skipped"
+    },
+    {
+     "step": "harness",
+     "seconds": 2.8,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 6141\nprototype (gate this): http://localhost:8931/about-consumer-support.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-canonusa-machine-draft/proto/about-consumer-support.html\nsite: /private/tmp/stardust-bench3/sdt-canonusa-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 51,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached (opened 9.2 s), build 13.2 s, compare 0.6 s, sections 0.2 s | 1440: live cached (opened 9.2 s), build 12.7 s, compare 1 s, sections 0.4 s | 2560: live cached (opened 9.2 s), build 13 s, compare 1.6 s, sections 0.6 s | cap-probe 0.5 s, sections pass 6.9 s | total 51 s\nevidence: /tmp/stardust-bench3/sdt-canonusa-machine-draft/gate/\nsite: /private/tmp/stardust-bench3/sdt-canonusa-machine-draft/migration/site.json\nd) — bot challenge at https://www.usa.canon.com/support/about-consumer-support: HTTP 403 + Akamai edge signature — the live side served an edge interstitial, NOT the page; refusing to measure it as the source. Escalate with --headed (stealth real Chrome); if that is still blocked, the site needs crawl.mjs-class capture (extract's bot-management ladder) and the gate cannot run against it headless."
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 51.77,
+     "dh": -2000
+    },
+    {
+     "W": 1440,
+     "pct": 41.26,
+     "dh": -2767
+    },
+    {
+     "W": 2560,
+     "pct": 37.07,
+     "dh": -2764
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 13.2,
+     "compare": 0.6,
+     "sections": 0.2,
+     "liveOpen": 9.2
+    },
+    "1440": {
+     "live": 0,
+     "build": 12.7,
+     "compare": 1,
+     "sections": 0.4,
+     "liveOpen": 9.2
+    },
+    "2560": {
+     "live": 0,
+     "build": 13,
+     "compare": 1.6,
+     "sections": 0.6,
+     "liveOpen": 9.2
+    }
+   }
+  },
+  {
+   "site": "sdt-cibc",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.cibc.com/en/about-cibc/careers.html",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "13  footer                             ([hr [a×2]×2 hr ([[[a ul]×2]×2]×2)]×3) ((pic —            footer: new                          —       no footer block in the inventory\nnovelty 58 % (7 new / 12 sections; inventory 0, collection 0, default 5) → /tmp/stardust-bench3/sdt-cibc-machine-draft/triage.json + /tmp/stardust-bench3/sdt-cibc-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-cibc-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 1 unassigned band(s) outside main (measure-page's extra roots) are rows of their own — chrome or content, decide in the table (a breadcrumb bar never reached the document before — wellsfargo)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "10  NEW       cards · 3 × 2                            6/6      9      default recipe: the Block Collection's cards shape (no recipe in blocks.json); NEW drafted through the collect\n11  default   —                                        —        1      \n12  default   —                                        —        5      \n12 sections → /tmp/stardust-bench3/sdt-cibc-machine-draft/doc/careers.html (120 texts, 7 block sections, 5 default, 7 new)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 5 rule(s)\nspec-to-css: the document has 11 sections, the triage 12 non-chrome rows — paired by order up to the shorter (the authored order is the triage's)\nspec-to-css: section 0 (default) — no live section pairs with the triage row's spec box; skipped"
+    },
+    {
+     "step": "harness",
+     "seconds": 3,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 10527\nprototype (gate this): http://localhost:8932/careers.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-cibc-machine-draft/proto/careers.html\nsite: /private/tmp/stardust-bench3/sdt-cibc-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 60.4,
+     "exit": 0,
+     "ok": true,
+     "out": "openPage: page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.cibc.com/en/about-cibc/careers.html — the origin refuses headless Chromium; run every instrument with --chrome (installed Google Chrome, headless) or STARDUST_CHROME=1, --headed for a window\ncap-probe: page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.cibc.com/en/about-cibc/careers.html\nCall log:\n\u001b[2m  - navigating to \"https://www.cibc.com/en/about-cibc/careers.html\", waiting until \"domcontentloaded\"\u001b[22m"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 29.81,
+     "dh": -3747
+    },
+    {
+     "W": 1440,
+     "pct": 25.92,
+     "dh": -5316
+    },
+    {
+     "W": 2560,
+     "pct": 20.39,
+     "dh": -5316
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 14.9,
+     "compare": 0.6,
+     "sections": null
+    },
+    "1440": {
+     "live": 0,
+     "build": 15.2,
+     "compare": 1.5,
+     "sections": null
+    },
+    "2560": {
+     "live": 0,
+     "build": 15.8,
+     "compare": 2.4,
+     "sections": null
+    }
+   }
+  },
+  {
+   "site": "sdt-citizensbank",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.citizensbank.com/about-us/sustainability-impact.aspx",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "9   footer                             (picture [h5 a×3]×3) [a×4]×2                 —            footer: new                          —       no footer block in the inventory\nnovelty 50 % (4 new / 8 sections; inventory 0, collection 0, default 4) → /tmp/stardust-bench3/sdt-citizensbank-machine-draft/triage.json + /tmp/stardust-bench3/sdt-citizensbank-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-citizensbank-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 8 sections split as measure-page's --sections marked them (the spec's and the gate's split)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "6   default   —                                        —        1      \n7   NEW       cards · 4 × 2                            8/8      12     default recipe: the Block Collection's cards shape (no recipe in blocks.json); NEW drafted through the collect\n8   default   —                                        —        1      \n8 sections → /tmp/stardust-bench3/sdt-citizensbank-machine-draft/doc/sustainability-impact.html (56 texts, 4 block sections, 4 default, 4 new)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/accordion/accordion.css: 1 section(s)\nblocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 12 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 3,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 9138\nprototype (gate this): http://localhost:8933/sustainability-impact.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-citizensbank-machine-draft/proto/sustainability-impact.html\nsite: /private/tmp/stardust-bench3/sdt-citizensbank-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 59.3,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached (opened 9.2 s), build 13.6 s, compare 0.7 s, sections 0.3 s | 1440: live cached (opened 9.2 s), build 14.8 s, compare 1.2 s, sections 0.5 s | 2560: live cached (opened 9.2 s), build 16.9 s, compare 2.3 s, sections 1 s | cap-probe 0.5 s, sections pass 7.1 s | total 59.3 s\nevidence: /tmp/stardust-bench3/sdt-citizensbank-machine-draft/gate/\nsite: /private/tmp/stardust-bench3/sdt-citizensbank-machine-draft/migration/site.json\n challenge at https://www.citizensbank.com/about-us/sustainability-impact.aspx: HTTP 403 + Akamai edge signature — the live side served an edge interstitial, NOT the page; refusing to measure it as the source. Escalate with --headed (stealth real Chrome); if that is still blocked, the site needs crawl.mjs-class capture (extract's bot-management ladder) and the gate cannot run against it headless."
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 39.24,
+     "dh": -1749
+    },
+    {
+     "W": 1440,
+     "pct": 38.21,
+     "dh": -5995
+    },
+    {
+     "W": 2560,
+     "pct": 51.38,
+     "dh": -7823
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 13.6,
+     "compare": 0.7,
+     "sections": 0.3,
+     "liveOpen": 9.2
+    },
+    "1440": {
+     "live": 0,
+     "build": 14.8,
+     "compare": 1.2,
+     "sections": 0.5,
+     "liveOpen": 9.2
+    },
+    "2560": {
+     "live": 0,
+     "build": 16.9,
+     "compare": 2.3,
+     "sections": 1,
+     "liveOpen": 9.2
+    }
+   }
+  },
+  {
+   "site": "sdt-covermore",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.covermore.com/travel-assistance",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "novelty 0 % (0 new / 19 sections; inventory 0, collection 0, default 19) → /tmp/stardust-bench3/sdt-covermore-machine-draft/triage.json + /tmp/stardust-bench3/sdt-covermore-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-covermore-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 17 unassigned band(s) outside main (measure-page's extra roots) are rows of their own — chrome or content, decide in the table (a breadcrumb bar never reached the document before — wellsfargo)\ntriage: 2 sections split as measure-page's --sections marked them (the spec's and the gate's split)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "17  default   —                                        —        1      \n18  default   —                                        —        2      \n19  default   —                                        —        10     \n19 sections → /tmp/stardust-bench3/sdt-covermore-machine-draft/doc/travel-assistance.html (134 texts, 0 block sections, 19 default, 0 new)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 64 rule(s)\nspec-to-css: section 0 (default) — no live section pairs with the triage row's spec box; skipped"
+    },
+    {
+     "step": "harness",
+     "seconds": 2.4,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 4726\nprototype (gate this): http://localhost:8934/travel-assistance.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-covermore-machine-draft/proto/travel-assistance.html\nsite: /private/tmp/stardust-bench3/sdt-covermore-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 64.4,
+     "exit": 0,
+     "ok": true,
+     "out": "tables: 3 row(s) off — 360 #1 \"Home\" Δh -123 (default); 1440 #1 \"Home\" Δh +262 (default); 2560 #1 \"Home\" Δh +539 (default)\ntiming (stitch, live and build concurrent): 360: live cached (opened 26.9 s), build 14.5 s, compare 0.4 s, sections 0.1 s | 1440: live cached (opened 26.7 s), build 12.1 s, compare 0.7 s, sections 0.2 s | 2560: live cached (opened 26.7 s), build 12.4 s, compare 1 s, sections 0.4 s | cap-probe 15.3 s, sections pass 7.1 s | total 64.4 s\nevidence: /tmp/stardust-bench3/sdt-covermore-machine-draft/gate/\nsite: /private/tmp/stardust-bench3/sdt-covermore-machine-draft/migration/site.json"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 19.74,
+     "dh": -8403
+    },
+    {
+     "W": 1440,
+     "pct": 26.03,
+     "dh": -3802
+    },
+    {
+     "W": 2560,
+     "pct": 22.44,
+     "dh": -3839
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 14.5,
+     "compare": 0.4,
+     "sections": 0.1,
+     "liveOpen": 26.9
+    },
+    "1440": {
+     "live": 0,
+     "build": 12.1,
+     "compare": 0.7,
+     "sections": 0.2,
+     "liveOpen": 26.7
+    },
+    "2560": {
+     "live": 0,
+     "build": 12.4,
+     "compare": 1,
+     "sections": 0.4,
+     "liveOpen": 26.7
+    }
+   }
+  },
+  {
+   "site": "sdt-harbourvest",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.harbourvest.com/it/en/about-harbourvest",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "novelty 75 % (6 new / 8 sections; inventory 0, collection 0, default 2) → /tmp/stardust-bench3/sdt-harbourvest-machine-draft/triage.json + /tmp/stardust-bench3/sdt-harbourvest-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-harbourvest-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 1 unassigned band(s) outside main (measure-page's extra roots) are rows of their own — chrome or content, decide in the table (a breadcrumb bar never reached the document before — wellsfargo)\ntriage: 7 sections split as measure-page's --sections marked them (the spec's and the gate's split)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 3,
+     "ok": true,
+     "out": "8   NEW       cards · 3 × 2                            5/6      5      default recipe: the Block Collection's cards shape (no recipe in blocks.json); NEW drafted through the collect\n8 sections → /tmp/stardust-bench3/sdt-harbourvest-machine-draft/doc/about-harbourvest.html (59 texts, 5 block sections, 2 default, 6 new)\nauthor: 1 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)\nauthor: a NEW section was emitted as default content — triage it (name the block, write its recipe), then run author again (exit 3)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 7 rule(s)\nspec-to-css: section 0 (default) — no live section pairs with the triage row's spec box; skipped"
+    },
+    {
+     "step": "harness",
+     "seconds": 2.9,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 9086\nprototype (gate this): http://localhost:8935/about-harbourvest.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-harbourvest-machine-draft/proto/about-harbourvest.html\nsite: /private/tmp/stardust-bench3/sdt-harbourvest-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 80,
+     "exit": 0,
+     "ok": true,
+     "out": "site: /private/tmp/stardust-bench3/sdt-harbourvest-machine-draft/migration/site.json\nopenPage: URL changed https://www.harbourvest.com/it/en/about-harbourvest → https://www.harbourvest.com/us/en?preventForwarding=true (a redirect or a JS forward: an edition, a locale, an attestation page — measure the page you mean)\nopenPage: URL changed https://www.harbourvest.com/it/en/about-harbourvest → https://www.harbourvest.com/us/en?preventForwarding=true (a redirect or a JS forward: an edition, a locale, an attestation page — measure the page you mean)\nopenPage: URL changed https://www.harbourvest.com/it/en/about-harbourvest → https://www.harbourvest.com/us/en?preventForwarding=true (a redirect or a JS forward: an edition, a locale, an attestation page — measure the page you mean)"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 37.72,
+     "dh": 1431
+    },
+    {
+     "W": 1440,
+     "pct": 48.24,
+     "dh": -4021
+    },
+    {
+     "W": 2560,
+     "pct": 38.49,
+     "dh": -4848
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 13.6,
+     "compare": 0.8,
+     "sections": 0.3,
+     "liveOpen": 13
+    },
+    "1440": {
+     "live": 0,
+     "build": 15.6,
+     "compare": 2,
+     "sections": 1.1,
+     "liveOpen": 12.4
+    },
+    "2560": {
+     "live": 0,
+     "build": 16.4,
+     "compare": 3.2,
+     "sections": 1.5,
+     "liveOpen": 12.8
+    }
+   }
+  },
+  {
+   "site": "sdt-manulife",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.manulife.com/ca/en/business",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "8   footer                                                                          —            footer: new                          —       no footer block in the inventory\nnovelty 71 % (5 new / 7 sections; inventory 0, collection 0, default 2) → /tmp/stardust-bench3/sdt-manulife-machine-draft/triage.json + /tmp/stardust-bench3/sdt-manulife-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-manulife-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 7 sections split as measure-page's --sections marked them (the spec's and the gate's split)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 3,
+     "ok": true,
+     "out": "7   NEW       —                                        —        0      NEW section: emitted as default content; triage it first (exit 3)\n7 sections → /tmp/stardust-bench3/sdt-manulife-machine-draft/doc/business.html (33 texts, 3 block sections, 2 default, 5 new)\nauthor: 6 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)\nauthor: a NEW section was emitted as default content — triage it (name the block, write its recipe), then run author again (exit 3)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 10 rule(s)\nspec-to-css: the document has 5 sections, the triage 7 non-chrome rows — paired by order up to the shorter (the authored order is the triage's)"
+    },
+    {
+     "step": "harness",
+     "seconds": 2.3,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 2914\nprototype (gate this): http://localhost:8936/business.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-manulife-machine-draft/proto/business.html\nsite: /private/tmp/stardust-bench3/sdt-manulife-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 46.6,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached (opened 10.9 s), build 10.9 s, compare 0.5 s, sections 0.1 s | 1440: live cached (opened 10.9 s), build 11 s, compare 1.2 s, sections 0.5 s | 2560: live cached (opened 10.9 s), build 11.2 s, compare 1.6 s, sections 0.6 s | cap-probe 0.4 s, sections pass 8.3 s | total 46.5 s\nevidence: /tmp/stardust-bench3/sdt-manulife-machine-draft/gate/\nsite: /private/tmp/stardust-bench3/sdt-manulife-machine-draft/migration/site.json\n escalate --headed) — bot challenge at https://www.manulife.com/ca/en/business: HTTP 403 + Akamai edge signature — the live side served an edge interstitial, NOT the page; refusing to measure it as the source. Escalate with --headed (stealth real Chrome); if that is still blocked, the site needs crawl.mjs-class capture (extract's bot-management ladder) and the gate cannot run against it headless."
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 43.37,
+     "dh": 2108
+    },
+    {
+     "W": 1440,
+     "pct": 35.26,
+     "dh": 1436
+    },
+    {
+     "W": 2560,
+     "pct": 33.93,
+     "dh": 1436
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 10.9,
+     "compare": 0.5,
+     "sections": 0.1,
+     "liveOpen": 10.9
+    },
+    "1440": {
+     "live": 0,
+     "build": 11,
+     "compare": 1.2,
+     "sections": 0.5,
+     "liveOpen": 10.9
+    },
+    "2560": {
+     "live": 0,
+     "build": 11.2,
+     "compare": 1.6,
+     "sections": 0.6,
+     "liveOpen": 10.9
+    }
+   }
+  },
+  {
+   "site": "sdt-mfs",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.mfs.com/corporate/en/home.html",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "4   39258.1                            (picture [a×9 button]×3 a×5) p               3 × 1        NEW (accordion?)                     weak    no inventory match; collection accordion (heading/link-only unit ×3 (hidden pane\n5   footer                             (picture [a×9 button]×3 a×5) p               —            footer: new                          —       no footer block in the inventory\nnovelty 50 % (2 new / 4 sections; inventory 0, collection 0, default 2) → /tmp/stardust-bench3/sdt-mfs-machine-draft/triage.json + /tmp/stardust-bench3/sdt-mfs-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-mfs-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "3   default   —                                        —        1      \n4   NEW       accordion · 4 × 2                        5/8      17     default recipe: the Block Collection's accordion shape (no recipe in blocks.json); NEW drafted through the col\n4 sections → /tmp/stardust-bench3/sdt-mfs-machine-draft/doc/home.html (56 texts, 2 block sections, 2 default, 2 new)\nauthor: 3 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/accordion/accordion.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 5 rule(s)\nspec-to-css: section 2 (default) — no live section pairs with the triage row's spec box; skipped"
+    },
+    {
+     "step": "harness",
+     "seconds": 2.7,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 6676\nprototype (gate this): http://localhost:8937/home.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-mfs-machine-draft/proto/home.html\nsite: /private/tmp/stardust-bench3/sdt-mfs-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 71.5,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached, build 11.8 s, compare 0.5 s, sections — | 1440: live cached, build 13.8 s, compare 1.2 s, sections — | 2560: live cached, build 14.1 s, compare 1.8 s, sections — | cap-probe 19.4 s, sections pass 8.5 s | total 71.4 s\nevidence: /tmp/stardust-bench3/sdt-mfs-machine-draft/gate/\nsite: /private/tmp/stardust-bench3/sdt-mfs-machine-draft/migration/site.json\ncap-probe: overlay dismissed via button#onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 53.13,
+     "dh": -1492
+    },
+    {
+     "W": 1440,
+     "pct": 53.47,
+     "dh": -4444
+    },
+    {
+     "W": 2560,
+     "pct": 50.44,
+     "dh": -4244
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 11.8,
+     "compare": 0.5,
+     "sections": null
+    },
+    "1440": {
+     "live": 0,
+     "build": 13.8,
+     "compare": 1.2,
+     "sections": null
+    },
+    "2560": {
+     "live": 0,
+     "build": 14.1,
+     "compare": 1.8,
+     "sections": null
+    }
+   }
+  },
+  {
+   "site": "sdt-natixis",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.im.natixis.com/en-intl/about/diversity-equity-and-inclusion",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "14  footer                             (picture p p) ([h2 a×16]×3 p)                —            footer: new                          —       no footer block in the inventory\nnovelty 54 % (7 new / 13 sections; inventory 0, collection 0, default 6) → /tmp/stardust-bench3/sdt-natixis-machine-draft/triage.json + /tmp/stardust-bench3/sdt-natixis-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-natixis-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 13 sections split as measure-page's --sections marked them (the spec's and the gate's split)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 3,
+     "ok": true,
+     "out": "13  default   —                                        —        2      \n13 sections → /tmp/stardust-bench3/sdt-natixis-machine-draft/doc/diversity-equity-and-inclusion.html (113 texts, 6 block sections, 6 default, 7 new)\nauthor: 3 empty cell(s) (a CTA row's empty picture cell is expected; a whole empty row is not)\nauthor: a NEW section was emitted as default content — triage it (name the block, write its recipe), then run author again (exit 3)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/cards/cards.css: 3 section(s)\nblocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 22 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 4.1,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 20684\nprototype (gate this): http://localhost:8938/diversity-equity-and-inclusion.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-natixis-machine-draft/proto/diversity-equity-and-inclusion.html\nsite: /private/tmp/stardust-bench3/sdt-natixis-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 118.8,
+     "exit": 0,
+     "ok": true,
+     "out": "openPage: consent control #onetrust-accept-btn-handler clicked\nopenPage: consent control #onetrust-accept-btn-handler clicked\nopenPage: consent control #onetrust-accept-btn-handler clicked\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 20.53,
+     "dh": -1444
+    },
+    {
+     "W": 1440,
+     "pct": 22.58,
+     "dh": -12528
+    },
+    {
+     "W": 2560,
+     "pct": 15.59,
+     "dh": -21732
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 17.2,
+     "compare": 1,
+     "sections": 0.4,
+     "liveOpen": 16.5
+    },
+    "1440": {
+     "live": 0,
+     "build": 21.6,
+     "compare": 2.5,
+     "sections": 1.2,
+     "liveOpen": 15.3
+    },
+    "2560": {
+     "live": 0,
+     "build": 30.1,
+     "compare": 4.9,
+     "sections": 2.2,
+     "liveOpen": 15.7
+    }
+   }
+  },
+  {
+   "site": "sdt-scotiabank",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.scotiabank.com/ca/en/personal.html",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "5   (no text)                          button                                       —            default content                      —       default content (headings, paragraphs, links)\n6   footer                             ([h2 p a]×3 p) (a×7 button) p                —            footer: new                          —       no footer block in the inventory\nnovelty 60 % (3 new / 5 sections; inventory 0, collection 0, default 2) → /tmp/stardust-bench3/sdt-scotiabank-machine-draft/triage.json + /tmp/stardust-bench3/sdt-scotiabank-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-scotiabank-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "4   NEW       columns · 1 × 2                          2/2      1      default recipe: the Block Collection's columns shape (no recipe in blocks.json); NEW drafted through the colle\n5   default   —                                        —        0      1 control(s) dropped (buttons / inputs)\n5 sections → /tmp/stardust-bench3/sdt-scotiabank-machine-draft/doc/personal.html (63 texts, 3 block sections, 2 default, 3 new)\nauthor: 1 empty spacer paragraph(s) in the source (24 px at y 2382) dropped — the pipeline drops <p>&nbsp;</p> and <p><br></p> too; a section table Δh of that size is this: model the rhythm in the section style or file it as a deviation (--keep-spacers writes a zero-width-space paragraph, an anti-pattern METHOD names)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 9 rule(s)\nspec-to-css: the document has 4 sections, the triage 5 non-chrome rows — paired by order up to the shorter (the authored order is the triage's)"
+    },
+    {
+     "step": "harness",
+     "seconds": 3,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 8037\nprototype (gate this): http://localhost:8939/personal.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-scotiabank-machine-draft/proto/personal.html\nsite: /private/tmp/stardust-bench3/sdt-scotiabank-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 79.9,
+     "exit": 0,
+     "ok": true,
+     "out": "openPage: consent control #onetrust-accept-btn-handler clicked\nopenPage: consent control #onetrust-accept-btn-handler clicked\nopenPage: consent control #onetrust-accept-btn-handler clicked\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 58.24,
+     "dh": -3160
+    },
+    {
+     "W": 1440,
+     "pct": 42.76,
+     "dh": -4821
+    },
+    {
+     "W": 2560,
+     "pct": 44.39,
+     "dh": -6049
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 14.7,
+     "compare": 0.8,
+     "sections": 0.4,
+     "liveOpen": 14.3
+    },
+    "1440": {
+     "live": 0,
+     "build": 14,
+     "compare": 1.4,
+     "sections": 0.6,
+     "liveOpen": 13.6
+    },
+    "2560": {
+     "live": 0,
+     "build": 15.5,
+     "compare": 2.4,
+     "sections": 1.1,
+     "liveOpen": 13.6
+    }
+   }
+  },
+  {
+   "site": "sdt-si",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.si.edu/",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "novelty 56 % (5 new / 9 sections; inventory 0, collection 0, default 4) → /tmp/stardust-bench3/sdt-si-machine-draft/triage.json + /tmp/stardust-bench3/sdt-si-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-si-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 3 unassigned band(s) outside main (measure-page's extra roots) are rows of their own — chrome or content, decide in the table (a breadcrumb bar never reached the document before — wellsfargo)\ntriage: 6 sections split as measure-page's --sections marked them (the spec's and the gate's split)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "7   NEW       cards · 16 × 2 in 2 tables               32/32    57     default recipe: the Block Collection's cards shape (no recipe in blocks.json); NEW drafted through the collect\n8   default   —                                        —        0      \n9   NEW       cards · 4 × 2                            8/8      8      default recipe: the Block Collection's cards shape (no recipe in blocks.json); NEW drafted through the collect\n9 sections → /tmp/stardust-bench3/sdt-si-machine-draft/doc/si-home.html (116 texts, 5 block sections, 4 default, 5 new)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "styles/sections-draft.css: 7 rule(s)\nspec-to-css: the document has 7 sections, the triage 9 non-chrome rows — paired by order up to the shorter (the authored order is the triage's)\nspec-to-css: section 0 (carousel) — no live section pairs with the triage row's spec box; skipped\nspec-to-css: section 2 (carousel) — no live section pairs with the triage row's spec box; skipped"
+    },
+    {
+     "step": "harness",
+     "seconds": 3.8,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 14407\nprototype (gate this): http://localhost:8940/si-home.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-si-machine-draft/proto/si-home.html\nsite: /private/tmp/stardust-bench3/sdt-si-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 110.3,
+     "exit": 0,
+     "ok": true,
+     "out": "tables: 15 row(s) off, 2 new sections — 360 #6 \"Explore from Anywher\" Δh -268 (default); 360 #7 \"What interests you?\" Δh +1156 (cards, new); 360 #8 \"Featured\" Δh +7631 (cards, new); 360 #9 not located (default); 360 #10 not located (default); 1440 #6 \"Explore from Anywher\" Δh -116 (default); 1440 #7 \"What interests you?\" Δh -224 (cards, new); 1440 #8 \"Featured\" Δh +1450 (cards, new); 1440 #9 not located (default); 1440 #10 not located (default); 2560 #6 \"Explore from Anywher\" Δh -134 (default); 2560 #7 \"What interests you?\" Δh -13 (cards, new); 2560 #8 \"Featured\" Δh +2066 (cards, new); 2560 #9 not located (default); 2560 #10 not located (default); new: #7 \"What interests you?\" (cards), #8 \"Featured\" (cards) — a new section takes the full gate at the three widths\ntiming (stitch, live and build concurrent): 360: live cached (opened 27.7 s), build 23.5 s, compare 1.6 s, sections 0.8 s | 1440: live cached (opened 26.3 s), build 19.4 s, compare 3 s, sections 1.7 s | 2560: live cached (opened 26.3 s), build 21.7 s, compare 4.5 s, sections 2.3 s | cap-probe 23.3 s, sections pass 8.2 s | total 110.2 s\nevidence: /tmp/stardust-bench3/sdt-si-machine-draft/gate/\nsite: /private/tmp/stardust-bench3/sdt-si-machine-draft/migration/site.json"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 48.66,
+     "dh": -13727
+    },
+    {
+     "W": 1440,
+     "pct": 84.65,
+     "dh": -8948
+    },
+    {
+     "W": 2560,
+     "pct": 57.17,
+     "dh": -9890
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 23.5,
+     "compare": 1.6,
+     "sections": 0.8,
+     "liveOpen": 27.7
+    },
+    "1440": {
+     "live": 0,
+     "build": 19.4,
+     "compare": 3,
+     "sections": 1.7,
+     "liveOpen": 26.3
+    },
+    "2560": {
+     "live": 0,
+     "build": 21.7,
+     "compare": 4.5,
+     "sections": 2.3,
+     "liveOpen": 26.3
+    }
+   }
+  },
+  {
+   "site": "sdt-take2games",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.take2games.com/ir/news/break-free-borderlandsr4-now-available-worldwide",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "3   footer                             picture ((p×8 button) p) picture             —            footer: new                          —       no footer block in the inventory\nnovelty 0 % (0 new / 2 sections; inventory 0, collection 0, default 2) → /tmp/stardust-bench3/sdt-take2games-machine-draft/triage.json + /tmp/stardust-bench3/sdt-take2games-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-take2games-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 2 sections split as measure-page's --sections marked them (the spec's and the gate's split)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "1   default   —                                        —        1      3 control(s) dropped (buttons / inputs)\n2   default   —                                        —        44     \n2 sections → /tmp/stardust-bench3/sdt-take2games-machine-draft/doc/ir-news-borderlands-4.html (55 texts, 0 block sections, 2 default, 0 new)\nauthor: 1 empty spacer paragraph(s) in the source (24 px at y 3576) dropped — the pipeline drops <p>&nbsp;</p> and <p><br></p> too; a section table Δh of that size is this: model the rhythm in the section style or file it as a deviation (--keep-spacers writes a zero-width-space paragraph, an anti-pattern METHOD names)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 7 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 3.3,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 3211\nprototype (gate this): http://localhost:8941/ir-news-borderlands-4.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-take2games-machine-draft/proto/ir-news-borderlands-4.html\nsite: /private/tmp/stardust-bench3/sdt-take2games-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 67.1,
+     "exit": 0,
+     "ok": true,
+     "out": "openPage: consent control #onetrust-accept-btn-handler clicked\nopenPage: consent control #onetrust-accept-btn-handler clicked\nopenPage: consent control #onetrust-accept-btn-handler clicked\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 26.5,
+     "dh": 1581
+    },
+    {
+     "W": 1440,
+     "pct": 16.02,
+     "dh": 720
+    },
+    {
+     "W": 2560,
+     "pct": 12.33,
+     "dh": 1273
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 13.7,
+     "compare": 0.8,
+     "sections": 0.3,
+     "liveOpen": 29.6
+    },
+    "1440": {
+     "live": 0,
+     "build": 11.1,
+     "compare": 1,
+     "sections": 0.3,
+     "liveOpen": 23.6
+    },
+    "2560": {
+     "live": 0,
+     "build": 10.8,
+     "compare": 1.4,
+     "sections": 0.5,
+     "liveOpen": 23.6
+    }
+   }
+  },
+  {
+   "site": "sdt-takeda",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.takeda.com/about/corporate-responsibility/corporate-giving/",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "25  footer                             (picture a×2) a×6 p (a×4 p)                  —            footer: new                          —       no footer block in the inventory\nnovelty 46 % (11 new / 24 sections; inventory 0, collection 0, default 13) → /tmp/stardust-bench3/sdt-takeda-machine-draft/triage.json + /tmp/stardust-bench3/sdt-takeda-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-takeda-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 24 sections split as measure-page's --sections marked them (the spec's and the gate's split)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "23  NEW       cards · 3 × 2                            6/6      9      default recipe: the Block Collection's cards shape (no recipe in blocks.json); NEW drafted through the collect\n24  default   —                                        —        5      \n24 sections → /tmp/stardust-bench3/sdt-takeda-machine-draft/doc/corporate-giving.html (186 texts, 11 block sections, 13 default, 11 new)\nauthor: background-image URL cut in the dump for <img.max-w-full> (older collector: 160 chars) — no picture written; re-dump with the current collector (bgiUrl) and media-fetch the URL"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/columns/columns.css: 1 section(s)\nblocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 40 rule(s)"
+    },
+    {
+     "step": "harness",
+     "seconds": 3.8,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 15329\nprototype (gate this): http://localhost:8942/corporate-giving.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-takeda-machine-draft/proto/corporate-giving.html\nsite: /private/tmp/stardust-bench3/sdt-takeda-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 123,
+     "exit": 0,
+     "ok": true,
+     "out": "openPage: consent control button#onetrust-accept-btn-handler clicked\nopenPage: consent control button#onetrust-accept-btn-handler clicked\nopenPage: consent control button#onetrust-accept-btn-handler clicked\ncap-probe: overlay dismissed via button#onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 56.84,
+     "dh": 610
+    },
+    {
+     "W": 1440,
+     "pct": 41.44,
+     "dh": -3434
+    },
+    {
+     "W": 2560,
+     "pct": 41.89,
+     "dh": -6701
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 22.3,
+     "compare": 2.4,
+     "sections": 1.3,
+     "liveOpen": 32.8
+    },
+    "1440": {
+     "live": 0,
+     "build": 19.5,
+     "compare": 3.9,
+     "sections": 2.1,
+     "liveOpen": 30.1
+    },
+    "2560": {
+     "live": 0,
+     "build": 24.1,
+     "compare": 7.1,
+     "sections": 3.7,
+     "liveOpen": 30.2
+    }
+   }
+  },
+  {
+   "site": "sdt-wellsfargo",
+   "mode": "machine",
+   "triage": "draft",
+   "url": "https://www.wellsfargo.com/about/inclusion/",
+   "steps": [
+    {
+     "step": "init",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "stardust-lite: wrote .github/skills/stardust-lite/SKILL.md, .claude/skills/stardust-lite/SKILL.md, AGENTS.md section, migration/ (method at /private/tmp/stardust-lite-gate/METHOD.md, rollout at /private/tmp/stardust-lite-gate/ROLLOUT.md)\nstardust-lite foundation: wrote migration/foundation-README.md, blocks/cards/cards.js, blocks/footer/footer.css, blocks/footer/footer.js, blocks/header/header.css, blocks/header/header.js, scripts/stardust.js, styles/fonts.css, styles/reset.css, styles/styles.css, scripts/scripts.js (stardust.js wired)"
+    },
+    {
+     "step": "triage",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "novelty 43 % (3 new / 7 sections; inventory 0, collection 0, default 4) → /tmp/stardust-bench3/sdt-wellsfargo-machine-draft/triage.json + /tmp/stardust-bench3/sdt-wellsfargo-machine-draft/triage.md\ntriage: /tmp/stardust-bench3/sdt-wellsfargo-machine-draft/migration/blocks.json not found — matching against an empty inventory (collection / new only)\ntriage: 1 unassigned band(s) outside main (measure-page's extra roots) are rows of their own — chrome or content, decide in the table (a breadcrumb bar never reached the document before — wellsfargo)\ntriage: 6 sections split as measure-page's --sections marked them (the spec's and the gate's split)"
+    },
+    {
+     "step": "author",
+     "seconds": 0,
+     "exit": 3,
+     "ok": true,
+     "out": "6   default   —                                        —        6      \n7   default   —                                        —        3      \n7 sections → /tmp/stardust-bench3/sdt-wellsfargo-machine-draft/doc/inclusion.html (45 texts, 2 block sections, 4 default, 3 new)\nauthor: a NEW section was emitted as default content — triage it (name the block, write its recipe), then run author again (exit 3)"
+    },
+    {
+     "step": "spec-to-css",
+     "seconds": 0,
+     "exit": 0,
+     "ok": true,
+     "out": "blocks/header/header.css: 1 section(s)\nblocks/footer/footer.css: 1 section(s)\nstyles/sections-draft.css: 14 rule(s)\nspec-to-css: section 0 (default) — no live section pairs with the triage row's spec box; skipped"
+    },
+    {
+     "step": "harness",
+     "seconds": 2.4,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 4589\nprototype (gate this): http://localhost:8943/inclusion.harness.html\nserialised (review):   /tmp/stardust-bench3/sdt-wellsfargo-machine-draft/proto/inclusion.html\nsite: /private/tmp/stardust-bench3/sdt-wellsfargo-machine-draft/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 66.2,
+     "exit": 0,
+     "ok": true,
+     "out": "openPage: consent control #onetrust-accept-btn-handler clicked\nopenPage: consent control #onetrust-accept-btn-handler clicked\nopenPage: consent control #onetrust-accept-btn-handler clicked\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 13.88,
+     "dh": -353
+    },
+    {
+     "W": 1440,
+     "pct": 26.31,
+     "dh": -2047
+    },
+    {
+     "W": 2560,
+     "pct": 14.93,
+     "dh": -2644
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 11.2,
+     "compare": 0.4,
+     "sections": 0.1,
+     "liveOpen": 8.5
+    },
+    "1440": {
+     "live": 0,
+     "build": 12.1,
+     "compare": 0.9,
+     "sections": 0.3,
+     "liveOpen": 8.3
+    },
+    "2560": {
+     "live": 0,
+     "build": 12.6,
+     "compare": 1.4,
+     "sections": 0.5,
+     "liveOpen": 8.3
+    }
+   }
+  }
+ ]
+}

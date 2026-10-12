@@ -1,0 +1,30 @@
+2026-10-11T03:38:06Z START [first]
+2026-10-11T03:39:54Z END   [first] rc=0 108s
+2026-10-11T03:45:58Z START [harness1]
+2026-10-11T03:46:09Z END   [harness1] rc=0 11s
+2026-10-11T03:46:28Z START [r1]
+2026-10-11T03:46:54Z END   [r1] rc=0 26s
+2026-10-11T03:47:18Z START [fresh-live-probe]
+2026-10-11T03:48:00Z END   [fresh-live-probe] rc=0 42s
+2026-10-11T03:49:15Z START [fresh-live-stitchshot]
+2026-10-11T03:53:35Z END   [fresh-live-stitchshot] rc=0 260s
+2026-10-11T03:56:55Z START [r2]
+2026-10-11T03:57:22Z END   [r2] rc=0 27s
+2026-10-11T03:58:26Z START [r3]
+2026-10-11T03:58:52Z END   [r3] rc=0 26s
+2026-10-11T03:59:08Z START [r3-alt-origin]
+2026-10-11T03:59:48Z END   [r3-alt-origin] rc=0 40s
+2026-10-11T04:00:12Z START [r4]
+2026-10-11T04:00:38Z END   [r4] rc=0 26s
+2026-10-11T04:01:05Z START [da-put-page]
+2026-10-11T04:01:09Z END   [da-put-page] rc=0 4s
+2026-10-11T04:01:09Z START [sync-poll]
+2026-10-11T04:01:21Z END   [sync-poll] rc=0 12s
+2026-10-11T04:01:26Z START [served-gate]
+2026-10-11T04:02:43Z END   [served-gate] rc=0 77s
+2026-10-11T04:03:09Z START [sync-poll2]
+2026-10-11T04:03:20Z END   [sync-poll2] rc=0 11s
+2026-10-11T04:03:20Z START [served-gate2]
+2026-10-11T04:04:38Z END   [served-gate2] rc=0 78s
+2026-10-11T04:04:49Z START [leak]
+2026-10-11T04:05:06Z END   [leak] rc=0 17s

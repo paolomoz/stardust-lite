@@ -13,7 +13,9 @@ function markRoot([mainSel, headerSel, footerSel]) {
   const R = (e) => { if (!e) return null; const b = e.getBoundingClientRect(); return [Math.round(b.x), Math.round(b.y + scrollY), Math.round(b.width), Math.round(b.height)]; };
   const chrome = (e) => /^(header|footer|nav|aside)$/i.test(e.tagName) || /\b(header|footer|masthead|colophon|nav)\b/i.test(`${e.className} ${e.id}`);
   let el = mainSel ? q(mainSel) : null;
-  if (!el) { el = q('main') || q('[role=main]'); while (el && el.parentElement && el.parentElement !== document.body && ![...el.parentElement.children].some((c) => c !== el && chrome(c))) el = el.parentElement; }
+  // climb above main only when main is a small part of the page (a hero before main — dentsu); a main holding the content stays the root (intel:
+  // the climb took in the header and the footer fragment, 3 sections)
+  if (!el) { el = q('main') || q('[role=main]'); const docH = document.documentElement.scrollHeight; if (el && el.getBoundingClientRect().height < docH * 0.5) while (el && el.parentElement && el.parentElement !== document.body && ![...el.parentElement.children].some((c) => c !== el && chrome(c))) el = el.parentElement; }
   let root = 'body'; if (el) { el.setAttribute('data-gate-root', ''); root = '[data-gate-root]'; }
   const name = el ? `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}${[...el.classList].slice(0, 2).map((c) => `.${c}`).join('')}` : 'body (chrome stripped)';
   return { root, rootName: name, rootResolved: !!(mainSel && q(mainSel)), header: R(q(headerSel || 'header')), footer: R(q(footerSel || 'footer')), doc: document.documentElement.scrollHeight };
@@ -21,11 +23,18 @@ function markRoot([mainSel, headerSel, footerSel]) {
 /** Browser side: the content root as a CSS PATH (`body > div:nth-child(2) > main`), so a caller that must not touch the DOM (the
  * structure dump and the captured DOM of measure-page) can name the root roster's rule finds: `mainSel` when it resolves, else the
  * largest ancestor of `main` / `[role=main]` that adds no chrome, else `body`. Returns { path, name }. */
-export function contentRootPath([mainSel]) {
+export function contentRootPath([mainSel, headerSel = null, footerSel = null]) {
   const q = (s) => { try { return document.querySelector(s); } catch { return null; } };
   const chrome = (e) => /^(header|footer|nav|aside)$/i.test(e.tagName) || /\b(header|footer|masthead|colophon|nav)\b/i.test(`${e.className} ${e.id}`);
   let el = mainSel ? q(mainSel) : null;
-  if (!el) { el = q('main') || q('[role=main]'); while (el && el.parentElement && el.parentElement !== document.body && ![...el.parentElement.children].some((c) => c !== el && chrome(c))) el = el.parentElement; }
+  // climb above main only when main is a small part of the page (a hero before main — dentsu); a main holding the content stays the root (intel:
+  // the climb took in the header and the footer fragment, 3 sections)
+  if (!el) { el = q('main') || q('[role=main]'); const docH = document.documentElement.scrollHeight; if (el && el.getBoundingClientRect().height < docH * 0.5) while (el && el.parentElement && el.parentElement !== document.body && ![...el.parentElement.children].some((c) => c !== el && chrome(c))) el = el.parentElement; }
+  // no main (an AEM Sites page — sherwin-williams: `body > *` guessed, two re-runs and --main by hand): the tallest element that holds neither
+  // the header nor the footer and spans ≥ 40 % of the document
+  if (!el) { const hd = headerSel ? q(headerSel) : q('header'); const ft = footerSel ? q(footerSel) : q('footer'); const docH = document.documentElement.scrollHeight;
+    const cands = [...document.querySelectorAll('body *')].filter((e) => { const r = e.getBoundingClientRect(); return r.height >= docH * 0.4 && r.width >= innerWidth * 0.8 && !(hd && (e.contains(hd) || hd.contains(e))) && !(ft && (e.contains(ft) || ft.contains(e))) && !/^(SCRIPT|STYLE|SVG|IMG|PICTURE|VIDEO|IFRAME)$/.test(e.tagName); });
+    cands.sort((a, b) => b.getBoundingClientRect().height - a.getBoundingClientRect().height || (a.contains(b) ? -1 : 1)); el = cands[0] || null; }
   if (!el) return { path: 'body', name: 'body (no main)', tag: 'body' };
   const parts = []; for (let n = el; n && n !== document.body; n = n.parentElement) parts.unshift(`${n.tagName.toLowerCase()}:nth-child(${[...n.parentElement.children].indexOf(n) + 1})`);
   return { path: ['body', ...parts].join(' > '), name: `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}${[...el.classList].slice(0, 2).map((c) => `.${c}`).join('')}`, tag: el.tagName.toLowerCase() };
@@ -95,7 +104,7 @@ export async function pairSections(buildPage, live, { secSel = 'main > .section'
   const sections = kept.map((s) => {
     const idx = partner.map((p, i) => (p === s.index ? i : -1)).filter((i) => i >= 0); const boxes = idx.map((i) => live.sections[i].box).filter(Boolean);
     const y0 = boxes.length ? Math.min(...boxes.map((x) => x[1])) : null; const y1 = boxes.length ? Math.max(...boxes.map((x) => x[1] + x[3])) : null;
-    return { ...s, build: { y0: s.box[1], y1: s.box[1] + s.box[3], h: s.box[3] }, live: y0 === null ? null : { y0, y1, h: y1 - y0, indices: idx, anchorText: live.sections[idx[0]].anchorText }, liveAnchorText: idx.length ? live.sections[idx[0]].anchorText : null };
+    return { ...s, build: { y0: s.box[1], y1: s.box[1] + s.box[3], h: s.box[3] }, live: y0 === null ? null : { y0, y1, h: y1 - y0, indices: idx.map((i) => live.sections[i].index ?? i), anchorText: live.sections[idx[0]].anchorText }, liveAnchorText: idx.length ? live.sections[idx[0]].anchorText : null };
   });
   // the range a section is READ over runs to the next section's top (its stride): a block margin that collapses out of the section box
   // (the 30 px member — METHOD step 6) is still this section's pixels, and the boxes alone read the hero 30 px short at 0.02 % diff
@@ -129,4 +138,13 @@ export function triageRowFor(triage, liveSection) {
   const norm = (s) => String(s || '').replace(/\s+/g, ' ').trim().toLowerCase();
   const a = norm(liveSection.anchorText);
   return (a && rows.find((r) => norm(r.anchorText) && (norm(r.anchorText).startsWith(a.slice(0, 28)) || a.startsWith(norm(r.anchorText).slice(0, 28))))) || rows[liveSection.index] || null;
+}
+
+/** The live sections from the MEASUREMENT's dump (content-<W>.json next to the origin capture), no live page: the same split as the triage's
+ * (splitSections on the whole dump: the extra bands included, as author wrote them) and the same session as the cached capture. The first
+ * round of a run opened the live page at three widths for these boxes (≈ 15–25 s each, wpp's first round 65 s against 31–48 s later). */
+export function liveSectionsFromDump(dump, { sections = null } = {}) {
+  const sp = splitSections(dump, { sections: sections && sections.length ? sections : null });
+  const rows = sp.sections.map((n, index) => { const fp = fingerprint(n); return { index, anchorText: fp.anchorText || '', box: boxOf(n) }; });
+  return { sections: rows, header: sp.header?.box || null, footer: sp.footer?.box || null, doc: Number(dump.__doc) || null, root: { requested: null, resolved: true, name: sp.mainKey }, split: sections && sections.length ? 'selectors' : 'automatic', from: 'dump' };
 }

@@ -45,8 +45,7 @@
 // coverage; novelty-first = greedy set cover over the distinct new fingerprints (`×N` collapsed), pages that add nothing sink.
 import { existsSync, readFileSync, readdirSync, writeFileSync, mkdirSync, statSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
-import { chromium } from 'playwright';
-import { arg, openPage, settle, overlayOpts, siteProfile, contextOptions } from './common.mjs';
+import { arg, openPage, settle, overlayOpts, siteProfile, contextOptions, launch } from './common.mjs';
 import { collectContent } from './lib/content-collector.mjs';
 import { splitSections, fingerprint, dropGeneric, matchSection, cleanClasses } from './lib/fingerprint.mjs';
 
@@ -205,7 +204,7 @@ async function lightPass(ctx, url, attempt) {
   return row;
 }
 
-const browser = await chromium.launch();
+const browser = await launch();
 const rows = []; let next = 0; let active = 0; let done = 0; const wall0 = Date.now();
 async function take() { for (;;) { if (next < queue.length) { active++; return next++; } if (mode !== 'crawl' || active === 0) return null; await sleep(250); } }
 const workers = Array.from({ length: concurrency }, async () => {

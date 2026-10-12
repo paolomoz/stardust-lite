@@ -1,0 +1,132 @@
+2026-10-10T06:41:53Z START [setup-da-refresh]
+2026-10-10T06:41:57Z END   [setup-da-refresh] rc=0 4s
+2026-10-10T06:41:57Z START [setup-da-guard]
+2026-10-10T06:41:57Z END   [setup-da-guard] rc=0 0s
+2026-10-10T06:42:04Z START [setup-gh-create]
+2026-10-10T06:42:08Z END   [setup-gh-create] rc=0 4s
+2026-10-10T06:42:12Z START [setup-git-fetch]
+2026-10-10T06:42:13Z END   [setup-git-fetch] rc=0 1s
+2026-10-10T06:42:17Z START [setup-push-main]
+2026-10-10T06:42:18Z END   [setup-push-main] rc=0 1s
+2026-10-10T06:42:18Z START [setup-codesync]
+2026-10-10T06:42:19Z END   [setup-codesync] rc=0 1s
+2026-10-10T06:42:24Z START [setup-npm-i]
+2026-10-10T06:42:29Z END   [setup-npm-i] rc=0 5s
+2026-10-10T06:42:37Z START [setup-seed-index]
+2026-10-10T06:42:38Z END   [setup-seed-index] rc=0 1s
+2026-10-10T06:42:38Z START [setup-preview-index]
+2026-10-10T06:42:41Z END   [setup-preview-index] rc=0 3s
+2026-10-10T06:42:41Z START [setup-seed-nav]
+2026-10-10T06:42:42Z END   [setup-seed-nav] rc=0 1s
+2026-10-10T06:42:42Z START [setup-preview-nav]
+2026-10-10T06:42:43Z END   [setup-preview-nav] rc=0 1s
+2026-10-10T06:42:43Z START [setup-seed-footer]
+2026-10-10T06:42:45Z END   [setup-seed-footer] rc=0 2s
+2026-10-10T06:42:45Z START [setup-preview-footer]
+2026-10-10T06:42:46Z END   [setup-preview-footer] rc=0 1s
+2026-10-10T06:42:51Z START [setup-playwright]
+2026-10-10T06:42:51Z END   [setup-playwright] rc=0 0s
+2026-10-10T06:42:51Z START [setup-init]
+2026-10-10T06:42:52Z END   [setup-init] rc=0 1s
+2026-10-10T06:42:55Z START [setup-push-branch]
+2026-10-10T06:42:56Z END   [setup-push-branch] rc=0 1s
+2026-10-10T06:43:07Z START [probe-load]
+2026-10-10T06:43:26Z END   [probe-load] rc=0 19s
+2026-10-10T06:43:40Z START [probe-load-2]
+2026-10-10T06:44:02Z END   [probe-load-2] rc=0 22s
+2026-10-10T06:44:17Z START [measure-page]
+2026-10-10T06:45:01Z END   [measure-page] rc=0 44s
+2026-10-10T06:45:04Z START [brief]
+2026-10-10T06:45:04Z END   [brief] rc=0 0s
+2026-10-10T06:45:21Z START [triage]
+2026-10-10T06:45:21Z END   [triage] rc=0 0s
+2026-10-10T06:46:06Z START [reorder-roots]
+2026-10-10T06:46:06Z END   [reorder-roots] rc=0 0s
+2026-10-10T06:46:06Z START [triage-2]
+2026-10-10T06:46:06Z END   [triage-2] rc=0 0s
+2026-10-10T06:46:29Z START [triage-from-md]
+2026-10-10T06:46:29Z END   [triage-from-md] rc=0 0s
+2026-10-10T06:46:35Z START [media-fetch]
+2026-10-10T06:46:36Z END   [media-fetch] rc=0 1s
+2026-10-10T06:46:36Z START [media-fonts]
+2026-10-10T06:46:37Z END   [media-fonts] rc=0 1s
+2026-10-10T06:46:41Z START [media-fetch-frompage]
+2026-10-10T06:47:05Z END   [media-fetch-frompage] rc=0 24s
+2026-10-10T06:47:09Z START [media-fetch-frompage-chrome]
+2026-10-10T06:47:34Z END   [media-fetch-frompage-chrome] rc=0 25s
+2026-10-10T06:47:40Z START [media-fetch-frompage-browser]
+2026-10-10T06:48:05Z END   [media-fetch-frompage-browser] rc=2 25s
+2026-10-10T06:48:09Z START [media-fetch-frompage-2]
+2026-10-10T06:48:32Z END   [media-fetch-frompage-2] rc=0 23s
+2026-10-10T06:48:38Z START [da-put-media]
+2026-10-10T06:49:32Z END   [da-put-media] rc=2 54s
+2026-10-10T06:49:36Z START [author]
+2026-10-10T06:49:36Z END   [author] rc=0 0s
+2026-10-10T06:50:02Z START [icons]
+2026-10-10T06:50:02Z END   [icons] rc=0 0s
+2026-10-10T06:51:17Z START [build-doc]
+2026-10-10T06:51:17Z END   [build-doc] rc=0 0s
+2026-10-10T06:51:17Z START [lint]
+2026-10-10T06:51:18Z END   [lint] rc=2 1s
+2026-10-10T06:51:24Z START [build-doc-2]
+2026-10-10T06:51:24Z END   [build-doc-2] rc=0 0s
+2026-10-10T06:51:24Z START [lint-2]
+2026-10-10T06:51:24Z END   [lint-2] rc=0 0s
+2026-10-10T06:51:36Z START [da-put-docs]
+2026-10-10T06:51:46Z END   [da-put-docs] rc=0 10s
+2026-10-10T06:51:51Z START [spec-to-css]
+2026-10-10T06:51:51Z END   [spec-to-css] rc=0 0s
+2026-10-10T06:57:32Z START [css-lint]
+2026-10-10T06:57:32Z END   [css-lint] rc=1 0s
+2026-10-10T06:57:46Z START [harness]
+2026-10-10T06:58:16Z END   [harness] rc=0 30s
+2026-10-10T06:58:19Z START [da-put-docs-2]
+2026-10-10T06:58:30Z END   [da-put-docs-2] rc=0 11s
+2026-10-10T06:58:30Z START [harness-2]
+2026-10-10T06:58:54Z END   [harness-2] rc=0 24s
+2026-10-10T06:58:59Z START [gate-r1]
+2026-10-10T07:00:14Z END   [gate-r1] rc=0 75s
+2026-10-10T07:01:00Z START [media-fonts-frompage]
+2026-10-10T07:01:01Z END   [media-fonts-frompage] rc=0 1s
+2026-10-10T07:01:19Z START [fetch-fonts]
+2026-10-10T07:03:03Z END   [fetch-fonts] rc=0 104s
+2026-10-10T07:03:09Z START [fetch-fonts-2]
+2026-10-10T07:03:24Z END   [fetch-fonts-2] rc=0 15s
+2026-10-10T07:03:43Z START [gate-r2]
+2026-10-10T07:04:58Z END   [gate-r2] rc=0 75s
+2026-10-10T07:06:24Z START [da-put-doc-3]
+2026-10-10T07:06:29Z END   [da-put-doc-3] rc=0 5s
+2026-10-10T07:06:29Z START [harness-3]
+2026-10-10T07:06:52Z END   [harness-3] rc=0 24s
+2026-10-10T07:06:53Z START [gate-r3]
+2026-10-10T07:08:08Z END   [gate-r3] rc=0 75s
+2026-10-10T07:09:15Z START [da-put-doc-4]
+2026-10-10T07:09:22Z END   [da-put-doc-4] rc=0 7s
+2026-10-10T07:09:22Z START [harness-4]
+2026-10-10T07:09:46Z END   [harness-4] rc=0 24s
+2026-10-10T07:09:46Z START [gate-r4]
+2026-10-10T07:11:01Z END   [gate-r4] rc=0 75s
+2026-10-10T07:11:27Z START [gate-r5]
+2026-10-10T07:12:44Z END   [gate-r5] rc=0 77s
+2026-10-10T07:13:31Z START [gate-r6]
+2026-10-10T07:14:47Z END   [gate-r6] rc=0 76s
+2026-10-10T07:15:15Z START [gate-r7]
+2026-10-10T07:16:32Z END   [gate-r7] rc=0 77s
+2026-10-10T07:16:54Z START [gate-r8]
+2026-10-10T07:18:13Z END   [gate-r8] rc=0 79s
+2026-10-10T07:18:32Z START [push]
+2026-10-10T07:18:34Z END   [push] rc=0 2s
+2026-10-10T07:18:40Z START [sync-poll]
+2026-10-10T07:18:53Z END   [sync-poll] rc=0 13s
+2026-10-10T07:19:03Z START [gate-served]
+2026-10-10T07:21:12Z END   [gate-served] rc=0 129s
+2026-10-10T07:21:30Z START [leak-proto]
+2026-10-10T07:21:49Z END   [leak-proto] rc=0 19s
+2026-10-10T07:21:49Z START [leak-served]
+2026-10-10T07:22:08Z END   [leak-served] rc=0 19s
+2026-10-10T07:22:18Z START [gate-probes]
+2026-10-10T07:24:23Z END   [gate-probes] rc=0 125s
+2026-10-10T07:25:07Z START [site-profile]
+2026-10-10T07:25:07Z END   [site-profile] rc=0 0s
+2026-10-10T07:25:07Z START [block-inventory]
+2026-10-10T07:25:07Z END   [block-inventory] rc=0 0s

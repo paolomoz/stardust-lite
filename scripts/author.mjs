@@ -19,7 +19,10 @@
 // (block / default / new), cells filled, texts, with the warnings: unknown media, empty cells, leaves that did not fit the recipe.
 // Usage: node author.mjs <triage.json> --content content.json[,clicks.json,hidden.json] --blocks migration/blocks.json --out doc/<slug>.html
 //        [--media media/manifest.json] [--media-host https://<branch-host>/drafts/media] [--nav doc/nav.html --footer doc/footer.html]
-//        [--site migration/site.json] [--nav-path /drafts/nav --footer-path /drafts/footer] [--url <page url>] [--no-lint] [--keep-spacers]
+//        [--site migration/site.json] [--nav-path /drafts/nav --footer-path /drafts/footer] [--url <page url>] [--no-lint] [--keep-spacers] [--draft-new]
+//   --draft-new   a template page on an empty inventory: a NEW section whose triage row names a Block Collection shape (hero, cards, tabs, …)
+//                 is drafted through that shape's default recipe (lib/recipes.mjs COLLECTION) instead of stopping the run — the model is
+//                 still the triage's to approve; every case had written its own generator here (scotiabank-personal, loop r1)
 //   --keep-spacers  write the source's empty paragraphs (`<p>&nbsp;</p>`, `<p><br></p>` — the collector marks them `spacer`) as a
 //               zero-width-space paragraph, the only empty line box the pipeline keeps; by default they are DROPPED and counted on
 //               stderr with their height (METHOD names the zero-width spacer an anti-pattern: model the rhythm, or file the Δh)
@@ -37,7 +40,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { basename, dirname, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { arg, siteProfile, davidsLint } from './common.mjs';
-import { splitSections, analyzeSection, pickUnit, kindOf, unwrap, general } from './lib/fingerprint.mjs';
+import { splitSections, analyzeSection, pickUnit, kindOf, unwrap, general, linkLabel } from './lib/fingerprint.mjs';
 import { defaultRecipe, recipeKind } from './lib/recipes.mjs';
 
 const triageFile = process.argv[2];
@@ -96,7 +99,13 @@ function inline(n) {
   // a `strong` / `em` the collector read as the text node itself (its paragraph held nothing else) keeps its weight
   const ownTag = /^(strong|b)$/.test(n.tag || '') ? 'strong' : /^(em|i)$/.test(n.tag || '') ? 'em' : null;
   const wrapOwn = (t) => (ownTag && t && !new RegExp(`^<${ownTag}>`).test(t) ? `<${ownTag}>${t}</${ownTag}>` : t);
-  const src = n.markupFull || (n.markup && n.markup.length < 600 ? n.markup : null);
+  // the dump's `markup` may be shorter than its `text` (a cut: an unclosed <b> parsed the metadata block inside a <strong> and crashed the fold —
+  // natixis about-article, two gate rounds): a markup whose plain text is shorter than the text is dropped for the text, and open inline tags are closed
+  const plainOf = (h) => String(h).replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+  const balanced = (h) => { const open = []; const out = String(h).replace(/<(\/?)(b|strong|em|i|a|span|sup|sub|u|small|mark)\b[^>]*>/gi, (m, close, tag) => { const t = tag.toLowerCase(); if (close) { const k = open.lastIndexOf(t); if (k < 0) return ''; open.splice(k, 1); return m; } open.push(t); return m; }); return out + open.reverse().map((t) => `</${t}>`).join(''); };
+  let src = n.markupFull || (n.markup && n.markup.length < 600 ? n.markup : null);
+  if (src && n.text && plainOf(src).length < String(n.text).replace(/\s+/g, ' ').trim().length - 2) { warn(`inline markup shorter than the text in the dump (cut) — plain text written for "${String(n.text).slice(0, 40)}…"`); src = null; }
+  if (src) src = balanced(src.replace(/<\/?(?!(?:strong|b|em|i|a|br|sup|sub|u|span|small|mark)\b)[a-z][a-z0-9-]*\b[^>]*>/gi, '')); // unknown inline tags (<org>, <chron>) are text
   if (!src) { if (n.markup && n.markup.length >= 600) warn(`inline markup cut at 600 chars in the dump (re-dump: the collector now keeps markupFull) — plain text written for "${String(n.text).slice(0, 40)}…"`); return wrapOwn(esc(n.text || '')); }
   let s = src.replace(/<!--[\s\S]*?-->/g, '').replace(/&nbsp;|\u00a0/g, '\u0004'); // the source's non-breaking spaces survive the whitespace collapse below
   s = s.replace(/<\/?([a-z][a-z0-9-]*)\b([^>]*)>/gi, (m, tag, attrs) => {
@@ -123,7 +132,10 @@ const SMALL_SVG = 64;
 const isIconImg = (n) => kindOf(n) === 'picture' && /\.svg(\?|$)/i.test(n.src || '') && n.box && Math.max(n.box[2], n.box[3]) <= SMALL_SVG;
 
 // ───────────────────────────── leaves ─────────────────────────────
-const hasBg = (n) => !!bgUrl(n);
+// an SVG background on an element that carries its own text is a MARKER (a list chevron, an arrow before a link), not a picture: rbc's 30
+// chevron `li`s were authored as card pictures and drawn ~300 px wide by the drafts' `picture img { width: 100% }` (≈ 4 min re-authoring)
+const textOf = (n) => !!(n && (n.text || (n.children || []).some(textOf)));
+const hasBg = (n) => { const u = bgUrl(n); if (!u) return false; if (/\.svg(\?|#|$)/i.test(u) && textOf(n)) return false; return true; };
 const MEDIA = (k) => general(k) === 'media';
 const CONTROL = new Set(['button', 'input']);
 /** The ordered leaves under a node: { kind (recipe kind), raw (dump kind), node, top (index of the top-level child), parent }. A list is
@@ -134,7 +146,11 @@ function leavesOf(root) {
   // (a bordered block holding the title and the row): with the root's own index every leaf read `top 0` and the recipe's
   // defaultContentBefore never peeled a title (sdt-dentsu beyond-the-funnel, the profiles)
   let start = root; while (start && !start.text && !start.src && (start.children || []).length === 1) start = start.children[0];
+  // screen-reader-only text is not page content ("Item 2 of 3.", "opens in a new tab" — mheducation): an sr-only class or a 1–2 px text box
+  // …and a carousel's cloned slides (the loop's copies — wyndham: 13 offers authored for 5, 21 hotels for 10)
+  const srOnly = (n) => /\b(sr-only|visually-?hidden|screen-reader(-text)?|sr-text|a11y-hidden|offscreen|u-hidden-visually|hide-text|slick-cloned|swiper-slide-duplicate|glide__slide--clone|tns-slide-cloned|splide__slide--clone|owl-item cloned|cloned)\b/i.test(String(n.cls || '')) || (!!n.text && !!n.box && n.box[2] <= 2 && n.box[3] <= 2);
   const walk = (n, top, parent, depth) => {
+    if (srOnly(n)) return;
     if (n.spacer) { if (keepSpacers) out.push({ kind: 'text', raw: 'p', node: n, spacer: true, top, parent }); else spacers.push(n); return; }
     const k = kindOf(n);
     if (k === 'box') return;
@@ -142,6 +158,21 @@ function leavesOf(root) {
     if (hasBg(n) && !kids.map(unwrap).some((c) => MEDIA(kindOf(c)))) out.push({ kind: 'picture', raw: 'picture', node: n, bg: true, top, parent });
     else if (bgCut(n) && !kids.map(unwrap).some((c) => MEDIA(kindOf(c)))) bgCutWarn(n);
     if (k === 'ul') { if (isControlList(n)) { out.push({ kind: 'control', raw: 'ul', node: n, top, parent }); return; } if (isTextList(n)) { out.push({ kind: 'list', raw: 'ul', node: n, top, parent }); return; } kids.forEach((c, i) => walk(c, n === start ? i : top, n, depth + 1)); return; }
+    if (k === 'a' && !n.text && linkLabel(n)) { out.push({ kind: 'link', raw: 'a', node: { ...n, children: undefined, text: linkLabel(n) }, top, parent }); return; } // a button's label in a span (acs-about)
+    // a link whose only content is ONE icon (a social link, an arrow button) is the icon inside the link — written as two leaves it read
+    // `:facebook:` then `<a>Learn more</a>` (rbc footer, every social link)
+    if ((k === 'a' || String(n.tag || '').toLowerCase() === 'a') && n.href && !textOf(n)) {
+      const icons = []; const scan = (x) => { const u = unwrap(x); const ck = kindOf(u); if (ck === 'icon' || isIconImg(u)) icons.push(u); else (x.children || []).forEach(scan); }; kids.forEach(scan);
+      // the icon token is the link's text; the aria label / title / alt stays as its title (the accessible name — linkHtml)
+      if (icons.length === 1) { const ic = icons[0]; const tok = isIconImg(ic) ? `:${iconName({ alt: basename(ic.src || '').replace(/\.[a-z0-9]+$/, '') })}:` : `:${iconName(ic)}:`; out.push({ kind: 'link', raw: 'a', node: { ...n, children: undefined, text: tok, title: n.title || n.aria || ic.alt || ic.aria || '' }, top, parent }); return; }
+    }
+    // kindOf reads a card-wide link as a `group` (fingerprint) — the TAG names it here, or the rule never fired and the href was lost (continental)
+    if ((k === 'a' || String(n.tag || '').toLowerCase() === 'a') && n.href && kids.map(unwrap).some((c) => { const ck = kindOf(c); return MEDIA(ck) || /^h[1-6]$/.test(ck) || ck === 'p' || ck === 'group'; }) && !n.text) {
+      // the card's own call to action (a short text in a link / button / cta / more element: "Find out more") is the link's text, not a paragraph
+      let cta = null; const findCta = (x, inCta) => { const c = inCta || /\b(link|button|btn|cta|more)\b/i.test(String(x.cls || '')); if (c && x.text && x.text.trim().length <= 40) { cta = cta || x; return; } (x.children || []).forEach((y) => findCta(y, c)); }; kids.forEach((c) => findCta(c, false));
+      const skipCta = (x) => { if (!cta) return x; const prune = (y) => (y === cta ? null : { ...y, children: (y.children || []).map(prune).filter(Boolean).filter((z) => !(String(z.tag || '').toLowerCase() === 'i' && !(z.children || []).some((w) => w.text))) }); return prune(x); };
+      kids.map(skipCta).filter(Boolean).forEach((c) => walk(c, top, n)); out.push({ kind: 'link', raw: 'a', node: { ...n, children: undefined, text: cta?.text?.trim() || n.aria || n.title || (kids.map(unwrap).find((c) => /^h[1-6]$/.test(kindOf(c)))?.text) || 'Learn more' }, top, parent, wrapLink: true }); return;
+    }
     if (k === 'picture' || k === 'video' || k === 'embed' || k === 'icon' || k === 'a' || /^h[1-6]$/.test(k) || k === 'p' || k === 'blockquote' || k === 'hr' || CONTROL.has(k)) {
       if (k === 'picture' && hasBg(n) && !n.src) return; // already pushed as the bg leaf
       out.push({ kind: k === 'hr' ? 'hr' : CONTROL.has(k) ? 'control' : isIconImg(n) ? 'icon' : recipeKind(k), raw: k, node: n, top, parent });
@@ -163,7 +194,15 @@ const sigOf = (leaves) => [...new Set(leaves.filter((l) => !['hr', 'control', 'i
 
 // ───────────────────────────── emission ─────────────────────────────
 const stats = { texts: 0 };
-const pictureHtml = (n, alt, wrap = 'p') => { const src = rewriteMedia(n.src || bgUrl(n)); const pic = `<picture><img src="${esc(src)}" alt="${esc(alt ?? n.alt ?? '')}"></picture>`; return wrap === 'p' ? `<p>${pic}</p>` : pic; };
+// art direction: the 360 dump's picture for the same image (document order) when its asset differs (the whole path less resize segments
+// like w_1920,c_limit — a CDN names different assets alike, nike) — authored as a second picture whose alt
+// ends `| mobile <bp>`; stardust.js folds it into the first as a <source media> (nike, revlon, intel: the portrait 360 images were fetched,
+// never authored — 360 sat at ≈ 30 % until a hand swap)
+const mobileMap = (() => { const f = arg('--mobile-content', null); if (typeof f !== 'string') return new Map(); const m = readJson(resolve(f)); if (!m) return new Map(); const imgs = (d) => { const out = []; const walk = (x) => { if (!x || typeof x !== 'object') return; if (x.src && /^(img|picture)$/i.test(String(x.tag || '')) && !/^data:/.test(x.src)) out.push({ src: x.src, alt: String(x.alt || '').trim() }); (x.children || []).forEach(walk); }; for (const [k, v] of Object.entries(d)) if (!k.startsWith('__') && !k.startsWith('hidden ')) (Array.isArray(v) ? v : [v]).forEach(walk); return out; }; const stem = (u) => String(u).split('?')[0].split('/').filter((seg) => !/^([a-z]{1,3}_[^/,]+,?)+$/i.test(seg) && !/^\d{2,4}(x\d{2,4})?$/.test(seg)).join('/').replace(/[-_]?(\d{2,4}w|\d{2,4}x\d{2,4}|small|medium|large|xl)(?=\.[a-z]+$)/gi, ''); const a = imgs(dump); const b = imgs(m); const map = new Map();
+    // counts differ (a carousel's clones, a mobile-only picture — unitedrentals: all 26 portrait pictures lost): pair by a unique alt text
+    if (a.length !== b.length) { const uniq = (arr) => { const c = new Map(); arr.forEach((x) => { if (x.alt) c.set(x.alt, (c.get(x.alt) || 0) + 1); }); return c; }; const ua = uniq(a); const ub = uniq(b); const byAlt = new Map(b.filter((x) => x.alt && ub.get(x.alt) === 1).map((x) => [x.alt, x.src])); a.forEach((x) => { if (x.alt && ua.get(x.alt) === 1 && byAlt.has(x.alt) && stem(x.src) !== stem(byAlt.get(x.alt))) map.set(x.src, byAlt.get(x.alt)); }); return map; } a.forEach((u, i) => { if (stem(u.src) !== stem(b[i].src)) map.set(u.src, b[i].src); }); return map; })();
+const mobileBp = Number(arg('--mobile-bp', 768)) || 768;
+const pictureHtml = (n, alt, wrap = 'p') => { const src = rewriteMedia(n.src || bgUrl(n)); const a = alt ?? n.alt ?? ''; const pic = `<picture><img src="${esc(src)}" alt="${esc(a)}"></picture>`; const mob = n.src && mobileMap.get(n.src); const pic2 = mob ? `<picture><img src="${esc(rewriteMedia(mob))}" alt="${esc(`${a} | mobile <${mobileBp}`)}"></picture>` : ''; return wrap === 'p' ? `<p>${pic}</p>${pic2 ? `<p>${pic2}</p>` : ''}` : `${pic}${pic2}`; };
 const weightOf = (n, force) => (force && force !== 'plain' ? force : force === 'plain' ? null : n.bg && !/rgba\(0, 0, 0, 0\)/.test(n.bg) ? 'strong' : n.border && !n.bg ? 'em' : null);
 function linkHtml(n, force, { altHint } = {}) {
   const h = href(n.href); const dead = isDead(n.href);
@@ -175,7 +214,7 @@ function linkHtml(n, force, { altHint } = {}) {
   if (!text) return '';
   if (dead) return label ? `<p>${label}</p>` : '';
   stats.texts += label ? 1 : 0;
-  const w = weightOf(n, force); const a = `<a href="${esc(h)}"${!label && (n.aria || n.title) ? ` title="${esc(n.aria || n.title)}"` : ''}>${text}</a>`;
+  const w = weightOf(n, force); const a = `<a href="${esc(h)}"${(!label || /^:[a-z0-9-]+:$/.test(label)) && (n.aria || n.title) ? ` title="${esc(n.aria || n.title)}"` : ''}>${text}</a>`;
   return `<p>${w ? `<${w}>${a}</${w}>` : a}</p>`;
 }
 function listHtml(n, force) {
@@ -269,15 +308,17 @@ const rowHtml = (cells) => `<div>${cells.map((c) => `<div>${c}</div>`).join('')}
 
 // ───────────────────────────── per section ─────────────────────────────
 const rowFor = (name, variant) => inventory.find((b) => b.name === name && (b.variant || null) === (variant || null)) || inventory.find((b) => b.name === name && !b.variant) || inventory.find((b) => b.name === name) || null;
-const recipeFor = (name, variant, report) => { const row = rowFor(name, variant); if (row?.recipe) return { recipe: row.recipe, row }; report.notes.push(`no recipe for ${name}${variant ? ` (${variant})` : ''} in blocks.json — default recipe (block-inventory scan --cases, or write one)`); return { recipe: defaultRecipe(row), row }; };
+const recipeFor = (name, variant, report) => { const row = rowFor(name, variant); if (row?.recipe) return { recipe: row.recipe, row }; report.notes.push(`no recipe for ${name}${variant ? ` (${variant})` : ''} in blocks.json — default recipe (block-inventory scan --cases, or write one)`); return { recipe: defaultRecipe(row, name), row }; };
 const dividerVariant = (name, variant) => { const v = `${variant ? `${variant} ` : ''}divider`; return inventory.some((b) => b.name === name && b.variant === v) ? v : null; };
 
 function authorSection(node, row) {
   const report = { index: row.index, kind: row.match.kind, block: null, rowsCols: null, filled: 0, cellsTotal: 0, texts: 0, notes: [], controls: 0, unfitted: 0, empty: 0 };
   const t0 = stats.texts; const parts = [];
   const m = row.match;
-  const block = m.kind === 'inventory' ? { name: m.block, variant: m.variant || null } : m.kind === 'collection' && m.block ? { name: m.block, variant: null } : null;
-  if (m.kind === 'new') { parts.push(`<!-- NEW: ${row.fingerprint}${row.collection ? ` (${row.collection}?)` : ''} — model this block -->`); report.notes.push('NEW section: emitted as default content; triage it first (exit 3)'); }
+  const draftNew = process.argv.includes('--draft-new') && m.kind === 'new' && m.block;
+  const block = m.kind === 'inventory' ? { name: m.block, variant: m.variant || null } : (m.kind === 'collection' || draftNew) && m.block ? { name: m.block, variant: m.variant || null } : null;
+  if (draftNew) report.notes.push(`NEW drafted through the collection's ${m.block} shape (--draft-new): approve the model in the triage before the block`);
+  if (m.kind === 'new' && !draftNew) { parts.push(`<!-- NEW: ${row.fingerprint}${row.collection ? ` (${row.collection}?)` : ''} — model this block -->`); report.notes.push('NEW section: emitted as default content; triage it first (exit 3)'); }
   if (!block) { parts.push(...defaultContent(node, report)); }
   else {
     const { recipe } = recipeFor(block.name, block.variant, report);
@@ -287,10 +328,10 @@ function authorSection(node, row) {
     else parts.push(...fixedSection(node, block, recipe, report));
     report.notes.unshift(...(recipe._notes || []).filter((n) => /default recipe/.test(n)));
     // the section style: the triage row, else the recipe's
-    const style = row.sectionStyle || recipe.sectionStyle || null;
+    const style = styleTokens(row.sectionStyle || recipe.sectionStyle || null, report);
     if (style) parts.push(`<div class="section-metadata"><div><div>style</div><div>${esc(style)}</div></div></div>`);
   }
-  if (!block && row.sectionStyle) parts.push(`<div class="section-metadata"><div><div>style</div><div>${esc(row.sectionStyle)}</div></div></div>`);
+  if (!block && row.sectionStyle) parts.push(`<div class="section-metadata"><div><div>style</div><div>${esc(styleTokens(row.sectionStyle, report))}</div></div></div>`);
   report.texts = stats.texts - t0;
   if (report.controls) report.notes.push(`${report.controls} control(s) dropped (buttons / inputs)`);
   return { html: `<div>\n${parts.filter(Boolean).join('\n')}\n</div>`, report };
@@ -301,24 +342,67 @@ function defaultContent(node, report, opts = {}) {
   const controls = leaves.filter((l) => l.kind === 'control').length; if (controls) report.controls += controls;
   // a run of icons with no text between them is a control strip (slider arrows), not content
   const drop = new Set(); for (let i = 0; i < leaves.length; i++) { if (leaves[i].kind !== 'icon') continue; let j = i; while (j < leaves.length && leaves[j].kind === 'icon') j++; if (j - i >= 2) { for (let k = i; k < j; k++) drop.add(leaves[k]); report.controls += j - i; } i = j; }
-  for (const l of leaves) { if (l.kind === 'control' || l.kind === 'hr' || drop.has(l)) continue; if (l.kind === 'link' && isDead(l.node.href) && !l.node.text && !(l.node.children || []).some((c) => MEDIA(kindOf(unwrap(c))))) continue; const h = leafHtml(l, opts); if (h) out.push(h); }
+  // a slideshow's / player's own control is not content (revlon: "Pause slideshow" authored as a paragraph)
+  const CTRL = /^(pause|play|stop|resume|previous|prev|next|close|skip|mute|unmute|toggle|show (more|less)|load more|go to slide|slide \d+)\b/i;
+  for (const l of leaves) { if (l.kind === 'control' && l.raw === 'button' && l.node.text && !CTRL.test(l.node.text.trim()) && !/^(submit|reset)$/.test(l.node.type || '')) { stats.texts += 1; out.push(`<p>${esc(l.node.text)}</p>`); continue; } // a labelled button (a menu's item, an opener) is a text an author types; the lint's control rule is for forms (ir-nav lost 1 of 4 items — take2games)
+    if (l.kind === 'control' || l.kind === 'hr' || drop.has(l)) continue; if (l.kind === 'link' && isDead(l.node.href) && !l.node.text && !(l.node.children || []).some((c) => MEDIA(kindOf(unwrap(c))))) continue; const h = leafHtml(l, opts); if (h) out.push(h); }
   return out;
 }
+// aem.js splits the style value on commas and classes each token: a space-separated list became one class (`spacing-top-spacing-bottom`, 3 min, natixis)
+const styleTokens = (v, rep) => { if (!v) return v; if (!v.includes(',') && /\s/.test(v.trim()) && v.trim().split(/\s+/).every((t) => /^[a-z0-9-]+$/i.test(t))) { rep.notes.push(`section style "${v}" written comma-separated (aem.js splits on commas)`); return v.trim().split(/\s+/).join(', '); } return v; };
 /** A container block: walk the section; consecutive unit members form one block table, everything else is default content in place. */
 function containerSection(node, block, recipe, report) {
   const a = analyzeSection(node); const picked = pickUnit(a);
-  const unit = picked.unit; const unitSig = unit ? unit.sig.join('+') : null;
+  let unit = picked.unit; let unitSig = unit ? unit.sig.join('+') : null;
+  // a collection default on a unit without media drops the picture cell (facts: number | text — an empty image cell on every row, natixis)
+  if (recipe._collectionDefault && unit && !unit.sig.some((k) => k === 'media') && (recipe.cells || [])[0] && (Array.isArray(recipe.cells[0].from) ? recipe.cells[0].from : [recipe.cells[0].from]).includes('picture')) { recipe = { ...recipe, cells: [{ name: 'lead', from: ['heading', 'text', 'link'], take: 1 }, ...recipe.cells.slice(1)] }; report.notes.push('text-only unit: picture cell dropped (lead | body)'); }
+  // accordion / tabs: the controls (buttons, dead links) ARE the unit, one row each, the panel from the k-th hidden root (natixis: three
+  // accordions whose summaries the dump holds as buttons and whose panels sit in the --hidden dump read as 1 × 2 with 0 cells)
+  if (recipe.controlsAreUnits && !unit) {
+    const ctls = []; const rest = []; const collect = (n) => { const u = unwrap(n); const k = kindOf(u); if (k === 'button' || (k === 'a' && isDead(u.href) && u.text)) { ctls.push(u); return; } if (!(u.children || []).length) { rest.push(u); return; } if (u.text) rest.push({ ...u, children: undefined }); (u.children || []).forEach(collect); };
+    (node.children || []).forEach(collect);
+    if (ctls.length >= 2 && block.name === 'tabs' && process.argv.includes('--tabs-as-sections')) {
+      // sections-as-panels (bny leadership): each panel is its own authored section with `section-metadata tab: <label>`; a panel holding a
+      // repeating unit is a cards block there, the rest default content — the tabs bar is built by the runtime from the metadata
+      report.notes.push(`${ctls.length} tabs as sections (section-metadata tab), panels from the hidden dump`);
+      const out = rest.flatMap((n) => defaultContent(n, report)); const sections = [];
+      for (const c of ctls) { const want = c.controls || (c.id ? c.id.replace(/-button$/, '') + '-panel' : null); const findId = (n) => n && (n.id === want ? n : (n.children || []).map(findId).find(Boolean)); let root = want ? hiddenRoots.map(findId).find(Boolean) : null; if (root) hiddenRoots.splice(hiddenRoots.findIndex((r) => findId(r)), 1); else { root = hiddenRoots[hiddenNext]; if (root) hiddenRoots.splice(hiddenNext, 1); }
+        const label = esc(c.text || c.aria || ''); const parts = []; if (root) { const a2 = analyzeSection(root); const u2 = pickUnit(a2).unit; if (u2) { const sub = { ...report, notes: [] }; parts.push(...containerSection(root, { name: 'cards', variant: null }, defaultRecipe(null, 'cards'), sub)); report.notes.push(`tab "${label.slice(0, 20)}": cards ${sub.rowsCols || ''}`); } else parts.push(...defaultContent(root, report)); } else report.notes.push(`tab "${label.slice(0, 20)}": no hidden root for its panel`);
+        parts.push(`<div class="section-metadata"><div><div>tab</div><div>${label}</div></div></div>`); sections.push(parts.join('\n')); }
+      report.rowsCols = `${ctls.length} sections`; report.tabSections = sections; return out;
+    }
+    if (ctls.length >= 2) {
+      report.notes.push(`${ctls.length} controls as rows (summary | hidden panel)`);
+      const out = rest.flatMap((n) => defaultContent(n, report)); // the section's own heading / lede stay default content before the block
+      const lines = [blockOpen(block.name, block.variant)]; let rows = 0;
+      for (const c of ctls) { const f = fillControlRow(c, recipe.cells || [], report); lines.push(rowHtml(f.cells)); rows += 1; }
+      lines.push('</div>'); out.push(lines.join('\n')); report.rowsCols = `${rows} × 2`; return out;
+    }
+  }
+  function fillControlRow(ctl, cells, rep) {
+    // the panel: the hidden root whose id is the control's aria-controls (or `<control id>-panel` / `-button` → `-panel`, the core-components convention), else the next in order
+    const want = ctl.controls || (ctl.id ? ctl.id.replace(/-button$/, '') + '-panel' : null); const findId = (n) => n && (n.id === want ? n : (n.children || []).map(findId).find(Boolean));
+    let root = want ? hiddenRoots.map(findId).find(Boolean) : null; if (root) { const k = hiddenRoots.findIndex((r) => findId(r)); if (k >= 0) { hiddenRoots.splice(k, 1); if (k < hiddenNext) hiddenNext -= 1; } } else { root = hiddenRoots[hiddenNext]; if (root) hiddenRoots.splice(hiddenNext, 1); }
+    if (!root) rep.notes.push('control row: no hidden root left for its panel (pass the --hidden dump with --content)'); const summary = esc(ctl.text || ctl.aria || ''); const panel = root ? cellHtml(leavesOf(root).filter((l) => !['control', 'hr'].includes(l.kind)), cells[1] || {}, '') : ''; rep.filled += (summary ? 1 : 0) + (panel ? 1 : 0); rep.cellsTotal += 2; if (!panel) rep.empty += 1; stats.texts += summary ? 1 : 0; return { cells: [`<p>${summary}</p>`, panel], filled: 0, unfitted: [], empty: [] }; }
   const rowNodes = new Set(); if (unit) for (const r of a.repeats) if (r.count >= 2 && r.sig.join('+') === unitSig) r.nodes.forEach((n) => rowNodes.add(n));
   // a lone node is a row when it is shaped like the unit: same pattern (a grid OF tiles has the tiles' kinds but a `[…]×N` pattern)
   const looksLikeUnit = (n) => { if (!unit || rowNodes.has(n)) return rowNodes.has(n); const k = kindOf(n); if (!['group', 'li', 'ul'].includes(k)) return false; const sub = analyzeSection(n); if (!sub.leaves.length || sub.repeats.some((r) => r.count >= 2 && r.unit.includes(' '))) return false; /* a composite repeat inside = a grid, not a row */ const sig = [...new Set(sub.leaves.map((l) => general(l.kind)))].sort().join('+'); return sub.pattern === unit.unit || (sig === unitSig && sub.leaves.length <= unit.leaves.length + 1); };
   const out = []; let dividerNext = false; let blocks = 0; let rows = 0; const cols = (recipe.cells || []).length;
+  let lastBlockAt = -1; // index in `out` of the last table: a unit continued in the next row wrapper joins it (6 × 2 in 2 tables → one, natixis)
+  // an <hr> between every unit member is the unit's separator (a `divider` variant), not a split into tables (five list cards over two tables — canon)
+  const kidsAll = (node.children || []).map(unwrap); const hrCount = kidsAll.filter((c) => kindOf(c) === 'hr').length; const unitCount = kidsAll.filter((c) => rowNodes.has(c)).length; const hrBetweenUnits = hrCount >= 2 && unitCount >= 3 && hrCount >= unitCount - 1;
+  if (hrBetweenUnits) report.notes.push(`${hrCount} <hr> between ${unitCount} units: the unit's separator (divider variant), one table`);
   const emitBlock = (members) => {
     const variant = dividerNext ? dividerVariant(block.name, block.variant) || block.variant : block.variant; if (dividerNext && variant !== block.variant) report.notes.push(`<hr> before a unit → variant "${variant}"`); dividerNext = false;
-    const lines = [blockOpen(block.name, variant)];
-    if (recipe.headRow) { const head = fillCells(members[0], recipe.headRow, report); lines.push(rowHtml(head.cells)); }
+    const joining = lastBlockAt === out.length - 1 && out.length > 0 && (!dividerNext || hrBetweenUnits);
+    const lines = joining ? [] : [blockOpen(block.name, variant)];
+    if (recipe.headRow && !joining) { const head = fillCells(members[0], recipe.headRow, report); lines.push(rowHtml(head.cells)); }
     for (const mNode of members) { const f = fillCells(mNode, recipe.cells || [], report); lines.push(rowHtml(f.cells)); rows += 1; report.filled += f.filled; report.cellsTotal += cols; report.unfitted += f.unfitted.length; report.empty += f.empty.length; if (f.unfitted.length) report.notes.push(`row ${rows}: ${f.unfitted.map((l) => `${l.kind}${l.fallbackCell ? `→cell ${l.fallbackCell}` : ''}`).join(' ')} did not fit the recipe`); }
-    lines.push('</div>'); out.push(lines.join('\n')); blocks += 1;
+    if (joining) { out[out.length - 1] = out[out.length - 1].replace(/<\/div>\s*$/, '') + '\n' + lines.join('\n') + '\n</div>'; report.notes.push('rows continued from the next row wrapper (one table)'); }
+    else { lines.push('</div>'); out.push(lines.join('\n')); blocks += 1; }
+    lastBlockAt = out.length - 1;
   };
+  
   const walk = (n) => {
     const kids = (n.children || []).map(unwrap);
     if (hasBg(n) && !kids.some((c) => MEDIA(kindOf(c)))) out.push(pictureHtml(n, '')); // the section root's own background is its picture too (a banner's bgi on the root — sdt-dentsu)
@@ -353,6 +437,15 @@ function fixedSection(node, block, recipe, report) {
   const out = head.map((l) => leafHtml(l)).filter(Boolean);
   const cells = recipe.cells || [{ name: 'body', from: ['rest'] }];
   const lines = [blockOpen(block.name, block.variant)];
+  if (recipe.cellsFromChildren) { // columns: one cell per top-level child of the content (≤ 4; more → one cell), the Block Collection's shape
+    // the columns are the children of the first node that branches (a wrapper chain above them gives every leaf `top` 0 — natixis: 4 columns × 3 logos)
+    const holds = (n, leaf) => n === leaf || (n.children || []).some((c) => holds(c, leaf));
+    let g = node; for (;;) { const kids = (g.children || []).map(unwrap).filter((c) => inner.some((l) => holds(c, l.node))); if (kids.length === 1) g = kids[0]; else break; }
+    const cols = (g.children || []).map(unwrap).filter((c) => inner.some((l) => holds(c, l.node)));
+    const tops = cols.map((c) => inner.filter((l) => holds(c, l.node)));
+    if (tops.length >= 2 && tops.length <= 4) { const cellsHtml = tops.map((ls) => cellHtml(ls, { from: ['rest'] }, '')); lines.push(rowHtml(cellsHtml)); report.filled += cellsHtml.filter(Boolean).length; report.cellsTotal += tops.length; report.rowsCols = `1 × ${tops.length}`; report.notes.push('columns: one cell per child'); lines.push('</div>'); out.push(lines.join('\n')); out.push(...tail.map((l) => leafHtml(l)).filter(Boolean)); return out; }
+    report.notes.push(`columns: ${tops.length} children — one cell (2–4 children make the columns)`);
+  }
   if (recipe.rows === 'leaf') { for (const l of inner) { const h = cellHtml([l], cells[0] || {}, ''); lines.push(rowHtml([h])); report.filled += h ? 1 : 0; report.cellsTotal += 1; } report.rowsCols = `${inner.length} × 1`; }
   else {
     // one row: bucket the leaves as a unit would be (the whole section is the unit)
@@ -373,7 +466,20 @@ function keyValueSection(node, block, recipe, report) {
 
 // ───────────────────────────── the page ─────────────────────────────
 const sectionsHtml = []; const reports = []; let sawNew = false;
-mainSections.forEach((row, i) => { const node = split.sections[i]; const { html, report } = authorSection(node, row); sectionsHtml.push(html); reports.push(report); if (row.match.kind === 'new') sawNew = true; });
+// a section that would come out EMPTY (no text, no picture: a back-to-top strip, a 3 px rule) is not authored, and its triage row is marked
+// `drop: empty` so spec-to-css and the gate keep their indices — the harness and the pipeline disagreed on keeping an empty section
+// (wyndham: kept by the served page; waters: dropped) and every nth-of-type after it shifted
+let emptied = 0;
+// a default-content row whose anchor IS the footer row's (the live footer's own band, split as a section too — omnicom "Stay connected") is the
+// footer's: authored twice it stood above the footer as a copy, and the gate's live split counted it (the pairing fell to anchors)
+{ const nt = (t) => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase(); const chromeAnchors = triage.sections.filter((r) => r.chrome || /^(header|footer)$/.test(r.match?.block || '')).map((r) => nt(r.anchorText)).filter(Boolean);
+  // and a row whose BOX is a chrome row's box (± 4 px) is that chrome split twice, whatever block it matched (lenovo: rows 1 / 12 = the header
+  // and footer boxes, dropped by hand and `first` re-run — ≈ 2 min)
+  const chromeBoxes = triage.sections.filter((r) => r.chrome && r.box).map((r) => r.box);
+  for (const row of mainSections) if (!row.drop && row.box && chromeBoxes.some((b) => b.every((v, k) => Math.abs(v - row.box[k]) <= 4))) { row.drop = 'the chrome split twice'; emptied += 1; console.error(`author: row ${row.index} has the header / footer box — not authored, marked drop`); }
+  for (const row of mainSections) if (!row.drop && !row.match?.block && chromeAnchors.includes(nt(row.anchorText))) { row.drop = 'in the chrome'; emptied += 1; console.error(`author: row ${row.index} "${String(row.anchorText).slice(0, 30)}" is the chrome's own band — not authored, marked drop`); } }
+mainSections.forEach((row, i) => { if (row.drop) { console.error(`author: row ${row.index} dropped in the triage — not authored`); return; } const node = split.sections[i]; const { html, report } = authorSection(node, row); if (!/<(img|picture|video|iframe|a\b|h[1-6]|p|li|div class=)[^>]*>[\s\S]*?(\S)/i.test(html.replace(/<p>\s*<\/p>/g, '')) && !/<img|<picture/i.test(html)) { row.drop = 'empty'; emptied += 1; console.error(`author: row ${row.index} would be an empty section — not authored (drop: empty in ${triageFile})`); return; } sectionsHtml.push(html); if (report.tabSections) sectionsHtml.push(...report.tabSections.map((p) => `<div>\n${p}\n</div>`)); reports.push(report); if (row.match.kind === 'new' && !(process.argv.includes('--draft-new') && row.match.block)) sawNew = true; });
+if (emptied) writeFileSync(resolve(triageFile), JSON.stringify(triage, null, 1)); // the marks reach spec-to-css and the gate
 const meta = [['title', dump.__title || triage.page?.title || ''], ...(dump.__desc ? [['description', dump.__desc]] : []), ...(navPath ? [['nav', navPath]] : []), ...(footerPath ? [['footer', footerPath]] : [])];
 if (!navPath || !footerPath) warn('metadata: no nav / footer path (no profile `chrome.fragments`; pass --nav-path / --footer-path)');
 sectionsHtml.push(`<div>\n<div class="metadata">\n${meta.map(([k, v]) => `<div><div>${esc(k)}</div><div>${esc(v)}</div></div>`).join('\n')}\n</div>\n</div>`);
@@ -383,12 +489,39 @@ mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, doc);
 // ───────────────────────────── nav / footer (simplest shape, only when absent) ─────────────────────────────
 const chromeDoc = (sections) => `<body>\n  <header></header>\n  <main>\n${sections.map((s) => `<div>\n${s.filter(Boolean).join('\n')}\n</div>`).join('\n')}\n  </main>\n  <footer></footer>\n</body>\n`;
 function navDoc(root) {
-  const leaves = leavesOf(root); const brand = leaves.find((l) => l.kind === 'link' && (l.node.children || []).some((c) => kindOf(unwrap(c)) === 'picture'));
-  const list = leaves.find((l) => l.kind === 'list'); const used = new Set([brand, list].filter(Boolean));
-  const menu = list ? [listHtml(list.node, 'plain')] : [`<ul>${leaves.filter((l) => l.kind === 'link' && l !== brand).map((l) => `<li>${leafInline(l.node, 'plain')}</li>`).join('')}</ul>`];
-  if (!list) leaves.filter((l) => l.kind === 'link' && l !== brand).forEach((l) => used.add(l));
-  const tools = leaves.filter((l) => !used.has(l) && ['link', 'icon'].includes(l.kind) && !(list && list.node === l.parent)).map((l) => leafHtml(l)).filter(Boolean);
-  return chromeDoc([[brand ? linkHtml(brand.node, 'plain') : null], menu, tools]);
+  // by kind AND position (five-minute loop: the nav docs were a skip link and bare icons — toryburch; the logo as "Learn more" — publicis;
+  // 3 of 7 items — continental): off-screen leaves (skip links) dropped; brand = the logo link (a picture or an icon inside, the widest);
+  // a thin full-width text band above the main row (a promo bar) its own section after the three; tools = the right third; sections = the rest
+  const W = root.box ? root.box[2] : 1440; const X0 = root.box ? root.box[0] : 0;
+  const onScreen = (l) => { const b = l.node.box; return !b || (b[0] + b[2] > X0 + 1 && b[0] < X0 + W - 1 && b[2] > 2 && b[3] > 2); };
+  const leaves = leavesOf(root).filter(onScreen);
+  const hasMark = (n) => (n.children || []).some((c) => ['picture', 'icon'].includes(kindOf(unwrap(c))) || /^(svg|img)$/i.test(String(c.tag || '')) || hasMark(c));
+  // a card-wide link leaf (wrapLink: the picture walked before it, its own children dropped) counts as a logo link too — publicis' brand was empty
+  const brand = leaves.filter((l) => l.kind === 'link' && (hasMark(l.node) || l.wrapLink)).sort((a, b) => (b.node.box?.[2] || 0) - (a.node.box?.[2] || 0))[0] || null;
+  const pic = brand ? leaves[leaves.indexOf(brand) - 1] : null; if (brand?.wrapLink && pic && ['picture', 'icon'].includes(pic.kind)) leaves.splice(leaves.indexOf(pic), 1);
+  const label = (n) => { const t = String(n.text || n.aria || n.title || n.alt || '').trim(); return /^learn more$/i.test(t) && n !== brand?.node ? '' : t; };
+  const mainTop = brand?.node.box ? brand.node.box[1] : Math.min(...leaves.map((l) => l.node.box?.[1] ?? 1e9));
+  const promo = leaves.filter((l) => l !== brand && l.node.box && l.node.box[1] + l.node.box[3] <= mainTop - 2 && ['text', 'link'].includes(l.kind));
+  const used = new Set([brand, ...promo].filter(Boolean));
+  const list = leaves.find((l) => l.kind === 'list' && !used.has(l));
+  const right = (l) => l.node.box && l.node.box[0] >= X0 + W * 0.66;
+  const tools = leaves.filter((l) => !used.has(l) && l !== list && right(l) && ['link', 'icon', 'control'].includes(l.kind));
+  tools.forEach((l) => used.add(l)); if (list) used.add(list);
+  const item = (l) => (l.kind === 'link' ? (label(l.node) ? `<li>${leafInline({ ...l.node, text: label(l.node) }, 'plain')}</li>` : null) : label(l.node) ? `<li>${esc(label(l.node))}</li>` : null); // an unlabelled link (an icon-only country selector) is not an item
+  const menu = list ? [listHtml(list.node, 'plain')] : [`<ul>${leaves.filter((l) => !used.has(l) && ['link', 'control'].includes(l.kind)).map(item).filter(Boolean).join('')}</ul>`];
+  const toolsHtml = tools.length ? [`<ul>${tools.map((l) => item(l) || (l.kind === 'icon' ? `<li>${leafHtml(l) || ''}</li>` : null)).filter(Boolean).join('')}</ul>`] : [];
+  const bl = brand ? (String(brand.node.aria || brand.node.title || '').trim() || (pic?.node?.alt || '').trim() || (/^learn more$/i.test(String(brand.node.text || '')) ? '' : String(brand.node.text || '').trim()) || 'Home') : null;
+  // never an empty brand section: the pipeline drops an empty section and every nav role shifts one slot (revlon: the link list in the brand
+  // slot) — the site's own name from the page URL when no logo link was found
+  const siteName = (() => { try { const h = new URL(arg('--url', '') || 'https://site.example').hostname.replace(/^www\./, '').split('.')[0]; return h.charAt(0).toUpperCase() + h.slice(1); } catch { return 'Home'; } })();
+  // the brand is its LOGO when the link holds one (an img inside it, or the picture walked before a card-wide link): the text link lost the
+  // logo on every run and the agents put `<a><picture><img></picture></a>` back by hand (santanderus, rbc, revlon — it serves as written)
+  const logoOf = (n) => { if (!n) return null; if (/^img$/i.test(String(n.tag || '')) && (n.src || bgUrl(n))) return n; for (const c of n.children || []) { const f = logoOf(c); if (f) return f; } return null; };
+  const logo = brand ? (logoOf(brand.node) || (pic && ['picture', 'icon'].includes(pic.kind) ? logoOf(pic.node) : null)) : null;
+  const brandHtml = brand ? (logo ? `<p><a href="${esc(brand.node.href || '/')}">${pictureHtml(logo, logo.alt || bl, null)}</a></p>` : `<p><a href="${esc(brand.node.href || '/')}">${esc(bl)}</a></p>`) : `<p><a href="/">${esc(siteName)}</a></p>`;
+  const sections = [[brandHtml], menu, toolsHtml];
+  if (promo.length) sections.push(promo.map((l) => leafHtml(l)).filter(Boolean));
+  return chromeDoc(sections);
 }
 function footerDoc(root) {
   let n = root; while (n.children?.length === 1 && !n.text) n = n.children[0];
@@ -396,10 +529,15 @@ function footerDoc(root) {
   const sections = groups.map((g) => { const leaves = leavesOf(g).filter((l) => !['control', 'hr'].includes(l.kind)); const out = []; let i = 0; while (i < leaves.length) { if (leaves[i].kind === 'link' && leaves[i + 1]?.kind === 'link') { const run = []; while (i < leaves.length && leaves[i].kind === 'link') run.push(leaves[i++]); out.push(`<ul>${run.map((l) => `<li>${leafInline(l.node, 'plain')}</li>`).join('')}</ul>`); } else out.push(leafHtml(leaves[i++])); } return out; }).filter((s) => s.length);
   return chromeDoc(sections);
 }
-for (const [flag, root, make] of [['--nav', split.header, navDoc], ['--footer', split.footer, footerDoc]]) {
+// rows the triage marked `header` / `footer` are the chrome document's source when the dump has no such root (equitable: the footer fragment
+// was two content rows; marking them `footer` only dropped them and footer.html stayed empty)
+const markedRoot = (kind) => { const nodes = mainSections.map((r, i) => (r.drop === kind ? split.sections[i] : null)).filter(Boolean); if (!nodes.length) return null; const bs = nodes.map((n) => n.box).filter(Boolean); return { tag: 'div', box: bs.length ? [Math.min(...bs.map((b) => b[0])), Math.min(...bs.map((b) => b[1])), Math.max(...bs.map((b) => b[0] + b[2])) - Math.min(...bs.map((b) => b[0])), Math.max(...bs.map((b) => b[1] + b[3])) - Math.min(...bs.map((b) => b[1]))] : null, children: nodes }; };
+for (const [flag, root, make] of [['--nav', split.header || markedRoot('header'), navDoc], ['--footer', split.footer || markedRoot('footer'), footerDoc]]) {
   const f = arg(flag, null); if (!f) continue;
   if (existsSync(resolve(f))) { console.error(`author: ${f} exists — left alone (chrome is authored once)`); continue; }
-  if (!root) { console.error(`author: ${flag}: the dump has no ${flag.slice(2)} root — nothing written`); continue; }
+  // no root (a page without a footer — publicis): an EMPTY chrome document, so the upload and the harness's fragment fetch have one (da-put
+  // exited 2 and the harness 4 on the missing footer.plain.html; the agent typed an empty document by hand)
+  if (!root) { mkdirSync(dirname(resolve(f)), { recursive: true }); writeFileSync(resolve(f), '<body>\n<header></header>\n<main>\n<div></div>\n</main>\n<footer></footer>\n</body>\n'); console.error(`author: ${flag}: the dump has no ${flag.slice(2)} root — an empty ${flag.slice(2)} document written (the source has none)`); continue; }
   mkdirSync(dirname(resolve(f)), { recursive: true }); writeFileSync(resolve(f), make(root)); console.error(`author: ${f} written from the dump's ${flag.slice(2)} root (simplest shape: review it)`);
 }
 

@@ -1,0 +1,58 @@
+# Five-minute loop — the field run protocol (one run = one page, one agent, alone on the machine)
+
+The orchestrator gives you: `URL`, `SLUG` (e.g. `marriott-home`), `REPO` (e.g. `sdt-marriott-lite`), `SHA` (stardust-lite commit on `exp/five-min`).
+The point is to MEASURE the wall clock from t0 to a prototype under 10 % at 360 / 1440 / 2560 — the target is 5 min. Work fast; every model
+turn costs ≈ 8 s. Do not read METHOD.md or BACKLOG.md unless a step fails and you need one row.
+
+## Setup (not counted)
+- Work dir `/Users/paolo/stardust/2026-10/REPO`, GitHub `aemcoder-adobe/REPO`, DA content `aemcoder-adobe/REPO`. If the GitHub repo already
+  exists, STOP and report (it may belong to another project). Never touch any other repo or DA path.
+- Create the site with the `eds-new-site` skill (boilerplate, fstab → da.live, Code Sync, liveness). Credentials:
+  `set -a; source /Users/paolo/.claude/.env; set +a`; `python3 ~/.claude/scripts/refresh_da_token.py` before DA / admin calls and on a 401.
+  Never print a token, never write one into a file.
+- `npm i -D --legacy-peer-deps github:paolomoz/stardust-lite#SHA`, `npx playwright install chromium`, `npx stardust-lite init --foundation --force`,
+  branch `blocks-first`, push once. Create `./tl` (below) and add `TIMING.log` to `.git/info/exclude`.
+
+```
+#!/bin/bash
+# usage: ./tl <label> -- <command...>   (logs label and timing only, never the command line)
+label="$1"; shift; [ "$1" = "--" ] && shift
+s=$(date +%s); echo "$(date -u +%FT%TZ) START [$label]" >> "$(dirname "$0")/TIMING.log"
+"$@"; rc=$?
+echo "$(date -u +%FT%TZ) END   [$label] rc=$rc $(( $(date +%s)-s ))s" >> "$(dirname "$0")/TIMING.log"
+exit $rc
+```
+
+## The clock (t0 = the start of the first command below)
+1. `./tl first -- npx stardust-lite first URL --slug SLUG` (DA_TOKEN in the environment). It runs probe-load, measure, triage (the draft,
+   accepted), media + fonts, the DA uploads, author, spec-to-css, the harness and the first round at the three widths, and prints a step
+   table and the round digest. Read `npx stardust-lite checklist` (CHECKLIST.md) only for the rows you need.
+2. If the split is wrong: a row that is not page content (a header band in main, a skip-link strip) → write `drop` in its block column
+   of `migration/cases/home/triage.md`; a wrong block → its name there; then `first URL --slug SLUG --skip probe,measure,media` (it applies
+   the edited triage.md and re-authors). A wrong section selector → `first … --sections '<css>'`. Note what you changed.
+3. The CSS: read `migration/cases/home/gate/cards/INDEX.md` (one card per section: its owner file, Δh and % per width, the live values
+   inside its range at 1440 and 360, and live | build crops) and open the cards of the sections the digest names — do not write your own
+   flatten script over the dumps. The drafts (`blocks/*/*.css`, `styles/sections-draft.css`) already carry the measured values — start from
+   the first round's digest and fix the sections it names, worst first. Open `spec-view` / `brief` for a section only when its row is off and
+   the draft does not say why; do not read every section at three widths up front.
+4. CSS rounds: edit the block drafts IN PLACE (`blocks/<name>/<name>.css` load after styles.css and are yours once `first` has run — do not
+   re-run `first` past this point) and `styles/styles.css` for page / section rules (the generated `styles/sections-draft.css` is imported first,
+   so a rule you write in styles.css wins a tie), then `./tl rN -- npx stardust-lite gate --live URL --build http://localhost:8990/SLUG.harness.html --out migration/cases/home/gate
+   --origin migration/cases/home/measure --round --widths 360,1440,2560 --triage migration/cases/home/triage.json` To check ONE section between rounds (≈ 5 s, the build fresh, the live side from the last round): `npx stardust-lite section-view migration/cases/home/gate http://localhost:8990/SLUG.harness.html --section <#i|header|footer>` → `gate/view/view-<i>-<W>.png` (live | build) with Δh and % (after a document / nav / footer edit re-run the
+   prototype with the EXACT harness command `first` printed at its end — it carries --local-media and --sync-chrome). Fix as much as the digest names per round, at all three widths at once.
+5. **Stop at the `stop:` line** (all three widths under 10 %) — that is the clock's end. Hard stop: 60 min after t0.
+6. After the clock (not counted, keep it short): push the code, `da-put` the page document if you edited it, `sync-poll`, served gate (`gate --live URL --build <host>/drafts/SLUG --out
+   migration/cases/home/gate-served --origin migration/cases/home/measure --widths 360,1440,2560`), `leak` on both. No polish rounds.
+
+Rules that stay: never copy source DOM or CSS (values come from the measurements); preview only (aem.page), never publish; do not edit
+stardust-lite (work around a tool failure with a case script and note it); ≤ 10 min on one residual, then register it.
+
+## Write (after the clock, ≤ 5 min) in `migration/cases/home/`
+- `TIMELINE.md`: UTC stamps for t0, `first` done (its first-round %), each round (three %s), `stop:`, served gate.
+- `NOTES.md`: (a) tool friction, one line each: what, minutes, what would have removed it; (b) your own time: the five largest chunks of
+  reading / deciding / writing with minutes; (c) what you changed per round and why the digest did or did not name it.
+- REPORT.md (numbers), REGISTER.md (deviations), copy TIMING.log. Commit and push the site repo.
+
+## Return (concise)
+Milestones in minutes from t0 (first done, each round with its three %s, stop, served), setup minutes, final prototype and served %; from
+TIMING.log the tool seconds t0 → stop; the five largest non-tool chunks; the three tool defects that cost the most; paths of NOTES / TIMELINE.

@@ -1,0 +1,25 @@
+2026-10-12T04:16:16Z START b01 claude-opus-5-5 high
+2026-10-12T04:32:23Z END   b01 rc=0
+2026-10-12T04:32:23Z START b02 claude-sonnet-5-5 low
+2026-10-12T05:00:01Z END   b02 rc=0
+2026-10-12T05:00:01Z START b03 claude-fable-5-1 medium
+2026-10-12T05:33:17Z END   b03 rc=0
+2026-10-12T05:33:17Z START b04 claude-opus-5-5 low
+2026-10-12T05:53:37Z END   b04 rc=0
+2026-10-12T05:53:37Z START b05 claude-sonnet-5-5 high
+2026-10-12T06:25:19Z END   b05 rc=0
+2026-10-12T06:25:19Z START b06 claude-fable-5-1 low
+2026-10-12T06:50:43Z END   b06 rc=0
+2026-10-12T06:50:43Z START b07 claude-opus-5-5 medium
+2026-10-12T07:11:00Z END   b07 rc=0
+2026-10-12T07:11:00Z START b08 claude-sonnet-5-5 medium
+2026-10-12T07:49:04Z END   b08 rc=0
+2026-10-12T07:49:04Z START b09 claude-fable-5-1 high
+2026-10-12T07:54:55Z END   b09 rc=killed (session ended ~5 min in; no repo created) — re-run as b09r
+2026-10-12T07:55:01Z START b09r claude-fable-5-1 high
+2026-10-12T08:21:17Z END   b09r rc=0
+2026-10-12T08:21:17Z START b10 claude-opus-5-5 high
+2026-10-12T08:38:02Z END   b10 rc=0
+2026-10-12T08:38:02Z PHASE 1 DONE
+2026-10-12T08:57:57Z START q01 qwen-3.8-27b(cerebras) default
+2026-10-12T09:21:51Z END   q01 rc=0 — ended by an API error: Qwen's 131 072-token context exceeded after 104 turns (Claude Code, told the model was Sonnet 5.5, never compacted)

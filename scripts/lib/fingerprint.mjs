@@ -27,6 +27,14 @@ const MEDIA_TAGS = new Set(['img', 'picture', 'video', 'video-js', 'source', 'au
 const hasBg = (n) => !!(n.bgi && /url\(/.test(n.bgi));
 const tagOf = (n) => String(n.tag || '').toLowerCase();
 
+/** A link whose content is ONE text (through spans / wrappers, an icon beside it allowed) and no picture or heading: its label — a button
+ * `a.acsbutton > span.acsbutton-label` is a link with that text, not a card-wide wrapper (acs-about: every button lost its href). Else null. */
+export function linkLabel(n) {
+  if (String(n.tag || '').toLowerCase() !== 'a' || n.text) return null; const texts = []; let block = false;
+  const walk = (x) => { const t = String(x.tag || '').toLowerCase(); if (MEDIA_TAGS.has(t) || x.src || HEAD.test(t)) { block = true; return; } if (x.text) texts.push(x.text); (x.children || []).forEach(walk); };
+  (n.children || []).forEach(walk); return !block && texts.length === 1 ? texts[0] : null;
+}
+
 /** The leaf kind of a node (see the header). */
 export function kindOf(n) {
   const tag = tagOf(n);
@@ -36,7 +44,9 @@ export function kindOf(n) {
   if (tag === 'svg') return 'icon';
   if (HEAD.test(tag)) return tag;
   if (tag === 'blockquote') return 'blockquote';
-  if (tag === 'a') return 'a';
+  // a card-wide link (no text of its own, wrapping a picture / heading / paragraph) is a container, as author reads it (35f9b73): read as a
+  // leaf, takeda's ten card grids were `a×4` link lists and the draft triage named them accordions (exp/five-min replay)
+  if (tag === 'a') return !n.text && !linkLabel(n) && (n.children || []).some((c) => { const k = kindOf(c); return k === 'picture' || k === 'video' || HEAD.test(k) || k === 'p' || k === 'group'; }) ? 'group' : 'a';
   if (tag === 'button') return 'button';
   if (['input', 'select', 'textarea', 'form'].includes(tag)) return 'input';
   if (tag === 'hr') return 'hr';
@@ -166,11 +176,23 @@ export function fingerprint(root, { depth = 6 } = {}) {
   const anchorText = (firstHead ? textOf(firstHead.node) : textOf(root)).replace(/\s+/g, ' ').trim().slice(0, 60);
   const mediaArea = media.reduce((s, l) => s + area(l.node), 0);
   const kinds = sigOf(a.leaves);
+  // the unit is PAINTED (a background, a border, a shadow or a radius on it or down its single-child chain): a link-only list of painted
+  // boxes is cards, not an accordion (acs-about: white rounded shadowed link cards drafted as `accordion (?)`)
+  const painted = (n) => { let x = n; for (let d = 0; x && d < 4; d += 1) { if ((x.bg && !/rgba\(0, 0, 0, 0\)/.test(x.bg)) || x.shadow || x.border || (x.br && x.br !== '0px')) return true; x = x.children?.length === 1 ? x.children[0] : null; } return false; };
+  // side-by-side columns of DIFFERENT kinds under the first branching node (a picture-only column beside a text-only one): columns, whatever
+  // the text column repeats (takeda: a picture beside three paragraphs read as "text run ×3: default content")
+  let br0 = root; while (br0.children?.length === 1) br0 = br0.children[0];
+  const kidsB = (br0.children || []).filter((c) => c.box && c.box[2] > 40 && c.box[3] > 20);
+  const hasMedia = (n) => MEDIA_TAGS.has(String(n.tag || '').toLowerCase()) || !!n.src || (n.children || []).some(hasMedia);
+  const hasText = (n) => !!n.text || (n.children || []).some(hasText);
+  const sideBySide = kidsB.length >= 2 && kidsB.length <= 4 && kidsB.every((c, i) => i === 0 || (c.box[0] >= kidsB[i - 1].box[0] + kidsB[i - 1].box[2] - 2 && Math.min(c.box[1] + c.box[3], kidsB[i - 1].box[1] + kidsB[i - 1].box[3]) - Math.max(c.box[1], kidsB[i - 1].box[1]) > 20));
+  const mixedCols = sideBySide && kidsB.some((c) => hasMedia(c) && !hasText(c)) && kidsB.some((c) => hasText(c) && !hasMedia(c)) ? kidsB.length : 0;
+  const unitPainted = !!u && u.nodes.filter(painted).length * 2 >= u.nodes.length; const unitH = u ? u.nodes.map((n) => (n.box ? n.box[3] : 0)).sort((x, z) => x - z)[Math.floor(u.nodes.length / 2)] : 0;
   return {
     anchorText, box: root.box || null, pattern: a.pattern, repeat: u ? (groups ? groups.reduce((s, g) => s + g, 0) : u.count) : 0, groups, unit: u ? unit.unit : null, unitSig: u ? unit.sig : [], unitCols: u ? cells(unit.unitNode) : null,
     cols: u ? cells(unit.unitNode) : cells(root), media: media.length, texts: texts.length, links: links.length,
     mediaRatio: media.length + texts.length ? Number((media.length / (media.length + texts.length)).toFixed(2)) : 0,
-    headingBefore, linkAfter, controls, sliderHint, classes: { root: chainClasses(root), unit: unitClasses, context }, kinds,
+    headingBefore, linkAfter, unitPainted, unitH, mixedCols, controls, sliderHint, classes: { root: chainClasses(root), unit: unitClasses, context }, kinds,
     defaultContent: def.slice(0, 12).map((l) => ({ tag: l.kind, text: textOf(l.node).replace(/\s+/g, ' ').trim().slice(0, 80) })), defaultCount: def.length,
     bigText: Math.max(0, ...texts.map((l) => fontPx(l.node))), mediaArea: root.box ? Number(Math.min(1, mediaArea / Math.max(1, area(root))).toFixed(2)) : 0, leafCount: a.leaves.length,
   };
@@ -194,11 +216,38 @@ export const allClasses = (fp) => [...new Set([...(fp.classes?.root || []), ...(
  * that is not header / footer / hidden). */
 export function splitSections(dump, { root = null, sections = null } = {}) {
   const keys = Object.keys(dump).filter((k) => !k.startsWith('__') && !k.startsWith('hidden '));
-  const headerKey = keys.find((k) => /^header\b/.test(k)) || null; const footerKey = keys.find((k) => /^footer\b/.test(k)) || null;
-  const mainKey = root || keys.find((k) => k === 'main') || keys.find((k) => k !== headerKey && k !== footerKey) || null;
+  // the chrome keys: a `header…` / `footer…` selector, else a header-ish key at the top / a footer-ish one (measure-page's guess for a page with
+  // no <header> / <footer> outside main — marriott: `div.m-header`, `div.footer`)
+  const top0 = (k) => (Array.isArray(dump[k]) ? dump[k] : [dump[k]]).find((n) => n?.box)?.box?.[1] ?? 1e9;
+  const named = dump.__chrome || {}; // measure-page names its chrome keys (a --header / --footer selector need not say header / footer)
+  const headerKey = (named.header && keys.includes(named.header) ? named.header : null) || keys.find((k) => /^header\b/.test(k)) || keys.find((k) => /(^|[\s.#_-])(header|masthead|banner)\b/i.test(k.split(',')[0]) && top0(k) < 250) || null;
+  const footerKey = (named.footer && keys.includes(named.footer) ? named.footer : null) || keys.find((k) => /^footer\b/.test(k)) || keys.find((k) => k !== headerKey && /(^|[\s.#_-])(footer|contentinfo)\b/i.test(k.split(',')[0])) || null;
+  const tallest = (ks) => ks.filter((k) => !Array.isArray(dump[k]) || dump[k].length <= 5).map((k) => [k, Math.max(0, ...(Array.isArray(dump[k]) ? dump[k] : [dump[k]]).filter((n) => n?.box).map((n) => n.box[3]))]).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+  const mainKey = root || keys.find((k) => k === 'main') || tallest(keys.filter((k) => k !== headerKey && k !== footerKey)) || null; // a renamed content root (`#content`, `div.main-container`) is the tallest non-chrome root, not the first key
   const roots = mainKey ? (dump[mainKey] || []) : [];
+  // the extra roots measure-page dumped (unassigned bands: a breadcrumb bar, a promo bar outside main) are sections of their own, in the dump's order
+  const extraKeys = keys.filter((k) => k !== headerKey && k !== footerKey && k !== mainKey);
+  // before / after main by the PAGE's geometry, the dump's key order only when a band has no box (acs-about: the footer band was dumped before
+  // main and triage made it the first content row)
+  const mainBox = (Array.isArray(roots) ? roots : [roots]).find((n) => n?.box)?.box || null; const firstBox = (k) => (Array.isArray(dump[k]) ? dump[k] : [dump[k]]).find((n) => n?.box)?.box || null;
+  const isAfter = (k) => { const b = firstBox(k); return b && mainBox ? b[1] >= mainBox[1] + mainBox[3] - 8 : keys.indexOf(k) > keys.indexOf(mainKey); };
+  const byY = (a, b) => (firstBox(a)?.[1] ?? 0) - (firstBox(b)?.[1] ?? 0);
+  const beforeMain = extraKeys.filter((k) => !isAfter(k)).sort(byY); const afterMain = extraKeys.filter(isAfter).sort(byY);
+  // …except the chrome dumped twice (exp/five-min, wellsfargo replay: the utility nav INSIDE the header box, the legal links inside the footer,
+  // a link-only mega-menu bar under the header read as four accordion sections and tripled the page): a band inside a header / footer
+  // node's box, or a link-only band touching the header's bottom / after main, belongs to the chrome
+  const chromeBoxes = [headerKey, footerKey].filter(Boolean).flatMap((k) => (Array.isArray(dump[k]) ? dump[k] : [dump[k]])).filter((n) => n?.box && n.box[3] > 0).map((n) => n.box);
+  const inside = (b, c) => { const ix = Math.max(0, Math.min(b[0] + b[2], c[0] + c[2]) - Math.max(b[0], c[0])); const iy = Math.max(0, Math.min(b[1] + b[3], c[1] + c[3]) - Math.max(b[1], c[1])); return b[2] * b[3] > 0 && (ix * iy) / (b[2] * b[3]) >= 0.8; };
+  const leaves = (n, out = []) => { if (n.text || !(n.children || []).length) out.push(n); else n.children.forEach((c) => (['a', 'button'].includes(tagOf(c)) ? out.push(c) : leaves(c, out))); return out; };
+  const linkOnly = (n) => { const l = leaves(n).filter((x) => x.text || ['img', 'picture', 'svg', 'video'].includes(tagOf(x))); return l.length > 0 && l.every((x) => ['a', 'button'].includes(tagOf(x))); };
+  const headerBottom = Math.max(0, ...chromeBoxes.filter((b) => b[1] < 400).map((b) => b[1] + b[3]));
+  const isChrome = (n, after) => !!n.box && (chromeBoxes.some((c) => inside(n.box, c)) || (linkOnly(n) && (after || (headerBottom && n.box[1] <= headerBottom + 8))));
+  const extras = (ks, after = false) => ks.flatMap((k) => (Array.isArray(dump[k]) ? dump[k] : [dump[k]]).filter((n) => n && typeof n === 'object' && !isChrome(n, after)));
   let secs = [];
-  if (sections && sections.length) {
+  // nodes measure-page marked `sec: true` (its --sections selector) split the dump as the spec and the gate split the page (loop r3)
+  const marked = []; const findMarked = (n) => { if (n.sec) { marked.push(n); return; } (n.children || []).forEach(findMarked); }; roots.forEach(findMarked);
+  if (marked.length && !(sections && sections.length)) secs = marked;
+  else if (sections && sections.length) {
     const match = (n, sel) => { const m = sel.match(/^([a-z][\w-]*)?((?:\.[\w-]+)*)(#[\w-]+)?$/i); if (!m) return false; const [, tag, cls, id] = m; const have = String(n.cls || '').split(/\s+/); return (!tag || tagOf(n) === tag.toLowerCase()) && (!id || n.id === id.slice(1)) && cls.split('.').filter(Boolean).every((c) => have.includes(c)); };
     const walk = (n) => { if (sections.some((s) => match(n, s))) { secs.push(n); return; } (n.children || []).forEach(walk); };
     roots.forEach(walk);
@@ -216,20 +265,49 @@ export function splitSections(dump, { root = null, sections = null } = {}) {
       if (flat) secs.push(...kids); else secs.push(c0);
     }
   }
-  return { header: headerKey ? dump[headerKey]?.[0] || null : null, footer: footerKey ? dump[footerKey]?.[0] || null : null, sections: secs, mainKey, headerKey, footerKey };
+  // no footer root, and the last band after main reaches the document's bottom and is mostly links: that band IS the footer (canon: an
+  // experience fragment with a "Footer" h2, five link columns and the legal line was authored as an accordion section)
+  // the extra bands, once each (a fragment dumped under two keys — equitable), none inside a section already split, those below the last
+  // section after the content (a footer fragment inside a tall content root read as "before main")
+  const seenBox = new Set(); const once = (n) => { const k = JSON.stringify(n.box); if (seenBox.has(k)) return false; seenBox.add(k); return true; };
+  const inSec = (n) => n.box && secs.some((sn) => sn.box && inside(n.box, sn.box));
+  const lastBottom = Math.max(0, ...secs.filter((sn) => sn.box).map((sn) => sn.box[1] + sn.box[3]));
+  const allEx = [...extras(beforeMain), ...extras(afterMain, true)].filter(once).filter((n) => !inSec(n));
+  const before = allEx.filter((n) => !(n.box && n.box[1] >= lastBottom - 8) && !extras(afterMain, true).includes(n));
+  let after = allEx.filter((n) => !before.includes(n)).sort((a, b) => (a.box?.[1] ?? 0) - (b.box?.[1] ?? 0)); let footerNode = footerKey ? dump[footerKey]?.[0] || null : null;
+  // the bottom band is the footer when it is mostly links, or holds a copyright line and a few links (equitable: 8 links of 12 texts)
+  const docH = Number(dump.__doc) || 0; const last = after[after.length - 1];
+  if (!footerNode && last?.box && docH && last.box[1] + last.box[3] >= docH - 24) { const l = leaves(last).filter((x) => x.text); const links = l.filter((x) => ['a', 'button'].includes(tagOf(x))).length; if ((links >= 10 && links >= l.length * 0.6) || (links >= 4 && l.some((x) => /©|copyright|all rights reserved/i.test(x.text)))) { footerNode = last; after = after.slice(0, -1); } }
+  // a TALL section made of heading-led parts (an AEM container holding the hero and a story grid — bms: one 1790 px "cards" section, Δh +1516
+  // on the first round) is split into those parts: ≥ 2 children of ≥ 250 px, each with an h1–h3, covering ≥ 70 % of it
+  const hasHead = (x) => /^h[1-3]$/.test(tagOf(x)) || (x.children || []).some(hasHead);
+  const refine = (n, d = 0) => { if (d > 2 || !n?.box || n.box[3] < 1200) return [n]; let x = n; while ((x.children || []).length === 1) x = x.children[0]; const parts = (x.children || []).filter((c) => c.box && c.box[3] >= 250 && hasHead(c)); if (parts.length < 2 || parts.reduce((a, c) => a + c.box[3], 0) < n.box[3] * 0.6) return [n];
+    // the children between the parts that carry content (a category icon row, a rewards band, a lone section title) are a section of their own:
+    // dropped, they were missing from the document and the drafts (lenovo: three visible rows authored by hand, ≈ 4 min) — spacers stay out
+    const out = []; let run = [];
+    const flush = () => { const c = run.filter((k) => k.box && k.box[3] > 0); run = []; if (!c.length || !c.some((k) => leaves(k).some((l) => l.text || /^(img|picture|video|svg)$/.test(tagOf(l))))) return; const y0 = Math.min(...c.map((k) => k.box[1])); const y1 = Math.max(...c.map((k) => k.box[1] + k.box[3])); if (y1 - y0 < 24) return; out.push(c.length === 1 ? c[0] : { tag: 'div', cls: 'stardust-gap-part', box: [Math.min(...c.map((k) => k.box[0])), y0, Math.max(...c.map((k) => k.box[0] + k.box[2])) - Math.min(...c.map((k) => k.box[0])), y1 - y0], children: c }); };
+    for (const c of x.children || []) { if (parts.includes(c)) { flush(); out.push(c); } else run.push(c); }
+    flush();
+    return out.flatMap((c) => (parts.includes(c) ? refine(c, d + 1) : [c])); };
+  if (!(sections && sections.length)) secs = secs.flatMap((n) => refine(n)); // the gate's live split (no marks) refines the same way
+  const extraCount = before.length + after.length; if (extraCount) secs = [...before, ...secs, ...after];
+  return { header: headerKey ? dump[headerKey]?.[0] || null : null, footer: footerNode, sections: secs, mainKey, headerKey, footerKey, marked: marked.length && secs.includes(marked[0]) ? marked.length : 0, extraRoots: extraCount };
 }
 
 /** The Block Collection shape a fingerprint suggests (null = default content or nothing recognisable); never more than a guess. */
 export function collectionGuess(fp) {
   const u = new Set(fp.unitSig || []); const k = new Set(fp.kinds || []);
   const r = { collection: null, alternatives: [], reason: '' };
+  if (fp.mixedCols && !fp.sliderHint) return { collection: 'columns', alternatives: ['hero'], reason: `${fp.mixedCols} columns side by side, a picture beside the text` };
   if (fp.repeat >= 2) {
     if (fp.sliderHint || fp.controls?.length) return { collection: 'carousel', alternatives: ['cards'], reason: `repeating unit ×${fp.repeat} with controls ${fp.controls?.join(' ') || ''}${fp.sliderHint ? ' and slider classes' : ''}`.trim() };
     if (u.has('media') && (u.has('heading') || u.has('text') || u.has('link'))) return fp.repeat >= 3 ? { collection: 'cards', alternatives: ['columns'], reason: `media + text unit ×${fp.repeat}` } : { collection: 'columns', alternatives: ['cards'], reason: `media + text unit ×${fp.repeat}` };
     if (u.has('media') && u.size === 1) return { collection: 'cards', alternatives: [], reason: `media-only unit ×${fp.repeat} (logos)` };
     if (u.has('media')) return { collection: 'cards', alternatives: ['carousel'], reason: `media unit ×${fp.repeat}` };
+    if (!u.has('media') && !u.has('heading') && !u.has('text') && fp.unitPainted && fp.unitH < 64) return { collection: null, alternatives: [], reason: `painted link unit ×${fp.repeat} under 64 px: buttons — default content (closing links)` }; // acs: pill CTAs read as accordions
+    if (!u.has('media') && (u.has('heading') || u.has('link')) && !u.has('text') && fp.unitPainted) return { collection: 'cards', alternatives: ['accordion'], reason: `painted heading/link unit ×${fp.repeat} (link cards)` };
     if (!u.has('media') && (u.has('heading') || u.has('link')) && !u.has('text')) return { collection: 'accordion', alternatives: ['tabs', 'columns'], reason: `heading/link-only unit ×${fp.repeat} (hidden panels are not in the dump)` };
-    if (!u.has('media') && u.has('text')) return { collection: 'columns', alternatives: ['cards'], reason: `text unit ×${fp.repeat}` };
+    if (!u.has('media') && u.has('text')) return fp.repeat >= 3 && u.has('heading') ? { collection: 'columns', alternatives: ['cards'], reason: `text unit ×${fp.repeat}` } : { collection: null, alternatives: ['columns'], reason: `text run ×${fp.repeat} without media: default content (a columns block needs ≥ 3 headed units)` }; // two paragraphs read as "columns? weak" on an article page (covermore, loop r6)
     return r;
   }
   if (k.has('quote') || (fp.texts === 1 && fp.media === 0 && !k.has('heading') && fp.bigText >= 32)) return { collection: 'quote', alternatives: [], reason: k.has('quote') ? 'blockquote' : `one paragraph at ${fp.bigText}px` };

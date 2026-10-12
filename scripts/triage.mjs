@@ -37,11 +37,16 @@ if (arg('--from-md', null)) {
   let changed = 0;
   for (let i = head + 2; i < lines.length && /^\|/.test(lines[i]); i++) {
     const c = cells(lines[i]); const row = json.sections.find((s) => String(s.index) === c[0]); if (!row) continue;
+    if (c.length !== cols.length) console.error(`triage: row ${c[0]} has ${c.length} cells, the header ${cols.length} — an unescaped \`|\` in a cell shifts the block / style columns (escape it as \\|)`);
     const style = iStyle >= 0 ? c[iStyle].replace(/`/g, '').trim() : ''; const newStyle = style && style !== '—' ? style : null;
     if ((row.sectionStyle || null) !== newStyle) { row.sectionStyle = newStyle; changed += 1; }
     if (iBlock >= 0 && !row.chrome) {
-      const cell = c[iBlock]; const isDefault = cell.trim() === '—';
-      const m = cell.match(/`([a-z][a-z0-9-]*)(?:\s*\(([^)]*)\))?`/); const isNew = /\*\*new\*\*/.test(cell);
+      const cell = c[iBlock];
+      // `drop` (or `header` / `footer`) in the block column: the row is not authored — a header band inside main, a skip-link strip (deloitte:
+      // the header row could not leave the page; si: the skip links authored and removed by a case script). It keeps its index so the split aligns
+      const dm = /^`?(drop|header|footer)`?$/i.exec(cell.trim()); const dropNow = dm ? dm[1].toLowerCase() : null; if ((dropNow || null) !== (row.drop || null)) { row.drop = dropNow || undefined; changed += 1; row.notes = [...(row.notes || []), dropNow ? `dropped in ${basename(mdFile)}` : `restored in ${basename(mdFile)}`]; } if (dropNow) continue;
+      const isDefault = cell.trim() === '—';
+      const m = cell.match(/`([a-z][a-z0-9-]*)(?:\s*\(([^)]*)\))?`/) || cell.trim().match(/^([a-z][a-z0-9-]*)(?:\s*\(([^)]*)\))?$/); const isNew = /\*\*new\*\*/.test(cell); // a bare `hero` too (equitable: the label without backticks was ignored)
       const kind = isDefault ? 'default' : isNew ? 'new' : m ? 'inventory' : row.match.kind;
       const block = isDefault ? null : m ? m[1] : row.match.block; const variant = isDefault ? null : m && m[2] && m[2] !== '?' ? m[2].trim() : m ? null : row.match.variant;
       if (kind !== row.match.kind || block !== row.match.block || (variant || null) !== (row.match.variant || null)) { row.match = { ...row.match, kind, block, variant: variant || null, confidence: kind === 'inventory' ? 'agent' : row.match.confidence }; row.notes = [...(row.notes || []), `edited in ${basename(mdFile)}`]; changed += 1; }
@@ -68,6 +73,8 @@ const depth = Number(arg('--depth', 6));
 const sectionSels = arg('--sections', null) ? String(arg('--sections')).split(',').map((s) => s.trim()).filter(Boolean) : null;
 
 const split = splitSections(dump, { root: arg('--root', null), sections: sectionSels });
+if (split.extraRoots) console.error(`triage: ${split.extraRoots} unassigned band(s) outside main (measure-page's extra roots) are rows of their own — chrome or content, decide in the table (a breadcrumb bar never reached the document before — wellsfargo)`);
+if (split.marked) console.error(`triage: ${split.marked} sections split as measure-page's --sections marked them (the spec's and the gate's split)`);
 if (!split.sections.length) { console.error(`triage: no sections under "${split.mainKey}" (keys: ${Object.keys(dump).filter((k) => !k.startsWith('__')).join(', ')}) — pass --root or --sections`); process.exit(2); }
 const width = (() => { const m = basename(file).match(/-(\d+)\.json$/); if (m) return Number(m[1]); const r = dump[split.mainKey]?.[0]; return r?.box ? r.box[2] : null; })();
 
@@ -79,7 +86,7 @@ fps.forEach((fp, i) => entries.push({ chrome: null, node: split.sections[i], fp 
 if (split.footer) entries.push({ chrome: 'footer', node: split.footer, fp: fingerprint(split.footer, { depth }) });
 
 const overlap = (a, b) => Math.max(0, Math.min(a[1] + a[3], b[1] + b[3]) - Math.max(a[1], b[1]));
-const specFor = (box) => { if (!spec?.secs || !box) return null; let best = null; for (const s of spec.secs) { if (!s.box) continue; const o = overlap(box, s.box); if (o > 0 && (!best || o > best.o)) best = { o, s }; } return best ? { id: best.s.id, box: best.s.box, overlap: Math.round(best.o) } : null; };
+const specFor = (box) => { if (!spec?.secs || !box) return null; let best = null; for (const s of spec.secs) { if (!s.box) continue; const o = overlap(box, s.box); if (o > 0 && (!best || o > best.o)) best = { o, s }; } return best ? { id: best.s.id, box: best.s.box, overlap: Math.round(best.o), inset: best.s.inset ? `top ${best.s.inset.first} (${best.s.inset.top.join(' → ')}) bottom ${best.s.inset.last} (${best.s.inset.bottom.join(' → ')})` : null } : null; };
 const structureFor = (box) => { if (!structure || !box) return null; const re = new RegExp(`\\sy${box[1]}\\s+w\\d+\\s+h${box[3]}\\b`); return structure.find((l) => re.test(l))?.trim() || null; };
 
 const sections = []; const counts = { inventory: 0, collection: 0, default: 0, new: 0 }; let mainCount = 0;

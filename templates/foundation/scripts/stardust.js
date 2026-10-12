@@ -5,7 +5,14 @@
  * Nothing here is a measurement: no sizes, no colours, no selectors of a source site.
  */
 
-import { buildBlock } from './aem.js';
+import { buildBlock, decorateIcons } from './aem.js';
+
+/**
+ * A block's own icons in one call: the `.icon` spans the decorate created become `<img>` (decorateIcons) and then inline `<svg>`
+ * (inlineIcons) so they follow `currentColor`. `decorateIcons(main)` ran before the block existed — forgotten in r1 of two cases.
+ * @param {Element} block
+ */
+export async function decorateBlockIcons(block) { decorateIcons(block); await inlineIcons(block); }
 
 /**
  * `:name:` tokens in text become `<span class="icon icon-name">` for decorateIcons() (the pipeline does the same for a
@@ -121,4 +128,50 @@ export function hideEmptySections(main) {
   main.querySelectorAll(':scope > .section').forEach((s) => {
     if (!s.children.length && !s.textContent.trim()) s.hidden = true;
   });
+}
+
+/**
+ * Art direction authored as a second picture: its alt ends `| mobile <960` (author writes it when the 360 page shows another image) — folded
+ * into the picture before it as `<source media="(max-width: 959px)">`, the second picture removed. Call it on main in decorateMain.
+ * @param {Element} root
+ */
+export function decorateArtDirection(root) {
+  root.querySelectorAll('img[alt*="| mobile"]').forEach((img) => {
+    const m = /\s*\|\s*mobile\s*<\s*(\d+)\s*$/.exec(img.alt);
+    if (!m) return;
+    const mobilePic = img.closest('picture');
+    if (!mobilePic) return;
+    const holder = mobilePic.parentElement;
+    const prev = mobilePic.previousElementSibling || (holder && holder.tagName === 'P' ? holder.previousElementSibling : null);
+    const deskPic = prev && (prev.tagName === 'PICTURE' ? prev : prev.querySelector('picture'));
+    img.alt = img.alt.replace(m[0], '');
+    if (!deskPic) return;
+    const source = document.createElement('source');
+    source.media = `(max-width: ${Number(m[1]) - 1}px)`;
+    source.srcset = img.getAttribute('src');
+    deskPic.prepend(source);
+    (holder && holder.tagName === 'P' && holder.children.length === 1 ? holder : mobilePic).remove();
+  });
+}
+
+/**
+ * A video the pipeline authored as its poster picture and a link to the file (`<p><picture>…</picture></p><p><a href="….mp4">…</a></p>`):
+ * the link becomes the video — muted, looping, inline, the poster in its place — where the poster stood. Nothing rendered it and the
+ * agents wrote a decorator per run (wpp: a `div.video` wrapper loaded as a block and 404'd). The gate holds videos at frame 0 on both sides.
+ */
+export function decorateVideos(root) {
+  root.querySelectorAll('a[href]').forEach((a) => { try {
+    if (!/\.(mp4|webm|mov)(\?|#|$)/i.test(a.getAttribute('href') || '')) return;
+    const p = a.closest('p'); if (!p || p.textContent.trim() !== a.textContent.trim()) return;
+    const prev = p.previousElementSibling; const posterPic = prev && (prev.tagName === 'PICTURE' ? prev : prev.querySelector(':scope > picture'));
+    const img = posterPic && posterPic.querySelector('img');
+    const video = document.createElement('video');
+    video.muted = true; video.loop = true; video.autoplay = true; video.playsInline = true;
+    ['muted', 'loop', 'autoplay', 'playsinline'].forEach((k) => video.setAttribute(k, ''));
+    video.src = a.href; video.preload = 'auto';
+    if (img) { video.poster = img.currentSrc || img.src; if (img.width && img.height) { video.width = img.width; video.height = img.height; } }
+    video.style.cssText = 'display:block;width:100%;height:auto;object-fit:cover';
+    if (img) prev.replaceWith(video); else p.before(video);
+    p.remove();
+  } catch { /* one video left as its link: the page still decorates */ } });
 }

@@ -1,0 +1,4 @@
+🟡 D3 migration/cases/home/doc/okta-home.html: section (unnamed) → block "columns": rows have differing cell counts (3, 4) — span-shaped structure; align rows or split the block
+🟡 D3 migration/cases/home/doc/okta-home.html: section (unnamed) → block "columns": rows have differing cell counts (1, 3) — span-shaped structure; align rows or split the block
+🟡 D4 migration/cases/home/doc/okta-home.html: 3 authored SVG media reference(s) — batch-verify pure-vector (an SVG embedding raster data URIs 409s the whole page's preview, #99): https://blocks-first--sdt-okta-lite--aemcoder-adobe.aem.page/drafts/media/tablet-homepage-01-blueprint-lockup-svg.svg, https://blocks-first--sdt-okta-lite--aemcoder-adobe.aem.page/drafts/media/customer-gartner-logo-svg.svg, https://blocks-first--sdt-okta-lite--aemcoder-adobe.aem.page/drafts/media/customer-forrester-logo-svg.svg
+PASS — 0 🔴, 3 🟡 (rules: ../davids-model.md)

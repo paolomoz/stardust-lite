@@ -1,0 +1,882 @@
+{
+ "_schema": "stardust-lite/bench@1",
+ "_writtenAt": "2026-10-09T19:30:07.229Z",
+ "mode": "hand",
+ "triage": "case",
+ "widths": "360,1440,2560",
+ "results": [
+  {
+   "site": "sdt-bny",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.bny.com/corporate/global/en/about-us/leadership.html",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 5,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 10729\nprototype (gate this): http://localhost:8960/leadership.author-draft.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-bny-hand/proto/leadership.author-draft.html\nsite: /private/tmp/stardust-bench/sdt-bny-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 77.5,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached, build 11.9 s, compare 0.9 s, sections — | 1440: live cached, build 13.1 s, compare 1.6 s, sections — | 2560: live cached, build 13.8 s, compare 2.5 s, sections —\nevidence: /tmp/stardust-bench/sdt-bny-hand/gate/\nsite: /private/tmp/stardust-bench/sdt-bny-hand/migration/site.json\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 62.18,
+     "dh": -2501
+    },
+    {
+     "W": 1440,
+     "pct": 32.32,
+     "dh": -7222
+    },
+    {
+     "W": 2560,
+     "pct": 21.28,
+     "dh": -7222
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 11.9,
+     "compare": 0.9,
+     "sections": null
+    },
+    "1440": {
+     "live": 0,
+     "build": 13.1,
+     "compare": 1.6,
+     "sections": null
+    },
+    "2560": {
+     "live": 0,
+     "build": 13.8,
+     "compare": 2.5,
+     "sections": null
+    }
+   }
+  },
+  {
+   "site": "sdt-canonusa",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.usa.canon.com/support/about-consumer-support",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 3.9,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 3374\nprototype (gate this): http://localhost:8961/about-consumer-support.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-canonusa-hand/proto/about-consumer-support.html\nsite: /private/tmp/stardust-bench/sdt-canonusa-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 42.6,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached (opened 9.4 s), build 10.7 s, compare 0.5 s, sections 0.1 s | 1440: live cached (opened 9.2 s), build 10.3 s, compare 1 s, sections 0.2 s | 2560: live cached (opened 9.2 s), build 10.5 s, compare 1.5 s, sections 0.3 s\nevidence: /tmp/stardust-bench/sdt-canonusa-hand/gate/\nsite: /private/tmp/stardust-bench/sdt-canonusa-hand/migration/site.json\nd) — bot challenge at https://www.usa.canon.com/support/about-consumer-support: HTTP 403 + Akamai edge signature — the live side served an edge interstitial, NOT the page; refusing to measure it as the source. Escalate with --headed (stealth real Chrome); if that is still blocked, the site needs crawl.mjs-class capture (extract's bot-management ladder) and the gate cannot run against it headless."
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 3.98,
+     "dh": 11
+    },
+    {
+     "W": 1440,
+     "pct": 1.77,
+     "dh": 0
+    },
+    {
+     "W": 2560,
+     "pct": 1.04,
+     "dh": 0
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 10.7,
+     "compare": 0.5,
+     "sections": 0.1,
+     "liveOpen": 9.4
+    },
+    "1440": {
+     "live": 0,
+     "build": 10.3,
+     "compare": 1,
+     "sections": 0.2,
+     "liveOpen": 9.2
+    },
+    "2560": {
+     "live": 0,
+     "build": 10.5,
+     "compare": 1.5,
+     "sections": 0.3,
+     "liveOpen": 9.2
+    }
+   }
+  },
+  {
+   "site": "sdt-cibc",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.cibc.com/en/about-cibc/careers.html",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 4.3,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 5210\nprototype (gate this): http://localhost:8962/careers.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-cibc-hand/proto/careers.html\nsite: /private/tmp/stardust-bench/sdt-cibc-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 707.4,
+     "exit": 0,
+     "ok": true,
+     "out": "openPage: page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.cibc.com/en/about-cibc/careers.html — the origin refuses headless Chromium; run every instrument with --chrome (installed Google Chrome, headless) or STARDUST_CHROME=1, --headed for a window\ncap-probe: page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.cibc.com/en/about-cibc/careers.html\nCall log:\n\u001b[2m  - navigating to \"https://www.cibc.com/en/about-cibc/careers.html\", waiting until \"domcontentloaded\"\u001b[22m"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 3.48,
+     "dh": 54
+    },
+    {
+     "W": 1440,
+     "pct": 1.78,
+     "dh": 1
+    },
+    {
+     "W": 2560,
+     "pct": 1.04,
+     "dh": 1
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 11.1,
+     "compare": 0.6,
+     "sections": null
+    },
+    "1440": {
+     "live": 0,
+     "build": 10.9,
+     "compare": 1.4,
+     "sections": null
+    },
+    "2560": {
+     "live": 0,
+     "build": 11.3,
+     "compare": 2.1,
+     "sections": null
+    }
+   }
+  },
+  {
+   "site": "sdt-citizensbank",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.citizensbank.com/about-us/sustainability-impact.aspx",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 4.8,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 3145\nprototype (gate this): http://localhost:8963/sustainability-impact.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-citizensbank-hand/proto/sustainability-impact.html\nsite: /private/tmp/stardust-bench/sdt-citizensbank-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 43.3,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached (opened 9.4 s), build 10.9 s, compare 0.6 s, sections 0.2 s | 1440: live cached (opened 9.2 s), build 10.2 s, compare 1 s, sections 0.2 s | 2560: live cached (opened 9.2 s), build 10.5 s, compare 1.6 s, sections 0.4 s\nevidence: /tmp/stardust-bench/sdt-citizensbank-hand/gate/\nsite: /private/tmp/stardust-bench/sdt-citizensbank-hand/migration/site.json\n challenge at https://www.citizensbank.com/about-us/sustainability-impact.aspx: HTTP 403 + Akamai edge signature — the live side served an edge interstitial, NOT the page; refusing to measure it as the source. Escalate with --headed (stealth real Chrome); if that is still blocked, the site needs crawl.mjs-class capture (extract's bot-management ladder) and the gate cannot run against it headless."
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 16.12,
+     "dh": 0
+    },
+    {
+     "W": 1440,
+     "pct": 2.69,
+     "dh": -2
+    },
+    {
+     "W": 2560,
+     "pct": 1.51,
+     "dh": -2
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 10.9,
+     "compare": 0.6,
+     "sections": 0.2,
+     "liveOpen": 9.4
+    },
+    "1440": {
+     "live": 0,
+     "build": 10.2,
+     "compare": 1,
+     "sections": 0.2,
+     "liveOpen": 9.2
+    },
+    "2560": {
+     "live": 0,
+     "build": 10.5,
+     "compare": 1.6,
+     "sections": 0.4,
+     "liveOpen": 9.2
+    }
+   }
+  },
+  {
+   "site": "sdt-covermore",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.covermore.com/travel-assistance",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 3.6,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 924\nprototype (gate this): http://localhost:8964/travel-assistance.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-covermore-hand/proto/travel-assistance.html\nsite: /private/tmp/stardust-bench/sdt-covermore-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 100.7,
+     "exit": 0,
+     "ok": true,
+     "out": "tables: CLEAN — Δh ≤ 2 on every section at 360, 1440, 2560\ntiming (stitch, live and build concurrent): 360: live cached (opened 27 s), build 9.4 s, compare 0.3 s, sections 0.1 s | 1440: live cached (opened 24.4 s), build 9.5 s, compare 0.6 s, sections 0.1 s | 2560: live cached (opened 24.3 s), build 9.7 s, compare 0.8 s, sections 0.2 s\nevidence: /tmp/stardust-bench/sdt-covermore-hand/gate/\nsite: /private/tmp/stardust-bench/sdt-covermore-hand/migration/site.json"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 4.57,
+     "dh": 0
+    },
+    {
+     "W": 1440,
+     "pct": 2.68,
+     "dh": 0
+    },
+    {
+     "W": 2560,
+     "pct": 1.51,
+     "dh": 0
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 9.4,
+     "compare": 0.3,
+     "sections": 0.1,
+     "liveOpen": 27
+    },
+    "1440": {
+     "live": 0,
+     "build": 9.5,
+     "compare": 0.6,
+     "sections": 0.1,
+     "liveOpen": 24.4
+    },
+    "2560": {
+     "live": 0,
+     "build": 9.7,
+     "compare": 0.8,
+     "sections": 0.2,
+     "liveOpen": 24.3
+    }
+   }
+  },
+  {
+   "site": "sdt-harbourvest",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.harbourvest.com/it/en/about-harbourvest",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 6.1,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 5067\nprototype (gate this): http://localhost:8965/about-harbourvest.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-harbourvest-hand/proto/about-harbourvest.html\nsite: /private/tmp/stardust-bench/sdt-harbourvest-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 85.5,
+     "exit": 0,
+     "ok": true,
+     "out": "site: /private/tmp/stardust-bench/sdt-harbourvest-hand/migration/site.json\nopenPage: URL changed https://www.harbourvest.com/it/en/about-harbourvest → https://www.harbourvest.com/us/en?preventForwarding=true (a redirect or a JS forward: an edition, a locale, an attestation page — measure the page you mean)\nopenPage: URL changed https://www.harbourvest.com/it/en/about-harbourvest → https://www.harbourvest.com/us/en?preventForwarding=true (a redirect or a JS forward: an edition, a locale, an attestation page — measure the page you mean)\nopenPage: URL changed https://www.harbourvest.com/it/en/about-harbourvest → https://www.harbourvest.com/us/en?preventForwarding=true (a redirect or a JS forward: an edition, a locale, an attestation page — measure the page you mean)"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 16.99,
+     "dh": 41
+    },
+    {
+     "W": 1440,
+     "pct": 3.46,
+     "dh": -2
+    },
+    {
+     "W": 2560,
+     "pct": 2.85,
+     "dh": -37
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 16.7,
+     "compare": 0.8,
+     "sections": 0.3,
+     "liveOpen": 13.2
+    },
+    "1440": {
+     "live": 0,
+     "build": 16.2,
+     "compare": 1.5,
+     "sections": 0.5,
+     "liveOpen": 10.6
+    },
+    "2560": {
+     "live": 0,
+     "build": 16.6,
+     "compare": 2.3,
+     "sections": 0.7,
+     "liveOpen": 10.6
+    }
+   }
+  },
+  {
+   "site": "sdt-manulife",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.manulife.com/ca/en/business",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 3.9,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 4350\nprototype (gate this): http://localhost:8966/business.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-manulife-hand/proto/business.html\nsite: /private/tmp/stardust-bench/sdt-manulife-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 47,
+     "exit": 0,
+     "ok": true,
+     "out": "timing (stitch, live and build concurrent): 360: live cached (opened 10.9 s), build 10.6 s, compare 0.5 s, sections 0.1 s | 1440: live cached (opened 11 s), build 10.8 s, compare 1.3 s, sections 0.3 s | 2560: live cached (opened 11.2 s), build 11.2 s, compare 2 s, sections 0.5 s\nevidence: /tmp/stardust-bench/sdt-manulife-hand/gate/\nsite: /private/tmp/stardust-bench/sdt-manulife-hand/migration/site.json\n escalate --headed) — bot challenge at https://www.manulife.com/ca/en/business: HTTP 403 + Akamai edge signature — the live side served an edge interstitial, NOT the page; refusing to measure it as the source. Escalate with --headed (stealth real Chrome); if that is still blocked, the site needs crawl.mjs-class capture (extract's bot-management ladder) and the gate cannot run against it headless."
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 2.13,
+     "dh": 0
+    },
+    {
+     "W": 1440,
+     "pct": 0.73,
+     "dh": 0
+    },
+    {
+     "W": 2560,
+     "pct": 0.41,
+     "dh": 0
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 10.6,
+     "compare": 0.5,
+     "sections": 0.1,
+     "liveOpen": 10.9
+    },
+    "1440": {
+     "live": 0,
+     "build": 10.8,
+     "compare": 1.3,
+     "sections": 0.3,
+     "liveOpen": 11
+    },
+    "2560": {
+     "live": 0,
+     "build": 11.2,
+     "compare": 2,
+     "sections": 0.5,
+     "liveOpen": 11.2
+    }
+   }
+  },
+  {
+   "site": "sdt-mfs",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.mfs.com/corporate/en/home.html",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 4.2,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 2235\nprototype (gate this): http://localhost:8967/home.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-mfs-hand/proto/home.html\nsite: /private/tmp/stardust-bench/sdt-mfs-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 59.4,
+     "exit": 0,
+     "ok": true,
+     "out": "tables: 3 row(s) off, 2 new sections — 360 #1 \"Welcome to MFS\" Δh +15 (cards (roles), new); 1440 #1 \"Welcome to MFS\" Δh -78 (cards (roles), new); 2560 #1 \"Welcome to MFS\" Δh -78 (cards (roles), new); new: #1 \"Welcome to MFS\" (cards (roles)), #3 \"Collective Expertise\" (cards (insights)) — a new section takes the full gate at the three widths\ntiming (stitch, live and build concurrent): 360: live cached, build 10 s, compare 0.4 s, sections — | 1440: live cached, build 9.9 s, compare 0.8 s, sections — | 2560: live cached, build 10.4 s, compare 1.3 s, sections —\nevidence: /tmp/stardust-bench/sdt-mfs-hand/gate/\nsite: /private/tmp/stardust-bench/sdt-mfs-hand/migration/site.json"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 1.19,
+     "dh": 5
+    },
+    {
+     "W": 1440,
+     "pct": 2.29,
+     "dh": -3
+    },
+    {
+     "W": 2560,
+     "pct": 1.33,
+     "dh": -3
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 10,
+     "compare": 0.4,
+     "sections": null
+    },
+    "1440": {
+     "live": 0,
+     "build": 9.9,
+     "compare": 0.8,
+     "sections": null
+    },
+    "2560": {
+     "live": 0,
+     "build": 10.4,
+     "compare": 1.3,
+     "sections": null
+    }
+   }
+  },
+  {
+   "site": "sdt-natixis",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.im.natixis.com/en-intl/about/diversity-equity-and-inclusion",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 6.1,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 9232\nprototype (gate this): http://localhost:8968/.draft-author.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-natixis-hand/proto/.draft-author.html\nsite: /private/tmp/stardust-bench/sdt-natixis-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 93.2,
+     "exit": 0,
+     "ok": true,
+     "out": "tables: 17 row(s) off, 10 new sections — 360 #5 \"The Natixis culture \" Δh -174 (cards (facts), new); 360 #7 \"Natixis Global Schol\" Δh -277 (accordion, new); 360 #8 Δh -275 (accordion, new); 360 #10 \"Partnerships\" Δh +160 (columns (logos), new); 360 #11 \"Policies and stateme\" Δh -263 (accordion (invert), new); 1440 #5 \"The Natixis culture \" Δh -180 (cards (facts), new); 1440 #7 \"Natixis Global Schol\" Δh -612 (accordion, new); 1440 #8 Δh +1014 (accordion, new); 1440 #10 \"Partnerships\" Δh +1148 (columns (logos), new); 1440 #11 \"Policies and stateme\" Δh -358 (accordion (invert), new); 1440 #12 \"Awards and recogniti\" Δh -1007 (cards (awards), new); 2560 #5 \"The Natixis culture \" Δh -180 (cards (facts), new); 2560 #7 \"Natixis Global Schol\" Δh -612 (accordion, new); 2560 #8 Δh +1014 (accordion, new); 2560 #10 \"Partnerships\" Δh +1148 (columns (logos), new); 2560 #11 \"Policies and stateme\" Δh -358 (accordion (invert), new); 2560 #12 \"Awards and recogniti\" Δh -1007 (cards (awards), new); new: #1 \"DIV breadcrumb\" (breadcrumbs), #2 \"Diversity, Equity and Inclus\" (breadcrumbs), #3 \"DIV in-page-navigation\" (in-page-nav), #5 \"The Natixis culture is roote\" (cards (facts)), #7 \"Natixis Global Scholarship P\" (accordion), #8 \"DIV container responsivegrid container--slim ntx-spacing--md\" (accordion), #9 \"Employee Resource Groups (ER\" (cards), #10 \"Partnerships\" (columns (logos)), #11 \"Policies and statements\" (accordion (invert)), #12 \"Awards and recognition\" (cards (awards)) — a new section takes the full gate at the three widths\ntiming (stitch, live and build concurrent): 360: live cached (opened 19 s), build 12.7 s, compare 1.1 s, sections 0.5 s | 1440: live cached (opened 17.6 s), build 12.4 s, compare 2.1 s, sections 0.9 s | 2560: live cached (opened 17.8 s), build 12.9 s, compare 3.4 s, sections 1.3 s\nevidence: /tmp/stardust-bench/sdt-natixis-hand/gate/\nsite: /private/tmp/stardust-bench/sdt-natixis-hand/migration/site.json"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 16.34,
+     "dh": 828
+    },
+    {
+     "W": 1440,
+     "pct": 14.2,
+     "dh": -1076
+    },
+    {
+     "W": 2560,
+     "pct": 7.99,
+     "dh": -1076
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 12.7,
+     "compare": 1.1,
+     "sections": 0.5,
+     "liveOpen": 19
+    },
+    "1440": {
+     "live": 0,
+     "build": 12.4,
+     "compare": 2.1,
+     "sections": 0.9,
+     "liveOpen": 17.6
+    },
+    "2560": {
+     "live": 0,
+     "build": 12.9,
+     "compare": 3.4,
+     "sections": 1.3,
+     "liveOpen": 17.8
+    }
+   }
+  },
+  {
+   "site": "sdt-scotiabank",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.scotiabank.com/ca/en/personal.html",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 7.2,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 3214\nprototype (gate this): http://localhost:8969/personal.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-scotiabank-hand/proto/personal.html\nsite: /private/tmp/stardust-bench/sdt-scotiabank-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 84.7,
+     "exit": 0,
+     "ok": true,
+     "out": "site: /private/tmp/stardust-bench/sdt-scotiabank-hand/migration/site.json\nopenPage: consent control #onetrust-accept-btn-handler clicked\nopenPage: consent control #onetrust-accept-btn-handler clicked\nopenPage: consent control #onetrust-accept-btn-handler clicked"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 8.17,
+     "dh": 31
+    },
+    {
+     "W": 1440,
+     "pct": 2.38,
+     "dh": 2
+    },
+    {
+     "W": 2560,
+     "pct": 1.92,
+     "dh": 2
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 16.1,
+     "compare": 0.7,
+     "sections": 0.2,
+     "liveOpen": 14.8
+    },
+    "1440": {
+     "live": 0,
+     "build": 15.4,
+     "compare": 1.1,
+     "sections": 0.3,
+     "liveOpen": 14
+    },
+    "2560": {
+     "live": 0,
+     "build": 15.8,
+     "compare": 1.9,
+     "sections": 0.6,
+     "liveOpen": 14
+    }
+   }
+  },
+  {
+   "site": "sdt-si",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.si.edu/",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 6.3,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 5456\nprototype (gate this): http://localhost:8970/si-home.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-si-hand/proto/si-home.html\nsite: /private/tmp/stardust-bench/sdt-si-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 115.1,
+     "exit": 0,
+     "ok": true,
+     "out": "tables: 12 row(s) off, 4 new sections — 360 #6 \"Explore from Anywher\" Δh +20 (columns, new); 360 #7 \"What interests you?\" Δh +11 (cards (navigation), new); 360 #9 not located (default); 360 #10 not located (carousel, new); 1440 #6 \"Explore from Anywher\" Δh +28 (columns, new); 1440 #7 \"What interests you?\" Δh +16 (cards (navigation), new); 1440 #9 not located (default); 1440 #10 not located (carousel, new); 2560 #6 \"Explore from Anywher\" Δh +28 (columns, new); 2560 #7 \"What interests you?\" Δh +16 (cards (navigation), new); 2560 #9 not located (default); 2560 #10 not located (carousel, new); new: #6 \"Explore from Anywhere!\" (columns), #7 \"What interests you?\" (cards (navigation)), #8 \"Featured\" (cards (featured)), #10 \"SECTION paragraph--65965 paragraph paragraph--type--layout p\" (carousel) — a new section takes the full gate at the three widths\ntiming (stitch, live and build concurrent): 360: live cached (opened 28.1 s), build 12.8 s, compare 1.3 s, sections 0.5 s | 1440: live cached (opened 26.2 s), build 11.4 s, compare 1.7 s, sections 0.5 s | 2560: live cached (opened 26.3 s), build 12 s, compare 2.8 s, sections 1 s\nevidence: /tmp/stardust-bench/sdt-si-hand/gate/\nsite: /private/tmp/stardust-bench/sdt-si-hand/migration/site.json"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 21.36,
+     "dh": 264
+    },
+    {
+     "W": 1440,
+     "pct": 4.21,
+     "dh": 3
+    },
+    {
+     "W": 2560,
+     "pct": 8.67,
+     "dh": 3
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 12.8,
+     "compare": 1.3,
+     "sections": 0.5,
+     "liveOpen": 28.1
+    },
+    "1440": {
+     "live": 0,
+     "build": 11.4,
+     "compare": 1.7,
+     "sections": 0.5,
+     "liveOpen": 26.2
+    },
+    "2560": {
+     "live": 0,
+     "build": 12,
+     "compare": 2.8,
+     "sections": 1,
+     "liveOpen": 26.3
+    }
+   }
+  },
+  {
+   "site": "sdt-take2games",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.take2games.com/ir/news/break-free-borderlandsr4-now-available-worldwide",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 3.4,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 3931\nprototype (gate this): http://localhost:8971/ir-news-borderlands-4.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-take2games-hand/proto/ir-news-borderlands-4.html\nsite: /private/tmp/stardust-bench/sdt-take2games-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 124.3,
+     "exit": 0,
+     "ok": true,
+     "out": "openPage: consent control #onetrust-accept-btn-handler clicked\nopenPage: consent control #onetrust-accept-btn-handler clicked\nopenPage: consent control #onetrust-accept-btn-handler clicked\ncap-probe: overlay dismissed via #onetrust-accept-btn-handler"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 0.96,
+     "dh": 0
+    },
+    {
+     "W": 1440,
+     "pct": 1.82,
+     "dh": 0
+    },
+    {
+     "W": 2560,
+     "pct": 1.21,
+     "dh": 0
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 16.7,
+     "compare": 0.8,
+     "sections": 0.2,
+     "liveOpen": 29.9
+    },
+    "1440": {
+     "live": 0,
+     "build": 10.5,
+     "compare": 1.1,
+     "sections": 0.3,
+     "liveOpen": 28.4
+    },
+    "2560": {
+     "live": 0,
+     "build": 10.8,
+     "compare": 1.7,
+     "sections": 0.5,
+     "liveOpen": 28.6
+    }
+   }
+  },
+  {
+   "site": "sdt-takeda",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.takeda.com/about/corporate-responsibility/corporate-giving/",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 7.5,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 11895\nprototype (gate this): http://localhost:8972/corporate-giving.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-takeda-hand/proto/corporate-giving.html\nsite: /private/tmp/stardust-bench/sdt-takeda-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 140.4,
+     "exit": 0,
+     "ok": true,
+     "out": "site: /private/tmp/stardust-bench/sdt-takeda-hand/migration/site.json\nopenPage: consent control button#onetrust-accept-btn-handler clicked\nopenPage: consent control button#onetrust-accept-btn-handler clicked\nopenPage: consent control button#onetrust-accept-btn-handler clicked"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 2.28,
+     "dh": -1
+    },
+    {
+     "W": 1440,
+     "pct": 0.65,
+     "dh": 0
+    },
+    {
+     "W": 2560,
+     "pct": 0.48,
+     "dh": 0
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 16.5,
+     "compare": 1.8,
+     "sections": 0.6,
+     "liveOpen": 33.3
+    },
+    "1440": {
+     "live": 0,
+     "build": 13.8,
+     "compare": 3.1,
+     "sections": 0.9,
+     "liveOpen": 30.4
+    },
+    "2560": {
+     "live": 0,
+     "build": 14.8,
+     "compare": 5,
+     "sections": 1.5,
+     "liveOpen": 30.4
+    }
+   }
+  },
+  {
+   "site": "sdt-wellsfargo",
+   "mode": "hand",
+   "triage": "case",
+   "url": "https://www.wellsfargo.com/about/inclusion/",
+   "steps": [
+    {
+     "step": "harness",
+     "seconds": 2.5,
+     "exit": 0,
+     "ok": true,
+     "out": "body: appear | doc height 2542\nprototype (gate this): http://localhost:8973/inclusion.harness.html\nserialised (review):   /tmp/stardust-bench/sdt-wellsfargo-hand/proto/inclusion.html\nsite: /private/tmp/stardust-bench/sdt-wellsfargo-hand/migration/site.json"
+    },
+    {
+     "step": "gate",
+     "seconds": 66,
+     "exit": 0,
+     "ok": true,
+     "out": "tables: 6 row(s) off, 4 new sections — 360 #2 \"Inclusion and access\" Δh +34 (default); 360 #6 \"Ways we help\" Δh -42 (cards, new); 1440 #2 \"Inclusion and access\" Δh +54 (default); 1440 #6 \"Ways we help\" Δh -54 (cards, reused); 2560 #2 \"Inclusion and access\" Δh +54 (default); 2560 #6 \"Ways we help\" Δh -54 (cards, new); new: #3 \"DIV\" (hero), #4 \"Our commitment to building a\" (hero), #5 \"Our workplace\" (cards), #6 \"Ways we help\" (cards) — a new section takes the full gate at the three widths\ntiming (stitch, live and build concurrent): 360: live cached (opened 10.3 s), build 15.1 s, compare 0.6 s, sections 0.1 s | 1440: live cached (opened 10 s), build 10 s, compare 0.8 s, sections 0.2 s | 2560: live cached (opened 10.1 s), build 10.1 s, compare 1.2 s, sections 0.3 s\nevidence: /tmp/stardust-bench/sdt-wellsfargo-hand/gate/\nsite: /private/tmp/stardust-bench/sdt-wellsfargo-hand/migration/site.json"
+    }
+   ],
+   "gate": [
+    {
+     "W": 360,
+     "pct": 2.7,
+     "dh": 0
+    },
+    {
+     "W": 1440,
+     "pct": 0.22,
+     "dh": 0
+    },
+    {
+     "W": 2560,
+     "pct": 0.12,
+     "dh": 0
+    }
+   ],
+   "error": null,
+   "timing": {
+    "360": {
+     "live": 0,
+     "build": 15.1,
+     "compare": 0.6,
+     "sections": 0.1,
+     "liveOpen": 10.3
+    },
+    "1440": {
+     "live": 0,
+     "build": 10,
+     "compare": 0.8,
+     "sections": 0.2,
+     "liveOpen": 10
+    },
+    "2560": {
+     "live": 0,
+     "build": 10.1,
+     "compare": 1.2,
+     "sections": 0.3,
+     "liveOpen": 10.1
+    }
+   }
+  }
+ ]
+}
