@@ -1,0 +1,13 @@
+main > .section:nth-of-type(4)
+main > .section:nth-of-type(4) > .default-content-wrapper
+main > .section:nth-of-type(4) > .default-content-wrapper > p
+main > .section:nth-of-type(4) .columns-wrapper
+main > .section:nth-of-type(4) .columns h4
+main > .section:nth-of-type(4) .columns p
+main > .section:nth-of-type(7)
+main > .section:nth-of-type(7) .columns h3
+main > .section:nth-of-type(7) .columns p
+main > .section:nth-of-type(7) .columns a
+main > .section.banner img
+main > .section.grey
+main > .section.social .icon

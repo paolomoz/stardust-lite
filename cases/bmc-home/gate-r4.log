@@ -1,0 +1,85 @@
+site: /Users/paolo/stardust/bmc-proto/migration/site.json
+origin 360 from /Users/paolo/stardust/bmc-proto/migration/cases/home/measure/live-360.png
+origin 1440 from /Users/paolo/stardust/bmc-proto/migration/cases/home/measure/live-1440.png
+origin 2560 from /Users/paolo/stardust/bmc-proto/migration/cases/home/measure/live-2560.png
+build 360…
+build 1440…
+build 2560…
+stitched migration/cases/home/gate/build-1440.png: 1440x5940 from 7 chunks in 10.0 s
+stitched migration/cases/home/gate/build-2560.png: 2560x6010 from 7 chunks in 10.8 s
+stitched migration/cases/home/gate/build-360.png: 360x8461 from 10 chunks in 11.8 s
+hottest band at 360: y 8100–8461 15.1 % — at (0,0) mean |Δlum| 38.65; best shift build→live dx=0 dy=4 → 38.14  (no shift explains it: rendition / scale / paint over it) · luminance live 61.3 build 43.9 ratio 1.396  (paint over the picture on the build side: a veil / gradient / fade state ≈ 28 % darker)
+sections 360…
+
+sections at 360 (8 authored, 6 paired with 6 live sections, 1 live unpaired; Δ doc -294; pairing anchor — the live split and the authored sections differ in count: the document, not the CSS; live root div.parsys.aem-GridColumn, split automatic; rows are the authored strides read at the same y on both captures)
+ #  anchor                       build y0–y1      live y0–y1         Δh    Δy  pixel %  block                        budget  over
+ 0  gartner® report              64–1038          0–2013           -1039b    64     0.31  columns ◂triage              new (no budget)  
+ 1  before you...optimize the    1038–1620        — (unpaired)         —     —     2.17  default content              default (no budget)  
+ 2  highlights                   1620–2014        — (unpaired)         —     —     2.67  columns (highlights columns- new (no budget)  
+ 3  bmc customers across the f   2014–2352        2013–2351            0     1     2.46  carousel ◂triage             new (no budget)  
+ 4  how we can help              2352–2936        2351–2935            0     1     1.79  cards (links)                new (no budget)  
+ 5  trusted partner              2936–3680        2935–3733          -54     1     2.44  carousel ◂triage             new (no budget)  
+ 6  the latest from bmc          3680–5563        3733–5581           35   -53    11.43  cards ◂triage                new (no budget)  
+ 7  gartner, magic quadrant fo   5563–6619        5581–6637            0   -18    10.65  default content              default (no budget)  
+    Δh marked b: a boundary another row closes (one gap attributed to two different sections; the offset chain returns) — not a height, not over budget
+    live "BEFORE YOU INNOVATE BEFORE" y 1038–2014 located in no authored section
+hottest band at 1440: y 3600–4050 11.5 % — at (0,0) mean |Δlum| 19.73; best shift build→live dx=0 dy=-8 → 11.91 · luminance live 196.7 build 196.0 ratio 1.004  (same paint: a rendition or anti-aliasing)
+sections 1440…
+
+sections at 1440 (8 authored, 6 paired with 6 live sections, 1 live unpaired; Δ doc 241; pairing anchor — the live split and the authored sections differ in count: the document, not the CSS; live root div.parsys.aem-GridColumn, split automatic; rows are the authored strides read at the same y on both captures)
+ #  anchor                       build y0–y1      live y0–y1         Δh    Δy  pixel %  block                        budget  over
+ 0  gartner® report              104–957          0–1826           -973b   104     0.44  columns ◂triage              new (no budget)  
+ 1  before you...optimize the    957–1632         — (unpaired)         —     —     2.15  default content              default (no budget)  
+ 2  highlights                   1632–1826        — (unpaired)         —     —     0.03  columns (highlights columns- new (no budget)  
+ 3  bmc customers across the f   1826–2300        1826–2300            0     0     0.89  carousel ◂triage             new (no budget)  
+ 4  how we can help              2300–2824        2300–2824            0     0     0.83  cards (links)                new (no budget)  
+ 5  trusted partner              2824–3519        2824–3629         -110     0     1.49  carousel ◂triage             new (no budget)  
+ 6  the latest from bmc          3519–4422        3629–4438           94  -110     7.98  cards ◂triage                new (no budget)  
+ 7  gartner, magic quadrant fo   4422–5018        4438–5034            0   -16     4.68  default content              default (no budget)  
+    Δh marked b: a boundary another row closes (one gap attributed to two different sections; the offset chain returns) — not a height, not over budget
+    live "BEFORE YOU INNOVATE BEFORE" y 957–1826 located in no authored section
+hottest band at 2560: y 1350–1800 16.2 % — at (0,0) mean |Δlum| 11.48; best shift build→live dx=0 dy=0 → 11.48  (no shift explains it: rendition / scale / paint over it) · luminance live 69.0 build 69.4 ratio 0.995  (same paint: a rendition or anti-aliasing)
+sections 2560…
+
+sections at 2560 (8 authored, 6 paired with 6 live sections, 1 live unpaired; Δ doc 240; pairing anchor — the live split and the authored sections differ in count: the document, not the CSS; live root div.parsys.aem-GridColumn, split automatic; rows are the authored strides read at the same y on both captures)
+ #  anchor                       build y0–y1      live y0–y1         Δh    Δy  pixel %  block                        budget  over
+ 0  gartner® report              104–1028         0–1897           -973b   104     0.90  columns ◂triage              new (no budget)  
+ 1  before you...optimize the    1028–1703        — (unpaired)         —     —    15.65  default content              default (no budget)  
+ 2  highlights                   1703–1897        — (unpaired)         —     —     0.01  columns (highlights columns- new (no budget)  
+ 3  bmc customers across the f   1897–2371        1897–2371            0     0     0.50  carousel ◂triage             new (no budget)  
+ 4  how we can help              2371–2895        2371–2895            0     0     0.47  cards (links)                new (no budget)  
+ 5  trusted partner              2895–3590        2895–3700         -110     0     1.42  carousel ◂triage             new (no budget)  
+ 6  the latest from bmc          3590–4492        3700–4509           93  -110     4.55  cards ◂triage                new (no budget)  
+ 7  gartner, magic quadrant fo   4492–5088        4509–5105            0   -17     2.62  default content              default (no budget)  
+    Δh marked b: a boundary another row closes (one gap attributed to two different sections; the offset chain returns) — not a height, not over budget
+    live "BEFORE YOU INNOVATE BEFORE" y 1028–1897 located in no authored section
+cap-probe: skipped (a round; the final gate runs it, --full forces it)
+
+| width | pixel % | Δh | bands |
+|---|---|---|---|
+| 360 | 6.02 | 294 | 0:0.5 900:1.9 1800:2.4 2700:2.1 3600:9 4500:14.8 5400:9.5 6300:7.2 7200:3.2 8100:15.1 |
+| 1440 | 3.12 | -241 | 0:0.6 450:0.7 900:2.9 1350:0.5 1800:0.9 2250:1 2700:0 3150:2.3 3600:11.5 4050:4.5 4500:6.2 4950:6.9 5400:2.4 |
+| 2560 | 3.75 | -240 | 0:0.9 450:0.9 900:7.7 1350:16.2 1800:0.5 2250:0.3 2700:0.2 3150:2.2 3600:6.1 4050:3.1 4500:3.3 4950:5.6 5400:1.3 |
+
+target 10 %: REACHED at the three widths
+cap-probe: skipped (round) (gate's live split: 8 sections — a cap-probe count that differs between runs is its own split, #162: compare the rows, not the verdict)
+round digest at 360 (vs the previous round in this dir): page 6.02 %
+  #1 before you...optimize the    2.17 % (0)  Δh — — Δh 0 but pixels — paint or position (shift-probe the band); the pair rows below name the child (a fractional height, a pinned link, a control's width)
+  #2 highlights                   2.67 % (-4.1)  Δh —  columns — Δh 0 but pixels — paint or position (shift-probe the band); the pair rows below name the child (a fractional height, a pinned link, a control's width)
+  #3 bmc customers across the f   2.46 % (-1.19)  Δh 0  carousel — Δh 0 but pixels — shift dx 0 dy 2; luminance ratio 0.987(same paint: a rendition or anti-aliasing); the pair rows below name the child (a fractional height, a pinned link, a control's width)
+  #4 how we can help              1.79 % (-9.39)  Δh 0  cards — Δh 0 but pixels — shift dx 0 dy 2; luminance ratio 1.010(same paint: a rendition or anti-aliasing); the pair rows below name the child (a fractional height, a pinned link, a control's width)
+      How we can help [60,2415,240,40] [32,2416,296,40] -28 1 56 0 0
+      Explore Control-M ⌗ [32,2487,296,164] [58,2586,155,24] 26 99-141-140 98
+      Explore BMC AMI ⌗ [32,2675,296,196] [58,2806,148,24] 26 131-148-172 130
+  #5 trusted partner              2.44 % (-4.89)  Δh -54  carousel — Δh -54: a height — padding, margin, line-height or a wrapped line in this section
+  #6 the latest from bmc          11.43 % (own 22.11 % — the rest is an offset from above) (-7.09)  Δh 35  cards — Δh +35: a height — padding, margin, line-height or a wrapped line in this section
+      TRUSTED PARTNER [110,2999,141,20] [32,3000,296,20] -78 1 155 0 0
+      Explore customer stories ⌗ [75,3593,211,28] [57,3596,246,20] -18 3 35 -8 2
+      The latest from BMC [32,3733,296,96] [32,3744,296,96] 0 11 0 0 10
+  #7 gartner, magic quadrant fo   10.65 % (own 0 % — the rest is an offset from above) (-1.35)  Δh 0 — Δh 0 but pixels — shift dx 0 dy 8; luminance ratio 1.016(same paint: a rendition or anti-aliasing); the pair rows below name the child (a fractional height, a pinned link, a control's width)
+under 10 % (not digested): 360 6.02 % · 1440 3.12 % · 2560 3.75 %
+stop: under 10 % at the three widths — the prototype is done; deploy and name the residuals in the register (polish after this is outside the clock)
+side by side (live | build, section tops red; tiles sbs-<W>-1.png …): migration/cases/home/gate/sbs-360-1.png migration/cases/home/gate/sbs-1440-1.png migration/cases/home/gate/sbs-2560-1.png
+timing (stitch, live and build concurrent): 360: live cached, build 11.8 s, compare 0.6 s, sections 0.2 s | 1440: live cached, build 10 s, compare 1.4 s, sections 0.5 s | 2560: live cached, build 10.8 s, compare 2.3 s, sections 0.8 s | cap-probe 0 s, sections pass 0 s, pair 10.9 s | total 32.4 s
+evidence: migration/cases/home/gate/
+cards: 8 section card(s) → migration/cases/home/gate/cards/INDEX.md — open the card of a section the digest names (values + crops), not the specs

@@ -1,0 +1,14 @@
+{
+  "name": "stardust-lite",
+  "description": "stardust-lite: high-fidelity single-page migration to AEM Edge Delivery Services, as a Claude Code plugin.",
+  "owner": {
+    "name": "Paolo Mottadelli"
+  },
+  "plugins": [
+    {
+      "name": "stardust-lite",
+      "source": "./",
+      "description": "Migrate one web page to AEM Edge Delivery Services with high fidelity, blocks-first, with a live-reloading prototype view."
+    }
+  ]
+}

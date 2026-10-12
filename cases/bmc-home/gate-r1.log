@@ -1,0 +1,100 @@
+site: /Users/paolo/stardust/bmc-proto/migration/site.json
+origin 360 from /Users/paolo/stardust/bmc-proto/migration/cases/home/measure/live-360.png
+origin 1440 from /Users/paolo/stardust/bmc-proto/migration/cases/home/measure/live-1440.png
+origin 2560 from /Users/paolo/stardust/bmc-proto/migration/cases/home/measure/live-2560.png
+build 360…
+build 1440…
+build 2560…
+stitched migration/cases/home/gate/build-360.png: 360x10564 from 12 chunks in 10.6 s · 13 broken image load(s) retried · 7 image(s) still BROKEN
+stitched migration/cases/home/gate/build-1440.png: 1440x9924 from 12 chunks in 11.4 s · 13 broken image load(s) retried · 7 image(s) still BROKEN
+stitched migration/cases/home/gate/build-2560.png: 2560x10103 from 12 chunks in 12.6 s · 13 broken image load(s) retried · 7 image(s) still BROKEN
+hottest band at 360: y 1800–2700 90.9 % — at (0,0) mean |Δlum| 90.11; best shift build→live dx=0 dy=8 → 89.41  (no shift explains it: rendition / scale / paint over it) · luminance live 45.6 build 119.8 ratio 0.381  (paint over the picture on the live side: a veil / gradient / fade state ≈ 62 % darker)
+sections 360…
+
+sections at 360 (7 authored, 7 paired with 7 live sections; Δ doc 1719; pairing index; live root div.parsys.aem-GridColumn, split automatic; rows are the authored strides read at the same y on both captures)
+ #  anchor                       build y0–y1      live y0–y1         Δh    Δy  pixel %  block                        budget  over
+ 0  gartner® report              80–1006          90–1128           -112   -10    68.24  columns ◂triage              new (no budget)  
+ 1  contact us                   1006–3619        1128–2103         1638  -122    72.17  default content              default (no budget)  
+ 2  bmc customers across the f   3619–4469        2103–2441          512  1516    85.74  carousel ◂triage             new (no budget)  
+ 3  how we can help              4469–5035        2441–3025          -18  2028    68.43  default content              default (no budget)  
+ 4  trusted partner              5035–5522        3025–3823         -311  2010    39.99  carousel ◂triage             new (no budget)  
+ 5  the latest from bmc          5522–7486        3823–5671          116  1699    41.41  cards ◂triage                new (no budget)  
+ 6  gartner, magic quadrant fo   7486–8446        5671–6727          -96  1815    85.97  default content              default (no budget)  
+hottest band at 1440: y 2250–2700 97.3 % — at (0,0) mean |Δlum| 66.71; best shift build→live dx=0 dy=-8 → 65.67  (no shift explains it: rendition / scale / paint over it) · luminance live 33.2 build 97.7 ratio 0.340  (paint over the picture on the live side: a veil / gradient / fade state ≈ 66 % darker)
+sections 1440…
+
+sections at 1440 (7 authored, 7 paired with 7 live sections; Δ doc 4135; pairing index; live root div.parsys.aem-GridColumn, split automatic; rows are the authored strides read at the same y on both captures)
+ #  anchor                       build y0–y1      live y0–y1         Δh    Δy  pixel %  block                        budget  over
+ 0  gartner® report              80–2152          90–1047           1115   -10    74.06  columns ◂triage              new (no budget)  
+ 1  contact us                   2152–4711        1047–1916         1690  1105    87.30  default content              default (no budget)  
+ 2  bmc customers across the f   4711–5759        1916–2390          574  2795    36.16  carousel ◂triage             new (no budget)  
+ 3  how we can help              5759–6277        2390–2914           -6  3369     0.00  default content              default (no budget)  
+ 4  trusted partner              6277–6755        2914–3719         -327  3363        —  carousel ◂triage             new (no budget)  
+ 5  the latest from bmc          6755–8368        3719–4528          804  3036        —  cards ◂triage                new (no budget)  
+ 6  gartner, magic quadrant fo   8368–8872        4528–5124          -92  3840        —  default content              default (no budget)  
+hottest band at 2560: y 2250–2700 98.7 % — at (0,0) mean |Δlum| 80.32; best shift build→live dx=8 dy=8 → 77.22  (no shift explains it: rendition / scale / paint over it) · luminance live 32.0 build 111.5 ratio 0.287  (paint over the picture on the live side: a veil / gradient / fade state ≈ 71 % darker)
+sections 2560…
+
+sections at 2560 (7 authored, 7 paired with 7 live sections; Δ doc 4243; pairing index; live root div.parsys.aem-GridColumn, split automatic; rows are the authored strides read at the same y on both captures)
+ #  anchor                       build y0–y1      live y0–y1         Δh    Δy  pixel %  block                        budget  over
+ 0  gartner® report              80–2330          90–1118           1222   -10    78.41  columns ◂triage              new (no budget)  
+ 1  contact us                   2330–4889        1118–1987         1690  1212    93.55  default content              default (no budget)  
+ 2  bmc customers across the f   4889–5937        1987–2461          574  2902    29.98  carousel ◂triage             new (no budget)  
+ 3  how we can help              5937–6455        2461–2985           -6  3476        —  default content              default (no budget)  
+ 4  trusted partner              6455–6933        2985–3790         -327  3470        —  carousel ◂triage             new (no budget)  
+ 5  the latest from bmc          6933–8547        3790–4599          805  3143        —  cards ◂triage                new (no budget)  
+ 6  gartner, magic quadrant fo   8547–9051        4599–5195          -92  3948        —  default content              default (no budget)  
+cap-probe: skipped (a round; the final gate runs it, --full forces it)
+
+| width | pixel % | Δh | bands |
+|---|---|---|---|
+| 360 | 62.69 | -1719 | 0:69.2 900:41.8 1800:90.9 2700:81.8 3600:86.2 4500:54.6 5400:23.2 6300:46.4 7200:86.9 8100:42.2 |
+| 1440 | 72.11 | -4135 | 0:53.9 450:61.4 900:78.1 1350:87.8 1800:86.7 2250:97.3 2700:90.7 3150:91.8 3600:78.5 4050:76.4 4500:84.9 4950:38.6 5400:1.9 |
+| 2560 | 76.18 | -4243 | 0:54 450:72.9 900:79.9 1350:90.7 1800:80.7 2250:98.7 2700:97 3150:94.2 3600:93.1 4050:89.7 4500:88.6 4950:50.8 5400:1.7 5850:0 |
+
+target 10 %: not yet — over at 360 / 1440 / 2560
+cap-probe: skipped (round) (gate's live split: 7 sections — a cap-probe count that differs between runs is its own split, #162: compare the rows, not the verdict)
+round digest at 360 (first round here): page 62.69 %
+  #0 gartner® report              68.24 %  Δh -112  columns — Δh -112: a height — padding, margin, line-height or a wrapped line in this section
+      English [276,111,52,21] [0,9194,360,20] -2769083 308 -1 0
+      Gartner® Report [32,218,296,20] [32,208,296,20] 0 -10 0 0 0
+      BMC named a Leader in the 20 [32,270,296,320] [32,228,296,320] 0 -42 0 0 -32
+  #1 contact us                   72.17 % (own 45.49 % — the rest is an offset from above)  Δh 1638 — Δh +1638: a height — padding, margin, line-height or a wrapped line in this section
+      BEFORE YOU... [32,1240,288,56] - MISSING
+      OPTIMIZE THE MAINFRAME [32,1296,296,112] - MISSING
+      Contact us [56,1614,83,32] [32,1368,296,144] -24-246 213 112 0
+  #2 bmc customers across the f   85.74 % (own 3.85 % — the rest is an offset from above)  Δh 512  carousel — Δh +512: a height — padding, margin, line-height or a wrapped line in this section
+      BMC customers across the For [32,2167,296,48] [32,3683,296,48] 01516 0 0 0
+      of the entire Forbes Global [32,2247,296,96] [32,3731,296,49] 01484 0 -47 -32
+      of the world's largest banks [328,2247,296,64] [32,3844,296,49] -2961597 0 -15 81
+  #3 how we can help              68.43 % (own 9.6 % — the rest is an offset from above)  Δh -18 — Δh -18: a height — padding, margin, line-height or a wrapped line in this section
+      How we can help [60,2505,240,40] [32,4597,296,96] -282092 56 56 0
+      Workflow Orchestration [58,2619,226,32] [32,4693,296,32] -262074 70 0 -18
+      Explore Control-M [58,2675,155,24] [32,4725,296,24] -262050 141 0 -42
+  #4 trusted partner              39.99 % (own 6.98 % — the rest is an offset from above)  Δh -311  carousel — Δh -311: a height — padding, margin, line-height or a wrapped line in this section
+  #5 the latest from bmc          41.41 % (own 18.04 % — the rest is an offset from above)  Δh 116  cards — Δh +116: a height — padding, margin, line-height or a wrapped line in this section
+      TRUSTED PARTNER [110,3089,141,20] [32,5099,296,24] -782010 155 4 0
+      The AI and automation engine [24,3125,312,160] [32,5123,296,86] 81998 -16 -74 -12
+      Explore customer stories [75,3685,195,24] [32,5333,296,24] -431648 101 0 -362
+  #6 gartner, magic quadrant fo   85.97 % (own 16.28 % — the rest is an offset from above)  Δh -96 — Δh -96: a height — padding, margin, line-height or a wrapped line in this section
+round digest at 1440 (first round here): page 72.11 %
+  #0 gartner® report              74.06 % (own 59.82 % — the rest is an offset from above)  Δh 1115  columns — Δh +1115: a height — padding, margin, line-height or a wrapped line in this section
+  #1 contact us                   87.3 % (own 45.36 % — the rest is an offset from above)  Δh 1690 — Δh +1690: a height — padding, margin, line-height or a wrapped line in this section
+  #2 bmc customers across the f   36.16 % (own 1.81 % — the rest is an offset from above)  Δh 574  carousel — Δh +574: a height — padding, margin, line-height or a wrapped line in this section
+  #3 how we can help              0 % (own 12.21 % — the rest is an offset from above)  Δh -6 — Δh -6: a height — padding, margin, line-height or a wrapped line in this section
+  #4 trusted partner              — %  Δh -327  carousel — Δh -327: a height — padding, margin, line-height or a wrapped line in this section
+  #5 the latest from bmc          — %  Δh 804  cards — Δh +804: a height — padding, margin, line-height or a wrapped line in this section
+  #6 gartner, magic quadrant fo   — %  Δh -92 — Δh -92: a height — padding, margin, line-height or a wrapped line in this section
+round digest at 2560 (first round here): page 76.18 %
+  #0 gartner® report              78.41 % (own 68.04 % — the rest is an offset from above)  Δh 1222  columns — Δh +1222: a height — padding, margin, line-height or a wrapped line in this section
+  #1 contact us                   93.55 % (own 35.49 % — the rest is an offset from above)  Δh 1690 — Δh +1690: a height — padding, margin, line-height or a wrapped line in this section
+  #2 bmc customers across the f   29.98 % (own 1.01 % — the rest is an offset from above)  Δh 574  carousel — Δh +574: a height — padding, margin, line-height or a wrapped line in this section
+  #3 how we can help              — %  Δh -6 — Δh -6: a height — padding, margin, line-height or a wrapped line in this section
+  #4 trusted partner              — %  Δh -327  carousel — Δh -327: a height — padding, margin, line-height or a wrapped line in this section
+  #5 the latest from bmc          — %  Δh 805  cards — Δh +805: a height — padding, margin, line-height or a wrapped line in this section
+  #6 gartner, magic quadrant fo   — %  Δh -92 — Δh -92: a height — padding, margin, line-height or a wrapped line in this section
+next: one round, changing only what the rows above name
+side by side (live | build, section tops red; tiles sbs-<W>-1.png …): migration/cases/home/gate/sbs-360-1.png migration/cases/home/gate/sbs-1440-1.png migration/cases/home/gate/sbs-2560-1.png
+timing (stitch, live and build concurrent): 360: live cached, build 10.6 s, compare 0.8 s, sections 0.3 s | 1440: live cached, build 11.4 s, compare 1.8 s, sections 1 s | 2560: live cached, build 12.6 s, compare 3 s, sections 1.6 s | cap-probe 0 s, sections pass 0 s, pair 0 s | total 33.9 s
+evidence: migration/cases/home/gate/
+cards: 7 section card(s) → migration/cases/home/gate/cards/INDEX.md — open the card of a section the digest names (values + crops), not the specs

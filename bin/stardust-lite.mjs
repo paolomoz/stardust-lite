@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // stardust-lite — run the method's instruments from any project (the site repo being migrated).
+//   npx stardust-lite new <url> [--dir]    create the site repo for a run (local aem-boilerplate on `proto`, or install into an existing one)
 //   npx stardust-lite init                 scaffold the skill stub, AGENTS.md section and migration/ case dir in the current repo
 //   npx stardust-lite init --foundation    also copy templates/foundation/ (scripts/stardust.js, styles/reset.css, styles.css, fonts.css) — never overwrites
 //   npx stardust-lite <instrument> [args]  run scripts/<instrument>.mjs or tools/replica/<instrument>.mjs (lint → tools/lint)
@@ -19,7 +20,7 @@ const dirs = { scripts: join(ROOT, 'scripts'), replica: join(ROOT, 'tools', 'rep
 const list = () => Object.entries(dirs).flatMap(([k, d]) => readdirSync(d).filter((f) => f.endsWith('.mjs') && !f.endsWith('.test.mjs') && !['common.mjs', 'run-capped.mjs'].includes(f)).map((f) => `${f.replace(/\.mjs$/, '')}  (${k})`));
 
 if (!cmd || cmd === 'help' || cmd === '--help') {
-  console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1, 8).map((l) => l.replace(/^\/\/ ?/, '')).join('\n'));
+  { const lines = readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1); console.log(lines.slice(0, lines.findIndex((l) => !l.startsWith('//'))).map((l) => l.replace(/^\/\/ ?/, '')).join('\n')); }
   console.log('\ninstruments:\n  ' + list().join('\n  '));
   process.exit(0);
 }
@@ -67,6 +68,42 @@ if (cmd === 'init') {
     console.log(`stardust-lite foundation: wrote ${wrote.length ? wrote.join(', ') : 'nothing'}${skipped.length ? `; skipped (exists) ${skipped.join(', ')}` : ''}`);
     if (skipped.includes('styles/styles.css')) console.log(`stardust-lite foundation: styles/styles.css exists — \`init --foundation --force\` overwrites it with the skeleton (the boilerplate's rules are not measurements, METHOD step 4)`);
   }
+  process.exit(0);
+}
+if (cmd === 'new') {
+  // the site repo a run works in, from nothing (node built-ins only: it runs from the plugin dir, before any `npm install`). Local by default —
+  // the aem-boilerplate on a `proto` branch, no remote, a placeholder fstab for `first`; an existing site repo (`--dir` with an fstab, e.g. one
+  // `eds-new-site` made) only gets stardust-lite installed. Then the foundation, one commit, and the commands to run next
+  // (bmc-home: ≈ 2 min of hand-typed setup; continental vision-mission: the same steps on an EDS repo).
+  const opt = (f, d) => { const i = rest.indexOf(f); return i >= 0 && rest[i + 1] && !rest[i + 1].startsWith('--') ? rest[i + 1] : d; };
+  const url = rest.find((a) => /^https?:\/\//.test(a));
+  if (!url) { console.error('usage: stardust-lite new <url> [--dir <path>] [--slug <page-slug>] [--site <sdt-name>] [--ref <git-ref> | --from <local checkout>] [--template <name>]'); process.exit(1); }
+  const u = new URL(url); const host = u.hostname.replace(/^www\d?\./, ''); const base = host.split('.').slice(0, -1).join('-') || host;
+  const site = opt('--site', `sdt-${base}`); const segs = u.pathname.split('/').filter(Boolean).map((x) => x.replace(/\.[a-z]+$/i, ''));
+  const template = opt('--template', segs.length ? segs[segs.length - 1].toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'home');
+  const slug = opt('--slug', `${base}-${template}`); const dir = resolve(opt('--dir', site)); const ref = opt('--ref', 'main');
+  const sh = (c, a, o = {}) => { const r = spawnSync(c, a, { stdio: 'inherit', ...o }); if (r.status) { console.error(`stardust-lite new: ${c} ${a.join(' ')} failed (exit ${r.status})`); process.exit(r.status || 1); } };
+  const existing = existsSync(join(dir, 'fstab.yaml'));
+  if (!existing) {
+    if (existsSync(dir) && readdirSync(dir).length) { console.error(`stardust-lite new: ${dir} exists and is not a site repo (no fstab.yaml) — pass another --dir`); process.exit(1); }
+    sh('git', ['clone', '-q', '--depth', '1', 'https://github.com/adobe/aem-boilerplate.git', dir]);
+    sh('git', ['remote', 'remove', 'origin'], { cwd: dir }); sh('git', ['checkout', '-q', '-b', 'proto'], { cwd: dir });
+    writeFileSync(join(dir, 'fstab.yaml'), `mountpoints:\n  /: https://content.da.live/local/${site}/\n`);   // a placeholder: `first` reads org / site from it; no host answers
+  }
+  // --from <path>: a local stardust-lite checkout (a branch not pushed yet, the plugin's own copy) instead of the GitHub ref
+  const from = opt('--from', null);
+  sh('npm', ['i', '-D', '-q', '--no-audit', '--no-fund', '--legacy-peer-deps', from ? resolve(from) : `github:paolomoz/stardust-lite#${ref}`], { cwd: dir });
+  sh('npx', ['-y', 'playwright', 'install', 'chromium'], { cwd: dir });
+  sh('npx', ['stardust-lite', 'init', '--foundation', '--force'], { cwd: dir });
+  const lock = existsSync(join(dir, 'package-lock.json')) ? readFileSync(join(dir, 'package-lock.json'), 'utf8') : '';
+  const sha = from ? 'local checkout' : (/"resolved": "git\+ssh:\/\/git@github\.com\/paolomoz\/stardust-lite\.git#([0-9a-f]{7,40})"/.exec(lock) || /stardust-lite\.git#([0-9a-f]{7,40})/.exec(lock) || [null, ref])[1];
+  sh('git', ['add', '-A'], { cwd: dir }); spawnSync('git', ['commit', '-q', '-m', `stardust-lite ${String(sha).slice(0, 7)}: foundation${existing ? '' : ' (local prototype repo)'}`], { cwd: dir, stdio: 'inherit' });
+  const local = !existing || /content\.da\.live\/local\//.test(readFileSync(join(dir, 'fstab.yaml'), 'utf8'));
+  writeFileSync(join(dir, 'migration', 'run.json'), JSON.stringify({ url, site, slug, template, dir, local, stardustLite: from ? `file:${resolve(from)}` : sha, createdAt: new Date().toISOString() }, null, 1));
+  console.log(`\nstardust-lite new: ${existing ? 'stardust-lite installed in' : 'local prototype repo'} ${dir} (stardust-lite ${String(sha).slice(0, 7)}, slug ${slug}, template ${template})
+next, from ${dir}:
+  npx stardust-lite live proto --site-repo . --open ${slug}        # the live view (background; it picks a free port)
+  npx stardust-lite first ${url} --slug ${slug} --template ${template}${local ? ' --no-da' : ''}`);
   process.exit(0);
 }
 const name = cmd === 'lint' ? 'davids-model-lint' : cmd;

@@ -1,0 +1,80 @@
+site: /Users/paolo/stardust/sdt-continental-lite/migration/site.json
+origin 360 from /Users/paolo/stardust/sdt-continental-lite/migration/cases/vision-mission/measure/live-360.png
+origin 1440 from /Users/paolo/stardust/sdt-continental-lite/migration/cases/vision-mission/measure/live-1440.png
+origin 2560 from /Users/paolo/stardust/sdt-continental-lite/migration/cases/vision-mission/measure/live-2560.png
+build 360…
+captured (one shot) migration/cases/vision-mission/gate-served/build-360.png: 360x6721 from 1 chunks in 13.5 s · 0.2 s waiting for scripted motion to settle
+build 1440…
+captured (one shot) migration/cases/vision-mission/gate-served/build-1440.png: 1440x4278 from 1 chunks in 12.2 s · 0.2 s waiting for scripted motion to settle
+build 2560…
+captured (one shot) migration/cases/vision-mission/gate-served/build-2560.png: 2560x4404 from 1 chunks in 12.3 s · 0.2 s waiting for scripted motion to settle
+chrome masked: header 0px footer 435px at 360
+hottest band at 360: y 0–900 19.9 % — at (0,0) mean |Δlum| 24.18; best shift build→live dx=0 dy=0 → 24.18  (no shift explains it: rendition / scale / paint over it) · luminance live 209.9 build 202.4 ratio 1.037  (same paint: a rendition or anti-aliasing)
+sections 360…
+
+sections at 360 (8 authored, 7 paired with 7 live sections, 2 live unpaired, 2 empty authored skipped; Δ doc 11; pairing anchor — the live split and the authored sections differ in count: the document, not the CSS; live root main, split automatic; rows are the authored strides read at the same y on both captures)
+ #  anchor                       build y0–y1      live y0–y1         Δh    Δy  pixel %  block                        budget  over
+ 0  (no text)                    56–260           — (unpaired)         —     —    82.28  default content              default (no budget)  
+ 2  vision & mission             260–993          260–994             -1     0     0.91  default content              default (no budget)  
+ 3  our vision/mission define    993–1950         994–1951             0    -1     4.79  columns (columns-2-cols)      14.35  
+ 4  our technologies.            1950–2766        1951–2767            0    -1     3.73  columns ◂triage               14.35  
+ 5  we are focusing on what is   2766–3107        2767–3108            0    -1     5.43  default content              default (no budget)  
+ 6  our code of conduct          3107–3945        3108–3945            1    -1     0.50  columns (media columns-2-col  14.35  
+ 7  our values                   3945–5971        3945–6029          -58     0     2.51  cards ◂triage                   3.2  Δh
+ 8  follow us on                 5971–6286        6029–6239          105   -58     6.21  accordion ◂triage            new (no budget)  
+    live "Open Country Selector" y 0–56 located in no authored section
+    live "(no text)" y 56–260 located in no authored section
+chrome masked: header 49px footer 419px at 1440
+hottest band at 1440: y 3150–3600 16.7 % — at (0,0) mean |Δlum| 21.23; best shift build→live dx=0 dy=8 → 5.27  (a displacement, not a rendition) · luminance live 204.0 build 205.0 ratio 0.995  (same paint: a rendition or anti-aliasing)
+sections 1440…
+
+sections at 1440 (9 authored, 9 paired with 9 live sections, 1 empty authored skipped; Δ doc 26; pairing index; live root main, split automatic; rows are the authored strides read at the same y on both captures)
+    anchor check: live 2 "Vision & Mission" starts a text in authored 1, paired to 2 by index
+ #  anchor                       build y0–y1      live y0–y1         Δh    Δy  pixel %  block                        budget  over
+ 0  (no text)                    133–378          133–379             -1     0     1.14  embed ◂triage                new (no budget)  
+ 1  company                      378–451          379–451              1    -1     1.32  default content              default (no budget)  
+ 2  vision & mission             451–1378         451–1378             0     0     0.00  default content              default (no budget)  
+ 3  our vision/mission define    1378–1850        1378–1850            0     0     1.80  columns (columns-2-cols)      10.23  
+ 4  our technologies.            1850–2246        1850–2246            0     0     0.72  columns ◂triage               10.23  
+ 5  we are focusing on what is   2246–2426        2246–2426            0     0     1.00  default content              default (no budget)  
+ 6  our code of conduct          2426–2907        2426–2898            9     0     2.95  columns (media columns-2-col  10.23  Δh
+ 7  our values                   2907–3643        2898–3689          -55     9    11.52  cards ◂triage                  6.68  pct+Δh
+ 8  follow us on                 3643–3813        3689–3796           63   -46     1.69  accordion ◂triage            new (no budget)  
+chrome masked: header 49px footer 419px at 2560
+hottest band at 2560: y 3150–3600 14.7 % — at (0,0) mean |Δlum| 20.14; best shift build→live dx=0 dy=8 → 14.42 · luminance live 216.7 build 217.0 ratio 0.999  (same paint: a rendition or anti-aliasing)
+sections 2560…
+
+sections at 2560 (9 authored, 9 paired with 9 live sections, 1 empty authored skipped; Δ doc 74; pairing index; live root main, split automatic; rows are the authored strides read at the same y on both captures)
+    anchor check: live 2 "Vision & Mission" starts a text in authored 1, paired to 2 by index
+ #  anchor                       build y0–y1      live y0–y1         Δh    Δy  pixel %  block                        budget  over
+ 0  (no text)                    133–460          133–460              0     0     0.00  embed ◂triage                new (no budget)  
+ 1  company                      460–532          460–533             -1     0     0.01  default content              default (no budget)  
+ 2  vision & mission             532–1528         533–1528             1    -1     0.75  default content              default (no budget)  
+ 3  our vision/mission define    1528–1972        1528–1972            0     0     0.83  columns (columns-2-cols)          7  
+ 4  our technologies.            1972–2340        1972–2340            0     0     0.50  columns ◂triage                   7  
+ 5  we are focusing on what is   2340–2520        2340–2520            0     0     0.60  default content              default (no budget)  
+ 6  our code of conduct          2520–3038        2520–3022           16     0     2.59  columns (media columns-2-col      7  Δh
+ 7  our values                   3038–3770        3022–3809          -55    16     9.53  cards ◂triage                  5.85  pct+Δh
+ 8  follow us on                 3770–3940        3809–3875          104   -39     1.00  accordion ◂triage            new (no budget)  
+cap-probe…
+
+| width | pixel % (header / footer bands MASKED — --no-chrome for the full page) | Δh | bands |
+|---|---|---|---|
+| 360 | 5.56 | -11 | 0:19.9 900:4.9 1800:3.6 2700:2.3 3600:0.6 4500:2.9 5400:4.6 6300:0 |
+| 1440 | 3.22 | -26 | 0:1.5 450:0 900:0 1350:1.9 1800:0.6 2250:1.7 2700:3.9 3150:16.7 3600:0.6 4050:0 |
+| 2560 | 2.61 | -74 | 0:0.4 450:0.8 900:0.9 1350:0.8 1800:0.4 2250:0.6 2700:3 3150:14.7 3600:0.8 4050:0 |
+
+target 10 %: REACHED at the three widths
+cap-probe: PASS at 2560 — 0 of 10 rows failed (gate's live split: 9 sections — a cap-probe count that differs between runs is its own split, #162: compare the rows, not the verdict)
+rows at 360: #1 Δh 0 new; #3 Δh 0 default; #4 Δh 0 default; #5 Δh 0 reused; #6 Δh 0 default; #7 Δh 0 default; #8 Δh -1 reused (chrome: #0 Δh 0, #9 Δh -120 — not judged)
+rows at 1440: #1 Δh 0 new; #2 Δh 0 default; #3 Δh 0 default; #4 Δh 0 default; #5 Δh 0 reused; #6 Δh 0 default; #7 Δh +9 default; #8 Δh +1 reused (chrome: #0 Δh 84, #9 Δh 45 — not judged)
+rows at 2560: #1 Δh 0 new; #2 Δh 0 default; #3 Δh 0 default; #4 Δh 0 default; #5 Δh 0 reused; #6 Δh 0 default; #7 Δh +17 default; #8 Δh +1 reused (chrome: #0 Δh 84, #9 Δh 45 — not judged)
+tables: 2 row(s) off, 1 new section — 1440 #7 "Our Code of Conduct" Δh +9 (default); 2560 #7 "Our Code of Conduct" Δh +17 (default); new: #1 "DIV c-heroteaser c-heroteaser--small c-heroteaser--small" (embed) — a new section takes the full gate at the three widths
+budget: FAIL (5 over, 2 new, 3 default content; budgets of migration/blocks.json)
+  ✗ 360 #7 "our values" cards: Δh -58 px > 2
+  ✗ 1440 #6 "our code of conduct" columns (media columns-2-cols): Δh 9 px > 2
+  ✗ 1440 #7 "our values" cards: 11.52 % > budget 6.68, Δh -55 px > 2
+  ✗ 2560 #6 "our code of conduct" columns (media columns-2-cols): Δh 16 px > 2
+  ✗ 2560 #7 "our values" cards: 9.53 % > budget 5.85, Δh -55 px > 2
+timing (stitch, live and build concurrent): 360: live cached, build 13.5 s, compare 0.6 s, sections 0.2 s | 1440: live cached, build 12.2 s, compare 1 s, sections 0.3 s | 2560: live cached, build 12.3 s, compare 1.7 s, sections 0.5 s | cap-probe 27.6 s, sections pass 8.7 s, pair 0 s | total 81.2 s
+evidence: migration/cases/vision-mission/gate-served/

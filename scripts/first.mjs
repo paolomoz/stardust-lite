@@ -6,6 +6,8 @@
 // author / lint warnings and the round digest. The field runs spent ≈ 30 model turns running these steps one at a time before the first
 // number (continental-home: 11.2 min to the first prototype, ≈ 2.5 of them tools); after this call the agent's work is the CSS rounds.
 // Usage: node first.mjs <url> --slug <slug> [--template <name>] [--port 8990] [--no-da] [--sections <css>] [--main <css>] [--skip <step,…>]
+//   --no-da: nothing goes to DA; when the branch host serves no nav either (a local prototype from `stardust-lite new`), the chrome is the
+//   authored nav / footer folded into proto/ by local-fragments.
 //   From the site repo root (fstab.yaml names the DA org / site; the git branch is the preview branch). Writes migration/cases/<template>/
 //   (measure/, media/, doc/, triage.json/.md, gate/) and first.json { steps: [{ step, seconds, exit, note }], harnessUrl, target }.
 //   --skip probe,measure,triage,media,author,css re-runs from where the case dir already has the outputs; after editing triage.md (`drop` in the block
@@ -107,7 +109,13 @@ if (!skip.has('css')) {
   if (!existsSync(join('styles', 'elements.css'))) writeFileSync(join('styles', 'elements.css'), '/* style-pass writes the element pass here */\n');
 }
 // 7 the prototype and the first round at the three widths
-const h = step('harness', S('harness'), [doc, '--serve', 'proto', '--name', slug, '--port', String(port), '--fragments', host, '--content', content, '--site-repo', '.', '--no-lint', ...(existsSync(media) ? ['--local-media', media] : []), ...(noDa ? [] : ['--sync-chrome'])], { show: 0, note: (r) => [(/(\d+) blocks? loaded/.exec(r.stdout) || [])[0], (/doc height (\d+)/.exec(r.stdout) || [])[0], (/(\d+) text.*not in the capture/.exec(`${r.stdout}${r.stderr}`) || [])[0]].filter(Boolean).join(' · ') });
+// the chrome: the pipeline's fragments from the branch host; a --no-da run whose host serves no nav (a local prototype, a repo not on EDS yet)
+// folds the authored nav / footer into the serve dir instead — the harness exited 4 on the fragments (bmc-home)
+const navPath = (/<div><div>nav<\/div><div>([^<]+)<\/div><\/div>/.exec(existsSync(doc) ? readFileSync(doc, 'utf8') : '') || [null, '/nav'])[1];
+const localChrome = noDa && !(await fetch(`${host}${navPath}.plain.html`).then((r) => r.ok).catch(() => false));
+if (localChrome) step('local-fragments', S('local-fragments'), [docDir, 'proto', '--media', media], { show: 0, note: () => `no ${host}${navPath}.plain.html — the chrome from ${docDir}/nav.html, footer.html` });
+const fragArgs = localChrome ? [] : ['--fragments', host];
+const h = step('harness', S('harness'), [doc, '--serve', 'proto', '--name', slug, '--port', String(port), ...fragArgs, '--content', content, '--site-repo', '.', '--no-lint', ...(existsSync(media) ? ['--local-media', media] : []), ...(noDa ? [] : ['--sync-chrome'])], { show: 0, note: (r) => [(/(\d+) blocks? loaded/.exec(r.stdout) || [])[0], (/doc height (\d+)/.exec(r.stdout) || [])[0], (/(\d+) text.*not in the capture/.exec(`${r.stdout}${r.stderr}`) || [])[0]].filter(Boolean).join(' · ') });
 if (h.status) finish(1, 'first: the harness failed — read its output above');
 // the element pass is opt-in: on bms's replay it moved the first round 33.9 / 30.1 / 17.3 → 35.5 / 30.7 / 17.6 (the first round's error is layout,
 // not type) — kept as an instrument, not a default step
@@ -116,6 +124,6 @@ const g = step('gate --round', S('gate'), ['--live', url, '--build', `http://loc
 if (daMedia) { const d = await daMedia; steps.push({ step: 'da-put media (background; the prototype uses local media)', seconds: d.seconds, exit: d.code, ok: !d.code, note: (() => { const bad = String(d.out).split('\n').filter((l) => /upload \S+\s+preview \S+/.test(l) && !/upload 20\d\s+preview (20\d|-)\b/.test(l)); return bad.length ? `${bad.length} FAILED (the served page will miss them): ${bad.map((l) => l.split(' → ')[0].split('/').pop() + ' ' + (/upload \S+\s+preview \S+/.exec(l) || [''])[0]).join(' · ').slice(0, 300)}` : ((/(\d+) upload/.exec(d.out) || [''])[0] || tail(d.out, 1).slice(0, 80)); })() }); daMedia = null; }
 // the split as authored, one line a row (the agents spent minutes reading structure dumps to see what `first` decided)
 let splitView = ''; try { const tj = JSON.parse(readFileSync(triage, 'utf8')); splitView = `\nsplit (triage.md to change it — \`drop\`, a block name):\n${tj.sections.map((r) => `  ${String(r.index).padStart(2)} ${(r.chrome || (r.drop ? `drop:${r.drop}` : r.match.kind === 'default' ? 'default' : `${r.match.block || '?'}${r.match.variant ? ` (${r.match.variant})` : ''}`)).padEnd(18)} y${r.box?.[1] ?? '?'} h${r.box?.[3] ?? '?'}  "${String(r.anchorText || '').slice(0, 50)}"`).join('\n')}`; } catch { /* no triage */ }
-const out = String(g.stdout); const from = out.indexOf('\n| width'); const reHarness = `npx stardust-lite harness ${doc} --serve proto --name ${slug} --port ${port} --fragments ${host} --content ${content} --site-repo . --no-lint${existsSync(media) ? ` --local-media ${media}` : ''}${noDa ? '' : ' --sync-chrome'}`;
+const out = String(g.stdout); const from = out.indexOf('\n| width'); const reHarness = `${localChrome ? `npx stardust-lite local-fragments ${docDir} proto --media ${media} && ` : ''}npx stardust-lite harness ${doc} --serve proto --name ${slug} --port ${port}${localChrome ? '' : ` --fragments ${host}`} --content ${content} --site-repo . --no-lint${existsSync(media) ? ` --local-media ${media}` : ''}${noDa ? '' : ' --sync-chrome'}`;
 const reRound = `npx stardust-lite gate --live ${url} --build http://localhost:${port}/${slug}.harness.html --out ${join(dir, 'gate')} --origin ${measure} --round --widths 360,1440,2560 --triage ${triage}`;
 finish(0, `${splitView}\n${from >= 0 ? out.slice(from).trim() : tail(out, 40)}\n\nprototype: http://localhost:${port}/${slug}.harness.html · document ${doc} · CSS blocks/*/*.css (yours) and styles/styles.css (yours; sections-draft.css is imported first)\nreading cards (one per section: the measured values inside its range + live | build crops, refreshed every round): ${join(dir, 'gate', 'cards', 'INDEX.md')}\nre-run the prototype after a document edit (local media, the nav / footer re-uploaded):\n  ${reHarness}\nround:\n  ${reRound}`);

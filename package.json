@@ -38,7 +38,9 @@
     "cases/*/registers/**",
     "cases/*/authored/**",
     "cases/*/scripts/**",
-    "CHECKLIST.md"
+    "CHECKLIST.md",
+    ".claude-plugin",
+    "skills"
   ],
   "repository": {
     "type": "git",
