@@ -151,6 +151,11 @@ export async function hideModals(page) {
     for (const e of document.querySelectorAll('body *')) {
       const cs = getComputedStyle(e); if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0) continue;
       const r = e.getBoundingClientRect(); const area = Math.max(0, Math.min(r.right, vw) - Math.max(r.left, 0)) * Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+      // a CHAT launcher (a small fixed box pinned to a bottom corner, or a known chat host): stitched, it sat in every viewport tile of the
+      // live capture and held okta's 360 / 1440 at 12 % (the chat column masked: 3.2 %) — hidden on both sides like a modal
+      const chatHost = /(q-messenger|qualified|intercom|drift|zendesk|zEmbed|hubspot-messages|livechat|chat-widget|chatbot|launcher|ollie|olark|tawk|crisp|freshchat|ada-button|webchat)/i.test(`${e.id} ${e.className && e.className.baseVal === undefined ? e.className : ''} ${e.tagName}`);
+      const corner = r.bottom >= vh - 140 && r.bottom <= vh + 2 && (r.right >= vw - 140 || r.left <= 140) && r.width <= Math.min(480, vw * 0.9) && r.height <= Math.min(640, vh * 0.8) && Number(cs.zIndex || 0) >= 10;
+      if ((chatHost || corner) && area < vw * vh * 0.3) { e.setAttribute('data-stardust-hidden', 'chat'); e.style.setProperty('display', 'none', 'important'); out.push(`chat ${e.tagName.toLowerCase()}${e.id ? `#${e.id}` : ''}`); continue; }
       if (area < vw * vh * 0.3) continue; if (r.top <= 2 && r.height < 220) continue; // a header bar
       const z = Number(cs.zIndex); if (cs.zIndex === 'auto' || !(z >= 10)) continue; // a modal sits ABOVE the page; a fixed background (a parallax image — deloitte's cmp-cta__bg-img) sits behind it
       if (e.closest('header') || e.querySelector('main, [role=main]') || e.matches('main, [role=main]') || e.hasAttribute('data-sd-unrolled')) continue; // the page itself
