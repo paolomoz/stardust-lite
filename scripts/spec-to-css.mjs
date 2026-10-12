@@ -158,7 +158,7 @@ rows.forEach((row, i) => {
   const bgiFile = live.bgi && mediaMap ? (/url\((['"]?)([^'")]+)\1\)/.exec(live.bgi) || [])[2] : null; const bgiAuthored = !!(bgiFile && mediaMap(bgiFile) && secHtml.includes(mediaMap(bgiFile)));
   const secDecl = [...(padTop !== null ? [`padding: ${px(Math.max(0, padTop))} 0 ${px(Math.max(0, padBottom))}`] : []), ...(bg ? [`background: ${rgb(bg)}`] : []), ...(live.bgi && !bgiAuthored ? [`background-image: ${live.bgi.slice(0, 120)}${live.bgs ? `; background-size: ${live.bgs.split(' ')[0]}; background-position: ${live.bgs.split(' ').slice(1, 3).join(' ')}` : ''}`] : [])];
   const insetNote = inset ? ` /* inset top ${inset.first}: ${inset.top.join(' → ')}; bottom ${inset.last}: ${inset.bottom.join(' → ')} */` : '';
-  if (bgiAuthored) (classes ? sectionsDraft : lines).push(`${sectionSel} { position: relative; isolation: isolate; } ${sectionSel} picture:has(img[src*="${mediaMap(bgiFile)}"]) { position: absolute; inset: 0; z-index: -1; } ${sectionSel} img[src*="${mediaMap(bgiFile)}"] { width: 100%; height: 100%; object-fit: ${String(live.bgs || 'cover').split(' ')[0] === 'contain' ? 'contain' : 'cover'}; }  /* the section's background picture, authored once */`);
+  if (bgiAuthored) (classes ? sectionsDraft : lines).push(`/* ${sectionSel}: the background picture is the authored picture — no url() drafted (it painted twice); place it behind the text by its position in the section (a file-name selector misses the served media_<hash> names) */`);
   if (secDecl.length) (classes ? sectionsDraft : lines).push(`${sectionSel} { ${secDecl.join('; ')}; }${insetNote}${classes && !style ? '  /* this section only: name a section style to share it across pages */' : ''}`);
   if (classes) {
     if (contentW && pageCap && Math.abs(contentW - pageCap) > 8) lines.push(`${sel} { max-width: ${px(contentW)}; margin: 0 auto; }  /* content x ${r[0]}..${r[1]} (the page cap is ${pageCap}) */`);
@@ -196,7 +196,9 @@ rows.forEach((row, i) => {
       lines.push(`${sel} { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: ${align}; min-height: ${px(big.box[3])}; }  /* ${over.length} text(s) over the ${big.box[2]}×${big.box[3]} picture: left ${left}, top ${top}, bottom ${bottom} */`);
       // only THE picture behind the text: the rule on every picture made the block's icons and slide images full-bleed backgrounds (cisco cards /
       // carousel / hero, bankofamerica — ≈ 2 min each rewriting the drafts); the file names it when the manifest knows the source
-      const bigFile = big.k === 'img' && mediaMap && big.src ? mediaMap(big.src) : null; const bp = bigFile ? `${sel} picture:has(img[src*="${bigFile}"])` : `${sel} picture`; const bi = bigFile ? `${sel} img[src*="${bigFile}"]` : `${sel} picture img`;
+      // (naming the picture by its file was tried and reverted: the served page renames media to media_<hash>, so the rule held on the
+      // prototype and missed on the delivery — accenture; a delivery-stable key for one picture is open)
+      const bp = `${sel} picture`; const bi = `${sel} picture img`;
       lines.push(`${bp}, ${sel} video { position: absolute; inset: 0; z-index: -1; } ${bi}, ${sel} video { width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; }`);
       lines.push(`${sel} > div { padding: ${align === 'flex-start' ? px(Math.max(0, top)) : 0} ${px(Math.max(0, big.box[0] + big.box[2] - Math.max(...over.map((it) => it.box[0] + it.box[2]))))} ${align === 'flex-end' ? px(Math.max(0, bottom)) : 0} ${px(Math.max(0, left))}; }`);
       const mbig = m ? m.items.filter((it) => ['img', 'video'].includes(it.k) && onPage(it, mobile)).sort((a, b) => b.box[2] * b.box[3] - a.box[2] * a.box[3])[0] : null;
