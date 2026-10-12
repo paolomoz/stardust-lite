@@ -65,8 +65,8 @@ was captured in); every measurement waits for `document.fonts.ready`.
 ```
 
 (on Claude Code before 2.1.275: `/plugin marketplace add paolomoz/stardust-lite`, then `/plugin install stardust-lite@stardust-lite`).
-Then, in a session opened **in the site's EDS repo** (an aem-boilerplate clone with an `fstab.yaml` — the plugin never creates
-one; the `eds-new-site` skill does), say **"migrate https://www.example.com/ with stardust-lite"**. The plugin's skill
+Then, in a session opened **in the site's EDS repo** (an aem-boilerplate clone with an `fstab.yaml`; the plugin never creates
+one), say **"migrate https://www.example.com/ with stardust-lite"**. The plugin's skill
 (`skills/stardust-lite/SKILL.md`) installs stardust-lite into that repo (`stardust-lite setup`: the instruments, Chromium, the foundation),
 opens the live-reloading prototype view in the browser (`stardust-lite live`), runs `first`, then the CSS rounds until every width is under
 10 %, and writes the case documents. Nothing is published unless the request says deploy: then the page goes to DA drafts (preview only)

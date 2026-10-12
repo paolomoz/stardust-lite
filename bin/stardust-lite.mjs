@@ -81,7 +81,7 @@ if (cmd === 'setup') {
   if (!url) { console.error('usage: stardust-lite setup <url> [--dir <site-repo>] [--slug <page-slug>] [--template <name>] [--ref <git-ref> | --from <local checkout>]'); process.exit(1); }
   const dir = resolve(opt('--dir', '.'));
   const missing = ['fstab.yaml', 'scripts/aem.js', 'head.html'].filter((f) => !existsSync(join(dir, f)));
-  if (missing.length) { console.error(`stardust-lite setup: ${dir} is not an EDS site repo (no ${missing.join(', ')}). stardust-lite runs inside one — create it (the eds-new-site skill, or a clone of adobe/aem-boilerplate with an fstab.yaml) and open the session there.`); process.exit(2); }
+  if (missing.length) { console.error(`stardust-lite setup: ${dir} is not an EDS site repo (no ${missing.join(', ')}). stardust-lite runs inside one — create one first and run it there.`); process.exit(2); }
   const u = new URL(url); const base = u.hostname.replace(/^www\d?\./, '').split('.').slice(0, -1).join('-') || u.hostname;
   const segs = u.pathname.split('/').filter(Boolean).map((x) => x.replace(/\.[a-z]+$/i, ''));
   const template = opt('--template', segs.length ? segs[segs.length - 1].toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'home');

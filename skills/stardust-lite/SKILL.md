@@ -15,8 +15,7 @@ as `npx stardust-lite <name>` once step 1 has installed them (`npx stardust-lite
 stardust-lite works **inside an EDS site repo** — the session's working directory (or the repo the user names): the aem-boilerplate shape,
 `fstab.yaml` mounting `content.da.live/<org>/<site>/`, `scripts/aem.js`, `head.html`. The blocks, styles and the case evidence are written
 there; the branch host `https://<branch>--<site>--<org>.aem.page` is where a deploy is gated. This skill never creates that repo. If the
-working directory is not one, stop and tell the user: open the session in the site's EDS repo (or create it first — the `eds-new-site`
-skill, or a clone of `adobe/aem-boilerplate` with an `fstab.yaml`).
+working directory is not one, stop and tell the user: open the session in the site's EDS repo, or create one first.
 
 Read from the request and the repo:
 - **URL** — the page. **Slug** `<domain label>-<last path segment | home>`, **template** the last path segment or `home`. Say what you picked.
