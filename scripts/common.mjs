@@ -10,11 +10,16 @@ export const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/5
 /** The browser every instrument opens. Chrome tier (`--chrome`, or STARDUST_CHROME=1 in the env, or the profile's `overlays.chrome`): the
  * installed Google Chrome, headless — an origin that resets headless Chromium's HTTP/2 (`net::ERR_HTTP2_PROTOCOL_ERROR`) accepts it
  * (cibc-careers, loop r2; BACKLOG #1). `--headed`: real Chrome with a window (the bot-managed tier). The tier is exported to the env so the
- * children an instrument spawns (gate → cap-probe, motion-observe; harness → serve) inherit it, the vendored tools through lib/chrome-tier.mjs. */
+ * children an instrument spawns (gate → cap-probe, motion-observe; harness → serve) inherit it, the vendored tools through lib/chrome-tier.mjs;
+ * the headed tier the same way (STARDUST_HEADED, or the profile's `overlays.headed`). */
 export async function launch(opts = {}) {
   const { chromium } = await import('playwright');
-  const headed = process.argv.includes('--headed'); const chrome = headed || process.argv.includes('--chrome') || process.env.STARDUST_CHROME === '1' || !!siteDefaults()?.overlays?.chrome;
+  // headed: the flag, STARDUST_HEADED=1 (set by `first --headed` and by any instrument that ran headed) or the profile's `overlays.headed`
+  // (probe-load writes it) — weblogic: `first` ran its children headless and measured the bot challenge, 2560 only got through by hand
+  const headed = process.argv.includes('--headed') || process.env.STARDUST_HEADED === '1' || !!siteDefaults()?.overlays?.headed;
+  const chrome = headed || process.argv.includes('--chrome') || process.env.STARDUST_CHROME === '1' || !!siteDefaults()?.overlays?.chrome;
   if (chrome) process.env.STARDUST_CHROME = '1';
+  if (headed) process.env.STARDUST_HEADED = '1';
   const cookie = overlayOpts().cookie; // sets STARDUST_COOKIE
   if ((chrome || cookie) && !(process.env.NODE_OPTIONS || '').includes('chrome-tier')) process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS || ''} --import ${new URL('./lib/chrome-tier.mjs', import.meta.url).pathname}`.trim(); // the vendored tools: channel and cookies
   return chromium.launch({ ...(chrome ? { channel: 'chrome' } : {}), ...(headed ? { headless: false, args: ['--disable-blink-features=AutomationControlled'] } : {}), ...opts });
@@ -53,7 +58,7 @@ export const overlayOpts = () => {
   const pick = (name, key) => { const v = arg(name, null); return v === null ? (o[key] ?? null) : v; };
   const cookie = pick('--cookie', 'cookie') ?? process.env.STARDUST_COOKIE ?? null; if (cookie) process.env.STARDUST_COOKIE = String(cookie); // the children (gate → cap-probe …) read the env; the preload adds them to the vendored tools' contexts
   const hide = list(pick('--hide', 'hide')); if (hide.length) process.env.STARDUST_HIDE = hide.join(','); else if (process.env.STARDUST_HIDE) hide.push(...process.env.STARDUST_HIDE.split(',')); // the children inherit it
-  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')), cookie: cookie ? String(cookie) : null, hide, chrome: !!o.chrome };
+  return { consent: pick('--consent', 'consent'), dismiss: list(pick('--dismiss', 'dismiss')), locale: pick('--locale', 'locale'), require: list(pick('--require', 'require')), cookie: cookie ? String(cookie) : null, hide, chrome: !!o.chrome, headed: !!o.headed };
 };
 /** `--cookie 'name=value; name2=value2'` (or the profile's `overlays.cookie`, or STARDUST_COOKIE) as Playwright cookies for the page's host —
  * an attestation gate (HarbourVest: `HV.attestation`, `HV.country`, `HV.language`) forwarded every cookieless session to a persona page and

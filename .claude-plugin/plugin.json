@@ -1,6 +1,6 @@
 {
   "name": "stardust-lite",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Migrate one web page to AEM Edge Delivery Services with high fidelity: site repo, live-reloading prototype view, measurement at three widths, David's Model triage, blocks, a pixel gate until every width is under 10 %.",
   "author": { "name": "Paolo Mottadelli" },
   "repository": "https://github.com/paolomoz/stardust-lite",

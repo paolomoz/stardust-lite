@@ -1,12 +1,14 @@
 // lib/chrome-tier.mjs — preload for the vendored tools (cap-probe, motion-observe, stitch-shot) when the chrome tier or cookies are on:
-// every Playwright `chromium.launch()` takes the installed Google Chrome when STARDUST_CHROME=1 (channel 'chrome', still headless), and every
+// every Playwright `chromium.launch()` takes the installed Google Chrome when STARDUST_CHROME=1 (channel 'chrome', headless; a window when
+// STARDUST_HEADED=1), and every
 // context the browser opens gets STARDUST_COOKIE's cookies for the first URL it navigates to. common.mjs's launch() adds it to NODE_OPTIONS
 // (`--import <this file>`) so gate's and harness's children inherit both (cibc-careers wrote the tier, harbourvest-about the cookies, as case scripts).
 import { chromium } from 'playwright';
 const launch = chromium.launch.bind(chromium);
 const parse = (cookie, url) => { let host; try { host = new URL(url).hostname; } catch { return []; } return String(cookie).split(/;\s*/).map((kv) => kv.trim()).filter(Boolean).map((kv) => { const i = kv.indexOf('='); return { name: kv.slice(0, i).trim(), value: kv.slice(i + 1).trim(), domain: host.replace(/^www\./, '.'), path: '/' }; }).filter((c) => c.name); };
 chromium.launch = async (opts = {}) => {
-  const b = await launch({ ...(process.env.STARDUST_CHROME === '1' ? { channel: 'chrome' } : {}), ...opts });
+  const headed = process.env.STARDUST_HEADED === '1'; // the headed tier (a window): a bot challenge the headless installed Chrome does not pass
+  const b = await launch({ ...(process.env.STARDUST_CHROME === '1' ? { channel: 'chrome' } : {}), ...opts, ...(headed ? { headless: false, args: [...(opts.args || []), '--disable-blink-features=AutomationControlled'] } : {}) });
   const hide = process.env.STARDUST_HIDE; // the vendored tools' live pages get the --hide rule too (gate → cap-probe, motion-observe)
   const hideOn = (p) => { if (!hide) return; p.on('load', () => p.addStyleTag({ content: hide.split(',').map((s) => `${s} { display: none !important; visibility: hidden !important; }`).join('\n') }).catch(() => {})); };
   const cookie = process.env.STARDUST_COOKIE; if (!cookie && !hide) return b;

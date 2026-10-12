@@ -12,7 +12,7 @@ import { firstLook } from './lib/probe-collectors.mjs'; // the in-page reading (
 
 const url = process.argv[2]; const widths = String(process.argv[3] && !process.argv[3].startsWith('--') ? process.argv[3] : 1440).split(',').map(Number);
 if (!url) { console.error('usage: probe-load.mjs <url> [W[,W…]] [--headed] [--locale <tag>] [--shot out.png]'); process.exit(1); }
-const headed = process.argv.includes('--headed'); const { locale, consent, dismiss } = overlayOpts(); // the profile's overlays, when one is in use (nothing is clicked here)
+const headed = process.argv.includes('--headed') || process.env.STARDUST_HEADED === '1' || !!overlayOpts().headed; const { locale, consent, dismiss } = overlayOpts(); // the profile's overlays, when one is in use (nothing is clicked here)
 const tier = { chrome: process.env.STARDUST_CHROME === '1' || process.argv.includes('--chrome') || !!overlayOpts().chrome, cookie: overlayOpts().cookie || null, locale: locale || null, consent: consent || null, dismiss: [...dismiss], hide: [], notes: [] }; // the tier line (loop high-impact pass): the flags every later instrument needs, printed once and written to --profile
 const THIRD_PARTY = /userway|intercom|drift|livechat|medallia|qualtrics|nebula|zendesk|hubspot|olark|tidio|crisp|accessibe|audioeye|trustarc|cookiebot/i;
 const b = await launch();
@@ -27,6 +27,7 @@ if (p.url().split('#')[0] !== url.split('#')[0]) { console.log(`URL CHANGED ${ur
 // a bot challenge answers 200: one full-viewport iframe, no main, or a vendor's marker (acs-about: Imperva's page at 360, and the tier line said
 // "no flag needed") — the width is a challenge, the tier is --chrome
 const challenge = await p.evaluate(() => { const t = `${document.title} ${document.body?.innerText?.slice(0, 400) || ''}`; const ifr = [...document.querySelectorAll('iframe')].find((f) => { const r = f.getBoundingClientRect(); return r.width >= innerWidth * 0.9 && r.height >= innerHeight * 0.8; }); const marker = /_Incapsula_Resource|incap_ses|cf-chl|challenge-platform|px-captcha|captcha-delivery|datadome|perimeterx/i.test(document.documentElement.innerHTML.slice(0, 20000)); const words = /pardon our interruption|just a moment|access denied|verify you are (a )?human|checking your browser|request unsuccessful/i.test(t); return (ifr && !document.querySelector('main') && (document.body?.innerText || '').trim().length < 200) || marker || words ? `${ifr ? 'a full-viewport iframe' : ''}${marker ? ' a vendor marker' : ''}${words ? ` "${t.trim().slice(0, 60)}"` : ''}`.trim() : null; }).catch(() => null);
+if (challenge && tier.chrome && !headed) tier.notes.push(`a bot challenge at ${W} through the installed Chrome: --headed (a window) is the last tier — first --headed / probe-load --headed --profile records it`);
 if (challenge) { console.log(`CHALLENGE at ${W}: ${challenge} — this load is a bot challenge, not the page`); if (!tier.chrome) { tier.chrome = true; tier.notes.push(`a bot challenge at ${W} (${challenge}): --chrome (the installed Chrome) on every instrument`); } }
 const info = await p.evaluate(firstLook);
 // a popup / modal layer over the page (a locale chooser, a newsletter): hidden on every instrument — toryburch measured two of them as sections
@@ -59,12 +60,12 @@ await p.close();
 }
 await b.close();
 // the tier line: what every later instrument takes, in copy-paste form; --profile <file> writes it as the site profile every instrument reads by default
-const flags = [...(tier.chrome ? ['--chrome'] : []), ...(tier.cookie ? [`--cookie '${tier.cookie}'`] : []), ...(tier.locale ? [`--locale ${tier.locale}`] : []), ...(tier.consent ? [`--consent '${tier.consent}'`] : []), ...(tier.dismiss.length ? [`--dismiss '${tier.dismiss.join(',')}'`] : []), ...(tier.hide.length ? [`--hide '${tier.hide.join(',')}'`] : [])];
+const flags = [...(headed ? ['--headed'] : tier.chrome ? ['--chrome'] : []), ...(tier.cookie ? [`--cookie '${tier.cookie}'`] : []), ...(tier.locale ? [`--locale ${tier.locale}`] : []), ...(tier.consent ? [`--consent '${tier.consent}'`] : []), ...(tier.dismiss.length ? [`--dismiss '${tier.dismiss.join(',')}'`] : []), ...(tier.hide.length ? [`--hide '${tier.hide.join(',')}'`] : [])];
 console.log(`\ntier: ${flags.length ? flags.join(' ') : 'no flag needed (headless Chromium, no overlay seen, no third-party fixed layer)'}${tier.notes.length ? `\n  ${tier.notes.join('\n  ')}` : ''}`);
 if (typeof arg('--profile', null) === 'string') {
   const { existsSync, readFileSync, writeFileSync, mkdirSync } = await import('node:fs'); const { dirname } = await import('node:path'); const file = arg('--profile');
   let prof = {}; try { if (existsSync(file)) prof = JSON.parse(readFileSync(file, 'utf8')); } catch { prof = {}; }
   prof._schema = prof._schema || 'stardust-lite/site@1'; prof._writtenAt = new Date().toISOString(); prof.origin = prof.origin || { url }; if (widths.length >= 3 && !prof.widths) prof.widths = widths; // a one-width first look must not become measure-page's default widths
-  prof.overlays = { ...(prof.overlays || {}), ...(tier.consent ? { consent: tier.consent } : {}), dismiss: tier.dismiss.length ? tier.dismiss : (prof.overlays?.dismiss || []), ...(tier.locale ? { locale: tier.locale } : {}), ...(tier.chrome ? { chrome: true } : {}), ...(tier.cookie ? { cookie: tier.cookie } : {}), hide: tier.hide.length ? tier.hide : (prof.overlays?.hide || []), _note: 'written by probe-load --profile at t0 (the tier line); site-profile init completes the rest after the template run' };
+  prof.overlays = { ...(prof.overlays || {}), ...(tier.consent ? { consent: tier.consent } : {}), dismiss: tier.dismiss.length ? tier.dismiss : (prof.overlays?.dismiss || []), ...(tier.locale ? { locale: tier.locale } : {}), ...(tier.chrome || headed ? { chrome: true } : {}), ...(headed ? { headed: true } : {}), ...(tier.cookie ? { cookie: tier.cookie } : {}), hide: tier.hide.length ? tier.hide : (prof.overlays?.hide || []), _note: 'written by probe-load --profile at t0 (the tier line); site-profile init completes the rest after the template run' };
   mkdirSync(dirname(file), { recursive: true }); writeFileSync(file, JSON.stringify(prof, null, 1)); console.log(`profile: ${file} — overlays ${JSON.stringify(prof.overlays).slice(0, 160)}; every instrument reads it (no flag typed again)`);
 }

@@ -12,7 +12,11 @@
 //   (measure/, media/, doc/, triage.json/.md, gate/) and first.json { steps: [{ step, seconds, exit, note }], harnessUrl, target }.
 //   --skip probe,measure,triage,media,author,css re-runs from where the case dir already has the outputs; after editing triage.md (`drop` in the block
 //   column removes a row) `--skip probe,measure,media` applies the edit (triage --from-md) and re-authors.
-// Exit: 0 the round ran (its own target line says whether it is under) · 1 a step failed before the round.
+//   --headed: every instrument opens a real Chrome window (the bot-managed tier) — exported as STARDUST_HEADED to each child; probe-load
+//   records it in the profile (`overlays.headed`) so later calls need no flag.
+//   --accept-guess: go on when measure-page had to guess the section split (otherwise `first` stops after the measurement, exit 4).
+// Exit: 0 the round ran (its own target line says whether it is under) · 1 a step failed before the round · 3 a block / challenge page (at
+// any width) · 4 the section split was guessed: confirm it (--skip probe,measure) or name it (--sections …), nothing was authored.
 import { spawnSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -21,7 +25,7 @@ import net from 'node:net';
 import { arg, daToken } from './common.mjs';
 
 const url = process.argv[2]; const slug = arg('--slug', null);
-if (!url || url.startsWith('--') || typeof slug !== 'string') { console.error('usage: first.mjs <url> --slug <slug> [--template <name>] [--port 8990] [--no-da] [--sections <css>] [--main <css>] [--header <css>] [--footer <css>] [--skip <step,…>]'); process.exit(1); }
+if (!url || url.startsWith('--') || typeof slug !== 'string') { console.error('usage: first.mjs <url> --slug <slug> [--template <name>] [--port 8990] [--no-da] [--headed] [--accept-guess] [--sections <css>] [--main <css>] [--header <css>] [--footer <css>] [--skip <step,…>]'); process.exit(1); }
 const here = dirname(fileURLToPath(import.meta.url)); const S = (n) => join(here, `${n}.mjs`);
 const template = String(arg('--template', 'home')); const noDa = process.argv.includes('--no-da');
 // a free port: a busy 8990 (another serve left running) cost marriott a whole `first` re-run — the harness refuses a port another dir owns
@@ -29,6 +33,9 @@ const free = (p) => new Promise((res) => { const srv = net.createServer(); srv.o
 let port = Number(arg('--port', 8990)); const ownServe = () => { const pid = spawnSync('lsof', ['-nP', '-t', `-iTCP:${port}`, '-sTCP:LISTEN'], { encoding: 'utf8' }).stdout.trim().split('\n')[0]; if (!pid) return false; const cwd = (spawnSync('lsof', ['-a', '-p', pid, '-d', 'cwd', '-Fn'], { encoding: 'utf8' }).stdout.split('\n').find((l) => l.startsWith('n')) || '').slice(1); if (!cwd) return false; const here = realpathSync(process.cwd()); let there = cwd; try { there = realpathSync(cwd); } catch { /* gone */ } return there === here || there.startsWith(`${here}/`); }; // the serve runs from proto/ inside the repo (equitable: each `first` took a new port) // our own serve from an earlier `first`
 if (!(await free(port)) && !ownServe()) { for (let p = port + 1; p < port + 40; p += 1) if (await free(p)) { console.log(`first: port ${port} is busy — using ${p}`); port = p; break; } }
 const skip = new Set(String(arg('--skip', '') || '').split(',').filter(Boolean));
+// the headed tier reaches every child (each instrument's launch() reads STARDUST_HEADED) — weblogic: a SiteGround challenge passed only in a
+// window, and `first` had no way to open one for its children
+if (process.argv.includes('--headed')) { process.env.STARDUST_HEADED = '1'; process.env.STARDUST_CHROME = '1'; }
 const fstab = existsSync('fstab.yaml') ? readFileSync('fstab.yaml', 'utf8') : ''; const m = /content\.da\.live\/([^/\s]+)\/([^/\s]+)/.exec(fstab);
 if (!m) { console.error('first: run from the site repo root (fstab.yaml with a content.da.live mount)'); process.exit(1); }
 const [, org, site] = m; const branch = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { encoding: 'utf8' }).stdout.trim();
@@ -66,7 +73,21 @@ if (!skip.has('measure')) {
   { let title = ''; let txt = ''; try { const d = JSON.parse(readFileSync(content, 'utf8')); title = String(d.__title || ''); txt = JSON.stringify(d).slice(0, 20000); } catch { /* unreadable */ }
     const geo = /not accessible from your (current )?location|not available in your (country|region)/i.test(txt);
     const blocked = /^(access denied|attention required|just a moment|request blocked|403 forbidden|forbidden|pardon our interruption|are you a robot)/i.test(title.trim()) || geo || /(verify you are (a )?human|enable javascript and cookies to continue|checking your browser)/i.test(txt);
-    if (blocked) finish(3, `first: the measured page is a BLOCK page, not the site ("${title.slice(0, 60)}")${geo ? ' — a LOCATION block: no browser tier passes it; it needs network egress from an allowed region' : ' — a bot challenge the installed Chrome did not pass'}. Nothing was authored or uploaded; pick another page.`); }
+    const headedHint = process.env.STARDUST_HEADED === '1' ? ' — not even in a window (--headed)' : ' — a bot challenge the installed Chrome did not pass: re-run with --headed (a window; probe-load records it in the profile)';
+    if (blocked) finish(3, `first: the measured page is a BLOCK page, not the site ("${title.slice(0, 60)}")${geo ? ' — a LOCATION block: no browser tier passes it; it needs network egress from an allowed region' : headedHint}. Nothing was authored or uploaded.`);
+    // one width blocked while the others measured (an intermittent challenge: weblogic's 2560 answered 403, sections 0, and the run kept it)
+    let status = {}; try { status = JSON.parse(readFileSync(join(measure, 'summary.json'), 'utf8')).status || {}; } catch { /* no summary */ }
+    const bad = Object.entries(status).filter(([, s]) => typeof s === 'number' && s >= 400);
+    if (bad.length) finish(3, `first: ${bad.map(([w, s]) => `${w} answered ${s}`).join(', ')} — that load was a block / challenge, not the page (an intermittent challenge passes on another try)${process.env.STARDUST_HEADED === '1' ? '' : '; if it repeats, --headed (a window)'}. Re-run first; nothing was authored.`); }
+  // a GUESSED split: measure-page found no section selector and guessed one — a wrong guess ran triage, author, drafts and round 1 on the
+  // wrong sections and cost a whole re-run (flowout: `body > *`, 36 sections, nav and hero in one band; equitable, sherwin-williams: 2–3
+  // `first` runs each). Stop here, print the guess and the page's top levels; confirming it costs no re-measurement.
+  const guess = /measured with the guess '([^']+)' \((\d+) sections, heights ([^)]*)\)/.exec(String(r.stdout)); const none = /matches nothing — the spec has header\/footer only/.test(String(r.stdout));
+  if ((guess || none) && typeof arg('--sections', null) !== 'string' && !process.argv.includes('--accept-guess')) {
+    let tops = ''; try { tops = readFileSync(join(measure, 'structure-1440.txt'), 'utf8').split('\n').filter((l) => /^ {0,4}\S/.test(l) && !/^ {0,4}(script|style|link|noscript|svg)\b/.test(l.trim())).slice(0, 24).map((l) => `   ${l.slice(0, 150)}`).join('\n'); } catch { /* none */ }
+    const base = `npx stardust-lite first ${url} --slug ${slug} --template ${template}${noDa ? ' --no-da' : ''}${process.env.STARDUST_HEADED === '1' ? ' --headed' : ''}`;
+    finish(4, `first: the section split was ${guess ? `GUESSED: '${guess[1]}' (${guess[2]} sections, heights ${guess[3]})` : 'not found (no section selector matched, no guess)'} — nothing was authored. The page's top levels at 1440 (${join(measure, 'structure-1440.txt')}):\n${tops}\n${guess ? `the guess is right:  ${base} --skip probe,measure   (no re-measurement)\n` : ''}name the split:      ${base} --skip probe --sections '<css>' [--header <css>] [--footer <css>] [--main <css>]`);
+  }
 }
 // 3 triage: the draft, accepted (edit triage.md and re-run with --skip probe,measure after `triage --from-md` to change it)
 // an EDITED triage.md (newer than triage.json) is applied, not drafted over — `first --skip probe,measure` re-ran triage over the agent's edit (deloitte)

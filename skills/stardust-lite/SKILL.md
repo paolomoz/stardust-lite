@@ -42,7 +42,8 @@ URL it printed. It is for eyes only — never gate its port; the gated page is t
 
 Record `date -u +%FT%TZ` in `TIMING.log` (t0). Then `npx stardust-lite first <url> --slug <slug> --template <template>` (`--no-da` in
 `prototype` mode; when the branch host serves no nav — a repo not synced yet — the chrome is folded locally by `local-fragments`). It measures, triages, authors, drafts the CSS,
-builds the prototype and runs round 1, and prints the exact harness / round commands to re-use. From there follow CHECKLIST steps 4–9:
+builds the prototype and runs round 1, and prints the exact harness / round commands to re-use. It stops, nothing authored, on a block page
+(exit 3; a challenge through the installed Chrome → `--headed`) and on a guessed split (exit 4: run one of the two commands it prints). From there follow CHECKLIST steps 4–9:
 fix the model in the document (the draft is a draft — remodel it, lint it), write the block CSS from the brief and the spec rows, one round
 at a time, until `target 10 %: REACHED` at 360 / 1440 / 2560 → `stop:`. Stamp the stop in `TIMING.log`.
 
